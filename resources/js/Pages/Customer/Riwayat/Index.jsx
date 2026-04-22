@@ -12,11 +12,38 @@ const TABS = [
     { key: 'selesai',  label: 'Selesai'  },
 ];
 
+function groupByDate(orders, fmtDate) {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const yday  = new Date(today); yday.setDate(yday.getDate() - 1);
+    const groups = new Map();
+    orders.forEach(o => {
+        const d = new Date(o.created_at); d.setHours(0, 0, 0, 0);
+        const t = d.getTime();
+        const key = t === today.getTime() ? 'HARI INI'
+            : t === yday.getTime()  ? 'KEMARIN'
+            : fmtDate(o.created_at).toUpperCase();
+        if (!groups.has(key)) groups.set(key, []);
+        groups.get(key).push(o);
+    });
+    return groups;
+}
+
 const METHOD_LABEL = { cash: 'Tunai', qris: 'QRIS' };
+const F = '"Plus Jakarta Sans", system-ui, sans-serif';
 
 export default function CustomerRiwayat({ orders = [] }) {
     const [activeTab,    setActiveTab]    = useState('all');
-    const [receiptOrder, setReceiptOrder] = useState(null);  // struk modal
+    const [receiptOrder, setReceiptOrder] = useState(null);
+
+    useEffect(() => {
+        if (!document.getElementById('pjs-font')) {
+            const link = document.createElement('link');
+            link.id   = 'pjs-font';
+            link.rel  = 'stylesheet';
+            link.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
+            document.head.appendChild(link);
+        }
+    }, []);
 
     /* Nama pelanggan dari sessionStorage sebagai fallback */
     const sessionName = (() => {
@@ -64,48 +91,53 @@ export default function CustomerRiwayat({ orders = [] }) {
         return o.status === activeTab;
     });
 
+    const grouped = groupByDate(filteredOrders, formatDate);
+
     return (
         <CustomerLayout activeTab="riwayat">
             <div style={{
                 display: 'flex', flexDirection: 'column',
                 minHeight: 'calc(100vh - 92px)',
-                gap: 20, padding: '0 24px 24px',
+                background: '#F5F5F0',
             }}>
 
-                {/* Header */}
-                <div style={{
-                    height: 56, display: 'flex',
-                    alignItems: 'center', justifyContent: 'center',
-                }}>
-                    <span style={{
-                        fontSize: 20, fontWeight: 700, color: '#2D2016',
-                        fontFamily: '"DM Sans", system-ui, sans-serif',
+                {/* Stats bar */}
+                <div style={{ padding: '16px 16px 0' }}>
+                    <div style={{
+                        background: '#EFEFEA', borderRadius: 14,
+                        padding: '12px 16px',
+                        display: 'inline-block', minWidth: 120,
                     }}>
-                        Riwayat Pesanan
-                    </span>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: '#A8998A', letterSpacing: 0.6, marginBottom: 4 }}>
+                            TOTAL ORDER
+                        </div>
+                        <div style={{ fontSize: 22, fontWeight: 800, color: '#1A1814', fontFamily: F, letterSpacing: -0.5 }}>
+                            {orders.length}
+                        </div>
+                    </div>
                 </div>
 
-                {/* Segment control */}
+                {/* Tab bar */}
                 <div style={{
-                    background: '#F5F0EB', borderRadius: 18,
-                    border: '1px solid #EDE8E2',
-                    padding: 4, display: 'flex', height: 46,
+                    display: 'flex', alignItems: 'center', gap: 4,
+                    padding: '14px 16px 10px',
+                    overflowX: 'auto',
                 }}>
                     {TABS.map(tab => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
                             style={{
-                                flex: 1, height: '100%',
-                                borderRadius: 14, border: 'none', cursor: 'pointer',
-                                fontSize: 14,
-                                fontFamily: 'Outfit, system-ui, sans-serif',
-                                background:  activeTab === tab.key ? '#FFFFFF' : 'transparent',
-                                color:       activeTab === tab.key ? '#2D2016' : '#B5A898',
-                                fontWeight:  activeTab === tab.key ? 700 : 500,
-                                boxShadow:   activeTab === tab.key
-                                    ? '0 2px 6px rgba(45,32,22,0.10)' : 'none',
-                                transition: 'background 0.15s, box-shadow 0.15s',
+                                flexShrink: 0,
+                                borderRadius: 999, border: 'none', cursor: 'pointer',
+                                padding: '7px 18px',
+                                fontSize: 13,
+                                fontFamily: F,
+                                background: activeTab === tab.key ? '#E8763A' : 'transparent',
+                                color:      activeTab === tab.key ? '#FFFFFF' : '#A8998A',
+                                fontWeight: activeTab === tab.key ? 700 : 500,
+                                boxShadow:  activeTab === tab.key ? '0 3px 10px rgba(232,118,58,0.30)' : 'none',
+                                transition: 'background 0.15s, color 0.15s, box-shadow 0.15s',
                             }}
                         >
                             {tab.label}
@@ -114,34 +146,50 @@ export default function CustomerRiwayat({ orders = [] }) {
                 </div>
 
                 {/* Order list */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14, flex: 1 }}>
+                <div style={{ padding: '0 16px 28px', display: 'flex', flexDirection: 'column', gap: 0, flex: 1 }}>
                     {filteredOrders.length === 0 ? (
                         <div style={{
                             display: 'flex', flexDirection: 'column',
                             alignItems: 'center', justifyContent: 'center',
-                            padding: '48px 0', gap: 12,
+                            padding: '56px 0', gap: 14,
                         }}>
                             <div style={{
-                                width: 64, height: 64, borderRadius: '50%',
-                                background: '#F5F0EB',
+                                width: 72, height: 72, borderRadius: 20,
+                                background: '#EFEFEA',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                             }}>
-                                <ClipboardList size={28} color="#C4B5A5" />
+                                <ClipboardList size={30} color="#C4B5A5" />
                             </div>
-                            <span style={{
-                                fontSize: 14, color: '#B5A898',
-                                fontFamily: 'Outfit, system-ui, sans-serif',
-                            }}>
-                                Belum ada pesanan
-                            </span>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+                                <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1814', fontFamily: F }}>
+                                    Belum ada pesanan
+                                </span>
+                                <span style={{ fontSize: 12.5, color: '#A8998A', fontFamily: F }}>
+                                    Pesanan kamu akan muncul di sini
+                                </span>
+                            </div>
                         </div>
                     ) : (
-                        filteredOrders.map(order => (
-                            <RiwayatCard
-                                key={order.id}
-                                order={order}
-                                onDetail={handleDetail}
-                            />
+                        Array.from(grouped.entries()).map(([dateLabel, groupOrders]) => (
+                            <div key={dateLabel}>
+                                <div style={{
+                                    fontSize: 11, fontWeight: 700, color: '#A8998A',
+                                    letterSpacing: 0.8,
+                                    fontFamily: F,
+                                    padding: '14px 0 8px',
+                                }}>
+                                    {dateLabel}
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                    {groupOrders.map(order => (
+                                        <RiwayatCard
+                                            key={order.id}
+                                            order={order}
+                                            onDetail={handleDetail}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
                         ))
                     )}
                 </div>
@@ -154,7 +202,8 @@ export default function CustomerRiwayat({ orders = [] }) {
                     onClick={() => setReceiptOrder(null)}
                     style={{
                         position: 'fixed', inset: 0,
-                        background: 'rgba(0,0,0,0.55)',
+                        background: 'rgba(26,24,20,0.60)',
+                        backdropFilter: 'blur(4px)',
                         zIndex: 300,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         padding: '24px 20px',
@@ -168,36 +217,40 @@ export default function CustomerRiwayat({ orders = [] }) {
                             width: '100%', maxWidth: 340,
                             maxHeight: 'calc(100vh - 48px)',
                             display: 'flex', flexDirection: 'column',
-                            boxShadow: '0 16px 48px rgba(45,32,22,0.22)',
+                            boxShadow: '0 20px 60px rgba(26,24,20,0.28)',
                             overflow: 'hidden',
-                            fontFamily: 'Outfit, system-ui, sans-serif',
+                            fontFamily: F,
                         }}
                     >
+                        {/* Color bar top */}
+                        <div style={{ height: 3, background: 'linear-gradient(90deg, #E8763A, #FB923C)', flexShrink: 0 }} />
+
                         {/* Close button */}
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '14px 16px 0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 16px 0' }}>
                             <button
                                 onClick={() => setReceiptOrder(null)}
                                 style={{
                                     width: 32, height: 32, borderRadius: '50%',
-                                    background: '#F5F0EB', border: 'none', cursor: 'pointer',
+                                    background: '#F7F4F0', border: '1px solid #EDE8E2',
+                                    cursor: 'pointer',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}
                             >
-                                <X size={16} color="#8C7B6B" />
+                                <X size={15} color="#8C7B6B" />
                             </button>
                         </div>
 
                         {/* Scrollable content */}
-                        <div style={{ overflowY: 'auto', flex: 1, padding: '0 24px 8px' }}>
+                        <div style={{ overflowY: 'auto', flex: 1, padding: '4px 24px 8px' }}>
 
                             {/* Logo + cafe name */}
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, paddingBottom: 20 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, paddingBottom: 18 }}>
                                 <div style={{
-                                    width: 56, height: 56, borderRadius: 14,
-                                    background: 'radial-gradient(ellipse 140% 140% at 50% 30%, #2A4F5F 0%, #1B3A4B 100%)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                    width: 54, height: 54, borderRadius: 14,
                                     overflow: 'hidden',
-                                    boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
+                                    boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
+                                    background: '#1B3A4B',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}>
                                     <img
                                         src="/images/logo.jpg"
@@ -210,8 +263,9 @@ export default function CustomerRiwayat({ orders = [] }) {
                                     />
                                 </div>
                                 <span style={{
-                                    fontSize: 18, fontWeight: 700, color: '#2D2016',
-                                    fontFamily: '"DM Sans", system-ui',
+                                    fontSize: 17, fontWeight: 800, color: '#1A1814',
+                                    fontFamily: F,
+                                    letterSpacing: -0.3,
                                 }}>
                                     W9 Cafe
                                 </span>
@@ -221,7 +275,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                             <div style={{ height: 1, background: '#EDE8E2', marginBottom: 16 }} />
 
                             {/* Info rows */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 16 }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 16 }}>
                                 {[
                                     { label: 'No. Pesanan', value: receiptOrder.order_code },
                                     { label: 'Tanggal',     value: `${formatDate(receiptOrder.created_at)}, ${formatTime(receiptOrder.created_at)}` },
@@ -229,10 +283,10 @@ export default function CustomerRiwayat({ orders = [] }) {
                                     { label: 'Pembayaran',  value: METHOD_LABEL[receiptOrder.payment_method] ?? '—' },
                                 ].map(row => (
                                     <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
-                                        <span style={{ fontSize: 13, color: '#B5A898', flexShrink: 0 }}>
+                                        <span style={{ fontSize: 12.5, color: '#A8998A', flexShrink: 0 }}>
                                             {row.label}
                                         </span>
-                                        <span style={{ fontSize: 13, fontWeight: 600, color: '#2D2016', textAlign: 'right' }}>
+                                        <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1814', textAlign: 'right' }}>
                                             {row.value}
                                         </span>
                                     </div>
@@ -244,18 +298,18 @@ export default function CustomerRiwayat({ orders = [] }) {
 
                             {/* Items table header */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: '#B5A898', flex: 1 }}>Item</span>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: '#B5A898', width: 32, textAlign: 'center' }}>Qty</span>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: '#B5A898', width: 80, textAlign: 'right' }}>Harga</span>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: '#A8998A', flex: 1, letterSpacing: 0.4 }}>ITEM</span>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: '#A8998A', width: 32, textAlign: 'center', letterSpacing: 0.4 }}>QTY</span>
+                                <span style={{ fontSize: 11, fontWeight: 700, color: '#A8998A', width: 80, textAlign: 'right', letterSpacing: 0.4 }}>HARGA</span>
                             </div>
 
                             {/* Items */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
                                 {(receiptOrder.items ?? []).map((item, i) => (
                                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 13, color: '#2D2016', flex: 1 }}>{item.name}</span>
-                                        <span style={{ fontSize: 13, color: '#8C7B6B', width: 32, textAlign: 'center' }}>{item.quantity}x</span>
-                                        <span style={{ fontSize: 13, color: '#2D2016', width: 80, textAlign: 'right' }}>{formatRupiah(item.subtotal)}</span>
+                                        <span style={{ fontSize: 13, color: '#1A1814', flex: 1 }}>{item.name}</span>
+                                        <span style={{ fontSize: 13, color: '#A8998A', width: 32, textAlign: 'center' }}>{item.quantity}×</span>
+                                        <span style={{ fontSize: 13, color: '#1A1814', width: 80, textAlign: 'right' }}>{formatRupiah(item.subtotal)}</span>
                                     </div>
                                 ))}
                             </div>
@@ -265,37 +319,44 @@ export default function CustomerRiwayat({ orders = [] }) {
 
                             {/* Subtotal */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                <span style={{ fontSize: 13, color: '#8C7B6B' }}>Subtotal</span>
-                                <span style={{ fontSize: 13, color: '#2D2016' }}>{formatRupiah(receiptOrder.total_amount)}</span>
+                                <span style={{ fontSize: 13, color: '#A8998A' }}>Subtotal</span>
+                                <span style={{ fontSize: 13, color: '#6B5E52' }}>{formatRupiah(receiptOrder.total_amount)}</span>
                             </div>
 
                             {/* Total */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-                                <span style={{ fontSize: 16, fontWeight: 700, color: '#2D2016', fontFamily: '"DM Sans", system-ui' }}>Total</span>
-                                <span style={{ fontSize: 16, fontWeight: 700, color: '#E8763A', fontFamily: '"DM Sans", system-ui' }}>
+                            <div style={{
+                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                marginBottom: 20, padding: '10px 12px',
+                                background: '#FFF5EF', borderRadius: 10,
+                                border: '1px solid #FCDFC9',
+                            }}>
+                                <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1814', fontFamily: F }}>Total</span>
+                                <span style={{ fontSize: 16, fontWeight: 800, color: '#E8763A', fontFamily: F, letterSpacing: -0.3 }}>
                                     {formatRupiah(receiptOrder.total_amount)}
                                 </span>
                             </div>
 
                             {/* Thank you */}
-                            <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                                <span style={{ fontSize: 14, fontWeight: 600, color: '#2D2016', fontFamily: '"DM Sans", system-ui' }}>
-                                    Terima kasih!
+                            <div style={{ textAlign: 'center', marginBottom: 18 }}>
+                                <span style={{ fontSize: 13, fontWeight: 600, color: '#A8998A', fontFamily: F }}>
+                                    Terima kasih sudah memesan!
                                 </span>
                             </div>
                         </div>
 
                         {/* Footer: Tutup button */}
-                        <div style={{ padding: '12px 24px 20px', flexShrink: 0 }}>
+                        <div style={{ padding: '10px 20px 22px', flexShrink: 0, borderTop: '1px solid #F0EBE4' }}>
                             <button
                                 onClick={() => setReceiptOrder(null)}
                                 style={{
                                     width: '100%', height: 50,
-                                    background: '#E8763A', color: '#FFFFFF',
-                                    border: 'none', borderRadius: 16,
+                                    background: 'linear-gradient(135deg, #E8763A, #F08050)',
+                                    color: '#FFFFFF',
+                                    border: 'none', borderRadius: 14,
                                     fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                                    fontFamily: '"DM Sans", system-ui',
-                                    boxShadow: '0 4px 14px rgba(232,118,58,0.30)',
+                                    fontFamily: F,
+                                    boxShadow: '0 6px 18px rgba(232,118,58,0.35)',
+                                    letterSpacing: -0.2,
                                 }}
                             >
                                 Tutup

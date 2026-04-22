@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\CafeTable;
+use App\Services\OrderBroadcastService;
 use App\Services\OrderPromotionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -85,6 +86,13 @@ class CustomerOrderController extends Controller
 
             $orderPromotionService->persistOrderPromotions($order, $appliedPromotions);
 
+            // Broadcast ke kasir — badge langsung update tanpa polling
+            try {
+                OrderBroadcastService::broadcastPendingCount();
+            } catch (\Throwable $e) {
+                // Reverb/Pusher tidak berjalan — abaikan, pesanan tetap tersimpan
+            }
+
             return response()->json([
                 'order_code'   => $order->order_code,
                 'total_amount' => $order->total_amount,
@@ -101,6 +109,15 @@ class CustomerOrderController extends Controller
         $orders = $phone
             ? Order::with('items.menu')
                 ->where('customer_phone', $phone)
+                ->where(function ($q) {
+                    // Cash: tampil segera setelah pilih metode
+                    $q->where('payment_method', 'cash')
+                    // QRIS: hanya tampil setelah bukti diunggah
+                      ->orWhere(function ($q2) {
+                          $q2->where('payment_method', 'qris')
+                             ->whereNotNull('payment_proof');
+                      });
+                })
                 ->latest()
                 ->get()
                 ->map(fn($o) => [

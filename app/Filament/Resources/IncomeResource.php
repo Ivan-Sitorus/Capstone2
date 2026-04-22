@@ -33,6 +33,8 @@ class IncomeResource extends Resource
 
     protected static ?string $navigationLabel = 'Income';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Schema $schema): Schema

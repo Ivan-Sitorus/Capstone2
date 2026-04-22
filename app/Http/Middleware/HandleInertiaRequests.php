@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -36,20 +37,31 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $user = $request->user(); // resolved once, reused below
+
         return array_merge(parent::share($request), [
             'auth' => [
-                'user' => $request->user() ? [
-                    'id' => $request->user()->id,
-                    'name' => $request->user()->name,
-                    'role' => $request->user()->role,
+                'user' => $user ? [
+                    'id'   => $user->id,
+                    'name' => $user->name,
+                    'role' => $user->role,
                 ] : null,
             ],
             'flash' => [
-                'success' => session('success'),
-                'error'   => session('error'),
+                'success' => fn() => session('success'),
+                'error'   => fn() => session('error'),
             ],
-            'pendingOrderCount' => $request->user() && in_array($request->user()->role, ['cashier', 'admin'])
-                ? Order::where('status', Order::STATUS_PENDING)->count()
+            // Lazy closure — only resolves when Inertia actually needs it
+            'pendingOrderCount' => fn() => $user && in_array($user->role, ['cashier', 'admin'])
+                ? Cache::remember('pending_order_count', 30, fn() => Order::where('status', Order::STATUS_PENDING)
+                    ->where(function ($q) {
+                        $q->where('payment_method', 'cash')
+                          ->orWhere(function ($q2) {
+                              $q2->where('payment_method', 'qris')
+                                 ->whereNotNull('payment_proof');
+                          });
+                    })
+                    ->count())
                 : 0,
         ]);
     }

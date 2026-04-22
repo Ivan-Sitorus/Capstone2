@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Services\InventoryService;
 use App\Services\OrderPromotionService;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -17,12 +18,15 @@ class CashierPesananBaruController extends Controller
 {
     public function index()
     {
-        $categories = Category::with([
-            'menus' => fn($q) => $q->where('is_available', true)->orderBy('name'),
-        ])
-            ->where('is_active', true)
-            ->orderBy('name')
-            ->get();
+        // Cache 5 menit — menu jarang berubah, admin bisa clear cache jika update menu
+        $categories = Cache::remember('menu_categories_active', 300, fn() =>
+            Category::with([
+                'menus' => fn($q) => $q->where('is_available', true)->orderBy('name'),
+            ])
+                ->where('is_active', true)
+                ->orderBy('name')
+                ->get()
+        );
 
         return Inertia::render('Cashier/PesananBaru', compact('categories'));
     }

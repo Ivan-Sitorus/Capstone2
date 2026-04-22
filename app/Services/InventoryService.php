@@ -63,8 +63,15 @@ class InventoryService
         return DB::transaction(function () use ($items) {
             $stockChanges = [];
 
+            // Pre-load all menus in one query to avoid N+1
+            $menuIds = array_unique(array_column($items, 'menu_id'));
+            $menus   = Menu::with('menuIngredients.ingredient')
+                ->whereIn('id', $menuIds)
+                ->get()
+                ->keyBy('id');
+
             foreach ($items as $item) {
-                $menu = Menu::with('menuIngredients.ingredient')->findOrFail($item['menu_id']);
+                $menu     = $menus->get($item['menu_id']) ?? Menu::with('menuIngredients.ingredient')->findOrFail($item['menu_id']);
                 $quantity = (int) ($item['quantity'] ?? 0);
 
                 if ($quantity <= 0 || $menu->menuIngredients->isEmpty()) {

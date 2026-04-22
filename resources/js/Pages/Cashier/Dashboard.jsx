@@ -1,4 +1,5 @@
-import { router, Link } from '@inertiajs/react';
+import { useState, useEffect } from 'react';
+import { router, Link, Head } from '@inertiajs/react';
 import { Calendar, Plus, ClipboardList, Clock } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
 import StatBar from '@/Components/Cashier/StatBar';
@@ -6,10 +7,14 @@ import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
 export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAktif, transaksiTerbaru }) {
-    const now = new Date();
+    const [now, setNow] = useState(new Date());
+    useEffect(() => {
+        const timer = setInterval(() => setNow(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
 
     return (
-        <CashierLayout title="Dashboard" fullscreen>
+        <><Head title="Dashboard | W9 Cafe" /><CashierLayout title="Dashboard" fullscreen>
             <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: '#F8FAFC' }}>
             <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 24, border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
@@ -187,6 +192,6 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
 
             </div>
             </div>
-        </CashierLayout>
+        </CashierLayout></>
     );
 }

@@ -1,6 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
-import axios from 'axios';
 import {
     LayoutDashboard,
     ShoppingCart,
@@ -25,7 +24,6 @@ const navItems = [
 export default function CashierLayout({ children, title = 'Dashboard', fullscreen = false }) {
     const { flash, pendingOrderCount: initialCount } = usePage().props;
     const [pendingCount, setPendingCount] = useState(initialCount ?? 0);
-    const intervalRef = useRef(null);
     const [toast, setToast] = useState(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
         if (typeof window === 'undefined') return false;
@@ -51,13 +49,18 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
     }, [initialCount]);
 
     useEffect(() => {
-        intervalRef.current = setInterval(async () => {
-            try {
-                const { data } = await axios.get('/cashier/pending-count');
-                setPendingCount(data.count);
-            } catch {/* silent */}
-        }, 5000);
-        return () => clearInterval(intervalRef.current);
+        // WebSocket via Laravel Reverb — zero polling, push-based update
+        if (!window.Echo) return;
+
+        const channel = window.Echo.channel('orders');
+
+        channel.listen('.OrderStatusUpdated', (e) => {
+            setPendingCount(e.pendingCount);
+        });
+
+        return () => {
+            window.Echo.leaveChannel('orders');
+        };
     }, []);
 
     useEffect(() => {
@@ -106,6 +109,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                             type="button"
                             onClick={() => setIsSidebarCollapsed(prev => !prev)}
                             title="Expand sidebar"
+                            aria-label="Expand sidebar"
                             style={{
                                 width: 40,
                                 height: 40,
@@ -127,6 +131,8 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                         <img
                             src="/images/logo.jpg"
                             alt="W9 Cafe"
+                            width={40}
+                            height={40}
                             style={{
                                 width: 40,
                                 height: 40,
@@ -145,6 +151,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                             type="button"
                             onClick={() => setIsSidebarCollapsed(prev => !prev)}
                             title="Collapse sidebar"
+                            aria-label="Collapse sidebar"
                             style={{
                                 marginLeft: 'auto',
                                 width: 32,
@@ -174,6 +181,8 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                             <Link
                                 key={href}
                                 href={href}
+                                prefetch
+                                cacheFor="1m"
                                 style={{
                                     display: 'flex',
                                     alignItems: 'center',

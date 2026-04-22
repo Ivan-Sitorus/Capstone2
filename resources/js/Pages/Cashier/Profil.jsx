@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { router } from '@inertiajs/react';
+import { router, Head } from '@inertiajs/react';
 import { User, LogOut } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
 import { formatDate } from '@/helpers';
@@ -25,7 +25,7 @@ export default function Profil({ user }) {
     ];
 
     return (
-        <CashierLayout title="Profil Saya" fullscreen>
+        <><Head title="Profil Saya | W9 Cafe" /><CashierLayout title="Profil Saya" fullscreen>
             <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: '#F8FAFC' }}>
             <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 24, border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
@@ -153,6 +153,6 @@ export default function Profil({ user }) {
             </div>
             </div>
             </div>
-        </CashierLayout>
+        </CashierLayout></>
     );
 }

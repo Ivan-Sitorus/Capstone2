@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { router, Link } from '@inertiajs/react';
+import { router, Link, Head } from '@inertiajs/react';
 import { Search, Calendar, CreditCard, ChevronDown } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
 import StatusBadge from '@/Components/Common/StatusBadge';
@@ -33,6 +33,13 @@ const COLS = [
 ];
 
 export default function RiwayatPesanan({ orders, filters }) {
+    // orders is a Laravel paginator object: { data: [], links: {}, meta: {} }
+    const rows      = orders.data ?? [];
+    const prevUrl   = orders.prev_page_url ?? null;
+    const nextUrl   = orders.next_page_url ?? null;
+    const currPage  = orders.current_page  ?? 1;
+    const lastPage  = orders.last_page     ?? 1;
+
     const [search, setSearch] = useState(filters.search  ?? '');
     const [date,   setDate]   = useState(filters.date    ?? TODAY);
     const [method, setMethod] = useState(filters.method  ?? '');
@@ -55,7 +62,7 @@ export default function RiwayatPesanan({ orders, filters }) {
     function handleMethod(e) { const val = e.target.value; setMethod(val); apply({ method: val }); }
 
     return (
-        <CashierLayout title="Riwayat Pesanan" fullscreen>
+        <><Head title="Riwayat Pesanan | W9 Cafe" /><CashierLayout title="Riwayat Pesanan" fullscreen>
             <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: '#F8FAFC' }}>
             <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 24, border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
@@ -176,7 +183,7 @@ export default function RiwayatPesanan({ orders, filters }) {
                 </div>
 
                 {/* Rows */}
-                {orders.length === 0 ? (
+                {rows.length === 0 ? (
                     <div style={{
                         textAlign: 'center', color: T.textTer,
                         padding: '48px 16px', fontSize: 14,
@@ -185,14 +192,47 @@ export default function RiwayatPesanan({ orders, filters }) {
                         Tidak ada data riwayat pesanan
                     </div>
                 ) : (
-                    orders.map(order => (
+                    rows.map(order => (
                         <OrderRow key={order.id} order={order} />
                     ))
                 )}
             </div>
+
+            {/* Pagination */}
+            {lastPage > 1 && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
+                    <span style={{ fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
+                        Halaman {currPage} dari {lastPage}
+                    </span>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                        {prevUrl && (
+                            <Link
+                                href={prevUrl}
+                                style={{
+                                    padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
+                                    border: `1px solid ${T.border}`, color: T.textPri,
+                                    background: T.surface, textDecoration: 'none',
+                                    fontFamily: 'Outfit, system-ui',
+                                }}
+                            >← Sebelumnya</Link>
+                        )}
+                        {nextUrl && (
+                            <Link
+                                href={nextUrl}
+                                style={{
+                                    padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
+                                    background: T.accent, color: '#fff', border: 'none',
+                                    textDecoration: 'none', fontFamily: 'Outfit, system-ui',
+                                }}
+                            >Berikutnya →</Link>
+                        )}
+                    </div>
+                </div>
+            )}
+
             </div>
             </div>
-        </CashierLayout>
+        </CashierLayout></>
     );
 }
 

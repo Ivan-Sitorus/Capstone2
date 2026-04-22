@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { router, Head } from '@inertiajs/react';
 import axios from 'axios';
 import { X, CircleCheck, QrCode } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
@@ -7,18 +7,38 @@ import OrderCard from '@/Components/Cashier/OrderCard';
 import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
-export default function PesananAktif({ orders, counts }) {
+export default function PesananAktif({ orders: initialOrders, counts }) {
     const [activeTab,    setActiveTab]    = useState('all');
-    const [qrisOrder,    setQrisOrder]    = useState(null);   // order for modal 4c
+    const [qrisOrder,    setQrisOrder]    = useState(null);
     const [rejectNote,   setRejectNote]   = useState('');
     const [processing,   setProcessing]   = useState(false);
+    const [localOrders,  setLocalOrders]  = useState(initialOrders ?? []);
 
-    /* ── Auto-refresh tiap 10 detik ── */
+    // Sync saat Inertia reload membawa data baru
+    useEffect(() => { setLocalOrders(initialOrders ?? []); }, [initialOrders]);
+
+    /* ── Auto-refresh: 20s saat tab aktif, pause saat tersembunyi ── */
     useEffect(() => {
-        const id = setInterval(() => {
+        const reload = () => {
+            if (document.visibilityState === 'hidden') return;
             router.reload({ only: ['orders', 'counts'] });
-        }, 10000);
-        return () => clearInterval(id);
+        };
+
+        // WebSocket (Reverb) — update instan saat ada event broadcast
+        if (window.Echo) {
+            window.Echo.channel('orders').listen('.OrderStatusUpdated', reload);
+        }
+
+        // Polling 5s sebagai fallback jika Reverb tidak aktif
+        const id = setInterval(reload, 5_000);
+        const onVisible = () => { if (document.visibilityState === 'visible') reload(); };
+        document.addEventListener('visibilitychange', onVisible);
+
+        return () => {
+            if (window.Echo) window.Echo.leaveChannel('orders');
+            clearInterval(id);
+            document.removeEventListener('visibilitychange', onVisible);
+        };
     }, []);
 
     /* ── Tabs ── */
@@ -31,10 +51,10 @@ export default function PesananAktif({ orders, counts }) {
 
     const filteredOrders = (() => {
         switch (activeTab) {
-            case 'pending':     return orders.filter(o => o.status === 'pending');
-            case 'diproses':    return orders.filter(o => o.status === 'diproses');
-            case 'belum_bayar': return orders.filter(o => o.is_paid === false);
-            default:            return orders;
+            case 'pending':     return localOrders.filter(o => o.status === 'pending');
+            case 'diproses':    return localOrders.filter(o => o.status === 'diproses');
+            case 'belum_bayar': return localOrders.filter(o => o.is_paid === false);
+            default:            return localOrders;
         }
     })();
 
@@ -44,10 +64,11 @@ export default function PesananAktif({ orders, counts }) {
         setProcessing(true);
         try {
             await axios.patch(`/cashier/order/${qrisOrder.id}/confirm-qris`);
-            setQrisOrder(null);
-            router.reload({ only: ['orders', 'counts'] });
+        } catch (_) {
         } finally {
             setProcessing(false);
+            setQrisOrder(null);
+            router.reload({ only: ['orders', 'counts'] });
         }
     }
 
@@ -67,8 +88,17 @@ export default function PesananAktif({ orders, counts }) {
     async function handleMarkDone(orderId, targetStatus) {
         if (processing) return;
         setProcessing(true);
+
+        // Optimistic: langsung hapus dari list jika selesai
+        if (targetStatus === 'selesai') {
+            setLocalOrders(prev => prev.filter(o => o.id !== orderId));
+        }
+
         try {
             await axios.patch(`/cashier/order/${orderId}/status`, { status: targetStatus });
+            router.reload({ only: ['orders', 'counts'] });
+        } catch (_) {
+            // Rollback jika gagal
             router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);
@@ -87,8 +117,8 @@ export default function PesananAktif({ orders, counts }) {
     }
 
     return (
-        <CashierLayout title="Pesanan Aktif" fullscreen>
-            <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: '#F8FAFC' }}>
+        <><Head title="Pesanan Aktif | W9 Cafe" /><CashierLayout title="Pesanan Aktif" fullscreen>
+            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 32, background: '#F8FAFC', minWidth: 0 }}>
             <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 24, border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
             {/* ── Header ── */}
@@ -131,13 +161,13 @@ export default function PesananAktif({ orders, counts }) {
 
             {/* ── Order Grid ── */}
             {filteredOrders.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#94A3B8', paddingTop: 64, fontSize: 14 }}>
+                <div style={{ textAlign: 'center', color: '#64748B', paddingTop: 64, fontSize: 14 }}>
                     Tidak ada pesanan aktif
                 </div>
             ) : (
                 <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
+                    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
                     gap: 18,
                     alignItems: 'start',
                 }}>
@@ -195,6 +225,7 @@ export default function PesananAktif({ orders, counts }) {
                             </div>
                             <button
                                 onClick={() => setQrisOrder(null)}
+                                aria-label="Tutup modal"
                                 style={{
                                     width: 32, height: 32, borderRadius: 8, flexShrink: 0,
                                     background: '#F1F5F9', border: 'none', cursor: 'pointer',
@@ -223,16 +254,16 @@ export default function PesananAktif({ orders, counts }) {
                                     display: 'flex', flexDirection: 'column', gap: 5,
                                 }}>
                                     <img
-                                        src={`/storage/${qrisOrder.payment_proof}`}
+                                        src={qrisOrder.payment_proof}
                                         alt="Bukti QRIS"
                                         style={{
                                             width: '100%', height: 150,
                                             objectFit: 'contain', borderRadius: 6,
                                             cursor: 'pointer', display: 'block',
                                         }}
-                                        onClick={() => window.open(`/storage/${qrisOrder.payment_proof}`, '_blank')}
+                                        onClick={() => window.open(qrisOrder.payment_proof, '_blank')}
                                     />
-                                    <span style={{ fontSize: 10, color: '#94A3B8', fontFamily: 'Outfit, system-ui', textAlign: 'center' }}>
+                                    <span style={{ fontSize: 10, color: '#64748B', fontFamily: 'Outfit, system-ui', textAlign: 'center' }}>
                                         Klik untuk perbesar
                                     </span>
                                 </div>
@@ -311,21 +342,6 @@ export default function PesananAktif({ orders, counts }) {
                                     ))}
                                 </div>
 
-                                {/* Reject note textarea */}
-                                <textarea
-                                    value={rejectNote}
-                                    onChange={e => setRejectNote(e.target.value)}
-                                    placeholder="Alasan penolakan (opsional, jika Tolak)"
-                                    rows={2}
-                                    style={{
-                                        width: '100%', border: '1px solid #E2E8F0',
-                                        borderRadius: 8, padding: '8px 10px',
-                                        fontSize: 12, fontFamily: 'Outfit, system-ui',
-                                        resize: 'none', boxSizing: 'border-box',
-                                        outline: 'none', color: '#0F172A',
-                                        background: '#F8FAFC',
-                                    }}
-                                />
                             </div>
                         </div>
 
@@ -347,10 +363,9 @@ export default function PesananAktif({ orders, counts }) {
                                     fontSize: 13, fontWeight: 600,
                                     fontFamily: 'Outfit, system-ui',
                                     cursor: processing ? 'not-allowed' : 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}
                             >
-                                <X size={16} />
                                 Tolak
                             </button>
                             {/* Konfirmasi Pembayaran */}
@@ -364,11 +379,10 @@ export default function PesananAktif({ orders, counts }) {
                                     fontSize: 13, fontWeight: 700,
                                     fontFamily: '"DM Sans", system-ui',
                                     cursor: processing ? 'not-allowed' : 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     boxShadow: processing ? 'none' : '0 3px 10px rgba(22,163,74,0.145)',
                                 }}
                             >
-                                <CircleCheck size={16} />
                                 Konfirmasi Pembayaran
                             </button>
                         </div>
@@ -377,6 +391,6 @@ export default function PesananAktif({ orders, counts }) {
             )}
             </div>
             </div>
-        </CashierLayout>
+        </CashierLayout></>
     );
 }

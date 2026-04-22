@@ -60,12 +60,16 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                 ? '0 4px 14px rgba(239,68,68,0.10)'
                 : '0 4px 14px rgba(15,23,42,0.06)',
             position: 'relative',
+            minWidth: 0,
         }}>
             {/* ── Top row: order code + payment badge | status + ellipsis ── */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
                 {/* Left */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-                    <span style={{ fontSize: 15, fontWeight: 600, color: '#0F172A', fontFamily: 'Outfit, system-ui', flexShrink: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
+                    <span style={{
+                        fontSize: 15, fontWeight: 600, color: '#0F172A', fontFamily: 'Outfit, system-ui',
+                        overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                    }}>
                         #{order.order_code}
                     </span>
                     {order.payment_method && order.payment_method !== 'bayar_nanti' && (() => {
@@ -97,12 +101,13 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                         <div ref={menuRef} style={{ position: 'relative' }}>
                             <button
                                 onClick={() => setMenuOpen(v => !v)}
+                                aria-label="Opsi pesanan"
                                 style={{
                                     width: 28, height: 28, borderRadius: 8,
                                     background: menuOpen ? '#F1F5F9' : 'transparent',
                                     border: 'none', cursor: 'pointer',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    color: '#64748B',
+                                    color: '#475569',
                                     transition: 'background 0.1s',
                                 }}
                             >
@@ -196,10 +201,10 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
             </div>
 
             {/* ── Time ── */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#94A3B8', fontFamily: 'Outfit, system-ui' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>
                 <span>{formatTime(order.created_at)} · {formatDate(order.created_at)}</span>
                 {order.table_number && (
-                    <span style={{ color: '#CBD5E1' }}>· Meja {order.table_number}</span>
+                    <span style={{ color: '#64748B' }}>· Meja {order.table_number}</span>
                 )}
                 {belumBayar && (
                     <span style={{
@@ -272,7 +277,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                     minWidth: 150,
                                 }}>
                                     <span style={{
-                                        fontSize: 11, fontWeight: 600, color: '#94A3B8',
+                                        fontSize: 11, fontWeight: 600, color: '#64748B',
                                         padding: '2px 8px 4px',
                                         fontFamily: 'Outfit, system-ui', letterSpacing: 0.4,
                                     }}>

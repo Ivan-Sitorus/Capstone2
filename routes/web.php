@@ -33,7 +33,7 @@ Route::prefix('cashier')->middleware(['auth', 'role:cashier,admin'])->group(func
     Route::patch('/order/{order}/confirm-qris', [CashierOrderController::class, 'confirmQris'])->name('cashier.order.confirm-qris');
     Route::patch('/order/{order}/reject-qris',  [CashierOrderController::class, 'rejectQris'])->name('cashier.order.reject-qris');
     Route::get('/profil', fn() => Inertia::render('Cashier/Profil', ['user' => auth()->user()]))->name('cashier.profil');
-    Route::get('/pending-count', fn() => response()->json(['count' => \App\Models\Order::where('status', \App\Models\Order::STATUS_PENDING)->where(function ($q) { $q->where('order_type', 'cashier')->orWhere(fn($q2) => $q2->where('order_type', 'qr')->where(fn($q3) => $q3->where('payment_method', 'cash')->orWhere(fn($q4) => $q4->where('payment_method', 'qris')->whereNotNull('payment_proof')))); })->count()]))->name('cashier.pending-count');
+    Route::get('/pending-count', \App\Http\Controllers\Cashier\CashierPendingCountController::class)->name('cashier.pending-count');
 });
 
 // Customer — entry point via QR scan

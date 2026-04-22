@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { router, Head } from '@inertiajs/react';
 import { Search, X, Banknote, QrCode, ShieldCheck, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
 import MenuGridItem from '@/Components/Cashier/MenuGridItem';
@@ -134,18 +134,19 @@ export default function PesananBaru({ categories }) {
 
     /* ── Design tokens ── */
     const T = {
-        accent:   '#3B6FD4',
-        accentBg: '#EFF6FF',
+        accent:     '#3B6FD4',
+        accentBg:   '#EFF6FF',
         accentRing: '#BFDBFE',
-        text:     '#0F172A',
-        sub:      '#64748B',
-        border:   '#E2E8F0',
-        elevated: '#F1F5F9',
-        surface:  '#FFFFFF',
+        text:       '#111827',
+        sub:        '#6C757D',
+        border:     '#E9ECEF',
+        elevated:   '#FFFFFF',
+        surface:    '#FFFFFF',
+        panelBg:    '#F8F9FA',
     };
 
     return (
-        <CashierLayout title="Pesanan Baru" fullscreen>
+        <><Head title="Pesanan Baru | W9 Cafe" /><CashierLayout title="Pesanan Baru" fullscreen>
             <div style={{ display: 'flex', flexDirection: isPortrait ? 'column' : 'row', height: '100vh', overflow: 'hidden' }}>
 
                 {/* ══ PANEL TENGAH ══ */}
@@ -153,7 +154,7 @@ export default function PesananBaru({ categories }) {
                     style={{
                         flex: 1,
                         padding: isPortrait ? 14 : 24,
-                        background: '#F8FAFC',
+                        background: T.panelBg,
                         overflowY: 'auto',
                         display: 'flex',
                         flexDirection: 'column',
@@ -182,7 +183,7 @@ export default function PesananBaru({ categories }) {
                         {['Semua', ...categories.map(c => c.name)].map(cat => {
                             const active = activeCategory === cat;
                             return (
-                                <button key={cat} onClick={() => setActiveCategory(cat)} style={{ height: 36, padding: '0 16px', borderRadius: 100, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: active ? 600 : 500, background: active ? T.accent : T.elevated, color: active ? '#FFFFFF' : T.sub, whiteSpace: 'nowrap', transition: 'background 0.15s, color 0.15s', flexShrink: 0 }}>
+                                <button key={cat} onClick={() => setActiveCategory(cat)} style={{ height: 36, padding: '0 16px', borderRadius: 100, border: active ? 'none' : '1.5px solid #C4C9D4', cursor: 'pointer', fontSize: 13, fontWeight: active ? 600 : 500, background: active ? T.accent : T.surface, color: active ? '#FFFFFF' : '#374151', whiteSpace: 'nowrap', transition: 'background 0.15s, color 0.15s', flexShrink: 0 }}>
                                     {cat}
                                 </button>
                             );
@@ -229,7 +230,7 @@ export default function PesananBaru({ categories }) {
                                     height: 32,
                                     borderRadius: 8,
                                     border: `1px solid ${T.border}`,
-                                    background: '#F8FAFC',
+                                    background: T.panelBg,
                                     color: '#334155',
                                     display: 'inline-flex',
                                     alignItems: 'center',
@@ -406,7 +407,6 @@ export default function PesananBaru({ categories }) {
                                         onClick={handleChooseProceed} disabled={processing}
                                         style={{ width: '100%', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: processing ? '#93AEDF' : '#3B6FD4', color: '#FFFFFF', border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 700, fontFamily: '"DM Sans", system-ui', cursor: processing ? 'not-allowed' : 'pointer', boxShadow: '0 4px 16px rgba(59,111,212,0.28)' }}
                                     >
-                                        <ShieldCheck size={20} color="#FFFFFF" />
                                         {processing ? 'Memproses...' : 'Konfirmasi Pembayaran'}
                                     </button>
                                 </div>
@@ -424,7 +424,6 @@ export default function PesananBaru({ categories }) {
                     zIndex: 2000,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                    {/* toastPopup — bg #FFFFFF, r:24, w:300, p:[28,24,24,24], gap:16, shadow */}
                     <div style={{
                         background: '#FFFFFF',
                         borderRadius: 24,
@@ -433,7 +432,6 @@ export default function PesananBaru({ categories }) {
                         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
                         boxShadow: '0 8px 30px rgba(15,23,42,0.18)',
                     }}>
-                        {/* iconCircle — 72x72, r:36, bg #EFF6FF (blue adapted), icon check green */}
                         <div style={{
                             width: 72, height: 72, borderRadius: 36,
                             background: '#F0FDF4',
@@ -442,17 +440,14 @@ export default function PesananBaru({ categories }) {
                             <CircleCheck size={40} color="#22C55E" strokeWidth={2} />
                         </div>
 
-                        {/* titleTxt — DM Sans 18/700 #0F172A */}
                         <span style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', fontFamily: '"DM Sans", system-ui', textAlign: 'center' }}>
                             Pesanan Diterima!
                         </span>
 
-                        {/* descTxt — Outfit 13 #64748B */}
                         <span style={{ fontSize: 13, color: '#64748B', fontFamily: 'Outfit, system-ui', textAlign: 'center', lineHeight: 1.5, width: '100%' }}>
                             Pesanan berhasil dibuat dan siap diproses.
                         </span>
 
-                        {/* amountWrap — bg #EFF6FF, r:14, p:[12,16] */}
                         <div style={{
                             background: '#EFF6FF', borderRadius: 14,
                             width: '100%', padding: '12px 16px',
@@ -466,7 +461,6 @@ export default function PesananBaru({ categories }) {
                             </span>
                         </div>
 
-                        {/* okBtn — bg #3B6FD4, r:14, h:46, DM Sans 15/700 white */}
                         <button
                             onClick={handleSuccessOk}
                             style={{
@@ -483,6 +477,6 @@ export default function PesananBaru({ categories }) {
                     </div>
                 </div>
             )}
-        </CashierLayout>
+        </CashierLayout></>
     );
 }

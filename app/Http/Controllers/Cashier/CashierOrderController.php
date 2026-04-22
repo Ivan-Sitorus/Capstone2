@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cashier;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\InventoryService;
+use App\Services\OrderBroadcastService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -69,6 +70,8 @@ class CashierOrderController extends Controller
             }
         });
 
+        OrderBroadcastService::broadcastPendingCount();
+
         return response()->json(['message' => 'Status diperbarui.']);
     }
 
@@ -84,6 +87,7 @@ class CashierOrderController extends Controller
             'payment_method' => $request->payment_method,
             'cashier_id'     => Auth::id(),
         ]);
+        OrderBroadcastService::broadcastPendingCount();
         return response()->json(['message' => 'Pembayaran dikonfirmasi.']);
     }
 
@@ -102,6 +106,7 @@ class CashierOrderController extends Controller
             $inventoryService->processSaleForOrder($order, Auth::id());
         });
 
+        OrderBroadcastService::broadcastPendingCount();
         return response()->json(['message' => 'Pembayaran cash dikonfirmasi.']);
     }
 
@@ -112,14 +117,21 @@ class CashierOrderController extends Controller
         }
 
         DB::transaction(function () use ($order, $inventoryService) {
+            // Hapus file bukti setelah dikonfirmasi
+            if ($order->payment_proof) {
+                Storage::disk('public')->delete($order->payment_proof);
+            }
+
             $order->update([
-                'status'     => Order::STATUS_DIPROSES,
-                'cashier_id' => Auth::id(),
+                'status'         => Order::STATUS_DIPROSES,
+                'cashier_id'     => Auth::id(),
+                'payment_proof'  => null,
             ]);
 
             $inventoryService->processSaleForOrder($order, Auth::id());
         });
 
+        OrderBroadcastService::broadcastPendingCount();
         return response()->json(['message' => 'Pembayaran QRIS dikonfirmasi.']);
     }
 

@@ -1,3 +1,34 @@
+# ── Gzip Compression ──────────────────────────────────────────────
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css
+    AddOutputFilterByType DEFLATE application/javascript application/json
+    AddOutputFilterByType DEFLATE application/x-javascript text/javascript
+    AddOutputFilterByType DEFLATE image/svg+xml application/xml text/xml
+    AddOutputFilterByType DEFLATE font/ttf font/otf font/woff font/woff2
+</IfModule>
+
+# ── Browser Cache ──────────────────────────────────────────────────
+<IfModule mod_expires.c>
+    ExpiresActive On
+    # Vite build assets (hashed filenames) — cache 1 year
+    <FilesMatch "\.(js|css|woff|woff2|ttf|otf)$">
+        ExpiresDefault "access plus 1 year"
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    # Images
+    <FilesMatch "\.(jpg|jpeg|png|gif|ico|svg|webp)$">
+        ExpiresDefault "access plus 30 days"
+        Header set Cache-Control "public, max-age=2592000"
+    </FilesMatch>
+</IfModule>
+
+# ── Security Headers ───────────────────────────────────────────────
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews -Indexes

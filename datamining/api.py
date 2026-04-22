@@ -27,13 +27,15 @@ from sklearn.cluster import KMeans
 from sklearn.metrics import silhouette_score
 
 try:
-    from .prediction  import run_prediction_pipeline   # saat dijalankan sebagai package (datamining.api:app)
-    from .association import run_association_pipeline
-    from .bahanbaku   import run_bahan_baku_pipeline
+    from .prediction    import run_prediction_pipeline
+    from .association   import run_association_pipeline
+    from .bahanbaku     import run_bahan_baku_pipeline
+    from .prediksibaku  import run_prediction_pipeline_bahan_baku
 except ImportError:
-    from prediction  import run_prediction_pipeline    # saat dijalankan dari folder datamining/ (api:app)
-    from association import run_association_pipeline
-    from bahanbaku   import run_bahan_baku_pipeline
+    from prediction    import run_prediction_pipeline
+    from association   import run_association_pipeline
+    from bahanbaku     import run_bahan_baku_pipeline
+    from prediksibaku  import run_prediction_pipeline_bahan_baku
 
 warnings.filterwarnings("ignore")
 load_dotenv()
@@ -67,7 +69,7 @@ def fetch_order_data() -> pd.DataFrame:
         FROM order_items oi
         JOIN orders o ON o.id  = oi.order_id
         JOIN menus  m ON m.id  = oi.menu_id
-        WHERE o.is_paid = true
+        WHERE o.status = 'selesai'
         ORDER BY o.created_at ASC
     """
     conn = get_connection()
@@ -466,6 +468,20 @@ def clustering_bahan_baku():
         if df.empty:
             return {"status": "error", "message": "Tidak ada data pemakaian bahan baku."}
         return run_bahan_baku_pipeline(df)
+    except Exception as e:
+        import traceback
+        return {"status": "error", "message": str(e), "trace": traceback.format_exc()}
+
+
+@app.post("/prediction-bahan-baku")
+def prediction_bahan_baku():
+    try:
+        df = fetch_ingredient_data()
+        if df.empty:
+            return {"status": "error", "message": "Tidak ada data pemakaian bahan baku di tabel daily_ingredient_usages."}
+        if df["Bahan_Baku"].nunique() < 1:
+            return {"status": "error", "message": "Minimal 1 bahan baku diperlukan untuk prediksi."}
+        return run_prediction_pipeline_bahan_baku(df)
     except Exception as e:
         import traceback
         return {"status": "error", "message": str(e), "trace": traceback.format_exc()}
