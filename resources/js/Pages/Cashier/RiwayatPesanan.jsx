@@ -173,7 +173,7 @@ export default function RiwayatPesanan({ orders, filters }) {
                     {COLS.map(col => (
                         <div key={col.key} style={{ width: col.width, flex: col.flex, flexShrink: col.flex ? undefined : 0 }}>
                             <span style={{
-                                fontSize: 12, fontWeight: 600, color: T.textSec,
+                                fontSize: 12, fontWeight: 600, color: '#475569',
                                 fontFamily: 'Outfit, system-ui',
                             }}>
                                 {col.label}

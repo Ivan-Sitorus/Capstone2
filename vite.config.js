@@ -12,9 +12,11 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks: {
-                    // React + Inertia dipisah agar browser bisa cache vendor terpisah
+                    // React + Inertia — core runtime, jarang berubah
                     vendor: ['react', 'react-dom', '@inertiajs/react'],
-                    // Filament/admin deps (lucide, dll) dipisah dari customer pages
+                    // State management — pisah agar bisa cache terpisah
+                    store: ['zustand'],
+                    // Icons — besar, jarang berubah
                     icons: ['lucide-react'],
                 },
             },
@@ -23,6 +25,7 @@ export default defineConfig({
         chunkSizeWarningLimit: 800,
     },
     server: {
+        host: '127.0.0.1',
         watch: {
             ignored: ['**/storage/framework/views/**'],
         },

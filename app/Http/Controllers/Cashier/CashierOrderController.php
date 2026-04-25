@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Cashier;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\BroadcastPendingCount;
 use App\Models\Order;
 use App\Services\InventoryService;
-use App\Services\OrderBroadcastService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -70,7 +70,7 @@ class CashierOrderController extends Controller
             }
         });
 
-        OrderBroadcastService::broadcastPendingCount();
+        BroadcastPendingCount::dispatch();
 
         return response()->json(['message' => 'Status diperbarui.']);
     }
@@ -87,7 +87,7 @@ class CashierOrderController extends Controller
             'payment_method' => $request->payment_method,
             'cashier_id'     => Auth::id(),
         ]);
-        OrderBroadcastService::broadcastPendingCount();
+        BroadcastPendingCount::dispatch();
         return response()->json(['message' => 'Pembayaran dikonfirmasi.']);
     }
 
@@ -106,7 +106,7 @@ class CashierOrderController extends Controller
             $inventoryService->processSaleForOrder($order, Auth::id());
         });
 
-        OrderBroadcastService::broadcastPendingCount();
+        BroadcastPendingCount::dispatch();
         return response()->json(['message' => 'Pembayaran cash dikonfirmasi.']);
     }
 
@@ -131,7 +131,7 @@ class CashierOrderController extends Controller
             $inventoryService->processSaleForOrder($order, Auth::id());
         });
 
-        OrderBroadcastService::broadcastPendingCount();
+        BroadcastPendingCount::dispatch();
         return response()->json(['message' => 'Pembayaran QRIS dikonfirmasi.']);
     }
 

@@ -8,14 +8,25 @@ use Illuminate\Support\Collection;
 
 class PromotionService
 {
+    private ?Collection $activePromotions = null;
+
+    private function loadActivePromotions(): Collection
+    {
+        if ($this->activePromotions === null) {
+            $this->activePromotions = Promotion::query()
+                ->with('rules')
+                ->where('status', Promotion::STATUS_ACTIVE)
+                ->whereDate('start_date', '<=', now())
+                ->whereDate('end_date', '>=', now())
+                ->get();
+        }
+
+        return $this->activePromotions;
+    }
+
     public function getApplicablePromotionsForMenu(Menu $menu): Collection
     {
-        return Promotion::query()
-            ->with('rules')
-            ->where('status', Promotion::STATUS_ACTIVE)
-            ->whereDate('start_date', '<=', now())
-            ->whereDate('end_date', '>=', now())
-            ->get()
+        return $this->loadActivePromotions()
             ->filter(fn (Promotion $promotion) =>
                 $promotion->canBeUsed() && $promotion->isApplicableTo((int) $menu->id, (int) $menu->category_id)
             )

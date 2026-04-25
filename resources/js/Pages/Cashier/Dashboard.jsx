@@ -135,7 +135,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                                         padding: '12px 16px',
                                         fontSize: 12,
                                         fontWeight: 600,
-                                        color: '#64748B',
+                                        color: '#475569',
                                         textAlign: 'left',
                                         textTransform: 'uppercase',
                                         letterSpacing: '0.4px',

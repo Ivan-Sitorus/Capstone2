@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Cashier;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
+use App\Jobs\BroadcastPendingCount;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Services\InventoryService;
 use App\Services\OrderPromotionService;
 use Illuminate\Support\Facades\Auth;
@@ -53,9 +55,14 @@ class CashierPesananBaruController extends Controller
             $isMahasiswa = (bool) $request->input('is_mahasiswa', false);
             $total = 0;
             $appliedPromotions = [];
+            $itemsToInsert = [];
+
+            // Bulk-fetch semua menu sekaligus — hindari N+1 query
+            $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
+            $menus   = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
             foreach ($request->items as $item) {
-                $menu      = Menu::findOrFail($item['menu_id']);
+                $menu = $menus->get($item['menu_id']);
 
                 $lineCalculation = $orderPromotionService->calculateLine(
                     $menu,
@@ -64,12 +71,15 @@ class CashierPesananBaruController extends Controller
                     $selectedPromotionIds,
                 );
 
-                $order->items()->create([
+                $itemsToInsert[] = [
+                    'order_id'   => $order->id,
                     'menu_id'    => $menu->id,
                     'quantity'   => $item['quantity'],
                     'unit_price' => $lineCalculation['unit_price'],
                     'subtotal'   => $lineCalculation['subtotal'],
-                ]);
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
 
                 if ($lineCalculation['applied_promotion'] !== null) {
                     $appliedPromotions[] = $lineCalculation['applied_promotion'];
@@ -77,6 +87,8 @@ class CashierPesananBaruController extends Controller
 
                 $total += $lineCalculation['subtotal'];
             }
+
+            OrderItem::insert($itemsToInsert);
 
             $order->update(['total_amount' => $total]);
 

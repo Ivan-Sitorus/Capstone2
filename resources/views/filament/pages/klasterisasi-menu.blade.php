@@ -63,17 +63,17 @@
                 </p>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-sm">
+                <table class="w-full text-sm border-collapse">
                     <thead>
-                        <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                            <th class="py-3 px-5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wide w-14">No</th>
-                            <th class="py-3 px-5 text-left   text-xs font-semibold text-gray-400 uppercase tracking-wide">Nama Item</th>
-                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-400 uppercase tracking-wide">Jumlah Terjual</th>
-                            <th class="py-3 px-5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wide">Klaster</th>
-                            <th class="py-3 px-5 text-left   text-xs font-semibold text-gray-400 uppercase tracking-wide">Kategori</th>
+                        <tr class="bg-gray-50 dark:bg-gray-700/50">
+                            <th class="py-3 px-5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wide w-14 border border-gray-200 dark:border-gray-600">No</th>
+                            <th class="py-3 px-5 text-left   text-xs font-semibold text-gray-400 uppercase tracking-wide border border-gray-200 dark:border-gray-600">Nama Item</th>
+                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-400 uppercase tracking-wide border border-gray-200 dark:border-gray-600">Jumlah Terjual</th>
+                            <th class="py-3 px-5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wide border border-gray-200 dark:border-gray-600">Klaster</th>
+                            <th class="py-3 px-5 text-left   text-xs font-semibold text-gray-400 uppercase tracking-wide border border-gray-200 dark:border-gray-600">Kategori</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700/40">
+                    <tbody>
                         @php
                             $badge = [
                                 'Sangat Laris' => 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
@@ -85,15 +85,15 @@
                         @endphp
                         @foreach($tableRows as $i => $row)
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors">
-                                <td class="py-3 px-5 text-right text-gray-400 dark:text-gray-500 tabular-nums">{{ $i }}</td>
-                                <td class="py-3 px-5 font-medium text-gray-700 dark:text-gray-200">{{ $row['Nama Item'] }}</td>
-                                <td class="py-3 px-5 text-right text-gray-600 dark:text-gray-300 tabular-nums font-medium">
+                                <td class="py-3 px-5 text-right text-gray-400 dark:text-gray-500 tabular-nums border border-gray-200 dark:border-gray-600">{{ $i }}</td>
+                                <td class="py-3 px-5 font-medium text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600">{{ $row['Nama Item'] }}</td>
+                                <td class="py-3 px-5 text-right text-gray-600 dark:text-gray-300 tabular-nums font-medium border border-gray-200 dark:border-gray-600">
                                     {{ number_format($row['Jumlah'], 1) }}
                                 </td>
-                                <td class="py-3 px-5 text-center text-gray-500 dark:text-gray-400 tabular-nums">
+                                <td class="py-3 px-5 text-center text-gray-500 dark:text-gray-400 tabular-nums border border-gray-200 dark:border-gray-600">
                                     {{ $row['Klaster'] }}
                                 </td>
-                                <td class="py-3 px-5">
+                                <td class="py-3 px-5 border border-gray-200 dark:border-gray-600">
                                     <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $badge[$row['Kategori']] ?? '' }}">
                                         {{ $row['Kategori'] }}
                                     </span>

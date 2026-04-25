@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { router } from '@inertiajs/react';
+import { router, Head } from '@inertiajs/react';
 import { Search, ShoppingBag, Coffee } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
@@ -8,7 +8,7 @@ import { formatRupiah } from '@/helpers';
 const F = '"Plus Jakarta Sans", system-ui, sans-serif';
 
 /* ── Inline menu item card (2-col grid, vertical) ───────────────────── */
-function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement }) {
+function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false }) {
     const cashback = Number(menu.cashback ?? 0);
 
     return (
@@ -29,6 +29,8 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement }) {
             }}>
                 {menu.image
                     ? <img src={menu.image} alt={menu.name}
+                           loading={priority ? 'eager' : 'lazy'}
+                           decoding={priority ? 'sync' : 'async'}
                            style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     : <Coffee size={36} color="#FFFFFF" strokeWidth={1.5} />
                 }
@@ -112,16 +114,6 @@ export default function CustomerMenu({ categories, table }) {
 
     const { items, addItem, updateQty, setTable, total, count } = useCart();
 
-    /* Font injection */
-    useEffect(() => {
-        if (!document.getElementById('pjs-font')) {
-            const link = document.createElement('link');
-            link.id   = 'pjs-font';
-            link.rel  = 'stylesheet';
-            link.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
-            document.head.appendChild(link);
-        }
-    }, []);
 
     /* Auth guard */
     useEffect(() => {
@@ -191,6 +183,13 @@ export default function CustomerMenu({ categories, table }) {
 
     return (
         <CustomerLayout activeTab="menu">
+            <Head>
+                <title>Menu — W9 Cafe</title>
+                <meta name="description" content="Pesan makanan dan minuman favorit Anda di W9 Cafe STIE Totalwin." />
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+            </Head>
 
             {/* ── Header ── */}
             <div style={{ background: '#FFFFFF', padding: '20px 20px 16px' }}>
@@ -206,6 +205,10 @@ export default function CustomerMenu({ categories, table }) {
                         <img
                             src="/images/logo.jpg"
                             alt="W9 Cafe"
+                            fetchPriority="high"
+                            loading="eager"
+                            width="52"
+                            height="52"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             onError={e => { e.target.style.display = 'none'; }}
                         />
@@ -312,10 +315,11 @@ export default function CustomerMenu({ categories, table }) {
                 ) : activeCategory === 'all' ? (
                     /* Flat list saat "Semua" — jarak seragam */
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        {filtered.map(menu => (
+                        {filtered.map((menu, idx) => (
                             <MenuItemCard
                                 key={menu.id}
                                 menu={menu}
+                                priority={idx < 4}
                                 cartItem={cartMap[menu.id]}
                                 onAdd={() => addItem(menu)}
                                 onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}

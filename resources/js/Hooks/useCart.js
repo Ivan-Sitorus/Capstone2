@@ -1,13 +1,16 @@
 import { useEffect } from 'react';
-import { openDB } from 'idb';
 import useCartStore from '@/Store/cartStore';
 
 const DB_NAME = 'w9cafe';
 const STORE   = 'cart';
 
-const initDB = () => openDB(DB_NAME, 1, {
-    upgrade(db) { db.createObjectStore(STORE); },
-});
+// idb dimuat secara lazy — tidak dibutuhkan saat halaman pertama dibuka
+const initDB = async () => {
+    const { openDB } = await import('idb');
+    return openDB(DB_NAME, 1, {
+        upgrade(db) { db.createObjectStore(STORE); },
+    });
+};
 
 const saveToIDB = async (items, tableId) => {
     try {

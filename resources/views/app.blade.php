@@ -7,7 +7,9 @@
     <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#E8692A">
     <title>W9 Cafe POS</title>
-    <link rel="dns-prefetch" href="//localhost">
+    <link rel="preload" as="image" href="/images/logo.jpg" fetchpriority="high">
+    <link rel="dns-prefetch" href="//fonts.googleapis.com">
+    <link rel="dns-prefetch" href="//fonts.gstatic.com">
     @routes
     @viteReactRefresh
     @vite(['resources/js/app.jsx'])

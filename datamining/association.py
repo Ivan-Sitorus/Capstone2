@@ -101,7 +101,7 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
     })
 
     # Cell 14-15: Frequent 2-Itemsets (min_support=0.05)
-    frequent_05 = fpgrowth(df_encoded, min_support=0.05, use_colnames=True)
+    frequent_05 = fpgrowth(df_encoded, min_support=0.01, use_colnames=True)
     frequent_2  = frequent_05[frequent_05["itemsets"].apply(lambda x: len(x) == 2)].copy()
     frequent_2["jumlah_kemunculan"] = (frequent_2["support"] * total_transactions).round().astype(int)
     frequent_2 = frequent_2.sort_values("support", ascending=False)
@@ -275,7 +275,7 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
         "status":             "success",
         "total_rules":        len(rules_out),
         "total_transactions": total_transactions,
-        "min_support":        0.05,
+        "min_support":        0.01,
         "min_confidence":     round(min_conf, 6),
         "date_range":         {"from": date_from, "to": date_to},
         "rules":              rules_out,

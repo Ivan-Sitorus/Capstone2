@@ -4,10 +4,10 @@ namespace App\Http\Controllers\Customer;
 
 use Exception;
 use App\Http\Controllers\Controller;
+use App\Jobs\BroadcastPendingCount;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\CafeTable;
-use App\Services\OrderBroadcastService;
 use App\Services\OrderPromotionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -53,12 +53,17 @@ class CustomerOrderController extends Controller
 
             $total = 0;
             $appliedPromotions = [];
+            $orderItemsToInsert = [];
+
+            // Bulk-fetch semua menu sekaligus — hindari N+1 query
+            $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
+            $menus   = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
             foreach ($request->items as $item) {
-                $menu = Menu::findOrFail($item['menu_id']);
+                $menu = $menus->get($item['menu_id']);
 
-                if (!$menu->is_available) {
-                    throw new Exception("Menu {$menu->name} tidak tersedia.");
+                if (!$menu || !$menu->is_available) {
+                    throw new Exception("Menu " . ($menu?->name ?? "#{$item['menu_id']}") . " tidak tersedia.");
                 }
 
                 $lineCalculation = $orderPromotionService->calculateLine(
@@ -68,12 +73,15 @@ class CustomerOrderController extends Controller
                     $selectedPromotionIds,
                 );
 
-                $order->items()->create([
+                $orderItemsToInsert[] = [
+                    'order_id'   => $order->id,
                     'menu_id'    => $menu->id,
                     'quantity'   => $item['quantity'],
                     'unit_price' => $lineCalculation['unit_price'],
                     'subtotal'   => $lineCalculation['subtotal'],
-                ]);
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
 
                 if ($lineCalculation['applied_promotion'] !== null) {
                     $appliedPromotions[] = $lineCalculation['applied_promotion'];
@@ -82,16 +90,15 @@ class CustomerOrderController extends Controller
                 $total += $lineCalculation['subtotal'];
             }
 
+            // Bulk insert semua order items sekaligus
+            \App\Models\OrderItem::insert($orderItemsToInsert);
+
             $order->update(['total_amount' => $total]);
 
             $orderPromotionService->persistOrderPromotions($order, $appliedPromotions);
 
-            // Broadcast ke kasir — badge langsung update tanpa polling
-            try {
-                OrderBroadcastService::broadcastPendingCount();
-            } catch (\Throwable $e) {
-                // Reverb/Pusher tidak berjalan — abaikan, pesanan tetap tersimpan
-            }
+            // Broadcast ke kasir via queue — tidak memblokir response
+            BroadcastPendingCount::dispatch()->afterCommit();
 
             return response()->json([
                 'order_code'   => $order->order_code,
@@ -107,25 +114,28 @@ class CustomerOrderController extends Controller
         $phone = $request->query('phone');
 
         $orders = $phone
-            ? Order::with('items.menu')
+            ? Order::with([
+                'items' => fn($q) => $q->select(['id', 'order_id', 'menu_id', 'quantity', 'subtotal']),
+                'items.menu' => fn($q) => $q->select(['id', 'name']),
+            ])
+                ->select(['id', 'order_code', 'status', 'total_amount', 'created_at', 'payment_method', 'customer_name', 'customer_phone', 'payment_proof'])
                 ->where('customer_phone', $phone)
                 ->where(function ($q) {
-                    // Cash: tampil segera setelah pilih metode
                     $q->where('payment_method', 'cash')
-                    // QRIS: hanya tampil setelah bukti diunggah
                       ->orWhere(function ($q2) {
                           $q2->where('payment_method', 'qris')
                              ->whereNotNull('payment_proof');
                       });
                 })
                 ->latest()
+                ->limit(50)
                 ->get()
                 ->map(fn($o) => [
-                    'id'            => $o->id,
-                    'order_code'    => $o->order_code,
-                    'status'        => $o->status,
-                    'total_amount'  => $o->total_amount,
-                    'created_at'    => $o->created_at->toISOString(),
+                    'id'             => $o->id,
+                    'order_code'     => $o->order_code,
+                    'status'         => $o->status,
+                    'total_amount'   => $o->total_amount,
+                    'created_at'     => $o->created_at->toISOString(),
                     'payment_method' => $o->payment_method,
                     'customer_name'  => $o->customer_name,
                     'items_summary'  => $o->items
@@ -144,7 +154,9 @@ class CustomerOrderController extends Controller
 
     public function status(string $code)
     {
-        $order = Order::where('order_code', $code)->firstOrFail();
+        $order = Order::select(['id', 'order_code', 'status', 'total_amount', 'payment_method', 'created_at'])
+            ->where('order_code', $code)
+            ->firstOrFail();
 
         return Inertia::render('Customer/Order/Status', [
             'order' => [

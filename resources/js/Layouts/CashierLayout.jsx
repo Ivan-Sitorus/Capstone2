@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import {
     LayoutDashboard,
     ShoppingCart,
@@ -115,7 +116,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                                 height: 40,
                                 borderRadius: 10,
                                 border: '1px solid rgba(255,255,255,0.14)',
-                                background: 'rgba(255,255,255,0.05)',
+                                background: '#1E293B',
                                 color: '#E2E8F0',
                                 display: 'inline-flex',
                                 alignItems: 'center',
@@ -158,7 +159,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                                 height: 32,
                                 borderRadius: 8,
                                 border: '1px solid rgba(255,255,255,0.14)',
-                                background: 'rgba(255,255,255,0.05)',
+                                background: '#1E293B',
                                 color: '#E2E8F0',
                                 display: 'inline-flex',
                                 alignItems: 'center',
