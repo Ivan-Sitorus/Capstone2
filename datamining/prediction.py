@@ -444,15 +444,27 @@ def run_prediction_pipeline(df: pd.DataFrame) -> dict:
 
     # ── Tahap 2: Split 75:25 per menu (cell 28) ───────────────────────────
     item_data = {}
+    skipped_items = []
     for item in items:
         df_full, df_train, df_test = prepare_menu_data(df_capped, item)
+        if len(df_train) < 2 or len(df_test) < 1:
+            skipped_items.append(item)
+            continue
         item_data[item] = {"full": df_full, "train": df_train, "test": df_test}
+
+    items = list(item_data.keys())
+
+    if not items:
+        raise ValueError(
+            "Semua menu tidak memiliki cukup data untuk diprediksi. "
+            "Setiap menu butuh minimal 3 hari data transaksi."
+        )
 
     logs.append({
         "tahap":  "Persiapan Data Per Menu",
         "detail": (
-            f"Data dibagi train (75%) dan test (25%) "
-            f"untuk {len(items)} menu."
+            f"Data dibagi train (75%) dan test (25%) untuk {len(items)} menu."
+            + (f" Dilewati ({len(skipped_items)} menu data kurang): {', '.join(skipped_items)}." if skipped_items else "")
         ),
     })
 

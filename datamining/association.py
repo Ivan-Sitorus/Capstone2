@@ -100,7 +100,7 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
         "detail": f"Ditemukan {len(frequent_1)} item dengan min_support ≥ 1%.",
     })
 
-    # Cell 14-15: Frequent 2-Itemsets (min_support=0.05)
+    # Cell 14-15: Frequent 2-Itemsets (min_support=0.01)
     frequent_05 = fpgrowth(df_encoded, min_support=0.01, use_colnames=True)
     frequent_2  = frequent_05[frequent_05["itemsets"].apply(lambda x: len(x) == 2)].copy()
     frequent_2["jumlah_kemunculan"] = (frequent_2["support"] * total_transactions).round().astype(int)

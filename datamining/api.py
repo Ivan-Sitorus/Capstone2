@@ -81,7 +81,8 @@ def fetch_order_data() -> pd.DataFrame:
         conn.close()
 
     df = pd.DataFrame([dict(r) for r in rows])
-    df["Tanggal"] = pd.to_datetime(df["Tanggal"])
+    if not df.empty:
+        df["Tanggal"] = pd.to_datetime(df["Tanggal"])
     return df
 
 
@@ -406,7 +407,9 @@ def clustering():
     try:
         df = fetch_order_data()
         if df.empty:
-            return {"status": "error", "message": "Tidak ada data pesanan yang sudah dibayar."}
+            return {"status": "error", "message": "Tidak ada data pesanan selesai. Pastikan ada transaksi dengan status 'selesai'."}
+        if df["Nama Item"].nunique() < 2:
+            return {"status": "error", "message": f"Clustering butuh minimal 2 menu berbeda. Saat ini hanya ada {df['Nama Item'].nunique()} menu."}
         return run_pipeline(df)
     except Exception as e:
         import traceback
@@ -418,7 +421,10 @@ def prediction():
     try:
         df = fetch_order_data()
         if df.empty:
-            return {"status": "error", "message": "Tidak ada data pesanan yang sudah dibayar."}
+            return {"status": "error", "message": "Tidak ada data pesanan selesai. Pastikan ada transaksi dengan status 'selesai'."}
+        unique_dates = df["Tanggal"].nunique()
+        if unique_dates < 3:
+            return {"status": "error", "message": f"Data terlalu sedikit untuk prediksi: hanya {unique_dates} hari transaksi. Prophet membutuhkan minimal 3 hari data."}
         return run_prediction_pipeline(df)
     except Exception as e:
         import traceback
