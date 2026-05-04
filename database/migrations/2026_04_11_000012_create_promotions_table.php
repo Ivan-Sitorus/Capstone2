@@ -26,6 +26,7 @@ return new class extends Migration
 
             $table->index('status');
             $table->index(['start_date', 'end_date']);
+            $table->index(['status', 'start_date', 'end_date']);
         });
     }
 

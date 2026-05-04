@@ -40,6 +40,8 @@ return new class extends Migration
             $table->index(['movement_type', 'created_at']);
             $table->index(['source_type', 'source_id']);
             $table->index('waste_record_id');
+            $table->index('ingredient_id');
+            $table->index('order_id');
         });
     }
 
