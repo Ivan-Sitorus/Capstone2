@@ -136,16 +136,16 @@ class StockAdjustmentResource extends Resource
                     ->formatStateUsing(fn (string $state): string => $state === StockAdjustment::TYPE_INCREASE ? 'Increase' : 'Decrease'),
                 TextColumn::make('quantity')
                     ->label('Qty')
-                    ->numeric(decimalPlaces: 2)
+                    ->numeric()
                     ->suffix(fn (StockAdjustment $record) => ' ' . ($record->ingredient?->unit ?? ''))
                     ->sortable(),
                 TextColumn::make('quantity_before')
                     ->label('Before')
-                    ->numeric(decimalPlaces: 2)
+                    ->numeric()
                     ->sortable(),
                 TextColumn::make('quantity_after')
                     ->label('After')
-                    ->numeric(decimalPlaces: 2)
+                    ->numeric()
                     ->sortable(),
                 TextColumn::make('recordedBy.name')
                     ->label('Recorded By')

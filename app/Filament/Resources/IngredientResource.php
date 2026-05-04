@@ -6,19 +6,21 @@ use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\IngredientResource\RelationManagers\BatchesRelationManager;
+use Filament\Support\RawJs;
 use App\Filament\Resources\IngredientResource\Pages\ListIngredients;
-use App\Filament\Resources\IngredientResource\Pages\CreateIngredient;
 use App\Filament\Resources\IngredientResource\Pages\EditIngredient;
-use App\Filament\Resources\IngredientResource\Pages;
-use App\Filament\Resources\IngredientResource\RelationManagers;
+use App\Filament\Resources\IngredientResource\Pages\ManageBatches;
 use App\Models\Ingredient;
 use Filament\Forms;
 use Filament\Resources\Resource;
@@ -50,18 +52,66 @@ class IngredientResource extends Resource
                 ->options(Ingredient::UNITS)
                 ->required()
                 ->searchable()
-                ->native(false),
+                ->native(false)
+                ->live(),
             TextInput::make('low_stock_threshold')
                 ->label('Low Stock Threshold')
                 ->required()
-                ->numeric()
+                ->integer()
                 ->minValue(0)
-                ->step(0.01)
-                ->default(0),
+                ->default(0)
+                ->extraInputAttributes([
+                    'min' => '0',
+                    'onkeydown' => "return !(event.key.length===1&&!/[0-9]/.test(event.key))",
+                ])
+                ->suffix(fn ($get) => $get('unit') ? ' ' . $get('unit') : ''),
             Toggle::make('is_active')
                 ->label('Active')
                 ->default(true)
                 ->inline(false),
+            Repeater::make('batches')
+                ->relationship('batches')
+                ->label('Stok Awal (Batch)')
+                ->addActionLabel('+ Tambah Batch')
+                ->hiddenOn('edit')
+                ->columnSpanFull()
+                ->columns(1)
+                ->schema([
+                    TextInput::make('quantity')
+                        ->label('Jumlah')
+                        ->required()
+                        ->numeric()
+                        ->minValue(0)
+                        ->step(0.1)
+                        ->extraInputAttributes([
+                            'min' => '0',
+                            'onkeydown' => "return !(event.key.length===1&&!/[0-9.]/.test(event.key))"
+                        ])
+                        ->suffix(fn ($get) => $get('../../unit') ? ' ' . $get('../../unit') : ''),
+                    DatePicker::make('expiry_date')
+                        ->label('Tanggal Kadaluarsa')
+                        ->nullable()
+                        ->native(false),
+                    DateTimePicker::make('received_at')
+                        ->label('Diterima Tanggal')
+                        ->required()
+                        ->default(now())
+                        ->native(false),
+                    TextInput::make('cost_per_unit')
+                        ->label('Harga per Unit')
+                        ->required()
+                        ->numeric()
+                        ->minValue(0)
+                        ->stripCharacters('.')
+                        ->mask(RawJs::make('$money($input, ",", ".", 0)'))
+                        ->extraInputAttributes([
+                            'min' => '0',
+                            'onkeydown' => "return !(event.key.length===1&&!/[0-9]/.test(event.key))",
+                        ])
+                        ->prefix(fn ($get) => $get('../../unit') ? 'Rp/' . $get('../../unit') : 'Rp'),
+                ])
+                ->defaultItems(0)
+                ->collapsible(),
         ]);
     }
 
@@ -69,9 +119,6 @@ class IngredientResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('id')
-                    ->label('ID')
-                    ->sortable(),
                 TextColumn::make('name')
                     ->label('Ingredient Name')
                     ->searchable()
@@ -81,13 +128,18 @@ class IngredientResource extends Resource
                     ->sortable(),
                 TextColumn::make('low_stock_threshold')
                     ->label('Low Stock Threshold')
-                    ->numeric(decimalPlaces: 2)
+                    ->numeric(decimalPlaces: 0)
+                    ->suffix(fn (Ingredient $record) => ' ' . $record->unit)
                     ->sortable(),
                 TextColumn::make('total_stock')
                     ->label('Total Stock')
                     ->getStateUsing(fn (Ingredient $record) => number_format($record->getTotalStock(), 2))
+                    ->suffix(fn (Ingredient $record) => ' ' . $record->unit)
                     ->badge()
-                    ->color(fn (Ingredient $record) => $record->getTotalStock() < (float) $record->low_stock_threshold ? 'danger' : 'success'),
+                    ->color(fn (Ingredient $record) => $record->getTotalStock() < (int) $record->low_stock_threshold ? 'danger' : 'success')
+                    ->sortable(query: function ($query, string $direction): void {
+                        $query->orderByRaw('(SELECT COALESCE(SUM(quantity), 0) FROM ingredient_batches WHERE ingredient_batches.ingredient_id = ingredients.id) ' . $direction);
+                    }),
                 IconColumn::make('is_active')
                     ->label('Active')
                     ->boolean()
@@ -104,6 +156,10 @@ class IngredientResource extends Resource
                     ->falseLabel('Inactive only'),
             ])
             ->recordActions([
+                Action::make('batches')
+                    ->label('Batch')
+                    ->icon('heroicon-o-cube')
+                    ->url(fn ($record) => static::getUrl('batches', ['record' => $record])),
                 EditAction::make(),
             ])
             ->toolbarActions([
@@ -116,17 +172,15 @@ class IngredientResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            BatchesRelationManager::class,
-        ];
+        return [];
     }
 
     public static function getPages(): array
     {
         return [
             'index' => ListIngredients::route('/'),
-            'create' => CreateIngredient::route('/create'),
             'edit' => EditIngredient::route('/{record}/edit'),
+            'batches' => ManageBatches::route('/{record}/batches'),
         ];
     }
 }
