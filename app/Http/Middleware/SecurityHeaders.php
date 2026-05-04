@@ -16,9 +16,8 @@ class SecurityHeaders
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
         $response->headers->set('X-XSS-Protection', '0'); // deprecated, rely on CSP instead
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
-        $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=(), payment=()');
+        $response->headers->set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
 
-        // Cross-Origin isolation — allows popups (needed for Midtrans payment window)
         $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
 
         // HSTS — browser remembers HTTPS for 1 year (active only over HTTPS)
@@ -28,12 +27,11 @@ class SecurityHeaders
         $vite = 'http://127.0.0.1:5173 http://localhost:5173';
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' $vite https://app.sandbox.midtrans.com",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' $vite",
             "style-src 'self' 'unsafe-inline' $vite",
             "img-src 'self' data: blob: https: http:",
             "font-src 'self' data: $vite",
-            "connect-src 'self' ws://127.0.0.1:* wss://127.0.0.1:* ws://localhost:* wss://localhost:* http://127.0.0.1:* http://localhost:* https://app.sandbox.midtrans.com",
-            "frame-src https://app.sandbox.midtrans.com",
+            "connect-src 'self' ws://127.0.0.1:* wss://127.0.0.1:* ws://localhost:* wss://localhost:* http://127.0.0.1:* http://localhost:*",
             "frame-ancestors 'none'",
             "base-uri 'self'",
             "form-action 'self'",

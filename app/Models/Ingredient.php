@@ -31,7 +31,7 @@ class Ingredient extends Model
     {
         return [
             'is_active' => 'boolean',
-            'low_stock_threshold' => 'decimal:2',
+            'low_stock_threshold' => 'integer',
         ];
     }
 

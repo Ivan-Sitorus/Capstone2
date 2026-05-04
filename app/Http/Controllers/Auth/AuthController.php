@@ -43,10 +43,10 @@ class AuthController extends Controller
         $role = Auth::user()->role;
 
         if (in_array($role, ['cashier', 'admin'])) {
-            return redirect()->route('cashier.dashboard');
+            return Inertia::location(route('cashier.dashboard'));
         }
 
-        return redirect()->route('customer.menu');
+        return Inertia::location(route('customer.menu'));
     }
 
     public function logout(Request $request)

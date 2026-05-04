@@ -17,6 +17,9 @@ return new class extends Migration
             $table->decimal('subtotal', 15, 2);
             $table->string('notes')->nullable();
             $table->timestamps();
+
+            $table->index('menu_id');
+            $table->index('order_id');
         });
     }
 
