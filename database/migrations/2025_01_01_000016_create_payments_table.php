@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->enum('payment_method', ['qris', 'ewallet', 'cash', 'transfer']);
-            $table->enum('payment_gateway', ['midtrans', 'manual']);
+            $table->enum('payment_gateway', ['manual']);
             $table->string('transaction_id')->nullable()->unique();
             $table->decimal('amount', 15, 2);
             $table->enum('status', ['pending', 'success', 'failed'])->default('pending');

@@ -29,7 +29,7 @@ Modul Admin, Inventori, Data Mining dikerjakan di fase terpisah.
 | State Management | Zustand (cart) |
 | Build Tool | Vite |
 | Web Server | Nginx |
-| Payment | Midtrans API (QRIS, E-Wallet, Transfer) |
+| Payment | Manual (Cash / QRIS) |
 
 > **Data Mining (FastAPI + Colab):** Di-skip untuk fase ini.
 
@@ -408,7 +408,7 @@ Per card:
   - ID Pesanan: label gray | nilai bold (#ORD-048)
   - Tanggal: label gray | nilai normal
   - Waktu: label gray | nilai normal
-  - Metode Pembayaran: label gray | nilai bold (QRIS (Midtrans))
+  - Metode Pembayaran: label gray | nilai bold (QRIS / Cash)
   - Kasir: label gray | nilai normal
   - Status: label gray | `<StatusBadge>`
 
@@ -678,7 +678,6 @@ pos-cafe/
 │   │   │   │   ├── CashierOrderController.php
 │   │   │   │   └── CashierVerifikasiController.php
 │   │   │   └── Api/
-│   │   │       └── MidtransWebhookController.php
 │   │   ├── Middleware/
 │   │   │   └── RoleMiddleware.php
 │   │   └── Requests/
@@ -694,7 +693,6 @@ pos-cafe/
 │   │   ├── OrderItem.php
 │   │   └── Payment.php
 │   └── Services/
-│       └── MidtransService.php
 │
 ├── resources/
 │   ├── css/
@@ -758,8 +756,7 @@ pos-cafe/
 │   ├── manifest.json
 │   └── sw.js
 │
-└── config/
-    └── midtrans.php
+├── config/
 ```
 
 ---
@@ -816,7 +813,7 @@ INDEX: (status), (created_at)
 ```sql
 id, order_id FK CASCADE,
 payment_method  ENUM('qris','ewallet','cash','transfer'),
-payment_gateway ENUM('midtrans','manual'),
+payment_gateway ENUM('manual'),
 transaction_id  VARCHAR NULL UNIQUE,
 amount DECIMAL(15,2),
 status ENUM('pending','success','failed') DEFAULT 'pending',
@@ -883,13 +880,6 @@ DB_DATABASE=pos_cafe
 DB_USERNAME=postgres
 DB_PASSWORD=
 
-MIDTRANS_SERVER_KEY=
-MIDTRANS_CLIENT_KEY=
-MIDTRANS_IS_PRODUCTION=false
-MIDTRANS_SNAP_URL=https://app.sandbox.midtrans.com/snap/snap.js
-
-VITE_MIDTRANS_CLIENT_KEY="${MIDTRANS_CLIENT_KEY}"
-VITE_MIDTRANS_SNAP_URL="${MIDTRANS_SNAP_URL}"
 VITE_APP_URL="${APP_URL}"
 ```
 

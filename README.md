@@ -15,7 +15,7 @@ Sistem POS berbasis web PWA untuk W9 Cafe STIE Totalwin Semarang.
 | CSS | Bootstrap 5 |
 | Build | Vite |
 | Auth | Laravel Sanctum (session-based) |
-| Payment | Midtrans Snap (QRIS, E-Wallet, Transfer) |
+| Payment | Manual (Cash / QRIS) |
 | State | Zustand (cart) + IndexedDB (offline) |
 
 ---
@@ -31,7 +31,7 @@ npm install
 cp .env.example .env
 php artisan key:generate
 
-# Isi DB_* dan MIDTRANS_* di .env
+# Isi DB_* di .env
 
 # 3. Database
 php artisan migrate:fresh --seed
@@ -68,10 +68,7 @@ DB_DATABASE=pos_cafe
 DB_USERNAME=postgres
 DB_PASSWORD=
 
-MIDTRANS_SERVER_KEY=SB-Mid-server-...
-MIDTRANS_CLIENT_KEY=SB-Mid-client-...
-MIDTRANS_IS_PRODUCTION=false
-MIDTRANS_SNAP_URL=https://app.sandbox.midtrans.com/snap/snap.js
+# No payment gateway configured (cash/qris only)
 ```
 
 ---
