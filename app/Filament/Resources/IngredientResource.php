@@ -17,7 +17,6 @@ use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Support\RawJs;
 use App\Filament\Resources\IngredientResource\Pages\ListIngredients;
 use App\Filament\Resources\IngredientResource\Pages\EditIngredient;
 use App\Filament\Resources\IngredientResource\Pages\ManageBatches;
@@ -60,9 +59,11 @@ class IngredientResource extends Resource
                 ->integer()
                 ->minValue(0)
                 ->default(0)
+                ->type('text')
+                ->stripCharacters('.')
                 ->extraInputAttributes([
-                    'min' => '0',
-                    'onkeydown' => "return !(event.key.length===1&&!/[0-9]/.test(event.key))",
+                    'onkeydown' => "return !['-','e','E','+','.',','].includes(event.key)",
+                    'oninput' => "let v=this.value.replace(/\\D/g,'');this.value=v.replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');",
                 ])
                 ->suffix(fn ($get) => $get('unit') ? ' ' . $get('unit') : ''),
             Toggle::make('is_active')
@@ -83,9 +84,12 @@ class IngredientResource extends Resource
                         ->numeric()
                         ->minValue(0)
                         ->step(0.1)
+                        ->type('text')
+                        ->stripCharacters('.')
+                        ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                         ->extraInputAttributes([
-                            'min' => '0',
-                            'onkeydown' => "return !(event.key.length===1&&!/[0-9.]/.test(event.key))"
+                            'onkeydown' => "return !['-','e','E','+'].includes(event.key)",
+                            'oninput' => "let v=this.value.replace(/[^0-9,]/g,'');let parts=v.split(',');let intPart=parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');let decPart=parts.length>1?parts.slice(1).join('').slice(0,1):'';this.value=decPart.length?intPart+','+decPart:intPart;",
                         ])
                         ->suffix(fn ($get) => $get('../../unit') ? ' ' . $get('../../unit') : ''),
                     DatePicker::make('expiry_date')
@@ -102,11 +106,11 @@ class IngredientResource extends Resource
                         ->required()
                         ->numeric()
                         ->minValue(0)
+                        ->type('text')
                         ->stripCharacters('.')
-                        ->mask(RawJs::make('$money($input, ",", ".", 0)'))
                         ->extraInputAttributes([
-                            'min' => '0',
-                            'onkeydown' => "return !(event.key.length===1&&!/[0-9]/.test(event.key))",
+                            'onkeydown' => "return !['-','e','E','+','.',','].includes(event.key)",
+                            'oninput' => "let v=this.value.replace(/\\D/g,'');this.value=v.replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');",
                         ])
                         ->prefix(fn ($get) => $get('../../unit') ? 'Rp/' . $get('../../unit') : 'Rp'),
                 ])
@@ -133,7 +137,7 @@ class IngredientResource extends Resource
                     ->sortable(),
                 TextColumn::make('total_stock')
                     ->label('Total Stock')
-                    ->getStateUsing(fn (Ingredient $record) => number_format($record->getTotalStock(), 2))
+                    ->getStateUsing(fn (Ingredient $record) => $record->getTotalStock() + 0)
                     ->suffix(fn (Ingredient $record) => ' ' . $record->unit)
                     ->badge()
                     ->color(fn (Ingredient $record) => $record->getTotalStock() < (int) $record->low_stock_threshold ? 'danger' : 'success')

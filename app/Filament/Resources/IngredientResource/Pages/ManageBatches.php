@@ -14,7 +14,6 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\Page;
-use Filament\Support\RawJs;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -80,9 +79,12 @@ class ManageBatches extends Page implements HasTable
                             ->numeric()
                             ->minValue(0)
                             ->step(0.1)
+                            ->type('text')
+                            ->stripCharacters('.')
+                            ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                             ->extraInputAttributes([
-                                'min' => '0',
-                                'onkeydown' => "return !(event.key.length===1&&!/[0-9.]/.test(event.key))"
+                                'onkeydown' => "return !['-','e','E','+'].includes(event.key)",
+                                'oninput' => "let v=this.value.replace(/[^0-9,]/g,'');let parts=v.split(',');let intPart=parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');let decPart=parts.length>1?parts.slice(1).join('').slice(0,1):'';this.value=decPart.length?intPart+','+decPart:intPart;",
                             ])
                             ->suffix(fn () => ' ' . $this->record->unit),
                         DatePicker::make('expiry_date')
@@ -99,9 +101,11 @@ class ManageBatches extends Page implements HasTable
                         ->required()
                         ->numeric()
                         ->minValue(0)
+                        ->type('text')
+                        ->stripCharacters('.')
                         ->extraInputAttributes([
-                            'min' => '0',
-                            'onkeydown' => "return !(event.key.length===1&&!/[0-9]/.test(event.key))"
+                            'onkeydown' => "return !['-','e','E','+','.',','].includes(event.key)",
+                            'oninput' => "let v=this.value.replace(/\\D/g,'');this.value=v.replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');",
                         ])
                         ->prefix('Rp'),
                     ])
@@ -118,9 +122,12 @@ class ManageBatches extends Page implements HasTable
                             ->numeric()
                             ->minValue(0)
                             ->step(0.1)
+                            ->type('text')
+                            ->stripCharacters('.')
+                            ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                             ->extraInputAttributes([
-                                'min' => '0',
-                                'onkeydown' => "return !(event.key.length===1&&!/[0-9.]/.test(event.key))"
+                                'onkeydown' => "return !['-','e','E','+'].includes(event.key)",
+                                'oninput' => "let v=this.value.replace(/[^0-9,]/g,'');let parts=v.split(',');let intPart=parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');let decPart=parts.length>1?parts.slice(1).join('').slice(0,1):'';this.value=decPart.length?intPart+','+decPart:intPart;",
                             ])
                             ->suffix(fn () => ' ' . $this->record->unit),
                         DatePicker::make('expiry_date')
@@ -137,9 +144,11 @@ class ManageBatches extends Page implements HasTable
                         ->required()
                         ->numeric()
                         ->minValue(0)
+                        ->type('text')
+                        ->stripCharacters('.')
                         ->extraInputAttributes([
-                            'min' => '0',
-                            'onkeydown' => "return !(event.key.length===1&&!/[0-9]/.test(event.key))"
+                            'onkeydown' => "return !['-','e','E','+','.',','].includes(event.key)",
+                            'oninput' => "let v=this.value.replace(/\\D/g,'');this.value=v.replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');",
                         ])
                         ->prefix('Rp'),
                     ]),
