@@ -8,7 +8,7 @@ import { formatRupiah } from '@/helpers';
 const F = '"Plus Jakarta Sans", system-ui, sans-serif';
 
 /* ── Inline menu item card (2-col grid, vertical) ───────────────────── */
-function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false }) {
+function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false, isMahasiswa = false }) {
     const cashback = Number(menu.cashback ?? 0);
 
     return (
@@ -50,7 +50,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                 }}>
                     {formatRupiah(Number(menu.price))}
                 </div>
-                {cashback > 0 && (
+                {isMahasiswa && cashback > 0 && (
                     <div style={{
                         fontSize: 10, color: '#16A34A', fontFamily: F,
                         display: 'flex', alignItems: 'center', gap: 3,
@@ -111,11 +111,11 @@ export default function CustomerMenu({ categories, table }) {
     const [activeCategory, setActiveCategory] = useState('all');
     const [search,         setSearch]         = useState('');
     const [customer,       setCustomer]       = useState(null);
+    const [ready,          setReady]          = useState(false);
 
     const { items, addItem, updateQty, setTable, total, count } = useCart();
 
-
-    /* Auth guard */
+    /* Auth guard — jalankan sebelum render konten */
     useEffect(() => {
         try {
             const saved = sessionStorage.getItem('w9_customer');
@@ -138,6 +138,7 @@ export default function CustomerMenu({ categories, table }) {
             }
             setCustomer(data);
             setTable(table?.id ?? data.tableId ?? null);
+            setReady(true);
         } catch (_) {
             router.visit('/order');
         }
@@ -180,6 +181,8 @@ export default function CustomerMenu({ categories, table }) {
         });
         return Object.entries(map).map(([label, menus]) => ({ label, menus }));
     }, [filtered, activeCategory]);
+
+    if (!ready) return null;
 
     return (
         <CustomerLayout activeTab="menu">
@@ -321,6 +324,7 @@ export default function CustomerMenu({ categories, table }) {
                                 menu={menu}
                                 priority={idx < 4}
                                 cartItem={cartMap[menu.id]}
+                                isMahasiswa={!!customer?.isMahasiswa}
                                 onAdd={() => addItem(menu)}
                                 onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
                                 onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
@@ -353,6 +357,7 @@ export default function CustomerMenu({ categories, table }) {
                                         key={menu.id}
                                         menu={menu}
                                         cartItem={cartMap[menu.id]}
+                                        isMahasiswa={!!customer?.isMahasiswa}
                                         onAdd={() => addItem(menu)}
                                         onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
                                         onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}

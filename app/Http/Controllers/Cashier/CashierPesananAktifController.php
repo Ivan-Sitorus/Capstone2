@@ -21,8 +21,13 @@ class CashierPesananAktifController extends Controller
                       ->where(fn($q3) =>
                           // Cash: tampil begitu dipilih
                           $q3->where('payment_method', 'cash')
-                             // QRIS: hanya setelah bukti dikirim
-                             ->orWhere(fn($q4) => $q4->where('payment_method', 'qris')->whereNotNull('payment_proof'))
+                             // QRIS: tampil saat bukti dikirim (pending) ATAU sudah dikonfirmasi (diproses, proof dihapus)
+                             ->orWhere(fn($q4) => $q4->where('payment_method', 'qris')
+                                 ->where(fn($q5) =>
+                                     $q5->whereNotNull('payment_proof')
+                                        ->orWhere('status', Order::STATUS_DIPROSES)
+                                 )
+                             )
                       )
                   );
             })

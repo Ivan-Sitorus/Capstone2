@@ -238,6 +238,17 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             Kasir sedang memverifikasi pembayaran Anda.<br/>
                             Harap tunggu konfirmasi.
                         </p>
+                        <div style={{
+                            width: '100%', background: '#F5F0EB',
+                            borderRadius: 12, padding: '10px 14px',
+                            textAlign: 'left',
+                        }}>
+                            <span style={{ fontSize: 12, color: '#6B5E52', lineHeight: 1.5, fontFamily: 'Outfit, system-ui' }}>
+                                Pantau status pesananmu di tab{' '}
+                                <strong style={{ color: '#E8763A' }}>Riwayat</strong>
+                                {' '}untuk melihat update dari kasir.
+                            </span>
+                        </div>
                         <button
                             onClick={() => router.visit('/customer/riwayat')}
                             style={{

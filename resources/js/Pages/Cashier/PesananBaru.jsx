@@ -14,6 +14,7 @@ export default function PesananBaru({ categories }) {
     const [payMethod,      setPayMethod]      = useState('cash');
     const [customerName,   setCustomerName]   = useState('');
     const [processing,     setProcessing]     = useState(false);
+    const [nameError,      setNameError]      = useState(false);
     const [showSuccess,    setShowSuccess]    = useState(false);
     const [successTotal,   setSuccessTotal]   = useState(0);
     const [isCartCollapsed, setIsCartCollapsed] = useState(false);
@@ -99,10 +100,16 @@ export default function PesananBaru({ categories }) {
         if (processing) return;
         setShowPayModal(false);
         setCustomerName('');
+        setNameError(false);
     }
 
     /* ── Step 1: proceed from choose ── */
     function handleChooseProceed() {
+        if (!customerName.trim()) {
+            setNameError(true);
+            return;
+        }
+        setNameError(false);
         submitOrder(payMethod);
     }
 
@@ -130,6 +137,7 @@ export default function PesananBaru({ categories }) {
         setCartItems([]);
         setCustomerName('');
         setPayMethod('cash');
+        router.visit('/cashier/pesanan-aktif');
     }
 
     /* ── Design tokens ── */
@@ -329,13 +337,18 @@ export default function PesananBaru({ categories }) {
                                             <input
                                                 type="text"
                                                 value={customerName}
-                                                onChange={e => setCustomerName(e.target.value)}
+                                                onChange={e => { setCustomerName(e.target.value); if (nameError) setNameError(false); }}
                                                 placeholder="Masukkan nama pelanggan..."
-                                                style={{ width: '100%', height: 44, border: '1px solid #E2E8F0', borderRadius: 12, padding: '0 14px 0 42px', fontSize: 14, color: '#0F172A', background: '#FFFFFF', outline: 'none', boxSizing: 'border-box', fontFamily: 'Outfit, system-ui', transition: 'border-color 0.15s' }}
-                                                onFocus={e => e.target.style.borderColor = '#3B6FD4'}
-                                                onBlur={e => e.target.style.borderColor = '#E2E8F0'}
+                                                style={{ width: '100%', height: 44, border: `1px solid ${nameError ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '0 14px 0 42px', fontSize: 14, color: '#0F172A', background: nameError ? '#FEF2F2' : '#FFFFFF', outline: 'none', boxSizing: 'border-box', fontFamily: 'Outfit, system-ui', transition: 'border-color 0.15s' }}
+                                                onFocus={e => e.target.style.borderColor = nameError ? '#EF4444' : '#3B6FD4'}
+                                                onBlur={e => e.target.style.borderColor = nameError ? '#EF4444' : '#E2E8F0'}
                                             />
                                         </div>
+                                        {nameError && (
+                                            <p style={{ margin: '4px 0 0', fontSize: 12, color: '#EF4444', fontFamily: 'Outfit, system-ui' }}>
+                                                Nama pelanggan wajib diisi
+                                            </p>
+                                        )}
                                     </div>
 
                                     {/* Metode Pembayaran */}
@@ -445,7 +458,7 @@ export default function PesananBaru({ categories }) {
                         </span>
 
                         <span style={{ fontSize: 13, color: '#64748B', fontFamily: 'Outfit, system-ui', textAlign: 'center', lineHeight: 1.5, width: '100%' }}>
-                            Pesanan berhasil dibuat dan siap diproses.
+                            Pesanan berhasil dibuat dan siap diproses. Anda akan diarahkan ke Pesanan Aktif.
                         </span>
 
                         <div style={{

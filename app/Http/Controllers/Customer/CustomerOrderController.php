@@ -124,7 +124,11 @@ class CustomerOrderController extends Controller
                     $q->where('payment_method', 'cash')
                       ->orWhere(function ($q2) {
                           $q2->where('payment_method', 'qris')
-                             ->whereNotNull('payment_proof');
+                             ->where(function ($q3) {
+                                 // Tampil saat bukti dikirim (pending) ATAU sudah dikonfirmasi kasir (proof dihapus)
+                                 $q3->whereNotNull('payment_proof')
+                                    ->orWhereIn('status', [Order::STATUS_DIPROSES, Order::STATUS_SELESAI]);
+                             });
                       });
                 })
                 ->latest()

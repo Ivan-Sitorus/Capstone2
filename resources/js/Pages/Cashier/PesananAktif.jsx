@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { router, Head } from '@inertiajs/react';
 import axios from 'axios';
-import { X, CircleCheck, QrCode } from 'lucide-react';
+import { X, QrCode } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
 import OrderCard from '@/Components/Cashier/OrderCard';
 import StatusBadge from '@/Components/Common/StatusBadge';
@@ -13,9 +13,20 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
     const [rejectNote,   setRejectNote]   = useState('');
     const [processing,   setProcessing]   = useState(false);
     const [localOrders,  setLocalOrders]  = useState(initialOrders ?? []);
+    const pendingRemoveRef = useRef(new Set());
+    const pendingStatusRef = useRef(new Map()); // orderId → optimistic status
 
-    // Sync saat Inertia reload membawa data baru
-    useEffect(() => { setLocalOrders(initialOrders ?? []); }, [initialOrders]);
+    // Sync saat Inertia reload — jaga optimistic state agar polling tidak timpa perubahan in-flight
+    useEffect(() => {
+        setLocalOrders(
+            (initialOrders ?? [])
+                .filter(o => !pendingRemoveRef.current.has(o.id))
+                .map(o => pendingStatusRef.current.has(o.id)
+                    ? { ...o, status: pendingStatusRef.current.get(o.id) }
+                    : o
+                )
+        );
+    }, [initialOrders]);
 
     /* ── Auto-refresh: 20s saat tab aktif, pause saat tersembunyi ── */
     useEffect(() => {
@@ -61,14 +72,27 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
     /* ── Actions ── */
     async function handleConfirmQris() {
         if (processing || !qrisOrder) return;
+        const orderId = qrisOrder.id;
         setProcessing(true);
+
+        // Optimistic: tutup modal + langsung tampilkan sebagai diproses
+        pendingStatusRef.current.set(orderId, 'diproses');
+        setLocalOrders(prev => prev.map(o =>
+            o.id === orderId ? { ...o, status: 'diproses', payment_proof: null } : o
+        ));
+        setQrisOrder(null);
+
         try {
-            await axios.patch(`/cashier/order/${qrisOrder.id}/confirm-qris`);
+            await axios.patch(`/cashier/order/${orderId}/confirm-qris`);
+            router.reload({
+                only: ['orders', 'counts'],
+                onFinish: () => pendingStatusRef.current.delete(orderId),
+            });
         } catch (_) {
+            pendingStatusRef.current.delete(orderId);
+            router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);
-            setQrisOrder(null);
-            router.reload({ only: ['orders', 'counts'] });
         }
     }
 
@@ -89,16 +113,26 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         if (processing) return;
         setProcessing(true);
 
-        // Optimistic: langsung hapus dari list jika selesai
         if (targetStatus === 'selesai') {
+            pendingRemoveRef.current.add(orderId);
             setLocalOrders(prev => prev.filter(o => o.id !== orderId));
+        } else {
+            pendingStatusRef.current.set(orderId, targetStatus);
+            setLocalOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: targetStatus } : o));
         }
 
         try {
             await axios.patch(`/cashier/order/${orderId}/status`, { status: targetStatus });
-            router.reload({ only: ['orders', 'counts'] });
+            router.reload({
+                only: ['orders', 'counts'],
+                onFinish: () => {
+                    pendingRemoveRef.current.delete(orderId);
+                    pendingStatusRef.current.delete(orderId);
+                },
+            });
         } catch (_) {
-            // Rollback jika gagal
+            pendingRemoveRef.current.delete(orderId);
+            pendingStatusRef.current.delete(orderId);
             router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);

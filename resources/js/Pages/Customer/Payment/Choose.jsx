@@ -307,6 +307,16 @@ export default function PaymentChoose({ order, items, table_number }) {
                             alignItems: 'center', gap: 2,
                         }}>
                             <span style={{ fontSize: 11, fontWeight: 500, color: '#B5A898', fontFamily: 'Outfit, system-ui' }}>
+                                No. Pesanan
+                            </span>
+                            <span style={{
+                                fontSize: 15, fontWeight: 700, color: '#2D2016',
+                                fontFamily: '"DM Sans", system-ui', letterSpacing: 0.3,
+                                marginBottom: 6,
+                            }}>
+                                #{order.order_code}
+                            </span>
+                            <span style={{ fontSize: 11, fontWeight: 500, color: '#B5A898', fontFamily: 'Outfit, system-ui' }}>
                                 Total Pembayaran
                             </span>
                             <span style={{
@@ -314,6 +324,24 @@ export default function PaymentChoose({ order, items, table_number }) {
                                 fontFamily: '"DM Sans", system-ui', letterSpacing: -0.5,
                             }}>
                                 {formatRupiah(order.total_amount)}
+                            </span>
+                        </div>
+
+                        {/* Info riwayat */}
+                        <div style={{
+                            width: '100%',
+                            background: '#F5F0EB',
+                            borderRadius: 12,
+                            padding: '10px 14px',
+                            display: 'flex', alignItems: 'flex-start', gap: 8,
+                        }}>
+                            <span style={{
+                                fontSize: 12, color: '#6B5E52', lineHeight: 1.5,
+                                fontFamily: 'Outfit, system-ui',
+                            }}>
+                                Pantau status pesananmu di tab{' '}
+                                <strong style={{ color: '#E8763A' }}>Riwayat</strong>
+                                {' '}untuk melihat update dari kasir.
                             </span>
                         </div>
 

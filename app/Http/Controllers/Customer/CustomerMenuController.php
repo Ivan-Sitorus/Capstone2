@@ -18,6 +18,10 @@ class CustomerMenuController extends Controller
             ? CafeTable::select(['id', 'table_number'])->find($tableId)
             : null;
 
+        if ($table && $table->table_number > 10) {
+            abort(404);
+        }
+
         return Inertia::render('Customer/Identitas', ['table' => $table]);
     }
 
@@ -38,6 +42,10 @@ class CustomerMenuController extends Controller
         $table = $request->query('table')
             ? CafeTable::select(['id', 'table_number'])->find($request->query('table'))
             : null;
+
+        if ($table && $table->table_number > 10) {
+            abort(404);
+        }
 
         return Inertia::render('Customer/Menu/Index', compact('categories', 'table'));
     }

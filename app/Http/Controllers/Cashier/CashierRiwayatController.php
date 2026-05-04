@@ -17,7 +17,7 @@ class CashierRiwayatController extends Controller
             ->when($request->search, fn($q) => $q->where('order_code', 'like', '%' . $request->search . '%')
                 ->orWhere('customer_name', 'like', '%' . $request->search . '%'))
             ->when($request->date,   fn($q) => $q->whereDate('created_at', $request->date))
-            ->when($request->method, fn($q) => $q->where('payment_method', $request->method))
+            ->when($request->input('method'), fn($q) => $q->where('payment_method', $request->input('method')))
             ->latest()
             ->paginate(25)
             ->through(fn($o) => [
