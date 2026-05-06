@@ -13,7 +13,6 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\MenuResource\RelationManagers\IngredientsRelationManager;
 use App\Filament\Resources\MenuResource\Pages\ListMenus;
-use App\Filament\Resources\MenuResource\Pages\CreateMenu;
 use App\Filament\Resources\MenuResource\Pages\EditMenu;
 use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers;
@@ -22,7 +21,9 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Forms\Components\FileUpload;
 use Filament\Resources\Resource;
+use App\Services\MenuImageService;
 use Filament\Tables;
 use Filament\Tables\Table;
 
@@ -60,6 +61,19 @@ class MenuResource extends Resource
                 ->required()
                 ->searchable()
                 ->preload(),
+            FileUpload::make('image')
+                ->label('Gambar Menu')
+                ->directory('menus/')
+                ->disk('public')
+                ->image()
+                ->imagePreviewHeight('200')
+                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                ->maxSize(5120)
+                ->nullable()
+                ->saveUploadedFileUsing(function ($file) {
+                    $oldPath = $this->record?->image;
+                    return app(MenuImageService::class)->convertAndStore($file, $oldPath);
+                }),
             TextInput::make('price')
                 ->label('Harga Normal')
                 ->required()
@@ -137,7 +151,7 @@ class MenuResource extends Resource
                     ->falseLabel('Tanpa Resep'),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->modal(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -158,7 +172,6 @@ class MenuResource extends Resource
     {
         return [
             'index'  => ListMenus::route('/'),
-            'create' => CreateMenu::route('/create'),
             'edit'   => EditMenu::route('/{record}/edit'),
         ];
     }
