@@ -31,7 +31,8 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                     ? <img src={menu.image} alt={menu.name}
                            loading={priority ? 'eager' : 'lazy'}
                            decoding={priority ? 'sync' : 'async'}
-                           style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                           onError={e => { e.target.style.display = 'none'; }} />
                     : <Coffee size={36} color="#FFFFFF" strokeWidth={1.5} />
                 }
             </div>

@@ -30,6 +30,7 @@ export default function MenuCard({ menu, onAdd }) {
                         src={menu.image}
                         alt={menu.name}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        onError={e => { e.target.style.display = 'none'; }}
                       />
                     : <Coffee size={32} color="#B5A898" />
                 }
