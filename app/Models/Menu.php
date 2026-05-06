@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\MenuImageService;
 use Illuminate\Database\Eloquent\Model;
 
 class Menu extends Model
@@ -20,6 +21,8 @@ class Menu extends Model
         'student_price',
     ];
 
+    protected $appends = ['image_url'];
+
     protected function casts(): array
     {
         return [
@@ -30,6 +33,18 @@ class Menu extends Model
             'is_stock_calculated' => 'boolean',
             'is_student_discount' => 'boolean',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::deleting(function (self $menu): void {
+            app(MenuImageService::class)->delete($menu->image);
+        });
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        return $this->image ? app(MenuImageService::class)->getImageUrl($this->image) : null;
     }
 
     public function category()
