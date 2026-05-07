@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Expense;
 use App\Models\IngredientBatch;
 use App\Models\Order;
 use App\Models\Receivable;
@@ -74,10 +73,6 @@ class SimpleReportService
      */
     private function calculateTotalExpense(Carbon $start, Carbon $end): float
     {
-        // Expense from Expense table
-        $fromExpenses = (float) Expense::whereBetween('date', [$start, $end])
-            ->sum('amount');
-
         // Expense from ingredient batches (quantity * cost_per_unit)
         $fromBatches = (float) IngredientBatch::whereBetween('received_at', [$start, $end])
             ->selectRaw('SUM(quantity * cost_per_unit) as total')
@@ -88,7 +83,7 @@ class SimpleReportService
             ->whereBetween('created_at', [$start, $end])
             ->sum('nominal');
 
-        return $fromExpenses + $fromBatches + $fromUnexpected;
+        return $fromBatches + $fromUnexpected;
     }
 
     /**
@@ -132,18 +127,6 @@ class SimpleReportService
      */
     private function calculateExpenseBreakdown(Carbon $start, Carbon $end): array
     {
-        // Expenses by category
-        $expensesByCategory = Expense::whereBetween('date', [$start, $end])
-            ->select('category', DB::raw('SUM(amount) as total'), DB::raw('COUNT(*) as count'))
-            ->groupBy('category')
-            ->get()
-            ->map(fn ($item) => [
-                'source' => $item->category ?? 'uncategorized',
-                'total' => (float) $item->total,
-                'count' => (int) $item->count,
-            ])
-            ->toArray();
-
         // Ingredient batch costs
         $ingredientCosts = (float) IngredientBatch::whereBetween('received_at', [$start, $end])
             ->selectRaw('SUM(quantity * cost_per_unit) as total')
@@ -161,7 +144,7 @@ class SimpleReportService
             ->whereBetween('created_at', [$start, $end])
             ->count();
 
-        $breakdown = array_merge($expensesByCategory, [
+        $breakdown = [
             [
                 'source' => 'ingredient_purchase',
                 'total' => $ingredientCosts,
@@ -172,7 +155,7 @@ class SimpleReportService
                 'total' => $unexpectedExpense,
                 'count' => $unexpectedCount,
             ],
-        ]);
+        ];
 
         return $breakdown;
     }

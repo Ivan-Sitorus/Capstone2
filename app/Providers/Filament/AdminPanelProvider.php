@@ -47,6 +47,7 @@ class AdminPanelProvider extends PanelProvider
             ->spa()
             ->spaUrlExceptions([
                 '/admin/financial-report*',
+                '/admin/view-report*',
             ])
             ->sidebarCollapsibleOnDesktop()
             ->collapsedSidebarWidth('4rem')

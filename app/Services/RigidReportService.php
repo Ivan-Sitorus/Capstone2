@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Expense;
 use App\Models\IngredientBatch;
 use App\Models\Order;
 use App\Models\Receivable;
@@ -36,8 +35,7 @@ class RigidReportService
 
         $labaKotor = $pendapatan - $hpp;
 
-        $bebanOperasional = (float) Expense::whereBetween('date', [$s, $e])
-            ->sum('amount');
+        $bebanOperasional = 0;
 
         $bebanTakTerduga = (float) UnexpectedTransaction::where('jenis', 'pengeluaran')
             ->whereBetween('created_at', [$s, $e])

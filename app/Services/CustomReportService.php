@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Category;
-use App\Models\Expense;
 use App\Models\IngredientBatch;
 use App\Models\Order;
 use App\Models\UnexpectedTransaction;
@@ -16,7 +15,6 @@ class CustomReportService
      * Category identifier prefixes used in $config['categories']:
      * - menu:{id}              Menu category (by categories.id)
      * - unexpected_income      UnexpectedTransaction jenis='pemasukan'
-     * - expense:{name}         Direct expense category (expenses.category value)
      * - bahan_baku             IngredientBatch purchases
      * - unexpected_expense     UnexpectedTransaction jenis='pengeluaran'
      *
@@ -36,7 +34,7 @@ class CustomReportService
         $aggregation = ($config['aggregation'] ?? 'monthly') === 'daily' ? 'daily' : 'monthly';
         $categoryFilters = $config['categories'] ?? [];
 
-        [$menuCatIds, $expenseCatNames, $includeUncInc, $includeBb, $includeUncExp]
+        [$menuCatIds, $includeUncInc, $includeBb, $includeUncExp]
             = $this->parseCategoryFilters($categoryFilters);
 
         $dateExpr = $aggregation === 'daily'
@@ -52,10 +50,6 @@ class CustomReportService
 
         if ($includeUncInc) {
             $unionParts[] = $this->incomeUnexpectedSql($from, $to, $dateExpr, $bindings);
-        }
-
-        if ($expenseCatNames !== null) {
-            $unionParts[] = $this->expenseDirectSql($from, $to, $expenseCatNames, $bindings);
         }
 
         if ($includeBb) {
@@ -83,7 +77,6 @@ class CustomReportService
             $to,
             $aggregation,
             $menuCatIds,
-            $expenseCatNames,
             $includeUncInc,
             $includeBb,
             $includeUncExp
@@ -121,28 +114,26 @@ class CustomReportService
 
     /**
      * Parse $config['categories'] into concrete category sets.
-     * Returns [menuCatIds|null, expenseCatNames|null, bool, bool, bool].
+     * Returns [menuCatIds|null, bool, bool, bool].
      * null means "ALL" for that set. Empty filters = all null + all true.
      */
     private function parseCategoryFilters(array $categoryFilters): array
     {
         $includeAll = empty($categoryFilters);
 
-        $menuCatIds      = null;
-        $expenseCatNames = null;
-        $includeUncInc   = true;
-        $includeBb       = true;
-        $includeUncExp   = true;
+        $menuCatIds    = null;
+        $includeUncInc = true;
+        $includeBb     = true;
+        $includeUncExp = true;
 
         if ($includeAll) {
-            return [$menuCatIds, $expenseCatNames, $includeUncInc, $includeBb, $includeUncExp];
+            return [$menuCatIds, $includeUncInc, $includeBb, $includeUncExp];
         }
 
-        $menuIds     = [];
-        $expenseCats = [];
-        $uncInc      = false;
-        $bb          = false;
-        $uncExp      = false;
+        $menuIds = [];
+        $uncInc  = false;
+        $bb      = false;
+        $uncExp  = false;
 
         foreach ($categoryFilters as $ident) {
             if ($ident === 'unexpected_income') {
@@ -156,14 +147,11 @@ class CustomReportService
                 if ($id > 0) {
                     $menuIds[] = $id;
                 }
-            } elseif (str_starts_with($ident, 'expense:')) {
-                $expenseCats[] = substr($ident, 8);
             }
         }
 
         return [
             ! empty($menuIds) ? $menuIds : null,
-            ! empty($expenseCats) ? $expenseCats : null,
             $uncInc,
             $bb,
             $uncExp,
@@ -217,31 +205,6 @@ class CustomReportService
     }
 
     /**
-     * Expense from expenses table, grouped by category (date is a DATE column).
-     */
-    private function expenseDirectSql(Carbon $from, Carbon $to, ?array $expenseCatNames, array &$bindings): string
-    {
-        $bindings[] = $from->toDateString();
-        $bindings[] = $to->toDateString();
-
-        $where = "e.date BETWEEN ? AND ?";
-
-        if (! empty($expenseCatNames)) {
-            $placeholders = $this->buildInPlaceholders($expenseCatNames);
-            $where .= " AND e.category IN ({$placeholders})";
-            foreach ($expenseCatNames as $cat) {
-                $bindings[] = $cat;
-            }
-        }
-
-        return "SELECT e.date AS bucket_date, e.category AS category, 'Expense' AS type,\n"
-              ."       COALESCE(SUM(e.amount), 0) AS amount\n"
-              ."FROM expenses e\n"
-              ."WHERE {$where}\n"
-              ."GROUP BY e.date, e.category";
-    }
-
-    /**
      * Expense from IngredientBatch purchases as "Bahan Baku".
      */
     private function expenseBahanBakuSql(Carbon $from, Carbon $to, string $dateExpr, array &$bindings): string
@@ -285,7 +248,6 @@ class CustomReportService
         Carbon  $to,
         string  $aggregation,
         ?array  $menuCatIds,
-        ?array  $expenseCatNames,
         bool    $includeUncInc,
         bool    $includeBb,
         bool    $includeUncExp,
@@ -307,7 +269,6 @@ class CustomReportService
         }
 
         $incCategoryNames = [];
-        $expCategoryNames = [];
 
         if ($menuCatIds !== null) {
             $incCategoryNames = Category::whereIn('id', $menuCatIds)
@@ -316,12 +277,6 @@ class CustomReportService
                 ->toArray();
         } else {
             $incCategoryNames = Category::where('is_active', true)->pluck('name')->toArray();
-        }
-
-        if ($expenseCatNames !== null) {
-            $expCategoryNames = $expenseCatNames;
-        } else {
-            $expCategoryNames = Expense::distinct()->pluck('category')->toArray();
         }
 
         $keyed = [];
@@ -347,13 +302,6 @@ class CustomReportService
                 $filled[] = isset($keyed[$k])
                     ? $this->toArray($keyed[$k])
                     : $this->makeRow($date, 'Unexpected Income', 'Income', 0);
-            }
-
-            foreach ($expCategoryNames as $catName) {
-                $k = "{$date}|{$catName}|Expense";
-                $filled[] = isset($keyed[$k])
-                    ? $this->toArray($keyed[$k])
-                    : $this->makeRow($date, $catName, 'Expense', 0);
             }
 
             if ($includeBb) {

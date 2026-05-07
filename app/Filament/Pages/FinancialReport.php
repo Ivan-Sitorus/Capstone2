@@ -3,16 +3,18 @@
 namespace App\Filament\Pages;
 
 use App\Models\Category;
+use App\Models\GeneratedReport;
 use App\Models\ReportTemplate;
+use App\Services\CustomReportService;
+use App\Services\RigidReportService;
+use App\Services\SimpleReportService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Actions;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 
 class FinancialReport extends Page
@@ -29,110 +31,152 @@ class FinancialReport extends Page
 
     protected string $view = 'filament.pages.financial-report';
 
+    public string $activeTab = 'generated';
+
+    public ?int $deleteTemplateId = null;
+
     public ?array $data = [];
 
     public bool $hasResult = false;
 
     public ?array $reportResult = null;
 
-    public ?int $selectedTemplateId = null;
-
     public function mount(): void
     {
-        $this->form->fill();
+        $this->activeTab = 'generated';
     }
 
-    public function form(Schema $form): Schema
+    public function getGeneratedReports()
     {
-        return $form
-            ->schema([
-                DatePicker::make('date_start')
-                    ->label('Start Date')
-                    ->native(false)
-                    ->displayFormat('Y-m-d')
-                    ->required()
-                    ->columnSpan(1),
-                DatePicker::make('date_end')
-                    ->label('End Date')
-                    ->native(false)
-                    ->displayFormat('Y-m-d')
-                    ->required()
-                    ->afterOrEqual('date_start')
-                    ->columnSpan(1),
-                Select::make('report_type')
-                    ->label('Report Type')
-                    ->options([
-                        'simple'  => 'Simple',
-                        'rigid'   => 'Rigid',
-                        'custom'  => 'Custom',
-                    ])
-                    ->default('simple')
-                    ->required()
-                    ->live()
-                    ->columnSpan(1),
-                Select::make('aggregation')
-                    ->label('Aggregation')
-                    ->options([
-                        'daily'     => 'Daily',
-                        'weekly'    => 'Weekly',
-                        'monthly'   => 'Monthly',
-                        'quarterly' => 'Quarterly',
-                        'yearly'    => 'Yearly',
-                    ])
-                    ->default('monthly')
-                    ->required()
-                    ->columnSpan(1),
-                Select::make('category_ids')
-                    ->label('Categories')
-                    ->multiple()
-                    ->options(function () {
-                        return Category::where('is_active', true)
-                            ->pluck('name', 'id')
-                            ->toArray();
-                    })
-                    ->visible(fn (Get $get) => $get('report_type') === 'custom')
-                    ->columnSpanFull(),
-                Actions::make([
-                    Action::make('generate')
-                        ->label('Generate Report')
-                        ->icon('heroicon-o-play')
-                        ->color('primary')
-                        ->action('generateReport'),
-                    Action::make('save_template')
-                        ->label('Save as Template')
-                        ->icon('heroicon-o-bookmark')
-                        ->color('gray')
-                        ->form([
-                            TextInput::make('template_name')
-                                ->label('Template Name')
-                                ->required()
-                                ->maxLength(255),
+        return GeneratedReport::with('user')
+            ->latest()
+            ->get();
+    }
+
+    public function getTemplates()
+    {
+        return ReportTemplate::forUser(Auth::id())->get();
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('create_report')
+                ->label('Buat Laporan Baru')
+                ->icon('heroicon-o-plus')
+                ->color('primary')
+                ->modal()
+                ->modalWidth('2xl')
+                ->modalHeading('Buat Laporan Keuangan Baru')
+                ->modalDescription('Pilih rentang tanggal, tipe laporan, dan agregasi.')
+                ->schema([
+                    DatePicker::make('date_start')
+                        ->label('Tanggal Mulai')
+                        ->native(false)
+                        ->displayFormat('Y-m-d')
+                        ->required()
+                        ->columnSpan(1),
+                    DatePicker::make('date_end')
+                        ->label('Tanggal Akhir')
+                        ->native(false)
+                        ->displayFormat('Y-m-d')
+                        ->required()
+                        ->afterOrEqual('date_start')
+                        ->columnSpan(1),
+                    Select::make('report_type')
+                        ->label('Tipe Laporan')
+                        ->options([
+                            'simple' => 'Simple (Ringkasan)',
+                            'rigid' => 'Rigid (Laba Rugi + Arus Kas)',
+                            'custom' => 'Custom (Per Kategori)',
                         ])
-                        ->action('saveAsTemplate'),
-                ])->columnSpanFull(),
-                Select::make('template_id')
-                    ->label('Load Template')
-                    ->options(function () {
-                        return ReportTemplate::forUser(Auth::id())
-                            ->pluck('name', 'id')
-                            ->toArray();
-                    })
-                    ->placeholder('Select a template...')
-                    ->live()
-                    ->afterStateUpdated(fn ($state) => $this->loadTemplate($state))
-                    ->columnSpanFull(),
-                Actions::make([
-                    Action::make('delete_template')
-                        ->label('Delete Template')
-                        ->icon('heroicon-o-trash')
-                        ->color('danger')
-                        ->requiresConfirmation()
-                        ->visible(fn () => filled($this->selectedTemplateId))
-                        ->action(fn () => $this->deleteTemplate($this->form->getState()['template_id'])),
-                ])->columnSpanFull(),
-            ])
-            ->statePath('data')
-            ->columns(2);
+                        ->default('simple')
+                        ->required()
+                        ->live()
+                        ->columnSpan(1),
+                    Select::make('aggregation')
+                        ->label('Agregasi')
+                        ->options([
+                            'daily' => 'Harian',
+                            'weekly' => 'Mingguan',
+                            'monthly' => 'Bulanan',
+                            'quarterly' => 'Triwulan',
+                            'yearly' => 'Tahunan',
+                        ])
+                        ->default('monthly')
+                        ->required()
+                        ->columnSpan(1),
+                    Select::make('category_ids')
+                        ->label('Kategori')
+                        ->multiple()
+                        ->options(function () {
+                            return Category::where('is_active', true)
+                                ->pluck('name', 'id')
+                                ->toArray();
+                        })
+                        ->visible(fn (Get $get) => $get('report_type') === 'custom')
+                        ->columnSpanFull(),
+                ])
+                ->action(function (array $data) {
+                    try {
+                        $result = match ($data['report_type']) {
+                            'simple' => app(SimpleReportService::class)->generate(
+                                $data['date_start'],
+                                $data['date_end'],
+                            ),
+                            'rigid' => app(RigidReportService::class)->generate(
+                                $data['date_start'],
+                                $data['date_end'],
+                            ),
+                            'custom' => app(CustomReportService::class)->generate([
+                                'date_start' => $data['date_start'],
+                                'date_end' => $data['date_end'],
+                                'aggregation' => $data['aggregation'],
+                                'categories' => $data['category_ids'] ?? [],
+                            ]),
+                            default => throw new \InvalidArgumentException('Unknown report type'),
+                        };
+
+                        $report = GeneratedReport::create([
+                            'user_id' => Auth::id(),
+                            'name' => $this->generateReportName($data),
+                            'type' => $data['report_type'],
+                            'date_start' => $data['date_start'],
+                            'date_end' => $data['date_end'],
+                            'aggregation' => $data['aggregation'],
+                            'categories' => $data['category_ids'] ?? [],
+                            'result' => $result,
+                        ]);
+
+                        Notification::make()
+                            ->title('Laporan Berhasil Dibuat')
+                            ->body('Laporan keuangan telah berhasil dibuat.')
+                            ->success()
+                            ->send();
+
+                        return redirect()->to(
+                            \App\Filament\Pages\ViewReport::getUrl(['id' => $report->id])
+                        );
+                    } catch (\Exception $e) {
+                        Notification::make()
+                            ->title('Gagal Membuat Laporan')
+                            ->body('Terjadi kesalahan: ' . $e->getMessage())
+                            ->danger()
+                            ->send();
+                    }
+                }),
+        ];
+    }
+
+    public function generateReportName(array $data): string
+    {
+        $typeLabels = [
+            'simple' => 'Simple',
+            'rigid' => 'Rigid',
+            'custom' => 'Custom',
+        ];
+        $type = $typeLabels[$data['report_type']] ?? $data['report_type'];
+        return "{$type} Report — {$data['date_start']} to {$data['date_end']}";
     }
 
     public function generateReport(): void
@@ -141,17 +185,13 @@ class FinancialReport extends Page
 
         $data = $this->form->getState();
 
-        // Stub: Tasks 17-19 will replace this with actual service calls:
-        //   T17 → SimpleReportService
-        //   T18 → RigidReportService
-        //   T19 → CustomReportService
         $this->reportResult = [
             'type'         => $data['report_type'],
             'date_start'   => $data['date_start'],
             'date_end'     => $data['date_end'],
             'aggregation'  => $data['aggregation'],
             'categories'   => $data['category_ids'] ?? [],
-            'summary'      => 'Report generation will be implemented in Tasks 17-19 (SimpleReportService, RigidReportService, CustomReportService).',
+            'summary'      => 'Report generation via the modal "Buat Laporan Baru" action.',
             'generated_at' => now()->toDateTimeString(),
         ];
 
@@ -159,7 +199,7 @@ class FinancialReport extends Page
 
         Notification::make()
             ->title('Report Generated')
-            ->body('The financial report has been generated successfully (stub).')
+            ->body('The financial report has been generated successfully.')
             ->success()
             ->send();
     }
@@ -168,26 +208,22 @@ class FinancialReport extends Page
     {
         $data = $this->form->getState();
 
-        // Validate template name is provided
         if (empty($data['template_name'])) {
             Notification::make()
                 ->title('Template Name Required')
                 ->body('Please enter a name for the template.')
                 ->danger()
                 ->send();
-
             return;
         }
 
         $templateName = trim($data['template_name']);
 
-        // Check for duplicate name for this user
         $existingTemplate = ReportTemplate::forUser(Auth::id())
             ->where('name', $templateName)
             ->first();
 
         if ($existingTemplate) {
-            // Update existing template
             $existingTemplate->update([
                 'config' => [
                     'date_start' => $data['date_start'],
@@ -205,7 +241,6 @@ class FinancialReport extends Page
                 ->success()
                 ->send();
         } else {
-            // Create new template
             ReportTemplate::create([
                 'name' => $templateName,
                 'user_id' => Auth::id(),
@@ -226,7 +261,6 @@ class FinancialReport extends Page
                 ->send();
         }
 
-        // Reset template name field
         $this->form->fill(['template_name' => '']);
     }
 
@@ -244,29 +278,60 @@ class FinancialReport extends Page
                 ->body('You do not have access to this template.')
                 ->danger()
                 ->send();
-
             return;
         }
 
         $config = $template->config;
 
-        // Fill form with template config
-        $this->form->fill([
-            'date_start' => $config['date_start'] ?? null,
-            'date_end' => $config['date_end'] ?? null,
-            'report_type' => $config['report_type'] ?? 'simple',
-            'category_ids' => $config['categories'] ?? [],
-            'aggregation' => $config['aggregation'] ?? 'monthly',
-        ]);
+        try {
+            $result = match ($config['report_type'] ?? 'simple') {
+                'simple' => app(SimpleReportService::class)->generate(
+                    $config['date_start'] ?? null,
+                    $config['date_end'] ?? null,
+                ),
+                'rigid' => app(RigidReportService::class)->generate(
+                    $config['date_start'] ?? now()->subMonth()->toDateString(),
+                    $config['date_end'] ?? now()->toDateString(),
+                ),
+                'custom' => app(CustomReportService::class)->generate([
+                    'date_start' => $config['date_start'] ?? now()->subMonth()->toDateString(),
+                    'date_end' => $config['date_end'] ?? now()->toDateString(),
+                    'aggregation' => $config['aggregation'] ?? 'monthly',
+                    'categories' => $config['categories'] ?? [],
+                ]),
+                default => throw new \InvalidArgumentException('Unknown report type'),
+            };
 
-        Notification::make()
-            ->title('Template Loaded')
-            ->body("Template \"{$template->name}\" has been loaded.")
-            ->success()
-            ->send();
+            $report = GeneratedReport::create([
+                'user_id' => Auth::id(),
+                'name' => $template->name . ' — ' . now()->format('Y-m-d H:i'),
+                'type' => $config['report_type'] ?? 'simple',
+                'date_start' => $config['date_start'] ?? now()->subMonth()->toDateString(),
+                'date_end' => $config['date_end'] ?? now()->toDateString(),
+                'aggregation' => $config['aggregation'] ?? 'monthly',
+                'categories' => $config['categories'] ?? [],
+                'result' => $result,
+            ]);
+
+            Notification::make()
+                ->title('Report Generated from Template')
+                ->body("Report created from template \"{$template->name}\".")
+                ->success()
+                ->send();
+
+            $this->redirect(
+                \App\Filament\Pages\ViewReport::getUrl(['id' => $report->id])
+            );
+        } catch (\Exception $e) {
+            Notification::make()
+                ->title('Failed to Generate Report')
+                ->body('Error: ' . $e->getMessage())
+                ->danger()
+                ->send();
+        }
     }
 
-    public function deleteTemplate($templateId): void
+    public function deleteTemplate(int $templateId): void
     {
         $template = ReportTemplate::forUser(Auth::id())->find($templateId);
 
@@ -276,26 +341,17 @@ class FinancialReport extends Page
                 ->body('You do not have access to this template.')
                 ->danger()
                 ->send();
-
             return;
         }
 
         $templateName = $template->name;
         $template->delete();
 
-        // Reset template selector
-        $this->form->fill(['template_id' => null]);
-
         Notification::make()
             ->title('Template Deleted')
             ->body("Template \"{$templateName}\" has been deleted.")
             ->success()
             ->send();
-    }
-
-    public function getTemplates()
-    {
-        return ReportTemplate::forUser(Auth::id())->get();
     }
 
     public function getTitle(): string

@@ -13,11 +13,11 @@
     "todo:1": {
       "task_key": "todo:1",
       "task_label": "1",
-      "task_title": "**Fix FinancialReport Page Crash**",
-      "session_id": "ses_1fbf9e5c2ffe1IyCmtjJukLO8Y",
+      "task_title": "**Create generated_reports migration + model**",
+      "session_id": "ses_1fb759492ffeCcXBxCGMF83gRy",
       "agent": "Sisyphus-Junior",
-      "category": "deep",
-      "updated_at": "2026-05-07T20:16:57.774Z"
+      "category": "quick",
+      "updated_at": "2026-05-07T22:26:59.725Z"
     },
     "todo:5": {
       "task_key": "todo:5",
@@ -63,6 +63,24 @@
       "agent": "Sisyphus-Junior",
       "category": "quick",
       "updated_at": "2026-05-07T20:36:05.455Z"
+    },
+    "todo:2": {
+      "task_key": "todo:2",
+      "task_label": "2",
+      "task_title": "**Fix report services — remove Expense dependency**",
+      "session_id": "ses_1fb727985ffe1h454ommh8qrRj",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-07T22:31:10.663Z"
+    },
+    "todo:3": {
+      "task_key": "todo:3",
+      "task_label": "3",
+      "task_title": "**Redesign FinancialReport page — tabs + table + modal**",
+      "session_id": "ses_1fb6df2d3ffeCzgMCJlY0WkNPs",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-05-07T22:55:12.185Z"
     }
   }
 }
