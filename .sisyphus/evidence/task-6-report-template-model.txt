@@ -1,0 +1,48 @@
+# Task 6: ReportTemplate Model - Evidence
+
+**Date:** 2026-05-06
+**Status:** COMPLETED
+
+## Created File
+- `app/Models/ReportTemplate.php`
+
+## Implementation Details
+
+### $fillable
+```php
+protected $fillable = ['name', 'user_id', 'config', 'type'];
+```
+
+### $casts
+```php
+protected $casts = [
+    'config' => 'array',
+];
+```
+
+### Relations
+```php
+public function user()
+{
+    return $this->belongsTo(User::class);
+}
+```
+
+### Scopes
+```php
+public function scopeForUser($query, $userId)
+{
+    return $query->where('user_id', $userId);
+}
+
+public function scopeOfType($query, $type)
+{
+    return $query->where('type', $type);
+}
+```
+
+## Verification
+- Model created following pattern from `app/Models/Setting.php`
+- All required properties implemented as specified
+- No Filament Resource created (as per requirements)
+- No migration created (as per requirements)

@@ -1,0 +1,74 @@
+TASK-16: Financial Report Page
+================================
+
+Date: 2026-05-06
+Status: COMPLETED
+
+IMPLEMENTATION SUMMARY
+----------------------
+
+1. app/Filament/Pages/FinancialReport.php (191 lines)
+   - Filament Page extending Page + InteractsWithForms trait
+   - Navigation: heroicon-o-document-chart-bar, group "Finance Details", sort 4
+   - Labels: navigationLabel & title = "Financial Reports"
+   - View: filament.pages.financial-report
+
+2. Form Schema (2-column layout):
+   - date_start (DatePicker, required, native=false)
+   - date_end (DatePicker, required, native=false, afterOrEqual=date_start)
+   - report_type (Select: Simple/Rigid/Custom, default=simple, live)
+   - aggregation (Select: daily/weekly/monthly/quarterly/yearly, default=monthly)
+   - category_ids (MultiSelect, visible only when report_type=custom)
+     - Options: active menu Categories + distinct Expense categories
+   - Actions bar: "Generate Report" (primary) + "Save as Template" (gray)
+
+3. generateReport() — stub:
+   - Validates form
+   - Stores report config in $reportResult array
+   - Sets $hasResult = true
+   - Sends success Notification
+   - T17-19 will replace with actual service calls
+
+4. saveAsTemplate() — stub:
+   - Validates form
+   - Sends info Notification
+   - T20 will implement full save logic
+
+5. Template Load:
+   - updatedSelectedTemplateId() auto-loads template config on select change
+   - Reads from ReportTemplate::forUser(Auth::id())
+   - getTemplates() returns available templates for dropdown
+
+6. resources/views/filament/pages/financial-report.blade.php (116 lines)
+   - Info card explaining report types
+   - Template load dropdown (conditional, only if templates exist)
+   - Form section with {{ $this->form }} rendering
+   - Results section (conditional on $hasResult):
+     - Summary cards (type, period, aggregation, categories)
+     - Stub notice referencing T17-T19
+     - Placeholder area for future data tables/charts
+
+VERIFICATION
+------------
+- LSP diagnostics: 0 errors, 0 warnings
+- Follows CashFlow.php page pattern (extends Page, uses InteractsWithForms)
+- Follows existing navigation conventions (icon, group, sort, label)
+- Referenced ReportTemplate model (forUser scope, config cast)
+
+FILES CREATED
+-------------
+- app/Filament/Pages/FinancialReport.php
+- resources/views/filament/pages/financial-report.blade.php
+
+DEPENDENCIES
+------------
+- Blocks: T17 (SimpleReportService), T18 (RigidReportService), T19 (CustomReportService)
+- Depends on: T7 (CashFlow pattern), ReportTemplate model (Task 6)
+- Stub for: T20 (template save/load logic)
+
+NOTES
+-----
+- category_ids MultiSelect combines: Category::where('is_active', true) + Expense::distinct('category')
+- Date validation: end >= start enforced via afterOrEqual rule on date_end
+- Template load auto-fills form via wire:model.change + updatedSelectedTemplateId hook
+- All report logic deferred to T17-19; page only provides UI and scaffolding

@@ -1,0 +1,33 @@
+# Task 11: IncomeResource Retired - Evidence
+
+## Date: 2026-05-06
+
+## Actions Taken:
+
+### 1. Added @deprecated docblock
+- Added to class declaration (line 24-28)
+- Message: "Incomes migrated to unexpected_transactions. This resource is kept for historical reference but is no longer accessible. Navigation is hidden and all routes are disabled."
+
+### 2. Disabled routes
+- getPages() now returns empty array `[]`
+- Previously returned ListIncomes and EditIncome pages
+
+### 3. Removed unused imports
+- Removed: `use App\Filament\Resources\IncomeResource\Pages\ListIncomes;`
+- Removed: `use App\Filament\Resources\IncomeResource\Pages\EditIncome;`
+- Removed: `use App\Filament\Resources\IncomeResource\Pages;`
+
+### 4. Navigation already hidden
+- `$shouldRegisterNavigation = false` (was already set)
+
+## Verification:
+
+### grep "IncomeResource" app/ results:
+Only 3 files reference IncomeResource:
+1. app/Filament/Resources/IncomeResource.php (the retired resource itself)
+2. app/Filament/Resources/IncomeResource/Pages/ListIncomes.php (page file, not loaded)
+3. app/Filament/Resources/IncomeResource/Pages/EditIncome.php (page file, not loaded)
+
+No external references found. Pages still exist but are not accessible via routes.
+
+## Status: COMPLETE

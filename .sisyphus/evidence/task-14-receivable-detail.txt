@@ -1,0 +1,41 @@
+TASK 14: Create ViewReceivable page in ReceivableResource
+============================================================
+Date: 2026-05-06
+Status: COMPLETED
+
+FILES CREATED:
+--------------
+1. app/Filament/Resources/ReceivableResource/Pages/ViewReceivable.php
+   - Extends Filament\Resources\Pages\ViewRecord
+   - Contains "Record Payment" action with modal for inputting payment amount
+   - Validates payment <= remaining amount
+   - Updates paid_amount and status (partial/paid)
+
+FILES MODIFIED:
+--------------
+2. app/Filament/Resources/ReceivableResource.php
+   - Added infolist() method with sections:
+     * Receivable Information (customer_name, invoice_date, amount, paid_amount, remaining_amount, due_date, status, notes)
+     * Order Information (order_code as link, order status, order total) - visible when order exists
+     * Order Items - visible when order exists and has items
+     * "No Linked Order" message - visible when order is null
+   - Added ViewAction to recordActions
+   - Registered view page in getPages(): 'view' => ViewReceivable::route('/{record}')
+
+FEATURES IMPLEMENTED:
+---------------------
+✓ ViewReceivable page created extending ViewRecord
+✓ Receivable info displayed in infolist (customer_name, amount, paid_amount, remaining, due_date, status, notes)
+✓ Order info displayed when order_id exists (order_code as link to order view, status, total)
+✓ Order items displayed in a list (menu name, qty, unit_price, subtotal)
+✓ "No linked order" message shown when order_id is null
+✓ "Record Payment" button as header action → modal with TextInput for amount
+✓ Payment validation: maxValue = remaining amount (prevents payment > remaining)
+✓ Status auto-update: partial when paid_amount > 0, paid when remaining <= 0
+✓ ViewAction added to table for accessing the view page
+✓ Page registered in getPages() as 'view' => ViewReceivable::route('/{record}')
+
+VERIFICATION:
+-------------
+- LSP diagnostics: Only pre-existing issues (Filament\Forms\Set, deprecated form hint)
+- No new errors introduced

@@ -1,0 +1,32 @@
+# Task 10: ExpenseResource Navigation Restoration - Evidence
+
+## Date: 2026-05-06
+
+## Changes Made:
+
+### 1. Set $shouldRegisterNavigation = true
+- File: app/Filament/Resources/ExpenseResource.php
+- Line 37: Changed from `false` to `true`
+
+### 2. Created CreateExpense Page
+- File: app/Filament/Resources/ExpenseResource/Pages/CreateExpense.php
+- Extends: Filament\Resources\Pages\CreateRecord
+- Sets: protected static string $resource = ExpenseResource::class;
+
+### 3. Added create route to getPages()
+- File: app/Filament/Resources/ExpenseResource.php
+- Line 171: Added 'create' => Pages\CreateExpense::route('/create'),
+
+### 4. Navigation Sort Verification
+- ExpenseResource: navigationSort = 2
+- Finance Details group:
+  - IncomeResource: sort = 1
+  - ExpenseResource: sort = 2
+  - ReceivableResource: sort = 3
+- No conflict detected
+
+## Verification:
+- LSP Diagnostics: No errors on both files
+- Create expense page accessible at: /admin/expenses/create
+
+## Status: COMPLETE

@@ -1,0 +1,32 @@
+TASK 21: Excel/CSV Export - COMPLETED
+=====================================
+
+Date: 2026-05-06
+File Created: app/Exports/FinancialReportExport.php
+
+IMPLEMENTATION DETAILS:
+-----------------------
+- Implements FromArray, WithHeadings, WithTitle, ShouldAutoSize, WithEvents
+- Constructor accepts: type (simple|rigid|custom), data, dateRange
+- Supports all 3 report types with appropriate headers:
+  * Simple: No | Kategori | Type | Amount
+  * Rigid: Section | Subsection | Amount  
+  * Custom: Date | Category | Type | Amount | Running Total
+- Number formatting: Rp currency (Indonesian Rupiah)
+- UTF-8 BOM handling via WithEvents for Indonesian characters
+- Category/source mapping for display (cash->Tunai, qris->QRIS, etc.)
+
+VERIFICATION:
+-------------
+- LSP Diagnostics: No errors
+- File exists at app/Exports/FinancialReportExport.php
+
+USAGE EXAMPLE:
+--------------
+$simpleData = app(SimpleReportService::class)->generate($start, $end);
+$export = new FinancialReportExport('simple', $simpleData, ['start' => $start, 'end' => $end]);
+return Excel::download($export, 'laporan-sederhana.xlsx');
+
+$customData = app(CustomReportService::class)->generate($config);
+$export = new FinancialReportExport('custom', $customData, ['start' => $config['date_start'], 'end' => $config['date_end']]);
+return Excel::download($export, 'laporan-custom.csv');

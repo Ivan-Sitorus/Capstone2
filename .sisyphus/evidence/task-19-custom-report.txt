@@ -1,0 +1,52 @@
+Task 19 — CustomReportService
+========================================
+Date: 2026-05-06
+File: app/Services/CustomReportService.php
+
+What was created:
+- CustomReportService with generate(array $config): array method
+
+Category identifier scheme (used in $config['categories']):
+  - menu:{id}              → Menu category (by categories.id), Income type
+  - unexpected_income      → UnexpectedTransaction jenis='pemasukan', Income type
+  - expense:{name}         → Direct expense from expenses.category, Expense type
+  - bahan_baku             → IngredientBatch purchases, Expense type
+  - unexpected_expense     → UnexpectedTransaction jenis='pengeluaran', Expense type
+  - Empty array            → ALL categories from all sources
+
+Data sources queried:
+  Income:
+    1. OrderItems → Menu → Category (paid orders, SUM subtotal)
+    2. UnexpectedTransaction where jenis = 'pemasukan' (SUM nominal)
+  Expense:
+    3. Expenses table grouped by category (SUM amount)
+    4. IngredientBatch purchases (SUM quantity * cost_per_unit) → "Bahan Baku"
+    5. UnexpectedTransaction where jenis = 'pengeluaran' (SUM nominal) → "Unexpected"
+
+Aggregation:
+  - daily:   GROUP BY DATE(created_at)   → bucket "YYYY-MM-DD"
+  - monthly: GROUP BY DATE_TRUNC('month', created_at) → bucket "YYYY-MM-DD" (1st of month)
+
+Output format:
+  [
+    'config'  => $config,  // echoed back
+    'rows'    => [
+      ['date' => '...', 'category' => '...', 'type' => 'Income'|'Expense',
+       'amount' => float, 'running_total' => float],
+    ],
+    'summary' => [
+      'total_income'  => float,
+      'total_expense' => float,
+      'net'           => float,
+    ],
+  ]
+
+Key behaviors:
+  - Empty categories (no data) → shown with amount 0 (fillMissingCombos)
+  - Running total computed as cumulative net (Income +, Expense -)
+  - All aggregation done at SQL level (COALESCE/SUM/GROUP BY)
+  - Category filters applied via WHERE IN with parameterized bindings
+  - No PHP loops for summation (only running total accumulator and zero-fill structure)
+  - Sorted: date ASC, type (Income before Expense), category ASC
+
+Evidence generated: 2026-05-06

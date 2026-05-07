@@ -1,0 +1,41 @@
+# Task 13: ReceivableResource Enhanced
+
+## Date: 2026-05-06
+
+## Changes Made
+
+### 1. Table - Order Link Column
+- Added `TextColumn::make('order.order_code')` with:
+  - Label: 'Order'
+  - Searchable
+  - URL linking to Order resource view page
+  - Opens in new tab
+
+### 2. Form - Order Select with Auto-fill
+- Added `Select::make('order_id')` with:
+  - Relationship to 'order' model using 'order_code'
+  - Searchable
+  - Nullable (optional)
+  - Preload for performance
+  - `afterStateUpdated` callback that auto-fills:
+    - `customer_name` from order's customer relation
+    - `amount` from order's total_amount
+
+### 3. Filters - Due Date Range
+- Added `Filter::make('due_date')` with:
+  - Two DatePicker inputs (from/until)
+  - Query builder that filters by due_date >= from AND due_date <= until
+
+### 4. Existing Features Preserved
+- Status filter (SelectFilter)
+- All existing columns
+- defaultSort('due_date', 'asc')
+- All actions (Edit, Delete, Bulk)
+
+## Verification
+- LSP diagnostics: No errors
+- File: app/Filament/Resources/ReceivableResource.php (210 lines)
+
+## Notes
+- order_id is optional (nullable) - admin can leave blank
+- customer_name remains editable in case admin wants to override auto-fill

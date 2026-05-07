@@ -1,0 +1,35 @@
+TASK-17: SimpleReportService Implementation
+============================================
+
+Date: 2026-05-06
+Status: COMPLETED
+
+FILE CREATED:
+- app/Services/SimpleReportService.php
+
+IMPLEMENTATION DETAILS:
+-----------------------
+
+1. generate($dateStart, $dateEnd) method returns array with:
+   - total_income: Sum of paid orders + UnexpectedTransaction (pemasukan)
+   - total_expense: Sum of Expense + IngredientBatch costs + UnexpectedTransaction (pengeluaran)
+   - net: total_income - total_expense
+   - income_breakdown[]: Breakdown by payment_method + unexpected_income
+   - expense_breakdown[]: Breakdown by category + ingredient_purchase + unexpected_expense
+   - receivables_outstanding: Sum of unpaid receivables (status != 'paid') with invoice_date in range
+
+2. Database-level aggregation used (NO PHP loops):
+   - Order::where('is_paid', true)->whereBetween('created_at', [...])->sum('total_amount')
+   - UnexpectedTransaction::where('jenis', 'pemasukan')->whereBetween('created_at', [...])->sum('nominal')
+   - Expense::whereBetween('date', [...])->sum('amount')
+   - IngredientBatch::whereBetween('received_at', [...])->selectRaw('SUM(quantity * cost_per_unit) as total')
+   - Receivable::where('status', '!=', STATUS_PAID)->whereBetween('invoice_date', [...])
+
+3. Query patterns derived from CashFlowStatsWidget.php (lines 70-86)
+
+4. Empty date range returns zeros (default to all-time range from 2000-01-01 to now)
+
+VERIFICATION:
+- lsp_diagnostics: No errors
+- All aggregate methods used (no Order::all() or Order::get())
+- Only paid orders included (is_paid = true)

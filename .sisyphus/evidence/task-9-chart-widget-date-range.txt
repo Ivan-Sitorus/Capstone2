@@ -1,0 +1,22 @@
+Task 9 — CashFlowChartWidget: Free Date Range Support
+======================================================
+Date: 2026-05-06
+File modified: app/Filament/Widgets/CashFlowChartWidget.php
+
+Changes made:
+1. Added `public string $dateStart = ''` and `public string $dateEnd = ''` properties
+2. Added `#[On('cashflow-date-changed')]` listener → `onDateChanged(string $start, string $end)`
+3. Updated `onPeriodChanged()` to also reset dateStart/dateEnd to empty
+4. Updated `buildData()` with Cache::remember() — key = md5(serialize([period, dateStart, dateEnd])), TTL = 300s
+5. Added `buildDynamicRange()` — dispatches to bucketing method based on range length:
+   - ≤7 days   → byDayRange()    (daily, label: "D MMM")
+   - 8–60 days → byWeekRange()   (weekly, label: "Minggu N")
+   - 61–365d   → byMonthRange()  (monthly, label: "MMM YYYY")
+   - >365 days → byQuarterRange() (quarterly, label: "MMM YYYY – MMM YYYY", capped at 200 points)
+6. Period-based methods preserved as fallbacks when dateStart/dateEnd are empty
+7. Cache key includes both period and date range state for proper cache isolation
+
+Verification:
+- LSP diagnostics: 0 errors, 0 warnings (only pre-existing informational notices)
+- All existing methods (byHour, byEvenDay, byMonthOfYear, byMonth) untouched
+- Existing On listener preserved

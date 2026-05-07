@@ -1,0 +1,38 @@
+Task 12: Auto-Create Receivable Listener
+=========================================
+Date: 2026-05-06
+File: app/Models/Order.php
+
+Changes Made
+------------
+1. Added booted() method with static::created event listener
+   - Trigger: Order created with payment_method === 'bayar_nanti' && is_paid === false
+   - Action: Auto-create Receivable record
+   - Guard: Checks receivable()->exists() to prevent duplicates
+   
+2. Added receivable() hasOne relation
+   - return $this->hasOne(Receivable::class)
+
+Receivable Fields Mapped
+------------------------
+- customer_name => $order->customer_name ?? 'Event Customer'
+- amount        => $order->total_amount
+- invoice_date  => $order->created_at
+- due_date      => $order->created_at->copy()->addDays(30)
+- status        => Receivable::STATUS_PENDING
+- paid_amount   => 0
+- order_id      => $order->id
+- notes         => "Auto-generated from Order #{$order->order_code}"
+
+Non-Creation Conditions (per spec)
+----------------------------------
+- payment_method !== 'bayar_nanti' → no receivable created
+- is_paid === true → no receivable created
+- Duplicate receivable already exists → no second receivable created
+
+Verification
+------------
+- lsp_diagnostics: clean (no errors)
+- Uses booted() pattern (consistent with Menu.php)
+- No infinite loop risk: only reads from order, never writes back
+- No event/listener service provider registration needed

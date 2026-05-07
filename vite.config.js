@@ -25,8 +25,14 @@ export default defineConfig({
         chunkSizeWarningLimit: 800,
     },
     server: {
-        host: '127.0.0.1',
+        host: '0.0.0.0',
+        port: 5173,
+        hmr: {
+            host: 'localhost',
+        },
         watch: {
+            usePolling: true,
+            interval: 100,
             ignored: ['**/storage/framework/views/**'],
         },
     },

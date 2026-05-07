@@ -1,0 +1,26 @@
+Task 8: CashFlowStatsWidget — Free Date Range + Caching
+======================================================
+Date: 2026-05-06
+File: app/Filament/Widgets/CashFlowStatsWidget.php
+
+CHANGES:
+ 1. Added `use Illuminate\Support\Facades\Cache;` import
+ 2. Added `public string $dateStart = '';` and `public string $dateEnd = '';` properties
+ 3. Added `#[On('cashflow-date-changed')]` listener → sets dateStart, dateEnd, clears period
+ 4. Updated `onPeriodChanged()` to also clear dateStart/dateEnd (dual-mode safety)
+ 5. Updated `dateRange()` to check `$dateStart && $dateEnd` first; falls back to period-based match
+ 6. Wrapped `getStats()` body in `Cache::remember($cacheKey, 300, fn())`
+    - Cache key: 'cashflow_stats_' . md5($this->period . $this->dateStart . $this->dateEnd)
+    - TTL: 300 seconds (5 minutes)
+
+DUAL-MODE LOGIC:
+ - When dateStart && dateEnd are set → dateRange() returns custom range
+ - When dateStart/dateEnd are empty → dateRange() falls back to period-based (day/month/year/all_time)
+ - Switching to period mode clears date range; switching to date range clears period
+ - prevRange() still works for period comparison; when date range active, computes same-length prior period
+
+VERIFIED:
+ - lsp_diagnostics: clean (only pre-existing info-level type hints)
+ - No polling (pollingInterval = null, preserved)
+ - Sparkline methods unchanged (keep period comparison)
+ - Visual/stats display unchanged

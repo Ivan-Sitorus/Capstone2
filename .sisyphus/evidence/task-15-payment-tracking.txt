@@ -1,0 +1,45 @@
+TASK-15: Payment Tracking for Receivables
+==========================================
+
+Date: 2026-05-06
+Status: COMPLETED
+
+IMPLEMENTATION SUMMARY
+----------------------
+
+1. recordPayment(float $amount): void
+   - Throws InvalidArgumentException if status === 'paid'
+   - Throws InvalidArgumentException if amount <= 0
+   - Accumulates paid_amount (current + new amount)
+   - Caps paid_amount at amount (no overpayment allowed)
+   - Auto-transitions status:
+     * paid_amount >= amount → status = 'paid'
+     * paid_amount > 0 && < amount → status = 'partial'
+     * paid_amount = 0 → status remains 'pending'
+
+2. isOverdue() updated
+   - Changed from: $this->due_date->isPast()
+   - Changed to: $this->due_date->lessThan(now())
+   - Logic: due_date < now() && status != 'paid'
+
+3. Scopes added:
+   - scopeOverdue(): where status != 'paid' AND due_date < now()
+   - scopePending(): where status = 'pending'
+   - scopePaid(): where status = 'paid'
+
+VERIFICATION
+------------
+- LSP diagnostics: No errors
+- Code follows existing model patterns
+- Uses STATUS constants from model
+- getRemainingAmountAttribute() still works (returns max(0, amount - paid_amount))
+
+FILES MODIFIED
+--------------
+- app/Models/Receivable.php
+
+NOTES
+-----
+- paid_amount NOT added to $fillable (protected via method only)
+- Cannot overpay: paid_amount capped at amount
+- Cannot pay already-paid receivable: throws exception

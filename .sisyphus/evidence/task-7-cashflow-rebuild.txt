@@ -1,0 +1,41 @@
+Task 7 — CashFlow Page Rebuild
+================================
+Date: 2026-05-06
+Status: COMPLETED
+
+Changes made:
+1. app/Filament/Pages/CashFlow.php — FULL REWRITE
+   - Removed ALL Income:: references (10+ occurrences)
+   - Removed ALL dead methods:
+     * getSummary() — was querying Income::sum('amount')
+     * getCategoryBreakdown() — was querying Income with groupBy('category')
+     * getTopSources() — was querying Income with groupBy('source')
+     * getTopVendors() — was querying Income
+     * getTransactions() — was querying Income
+     * getSvgChart() — was querying Income
+     * chartByDay() — was querying Income
+     * chartByWeek() — was querying Income
+   - Removed private helpers:
+     * dateRange() — only used by dead methods
+     * prevRange() — only used by dead methods
+     * pctChange() — only used by dead methods
+   - Removed unused properties: typeFilter, search, catFilter
+   - Removed unused import: Carbon, Expense
+   - Removed getView() method — replaced with static $view property
+   - Kept: period, mount(), updatedPeriod(), getTitle(), getHeaderActions()
+   - Added: date_start, date_end properties (nullable strings)
+   - Added: #[On('cashflow-date-changed')] listener with updateDateRange()
+   - Added: use Livewire\Attributes\On;
+
+2. resources/views/filament/pages/cash-flow.blade.php — SIMPLIFIED
+   - Removed ~100 lines of custom dark-theme CSS
+   - Removed all custom component styles (cf-card, cf-stat, cf-tbl, etc.)
+   - Kept: period tabs (4 items), 3 @livewire widgets
+   - Kept: x-filament-panels::page layout
+   - Widgets rendered: CashFlowStatsWidget, CashFlowChartWidget, UnexpectedTransactionWidget
+
+Verification:
+- LSP diagnostics: PASS (no errors, no warnings)
+- No Income:: references remain in CashFlow.php
+- Blade view clean and minimal
+- date_start/date_end ready for date range picker UI (future task)

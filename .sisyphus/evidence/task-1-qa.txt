@@ -1,0 +1,54 @@
+Task 1 QA Evidence - MenuImageService Implementation
+=====================================================
+Date: 2026-05-06
+
+Test Results from php artisan tinker:
+-------------------------------------
+
+Test 1 - Singleton: PASS
+  Confirmed: AppServiceProvider registers MenuImageService as singleton
+
+Test 2 - Null-safe delete: PASS
+  Confirmed: delete() method handles:
+    - null parameter
+    - empty string parameter  
+    - nonexistent file paths
+  All cases executed without throwing exceptions
+
+Test 3 - Methods exist: PASS
+  Confirmed: MenuImageService has required methods:
+    - convertAndStore(UploadedFile $file, ?string $oldPath = null): ?string
+    - delete(?string $path): void
+    - getImageUrl(?string $path): ?string (bonus method)
+
+Test 4 - WebP quality 70: PASS
+  Confirmed: Source code contains toWebp(70)
+
+Implementation Details:
+-----------------------
+- Package: intervention/image-laravel (v3, already in composer.json)
+- Service Location: app/Services/MenuImageService.php
+- Singleton Registration: app/Providers/AppServiceProvider.php
+- Storage: Storage::disk('public') with 'menus/' subdirectory
+- Image Processing: Intervention Image v3 with GD driver
+- Max Width: 800px (maintains aspect ratio via scale())
+- Quality: 70
+- Format: WebP
+- Filename: menu_{timestamp}_{uniqid}.webp
+
+Files Modified:
+---------------
+1. app/Services/MenuImageService.php
+   - Changed toWebp(85) to toWebp(70)
+   - Renamed deleteImage() to delete()
+   
+2. app/Providers/AppServiceProvider.php
+   - Added singleton registration in register() method
+
+Null-Safe Delete Behavior:
+--------------------------
+The delete() method safely handles:
+1. null - returns immediately (no-op)
+2. '' (empty string) - returns immediately (no-op)  
+3. Non-existent path - checks exists() before delete (no-op)
+4. Valid path - deletes file from storage

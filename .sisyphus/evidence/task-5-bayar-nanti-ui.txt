@@ -1,0 +1,40 @@
+# Task 5: Bayar Nanti UI - Evidence
+
+## Date: 2026-05-06
+
+## Status: ALREADY IMPLEMENTED
+
+## Verification Results
+
+### 1. Database Schema
+- File: `database/migrations/2025_01_01_000014_create_orders_table.php`
+- Line 21: `$table->enum('payment_method', ['cash', 'qris', 'bayar_nanti'])->nullable();`
+- ✅ `bayar_nanti` already exists in the enum
+
+### 2. Filament OrderResource
+- File: `app/Filament/Resources/OrderResource.php`
+- Filter options (lines 159-165): Already includes `'bayar_nanti' => 'Bayar Nanti'`
+- Infolist display (lines 67-74): Already formats `bayar_nanti` as "Bayar Nanti"
+- Table column (lines 119-127): Already formats `bayar_nanti` as "Bayar Nanti"
+- Note: OrderResource is read-only (no form schema), so no Select form field needed
+
+### 3. Kasir POS (PesananBaru.jsx)
+- File: `resources/js/Pages/Cashier/PesananBaru.jsx`
+- Payment method selection (lines 392-407): Already includes "Bayar Nanti" option
+- Button with `onClick={() => setPayMethod('bayar_nanti')}` exists
+- UI displays: "Bayar Nanti" with description "Simpan pesanan, pelanggan bayar nanti"
+
+### 4. Controller Logic
+- File: `app/Http/Controllers/Cashier/CashierPesananBaruController.php`
+- Line 43: `$isBayarNanti = $request->payment_method === 'bayar_nanti';`
+- Line 52: `'is_paid' => !$isBayarNanti,`
+- ✅ When payment_method is `bayar_nanti`, `is_paid` is set to `false`
+
+## Conclusion
+
+All requirements are already implemented:
+- ✅ `bayar_nanti` option visible in OrderResource Filament (filter + display)
+- ✅ `bayar_nanti` option visible in kasir POS payment method selection
+- ✅ Order with `bayar_nanti` has `is_paid = false`
+
+No code changes were needed - the feature was already complete.

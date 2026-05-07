@@ -1,0 +1,73 @@
+Task 18 — RigidReportService
+=============================
+Date: 2026-05-06
+File: app/Services/RigidReportService.php
+Status: COMPLETED
+
+=== Income Statement Query Plan ===
+Pendapatan:
+  FROM orders WHERE is_paid = true AND created_at BETWEEN [$s, $e]
+  SUM(total_amount)
+  +
+  FROM unexpected_transactions WHERE jenis = 'pemasukan' AND created_at BETWEEN [$s, $e]
+  SUM(nominal)
+
+HPP:
+  FROM ingredient_batches WHERE received_at BETWEEN [$s, $e]
+  SELECT SUM(quantity * cost_per_unit)
+
+Laba Kotor = Pendapatan - HPP
+
+Beban Operasional:
+  FROM expenses WHERE date BETWEEN [$s, $e]
+  SUM(amount)
+
+Beban Tak Terduga:
+  FROM unexpected_transactions WHERE jenis = 'pengeluaran' AND created_at BETWEEN [$s, $e]
+  SUM(nominal)
+
+Laba/Rugi Bersih = Laba Kotor - Beban Operasional - Beban Tak Terduga
+
+=== Cash Flow Query Plan ===
+Arus Kas Masuk:
+  Pendapatan (same as Income Statement)
+  +
+  FROM receivables WHERE status IN ('paid', 'partial') AND updated_at BETWEEN [$s, $e]
+  SUM(paid_amount)
+
+Arus Kas Keluar = Beban Operasional + HPP + Beban Tak Terduga
+
+Arus Kas Bersih = Arus Kas Masuk - Arus Kas Keluar
+
+Saldo Awal = 0
+Saldo Akhir = Arus Kas Bersih
+
+=== Return Structure ===
+meta:
+  - date_start, date_end, generated_at, type='rigid'
+
+income_statement:
+  - pendapatan, pendapatan_orders, pendapatan_unexpected
+  - hpp
+  - laba_kotor
+  - beban_operasional
+  - beban_tak_terduga
+  - laba_rugi_bersih
+
+cash_flow:
+  - arus_kas_masuk, pendapatan, receivable_payments
+  - arus_kas_keluar, beban_operasional, hpp, beban_tak_terduga
+  - arus_kas_bersih
+  - saldo_awal (0), saldo_akhir
+
+=== Constraints ===
+- Cash basis: is_paid = true for orders
+- All queries database-level aggregated (no in-memory computation)
+- No depreciation, no tax, no accrual
+- No balance sheet
+
+=== LSP Diagnostics ===
+Clean (0 errors, 0 warnings)
+
+=== Service Registration ===
+Not needed — auto-discovered via namespace App\Services

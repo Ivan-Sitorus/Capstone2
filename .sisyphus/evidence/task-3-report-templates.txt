@@ -1,0 +1,32 @@
+TASK 3: Report Templates - EVIDENCE
+=====================================
+Date: 2026-05-06
+
+FILES CREATED/UPDATED:
+----------------------
+1. database/migrations/2026_05_06_170232_create_report_templates_table.php
+   - Columns: id, name(100), user_id(FK nullable), config(json), type(enum)
+   - Unique constraint on (name, user_id)
+   - Index on user_id
+   - Default config = '{}'
+
+2. app/Models/ReportTemplate.php (already existed, verified)
+   - $fillable = ['name', 'user_id', 'config', 'type']
+   - casts = ['config' => 'array']
+   - user() belongsTo relationship
+   - scopeForUser($query, $userId)
+   - scopeOfType($query, $type)
+
+VERIFICATION:
+-------------
+- PHP syntax: PASSED (no errors)
+- Model loading: PASSED (class exists)
+
+NOTE: Database migration could not run (PostgreSQL not running locally),
+but migration syntax is valid and model is properly configured.
+
+EXPECTED BEHAVIOR (when DB is available):
+-----------------------------------------
+- php artisan migrate creates report_templates table
+- ReportTemplate::create(['name'=>'Test','user_id'=>1,'config'=>[],'type'=>'simple']) succeeds
+- Duplicate (name, user_id) constraint enforced

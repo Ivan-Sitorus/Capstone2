@@ -1,0 +1,39 @@
+TASK 1: Add order_id FK to receivables table
+============================================
+Date: 2026-05-06
+
+FILES CREATED/MODIFIED:
+----------------------
+1. database/migrations/2026_05_06_165854_add_order_id_to_receivables_table.php (CREATED)
+2. app/Models/Receivable.php (MODIFIED)
+
+MIGRATION DETAILS:
+-----------------
+- Column: order_id (foreignId)
+- Nullable: YES
+- Constrained to: orders table
+- On delete: nullOnDelete (NOT cascade)
+- Index: automatically created by constrained()
+
+Model Changes:
+-------------
+- Added 'order_id' to $fillable array
+- Added public function order() { return $this->belongsTo(Order::class); }
+
+VERIFICATION:
+------------
+- PHP syntax check: PASSED (both files)
+- Migration cannot run: Database connection unavailable (PostgreSQL not running)
+- Expected behavior when DB is available:
+  * php artisan migrate → adds order_id column with FK constraint
+  * php artisan migrate:rollback --step=1 → drops FK then column
+
+COMPLIANCE:
+----------
+✓ Column is nullable
+✓ FK constrained to orders table
+✓ Uses nullOnDelete (not cascade)
+✓ order_id added to $fillable
+✓ order() belongsTo relationship added
+✓ No existing columns modified
+✓ No existing relationships removed
