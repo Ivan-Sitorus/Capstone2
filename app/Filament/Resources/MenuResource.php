@@ -82,7 +82,6 @@ class MenuResource extends Resource
                 ->disk('public')
                 ->fetchFileInformation(false)
                 ->imagePreviewHeight('200')
-                ->loadingIndicator()
                 ->placeholder('Pilih gambar...')
                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                 ->maxSize(5120)
