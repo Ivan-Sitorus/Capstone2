@@ -62,15 +62,28 @@ class MenuResource extends Resource
             Select::make('category_id')
                 ->label('Kategori')
                 ->relationship('category', 'name')
-                ->required()
                 ->searchable()
-                ->preload(),
+                ->preload()
+                ->createOptionForm([
+                    TextInput::make('name')
+                        ->label('Nama Kategori')
+                        ->required()
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(fn ($state, Set $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                    TextInput::make('slug')
+                        ->label('Slug')
+                        ->required()
+                        ->unique(ignoreRecord: true),
+                ])
+                ->createOptionButtonLabel('+ Kategori Baru'),
             FileUpload::make('image')
                 ->label('Gambar Menu')
                 ->directory('menus/')
                 ->disk('public')
                 ->fetchFileInformation(false)
                 ->imagePreviewHeight('200')
+                ->loadingIndicator()
+                ->placeholder('Pilih gambar...')
                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                 ->maxSize(5120)
                 ->nullable()
@@ -122,6 +135,14 @@ class MenuResource extends Resource
                 ->addActionLabel('+ Tambah Bahan')
                 ->visible(fn (Get $get) => $get('is_stock_calculated'))
                 ->columnSpanFull()
+                ->itemLabel(function (array $state): string {
+                    $name = $state['ingredient_id'] ?? null;
+                    if (! $name) {
+                        return 'Bahan Baru';
+                    }
+                    $ingredient = \App\Models\Ingredient::find($name);
+                    return $ingredient ? $ingredient->name . ' (' . $ingredient->unit . ')' : 'Bahan Baru';
+                })
                 ->schema([
                     Select::make('ingredient_id')
                         ->label('Bahan')
@@ -129,6 +150,7 @@ class MenuResource extends Resource
                         ->required()
                         ->searchable()
                         ->preload()
+                        ->live()
                         ->getOptionLabelFromRecordUsing(fn ($record) => $record->name . ' (' . $record->unit . ')'),
                     TextInput::make('quantity_used')
                         ->label('Jumlah per Porsi')

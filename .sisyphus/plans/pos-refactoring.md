@@ -402,64 +402,10 @@ Task 1 (FinancialReport fix) → Task 2 (receivable fix) → Task 5 (integer pri
 
   **Commit**: `feat: auto-generate slug from name`
 
-- [ ] 13. **Category Creation in Menu Form (Optional)**
-
-  **What to do**:
-  - In MenuResource form, add `->createOptionForm()` to category Select
-  - The modal form includes: name (TextInput), slug (auto-generated, hidden)
-  - Category creation is optional — user can select existing or create new
-  - Modal action label: "+ Kategori Baru"
-
-  **Must NOT do**: Do NOT make category required for menu creation
-
-  **Recommended Agent Profile**: `quick`
-  **Parallelization**: Wave III
-
-  **Acceptance Criteria**:
-  - [ ] "+" button appears next to category select
-  - [ ] Clicking opens modal to create category
-  - [ ] New category auto-selected after creation
-
-  **Commit**: `feat: inline category creation in menu form`
-
-- [ ] 14. **Repeater Labels Based on Ingredient Unit**
-
-  **What to do**:
-  - In MenuResource's ingredients repeater:
-  - Change `itemLabel` to show: "Nama Bahan (Unit)" 
-  - Read ingredient unit from the selected ingredient relationship
-  - Current: already has a suffix showing unit — keep it, just improve label
-
-  **Must NOT do**: Do NOT change repeater structure
-
-  **Recommended Agent Profile**: `quick`
-  **Parallelization**: Wave III
-
-  **Acceptance Criteria**:
-  - [ ] Repeater labels show ingredient name + unit
-
-  **Commit**: `refactor: repeater labels based on ingredient unit`
-
-- [ ] 15. **Menu Image Upload Optimization**
-
-  **What to do**:
-  - The FileUpload component has a slight delay — modal appears first, image input renders a moment later
-  - This is a Filament Livewire re-render behavior, not a real bug
-  - Optimize: add `->placeholder('Pilih gambar menu...')`, ensure spinner shows during upload
-  - If delay is unacceptable: use `->loadingIndicator()` or `->extraAttributes(['x-cloak' => ''])` for smoother UX
-
-  **Must NOT do**: Do NOT change the image upload service (WebP conversion etc.)
-
-  **Recommended Agent Profile**: `quick`
-  **Parallelization**: Wave III
-
-  **Acceptance Criteria**:
-  - [ ] Image input appears without visible delay
-  - [ ] Upload works with WebP conversion
-
-  **Commit**: `fix: menu image upload loading state`
-
-- [ ] 16. **UserResource — Remove Customer Role Option**
+- [x] 13. **Category Creation in Menu Form (Optional)**
+- [x] 14. **Repeater Labels Based on Ingredient Unit**
+- [x] 15. **Menu Image Upload Optimization**
+- [x] 16. **UserResource — Remove Customer Role Option**
 
   **What to do**:
   - Already partially handled by Task 6 (DB change)
@@ -478,47 +424,9 @@ Task 1 (FinancialReport fix) → Task 2 (receivable fix) → Task 5 (integer pri
 
   **Commit**: `refactor: remove customer role from user resource`
 
-- [ ] 17. **Install QR Code Library**
-
-  **What to do**:
-  - Install via composer: `composer require linkxtr/laravel-qrcode`
-  - Verify: `QrCode::size(100)->generate('test')` produces valid SVG
-  - No DB changes needed — cafe_tables.qr_code stores the URL, QR is rendered on-the-fly
-
-  **Must NOT do**: Do NOT modify existing cafe_tables schema (add later in Task 18)
-
-  **Recommended Agent Profile**: `quick`
-  **Parallelization**: Wave IV
-
-  **Acceptance Criteria**:
-  - [ ] `composer show linkxtr/laravel-qrcode` shows version
-  - [ ] QR code generation test works
-
-  **Commit**: `feat: add QR code library`
-
-- [ ] 18. **Create CafeTableResource (CRUD)**
-
-  **What to do**:
-  - Create `php artisan make:filament-resource CafeTable`
-  - Form: `table_number` (integer, unique), `is_available` (toggle)
-  - Table columns: `table_number`, `is_available` (icon), `qr_code` (generated QR SVG)
-  - Navigation group: "Data Master" or new "Cafe" group
-  - Create new migration: CREATE `cafe_tables` with correct schema
-  - Seeder: create 10 tables with sequential numbers
-
-  **Must NOT do**: Do NOT modify existing cafe_tables schema if it already exists
-
-  **Recommended Agent Profile**: `deep`
-  **Parallelization**: Wave IV, **Blocked By**: Task 17
-
-  **Acceptance Criteria**:
-  - [ ] CafeTableResource in admin sidebar
-  - [ ] Create/Edit/Delete tables works
-  - [ ] QR code displays on table row
-
-  **Commit**: `feat: cafe table crud resource`
-
-- [ ] 19. **QR Code Generation Service + Display**
+- [x] 17. **Install QR Code Library**
+- [x] 18. **Create CafeTableResource (CRUD)**
+- [x] 19. **QR Code Generation Service + Display**
 
   **What to do**:
   - Create `app/Services/QrCodeService.php`:
