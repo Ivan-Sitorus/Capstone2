@@ -20,6 +20,7 @@ return new class extends Migration
         });
 
         Schema::table('stock_movements', function (Blueprint $table) {
+            $table->unsignedBigInteger('waste_record_id')->nullable();
             $table->foreign('waste_record_id')
                 ->references('id')
                 ->on('waste_records')

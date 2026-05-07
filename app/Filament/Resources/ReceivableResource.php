@@ -259,7 +259,7 @@ class ReceivableResource extends Resource
                     ]),
                 Filter::make('due_date')
                     ->label('Due Date Range')
-                    ->form([
+                    ->schema([
                         DatePicker::make('from'),
                         DatePicker::make('until'),
                     ])

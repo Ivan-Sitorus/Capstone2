@@ -3,8 +3,8 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\Expense;
-use App\Models\Income;
 use App\Models\Receivable;
+use App\Models\UnexpectedTransaction;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -15,26 +15,24 @@ class FinanceResourcesCrudTest extends TestCase
 
     public function test_income_can_be_created_and_updated(): void
     {
-        $income = Income::create([
-            'source' => 'Sales Counter',
-            'category' => 'sales',
-            'amount' => 250000,
-            'date' => now()->toDateString(),
-            'description' => 'Daily summary',
+        $transaction = UnexpectedTransaction::create([
+            'jenis' => 'pemasukan',
+            'nominal' => 250000,
+            'deskripsi' => 'Daily summary',
         ]);
 
-        $this->assertDatabaseHas('incomes', [
-            'id' => $income->id,
-            'source' => 'Sales Counter',
+        $this->assertDatabaseHas('unexpected_transactions', [
+            'id' => $transaction->id,
+            'jenis' => 'pemasukan',
         ]);
 
-        $income->update([
-            'amount' => 275000,
+        $transaction->update([
+            'nominal' => 275000,
         ]);
 
-        $this->assertDatabaseHas('incomes', [
-            'id' => $income->id,
-            'amount' => 275000,
+        $this->assertDatabaseHas('unexpected_transactions', [
+            'id' => $transaction->id,
+            'nominal' => 275000,
         ]);
     }
 
@@ -100,7 +98,6 @@ class FinanceResourcesCrudTest extends TestCase
         $this->actingAs($cashier);
 
         $routes = [
-            'filament.admin.resources.incomes.index',
             'filament.admin.resources.expenses.index',
             'filament.admin.resources.receivables.index',
         ];

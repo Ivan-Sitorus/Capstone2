@@ -27,3 +27,5 @@ Thumbs.db
 /.claude
 /datamining/__pycache__
 /datamining/*.pyc
+/tests/playwright/auth/
+/tests/playwright/report/

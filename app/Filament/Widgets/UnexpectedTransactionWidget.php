@@ -86,7 +86,7 @@ class UnexpectedTransactionWidget extends BaseWidget
                     ->form($this->formSchema())
                     ->model(UnexpectedTransaction::class),
             ])
-            ->actions([
+            ->recordActions([
                 EditAction::make()
                     ->label('Edit')
                     ->modalHeading('Edit Transaksi')
