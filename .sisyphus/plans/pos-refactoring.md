@@ -55,7 +55,7 @@ Implement actual financial report generation (remove stub), create `generated_re
   - Replace with `UnexpectedTransaction` or appropriate alternative
   - Run `php artisan test` to ensure no breaking changes
 
-- [ ] 7. **Final QA verification**
+- [x] 7. **Final QA verification** (Playwright skipped per request — verified via curl)
 
   **What to do**:
   - Test: generate a report → save → view → download PDF/Excel
