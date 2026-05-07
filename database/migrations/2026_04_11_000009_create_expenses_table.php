@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('vendor');
             $table->string('category');
-            $table->decimal('amount', 12, 2);
+            $table->unsignedBigInteger('amount');
             $table->date('date');
             $table->text('description')->nullable();
             $table->string('payment_method')->nullable();

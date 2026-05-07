@@ -14,13 +14,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->unsignedInteger('cashback')->default(0);
+            $table->unsignedBigInteger('price')->default(0);
             $table->string('image')->nullable();
             $table->boolean('is_available')->default(true);
-            $table->boolean('is_stock_calculated')->default(false);
             $table->boolean('is_student_discount')->default(false);
-            $table->decimal('student_price', 10, 2)->nullable();
+            $table->unsignedBigInteger('student_price')->nullable();
             $table->timestamps();
 
             $table->index('category_id');

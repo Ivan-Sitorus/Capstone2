@@ -59,7 +59,7 @@ class Order extends Model
     protected function casts(): array
     {
         return [
-            'total_amount' => 'decimal:2',
+            'total_amount' => 'integer',
             'is_paid'      => 'boolean',
         ];
     }

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->enum('payment_method', ['qris', 'ewallet', 'cash', 'transfer']);
             $table->enum('payment_gateway', ['manual']);
             $table->string('transaction_id')->nullable()->unique();
-            $table->decimal('amount', 15, 2);
+            $table->unsignedBigInteger('amount');
             $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();

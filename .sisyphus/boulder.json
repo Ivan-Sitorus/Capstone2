@@ -1,0 +1,32 @@
+{
+  "active_plan": "/home/nioha/projects/Capstone2/.sisyphus/plans/pos-refactoring.md",
+  "started_at": "2026-05-07T19:58:48.559Z",
+  "session_ids": [
+    "ses_200ab1cd4ffewwRdMSiUifeyMv"
+  ],
+  "session_origins": {
+    "ses_200ab1cd4ffewwRdMSiUifeyMv": "direct"
+  },
+  "plan_name": "pos-refactoring",
+  "agent": "atlas",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "**Fix FinancialReport Page Crash**",
+      "session_id": "ses_1fbf9e5c2ffe1IyCmtjJukLO8Y",
+      "agent": "Sisyphus-Junior",
+      "category": "deep",
+      "updated_at": "2026-05-07T20:16:57.774Z"
+    },
+    "todo:5": {
+      "task_key": "todo:5",
+      "task_label": "5",
+      "task_title": "**Integer Prices Migration — Monetary Fields Only**",
+      "session_id": "ses_1fbe4e301ffejvwz1AP6J6mZuj",
+      "agent": "Sisyphus-Junior",
+      "category": "quick",
+      "updated_at": "2026-05-07T20:23:01.400Z"
+    }
+  }
+}

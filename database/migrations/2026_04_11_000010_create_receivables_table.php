@@ -11,11 +11,9 @@ return new class extends Migration
         Schema::create('receivables', function (Blueprint $table) {
             $table->id();
             $table->string('customer_name');
-            $table->decimal('amount', 12, 2);
-            $table->date('invoice_date');
-            $table->date('due_date');
-            $table->enum('status', ['pending', 'partial', 'paid', 'overdue'])->default('pending');
-            $table->decimal('paid_amount', 12, 2)->default(0);
+            $table->unsignedBigInteger('amount');
+            $table->string('customer_name', 100);
+            $table->unsignedBigInteger('paid_amount')->default(0);
             $table->text('notes')->nullable();
             $table->timestamps();
 

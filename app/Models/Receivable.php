@@ -37,8 +37,8 @@ class Receivable extends Model
         return [
             'invoice_date' => 'date',
             'due_date' => 'date',
-            'amount' => 'decimal:2',
-            'paid_amount' => 'decimal:2',
+            'amount' => 'integer',
+            'paid_amount' => 'integer',
         ];
     }
 

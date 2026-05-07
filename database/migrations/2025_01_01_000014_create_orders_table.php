@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('cashier_id')->nullable()->constrained('users')->onDelete('set null');
             $table->enum('status', ['pending', 'diproses', 'selesai'])->default('pending');
             $table->enum('order_type', ['qr', 'cashier'])->default('qr');
-            $table->decimal('total_amount', 15, 2)->default(0);
+            $table->unsignedBigInteger('total_amount')->default(0);
             $table->enum('payment_method', ['cash', 'qris', 'bayar_nanti'])->nullable();
             $table->string('payment_proof', 500)->nullable();
             $table->string('rejection_note', 255)->nullable();

@@ -3,23 +3,20 @@
 namespace App\Filament\Pages;
 
 use App\Models\Category;
-use App\Models\Expense;
 use App\Models\ReportTemplate;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Actions;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
 
 class FinancialReport extends Page
 {
-    use InteractsWithForms;
-
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-chart-bar';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Finance Details';
@@ -89,18 +86,11 @@ class FinancialReport extends Page
                     ->label('Categories')
                     ->multiple()
                     ->options(function () {
-                        $menuCategories = Category::where('is_active', true)
+                        return Category::where('is_active', true)
                             ->pluck('name', 'id')
                             ->toArray();
-
-                        $expenseCategories = Expense::distinct()
-                            ->pluck('category', 'category')
-                            ->mapWithKeys(fn ($v) => ['expense:'.$v => $v.' (Expense)'])
-                            ->toArray();
-
-                        return array_merge($menuCategories, $expenseCategories);
                     })
-                    ->visible(fn (callable $get) => $get('report_type') === 'custom')
+                    ->visible(fn (Get $get) => $get('report_type') === 'custom')
                     ->columnSpanFull(),
                 Actions::make([
                     Action::make('generate')

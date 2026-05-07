@@ -13,8 +13,8 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
             $table->foreignId('menu_id')->constrained('menus')->onDelete('restrict');
             $table->integer('quantity');
-            $table->decimal('unit_price', 15, 2);
-            $table->decimal('subtotal', 15, 2);
+            $table->unsignedBigInteger('unit_price');
+            $table->unsignedBigInteger('subtotal');
             $table->string('notes')->nullable();
             $table->timestamps();
 

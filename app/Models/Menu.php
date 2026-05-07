@@ -25,9 +25,9 @@ class Menu extends Model
     protected function casts(): array
     {
         return [
-            'price'               => 'decimal:2',
+            'price'               => 'integer',
             'cashback'            => 'integer',
-            'student_price'       => 'decimal:2',
+            'student_price'       => 'integer',
             'is_available'        => 'boolean',
             'is_stock_calculated' => 'boolean',
             'is_student_discount' => 'boolean',

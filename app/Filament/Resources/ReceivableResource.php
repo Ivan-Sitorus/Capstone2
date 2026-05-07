@@ -56,9 +56,9 @@ class ReceivableResource extends Resource
                     if ($state) {
                         $order = Order::find($state);
                         if ($order) {
-                            // Auto-fill customer name from order's customer
-                            if ($order->customer) {
-                                $set('customer_name', $order->customer->name);
+                            // Auto-fill customer name from order's customer_name field
+                            if ($order->customer_name) {
+                                $set('customer_name', $order->customer_name);
                             }
                             // Auto-fill amount from order's total_amount
                             $set('amount', $order->total_amount);
@@ -234,8 +234,7 @@ class ReceivableResource extends Resource
                     ->sortable(),
                 TextColumn::make('remaining_amount')
                     ->label('Remaining')
-                    ->money('IDR')
-                    ->sortable(),
+                    ->money('IDR'),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
