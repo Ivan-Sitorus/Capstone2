@@ -8,11 +8,14 @@ use App\Models\UnexpectedTransaction;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 
 class CashFlowStatsWidget extends StatsOverviewWidget
 {
     public string $period = 'day';
+    public string $dateStart = '';
+    public string $dateEnd = '';
 
     protected ?string $pollingInterval = null;
 
@@ -24,10 +27,24 @@ class CashFlowStatsWidget extends StatsOverviewWidget
     public function onPeriodChanged(string $period): void
     {
         $this->period = $period;
+        $this->dateStart = '';
+        $this->dateEnd = '';
+    }
+
+    #[On('cashflow-date-changed')]
+    public function onDateChanged(string $dateStart, string $dateEnd): void
+    {
+        $this->dateStart = $dateStart;
+        $this->dateEnd = $dateEnd;
+        $this->period = '';
     }
 
     private function dateRange(): array
     {
+        if ($this->dateStart && $this->dateEnd) {
+            return [Carbon::parse($this->dateStart)->startOfDay(), Carbon::parse($this->dateEnd)->endOfDay()];
+        }
+
         return match ($this->period) {
             'day'      => [Carbon::today(),              Carbon::today()->endOfDay()],
             'year'     => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()],
@@ -99,58 +116,62 @@ class CashFlowStatsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        [$s, $e]   = $this->dateRange();
-        [$ps, $pe] = $this->prevRange();
+        $cacheKey = 'cashflow_stats_' . md5($this->period . $this->dateStart . $this->dateEnd);
 
-        $income  = $this->totalIncome($s, $e);
-        $expense = $this->totalExpense($s, $e);
-        $net     = $income - $expense;
-        $margin  = $income > 0 ? ($net / $income) * 100 : 0;
+        return Cache::remember($cacheKey, 300, function () {
+            [$s, $e]   = $this->dateRange();
+            [$ps, $pe] = $this->prevRange();
 
-        $txnCnt = Order::where('is_paid', true)->whereBetween('created_at', [$s, $e])->count()
-                + IngredientBatch::whereBetween('received_at', [$s, $e])->count()
-                + UnexpectedTransaction::whereBetween('created_at', [$s, $e])->count();
+            $income  = $this->totalIncome($s, $e);
+            $expense = $this->totalExpense($s, $e);
+            $net     = $income - $expense;
+            $margin  = $income > 0 ? ($net / $income) * 100 : 0;
 
-        $pIncome  = $this->totalIncome($ps, $pe);
-        $pExpense = $this->totalExpense($ps, $pe);
-        $pNet     = $pIncome - $pExpense;
+            $txnCnt = Order::where('is_paid', true)->whereBetween('created_at', [$s, $e])->count()
+                    + IngredientBatch::whereBetween('received_at', [$s, $e])->count()
+                    + UnexpectedTransaction::whereBetween('created_at', [$s, $e])->count();
 
-        $icPct = $this->pct($income, $pIncome);
-        $ecPct = $this->pct($expense, $pExpense);
-        $ncPct = $pNet != 0 ? (($net - $pNet) / abs($pNet)) * 100 : null;
+            $pIncome  = $this->totalIncome($ps, $pe);
+            $pExpense = $this->totalExpense($ps, $pe);
+            $pNet     = $pIncome - $pExpense;
 
-        return [
-            Stat::make('Total Pemasukan', $this->fmtK($income))
-                ->description($icPct !== null
-                    ? ($icPct >= 0 ? '↑ ' : '↓ ') . number_format(abs($icPct), 1) . '% dari periode lalu'
-                    : 'Periode pertama')
-                ->descriptionIcon($icPct === null || $icPct >= 0
-                    ? 'heroicon-m-arrow-trending-up'
-                    : 'heroicon-m-arrow-trending-down')
-                ->color($icPct === null || $icPct >= 0 ? 'success' : 'danger')
-                ->chart($this->sparklineIncome()),
+            $icPct = $this->pct($income, $pIncome);
+            $ecPct = $this->pct($expense, $pExpense);
+            $ncPct = $pNet != 0 ? (($net - $pNet) / abs($pNet)) * 100 : null;
 
-            Stat::make('Total Pengeluaran', $this->fmtK($expense))
-                ->description($ecPct !== null
-                    ? ($ecPct >= 0 ? '↑ ' : '↓ ') . number_format(abs($ecPct), 1) . '% dari periode lalu'
-                    : 'Periode pertama')
-                ->descriptionIcon($ecPct === null || $ecPct <= 0
-                    ? 'heroicon-m-arrow-trending-down'
-                    : 'heroicon-m-arrow-trending-up')
-                ->color($ecPct === null || $ecPct <= 0 ? 'success' : 'danger')
-                ->chart($this->sparklineExpense()),
+            return [
+                Stat::make('Total Pemasukan', $this->fmtK($income))
+                    ->description($icPct !== null
+                        ? ($icPct >= 0 ? '↑ ' : '↓ ') . number_format(abs($icPct), 1) . '% dari periode lalu'
+                        : 'Periode pertama')
+                    ->descriptionIcon($icPct === null || $icPct >= 0
+                        ? 'heroicon-m-arrow-trending-up'
+                        : 'heroicon-m-arrow-trending-down')
+                    ->color($icPct === null || $icPct >= 0 ? 'success' : 'danger')
+                    ->chart($this->sparklineIncome()),
 
-            Stat::make('Net Cash Flow', ($net >= 0 ? '+' : '−') . $this->fmtK(abs($net)))
-                ->description($ncPct !== null
-                    ? ($ncPct >= 0 ? '↑ ' : '↓ ') . number_format(abs($ncPct), 1) . '% dari periode lalu'
-                    : 'Periode pertama')
-                ->descriptionIcon('heroicon-m-banknotes')
-                ->color($net >= 0 ? 'success' : 'danger'),
+                Stat::make('Total Pengeluaran', $this->fmtK($expense))
+                    ->description($ecPct !== null
+                        ? ($ecPct >= 0 ? '↑ ' : '↓ ') . number_format(abs($ecPct), 1) . '% dari periode lalu'
+                        : 'Periode pertama')
+                    ->descriptionIcon($ecPct === null || $ecPct <= 0
+                        ? 'heroicon-m-arrow-trending-down'
+                        : 'heroicon-m-arrow-trending-up')
+                    ->color($ecPct === null || $ecPct <= 0 ? 'success' : 'danger')
+                    ->chart($this->sparklineExpense()),
 
-            Stat::make('Net Margin', number_format($margin, 1) . '%')
-                ->description($txnCnt . ' total transaksi')
-                ->descriptionIcon('heroicon-m-chart-pie')
-                ->color($margin >= 30 ? 'success' : ($margin >= 10 ? 'warning' : 'danger')),
-        ];
+                Stat::make('Net Cash Flow', ($net >= 0 ? '+' : '−') . $this->fmtK(abs($net)))
+                    ->description($ncPct !== null
+                        ? ($ncPct >= 0 ? '↑ ' : '↓ ') . number_format(abs($ncPct), 1) . '% dari periode lalu'
+                        : 'Periode pertama')
+                    ->descriptionIcon('heroicon-m-banknotes')
+                    ->color($net >= 0 ? 'success' : 'danger'),
+
+                Stat::make('Net Margin', number_format($margin, 1) . '%')
+                    ->description($txnCnt . ' total transaksi')
+                    ->descriptionIcon('heroicon-m-chart-pie')
+                    ->color($margin >= 30 ? 'success' : ($margin >= 10 ? 'warning' : 'danger')),
+            ];
+        });
     }
 }

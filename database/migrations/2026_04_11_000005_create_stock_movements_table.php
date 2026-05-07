@@ -14,8 +14,6 @@ return new class extends Migration
             $table->foreignId('ingredient_batch_id')->nullable()->constrained('ingredient_batches')->nullOnDelete();
             $table->foreignId('order_id')->nullable()->constrained('orders')->nullOnDelete();
             $table->foreignId('order_item_id')->nullable()->constrained('order_items')->nullOnDelete();
-            // FK to waste_records will be added in phase 2 after waste_records table exists.
-            $table->unsignedBigInteger('waste_record_id')->nullable();
             $table->foreignId('stock_adjustment_id')->nullable()->constrained('stock_adjustments')->nullOnDelete();
             $table->enum('movement_type', [
                 'purchase',
@@ -39,7 +37,6 @@ return new class extends Migration
             $table->index(['ingredient_id', 'created_at']);
             $table->index(['movement_type', 'created_at']);
             $table->index(['source_type', 'source_id']);
-            $table->index('waste_record_id');
             $table->index('ingredient_id');
             $table->index('order_id');
         });

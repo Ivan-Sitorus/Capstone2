@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Environment
+.env
+.env.*
+
+# Dependencies (will exist after install)
+node_modules
+vendor
+
+# Cache, logs, and temp
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/logs/*
+storage/app/private/*
+
+# Testing
+tests
+k6
+.phpunit.result.cache
+phpunit.xml
+
+# Tooling
+.sisyphus
+.opencode
+
+# Documentation
+*.md
+
+# Packages
+*.deb
+
+# Self (prevent recursive issues)
+.dockerignore

@@ -11,7 +11,6 @@ class Menu extends Model
         'category_id',
         'name',
         'slug',
-        'description',
         'price',
         'cashback',
         'image',

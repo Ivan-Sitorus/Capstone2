@@ -20,6 +20,26 @@ class Order extends Model
         });
     }
 
+    protected static function booted(): void
+    {
+        static::created(function (self $order) {
+            if ($order->payment_method === 'bayar_nanti' && ! $order->is_paid) {
+                if (! $order->receivable()->exists()) {
+                    Receivable::create([
+                        'customer_name' => $order->customer_name ?? 'Event Customer',
+                        'amount'        => $order->total_amount,
+                        'invoice_date'  => $order->created_at,
+                        'due_date'      => $order->created_at->copy()->addDays(30),
+                        'status'        => Receivable::STATUS_PENDING,
+                        'paid_amount'   => 0,
+                        'order_id'      => $order->id,
+                        'notes'         => "Auto-generated from Order #{$order->order_code}",
+                    ]);
+                }
+            }
+        });
+    }
+
     protected $fillable = [
         'order_code',
         'customer_name',
@@ -62,6 +82,11 @@ class Order extends Model
     public function appliedPromotions()
     {
         return $this->hasMany(AppliedPromotion::class);
+    }
+
+    public function receivable()
+    {
+        return $this->hasOne(Receivable::class);
     }
 
     public function isCashPending(): bool

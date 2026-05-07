@@ -8,11 +8,15 @@ use App\Models\UnexpectedTransaction;
 use Carbon\Carbon;
 use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 
 class CashFlowChartWidget extends ChartWidget
 {
     public string $period = 'month';
+
+    public string $dateStart = '';
+    public string $dateEnd = '';
 
     protected ?string $pollingInterval = null;
 
@@ -28,6 +32,15 @@ class CashFlowChartWidget extends ChartWidget
     public function onPeriodChanged(string $period): void
     {
         $this->period = $period;
+        $this->dateStart = '';
+        $this->dateEnd = '';
+    }
+
+    #[On('cashflow-date-changed')]
+    public function onDateChanged(string $start, string $end): void
+    {
+        $this->dateStart = $start;
+        $this->dateEnd = $end;
     }
 
     private function incomeQuery(): \Illuminate\Database\Eloquent\Builder
@@ -55,12 +68,117 @@ class CashFlowChartWidget extends ChartWidget
 
     private function buildData(): array
     {
-        return match ($this->period) {
-            'day'      => $this->byHour(),
-            'year'     => $this->byMonthOfYear(),
-            'all_time' => $this->byMonth(),
-            default    => $this->byEvenDay(),   // month
+        $cacheKey = 'cashflow_chart_' . md5(serialize([
+            $this->period,
+            $this->dateStart,
+            $this->dateEnd,
+        ]));
+
+        return Cache::remember($cacheKey, 300, function () {
+            if ($this->dateStart && $this->dateEnd) {
+                return $this->buildDynamicRange();
+            }
+
+            return match ($this->period) {
+                'day'      => $this->byHour(),
+                'year'     => $this->byMonthOfYear(),
+                'all_time' => $this->byMonth(),
+                default    => $this->byEvenDay(),   // month
+            };
+        });
+    }
+
+    private function buildDynamicRange(): array
+    {
+        $start = Carbon::parse($this->dateStart)->startOfDay();
+        $end   = Carbon::parse($this->dateEnd)->endOfDay();
+        $days  = (int) $start->diffInDays($end) + 1;
+
+        return match (true) {
+            $days <= 7   => $this->byDayRange($start, $end),
+            $days <= 60  => $this->byWeekRange($start, $end),
+            $days <= 365 => $this->byMonthRange($start, $end),
+            default      => $this->byQuarterRange($start, $end),
         };
+    }
+
+    private function byDayRange(Carbon $start, Carbon $end): array
+    {
+        $labels = $incData = $expData = [];
+        $cur = $start->copy();
+
+        while ($cur->lte($end)) {
+            $dayStart = $cur->copy()->startOfDay();
+            $dayEnd   = $cur->copy()->endOfDay();
+            $labels[] = $cur->isoFormat('D MMM');
+            $incData[] = $this->slotIncome($dayStart, $dayEnd);
+            $expData[] = $this->slotExpense($dayStart, $dayEnd);
+            $cur->addDay();
+        }
+
+        return compact('labels', 'incData', 'expData');
+    }
+
+    private function byWeekRange(Carbon $start, Carbon $end): array
+    {
+        $labels = $incData = $expData = [];
+        $cur = $start->copy()->startOfWeek();
+        $weekNum = 1;
+
+        while ($cur->lte($end)) {
+            $weekEnd = $cur->copy()->endOfWeek();
+            $slotEnd = $weekEnd->gt($end) ? $end->copy() : $weekEnd;
+
+            $labels[]  = 'Minggu ' . $weekNum;
+            $incData[] = $this->slotIncome($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
+            $expData[] = $this->slotExpense($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
+
+            $cur->addWeek();
+            $weekNum++;
+        }
+
+        return compact('labels', 'incData', 'expData');
+    }
+
+    private function byMonthRange(Carbon $start, Carbon $end): array
+    {
+        $labels = $incData = $expData = [];
+        $cur = $start->copy()->startOfMonth();
+
+        while ($cur->lte($end)) {
+            $monthEnd = $cur->copy()->endOfMonth();
+            $slotEnd  = $monthEnd->gt($end) ? $end->copy() : $monthEnd;
+
+            $labels[]  = $cur->isoFormat('MMM YYYY');
+            $incData[] = $this->slotIncome($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
+            $expData[] = $this->slotExpense($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
+
+            $cur->addMonth();
+        }
+
+        return compact('labels', 'incData', 'expData');
+    }
+
+    private function byQuarterRange(Carbon $start, Carbon $end): array
+    {
+        $labels = $incData = $expData = [];
+        $cur = $start->copy()->startOfMonth();
+        $maxPoints = 200;
+        $pointCount = 0;
+
+        while ($cur->lte($end) && $pointCount < $maxPoints) {
+            $quarterEnd = $cur->copy()->addMonths(2)->endOfMonth();
+            $slotEnd    = $quarterEnd->gt($end) ? $end->copy() : $quarterEnd;
+
+            $labels[]  = $cur->isoFormat('MMM YYYY') . ' – ' . $quarterEnd->isoFormat('MMM YYYY');
+            $incData[] = $this->slotIncome($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
+            $expData[] = $this->slotExpense($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
+
+            $cur->addMonths(3);
+            $pointCount++;
+        }
+
+        return compact('labels', 'incData', 'expData');
     }
 
     /** Hari Ini: per 3 jam (00:00, 03:00, 06:00, …, 21:00) */

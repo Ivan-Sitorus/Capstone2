@@ -29,6 +29,7 @@ class Receivable extends Model
         'status',
         'paid_amount',
         'notes',
+        'order_id',
     ];
 
     protected function casts(): array
@@ -50,6 +51,71 @@ class Receivable extends Model
     {
         return $this->status !== self::STATUS_PAID
             && $this->due_date !== null
-            && $this->due_date->isPast();
+            && $this->due_date->lessThan(now());
+    }
+
+    /**
+     * Record a payment for this receivable.
+     * Automatically updates status based on paid_amount.
+     *
+     * @param float $amount Payment amount to add
+     * @throws \InvalidArgumentException If receivable is already paid
+     * @return void
+     */
+    public function recordPayment(float $amount): void
+    {
+        if ($this->status === self::STATUS_PAID) {
+            throw new \InvalidArgumentException('Receivable is already fully paid');
+        }
+
+        if ($amount <= 0) {
+            throw new \InvalidArgumentException('Payment amount must be positive');
+        }
+
+        $currentPaid = (float) $this->paid_amount;
+        $totalAmount = (float) $this->amount;
+        $newPaid = min($currentPaid + $amount, $totalAmount);
+
+        $this->paid_amount = $newPaid;
+
+        if ($newPaid >= $totalAmount) {
+            $this->status = self::STATUS_PAID;
+            $this->paid_amount = $totalAmount;
+        } elseif ($newPaid > 0) {
+            $this->status = self::STATUS_PARTIAL;
+        }
+
+        $this->save();
+    }
+
+    /**
+     * Scope to filter overdue receivables.
+     */
+    public function scopeOverdue($query)
+    {
+        return $query->where('status', '!=', self::STATUS_PAID)
+            ->whereNotNull('due_date')
+            ->where('due_date', '<', now());
+    }
+
+    /**
+     * Scope to filter pending receivables.
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', self::STATUS_PENDING);
+    }
+
+    /**
+     * Scope to filter paid receivables.
+     */
+    public function scopePaid($query)
+    {
+        return $query->where('status', self::STATUS_PAID);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
     }
 }

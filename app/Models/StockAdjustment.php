@@ -17,15 +17,12 @@ class StockAdjustment extends Model
 
     protected $fillable = [
         'ingredient_id',
-        'ingredient_batch_id',
         'adjustment_type',
         'quantity',
         'quantity_before',
         'quantity_after',
         'reason',
-        'reference',
-        'recorded_by',
-        'approved_by',
+        'reported_by',
         'adjusted_at',
     ];
 
@@ -44,19 +41,9 @@ class StockAdjustment extends Model
         return $this->belongsTo(Ingredient::class);
     }
 
-    public function ingredientBatch()
+    public function reportedBy()
     {
-        return $this->belongsTo(IngredientBatch::class);
-    }
-
-    public function recordedBy()
-    {
-        return $this->belongsTo(User::class, 'recorded_by');
-    }
-
-    public function approvedBy()
-    {
-        return $this->belongsTo(User::class, 'approved_by');
+        return $this->belongsTo(User::class, 'reported_by');
     }
 
     public function stockMovements()

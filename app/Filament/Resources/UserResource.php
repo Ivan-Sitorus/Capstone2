@@ -10,7 +10,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
-use App\Filament\Resources\UserResource\Pages\CreateUser;
 use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
@@ -18,6 +17,8 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
+use App\Filament\Helpers\TextInputHelper;
+use App\Filament\Helpers\NumberInputHelper;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Hash;
@@ -40,13 +41,15 @@ class UserResource extends Resource
             TextInput::make('name')
                 ->label('Nama Lengkap')
                 ->required()
-                ->maxLength(255),
+                ->maxLength(255)
+                ->extraInputAttributes(TextInputHelper::string()),
             TextInput::make('email')
                 ->label('Email')
                 ->email()
                 ->required()
                 ->unique(ignoreRecord: true)
-                ->maxLength(255),
+                ->maxLength(255)
+                ->extraInputAttributes(TextInputHelper::string()),
             TextInput::make('password')
                 ->label('Password')
                 ->password()
@@ -66,7 +69,8 @@ class UserResource extends Resource
             TextInput::make('phone')
                 ->label('No. HP')
                 ->nullable()
-                ->maxLength(20),
+                ->maxLength(20)
+                ->extraInputAttributes(NumberInputHelper::integer()),
         ]);
     }
 
@@ -114,7 +118,7 @@ class UserResource extends Resource
                     ]),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->modal(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -129,7 +133,6 @@ class UserResource extends Resource
     {
         return [
             'index'  => ListUsers::route('/'),
-            'create' => CreateUser::route('/create'),
             'edit'   => EditUser::route('/{record}/edit'),
         ];
     }

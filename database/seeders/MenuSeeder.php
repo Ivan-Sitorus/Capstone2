@@ -71,7 +71,6 @@ class MenuSeeder extends Seeder
                 'category_id'         => $catId,
                 'name'                => $name,
                 'slug'                => $slug,
-                'description'         => null,
                 'price'               => $price,
                 'cashback'            => $cashback,
                 'image'               => null,

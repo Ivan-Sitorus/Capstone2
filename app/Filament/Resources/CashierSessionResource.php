@@ -13,10 +13,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\CashierSessionResource\Pages\ListCashierSessions;
-use App\Filament\Resources\CashierSessionResource\Pages\CreateCashierSession;
 use App\Filament\Resources\CashierSessionResource\Pages\EditCashierSession;
 use App\Filament\Resources\CashierSessionResource\Pages;
 use App\Models\CashierSession;
+use App\Filament\Helpers\NumberInputHelper;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -54,16 +54,21 @@ class CashierSessionResource extends Resource
                 ->native(false),
             TextInput::make('total_sales')
                 ->label('Total Sales')
-                ->numeric()
-                ->minValue(0)
                 ->default(0)
-                ->prefix('Rp'),
+                ->type('text')
+                ->prefix('Rp')
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::decimal())
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
             TextInput::make('total_transactions')
                 ->label('Total Transactions')
-                ->numeric()
-                ->integer()
-                ->minValue(0)
-                ->default(0),
+                ->default(0)
+                ->type('text')
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::integer(999999))
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 0, ',', '.') : ''),
         ])->columns(2);
     }
 
@@ -115,7 +120,7 @@ class CashierSessionResource extends Resource
                     ->query(fn ($query) => $query->today()),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->modal(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -130,7 +135,6 @@ class CashierSessionResource extends Resource
     {
         return [
             'index' => ListCashierSessions::route('/'),
-            'create' => CreateCashierSession::route('/create'),
             'edit' => EditCashierSession::route('/{record}/edit'),
         ];
     }

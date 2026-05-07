@@ -11,10 +11,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\CategoryResource\Pages\ListCategories;
-use App\Filament\Resources\CategoryResource\Pages\CreateCategory;
 use App\Filament\Resources\CategoryResource\Pages\EditCategory;
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
+use App\Filament\Helpers\TextInputHelper;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -40,12 +40,14 @@ class CategoryResource extends Resource
                 ->label('Nama Kategori')
                 ->required()
                 ->unique(ignoreRecord: true)
-                ->maxLength(100),
+                ->maxLength(100)
+                ->extraInputAttributes(TextInputHelper::string(100)),
             TextInput::make('slug')
                 ->label('Slug')
                 ->required()
                 ->unique(ignoreRecord: true)
-                ->maxLength(100),
+                ->maxLength(100)
+                ->extraInputAttributes(TextInputHelper::string(100)),
             Toggle::make('is_active')
                 ->label('Aktif')
                 ->default(true)
@@ -81,7 +83,7 @@ class CategoryResource extends Resource
                     ->falseLabel('Tidak Aktif'),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->modal(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -95,7 +97,6 @@ class CategoryResource extends Resource
     {
         return [
             'index'  => ListCategories::route('/'),
-            'create' => CreateCategory::route('/create'),
             'edit'   => EditCategory::route('/{record}/edit'),
         ];
     }

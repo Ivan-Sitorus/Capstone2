@@ -14,10 +14,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\ExpenseResource\Pages\ListExpenses;
-use App\Filament\Resources\ExpenseResource\Pages\CreateExpense;
 use App\Filament\Resources\ExpenseResource\Pages\EditExpense;
 use App\Filament\Resources\ExpenseResource\Pages;
 use App\Models\Expense;
+use App\Filament\Helpers\NumberInputHelper;
+use App\Filament\Helpers\TextInputHelper;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -33,7 +34,7 @@ class ExpenseResource extends Resource
 
     protected static ?string $navigationLabel = 'Expenses';
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
 
     protected static ?int $navigationSort = 2;
 
@@ -43,7 +44,8 @@ class ExpenseResource extends Resource
             TextInput::make('vendor')
                 ->label('Vendor')
                 ->required()
-                ->maxLength(255),
+                ->maxLength(255)
+                ->extraInputAttributes(TextInputHelper::string()),
             Select::make('category')
                 ->label('Category')
                 ->options([
@@ -60,9 +62,12 @@ class ExpenseResource extends Resource
             TextInput::make('amount')
                 ->label('Amount')
                 ->required()
-                ->numeric()
-                ->minValue(0)
-                ->prefix('Rp'),
+                ->type('text')
+                ->prefix('Rp')
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::decimal())
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
             DatePicker::make('date')
                 ->label('Date')
                 ->required()
@@ -148,7 +153,7 @@ class ExpenseResource extends Resource
                     ]),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->modal(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -163,7 +168,7 @@ class ExpenseResource extends Resource
     {
         return [
             'index' => ListExpenses::route('/'),
-            'create' => CreateExpense::route('/create'),
+            'create' => Pages\CreateExpense::route('/create'),
             'edit' => EditExpense::route('/{record}/edit'),
         ];
     }

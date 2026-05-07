@@ -4,6 +4,7 @@ namespace App\Filament\Resources\IngredientResource\Pages;
 
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
+use App\Filament\Helpers\NumberInputHelper;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -76,16 +77,12 @@ class ManageBatches extends Page implements HasTable
                         TextInput::make('quantity')
                             ->label('Quantity')
                             ->required()
-                            ->numeric()
                             ->minValue(0)
                             ->step(0.1)
                             ->type('text')
                             ->stripCharacters('.')
                             ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                            ->extraInputAttributes([
-                                'onkeydown' => "return !['-','e','E','+'].includes(event.key)",
-                                'oninput' => "let v=this.value.replace(/[^0-9,]/g,'');let parts=v.split(',');let intPart=parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');let decPart=parts.length>1?parts.slice(1).join('').slice(0,1):'';this.value=decPart.length?intPart+','+decPart:intPart;",
-                            ])
+                            ->extraInputAttributes(NumberInputHelper::decimal())
                             ->suffix(fn () => ' ' . $this->record->unit),
                         DatePicker::make('expiry_date')
                             ->label('Expiry Date')
@@ -103,10 +100,7 @@ class ManageBatches extends Page implements HasTable
                         ->minValue(0)
                         ->type('text')
                         ->stripCharacters('.')
-                        ->extraInputAttributes([
-                            'onkeydown' => "return !['-','e','E','+','.',','].includes(event.key)",
-                            'oninput' => "let v=this.value.replace(/\\D/g,'');this.value=v.replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');",
-                        ])
+                        ->extraInputAttributes(NumberInputHelper::integer())
                         ->prefix('Rp'),
                     ])
                     ->using(function (array $data): IngredientBatch {
@@ -119,16 +113,12 @@ class ManageBatches extends Page implements HasTable
                         TextInput::make('quantity')
                             ->label('Quantity')
                             ->required()
-                            ->numeric()
                             ->minValue(0)
                             ->step(0.1)
                             ->type('text')
                             ->stripCharacters('.')
                             ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                            ->extraInputAttributes([
-                                'onkeydown' => "return !['-','e','E','+'].includes(event.key)",
-                                'oninput' => "let v=this.value.replace(/[^0-9,]/g,'');let parts=v.split(',');let intPart=parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');let decPart=parts.length>1?parts.slice(1).join('').slice(0,1):'';this.value=decPart.length?intPart+','+decPart:intPart;",
-                            ])
+                            ->extraInputAttributes(NumberInputHelper::decimal())
                             ->suffix(fn () => ' ' . $this->record->unit),
                         DatePicker::make('expiry_date')
                             ->label('Expiry Date')
@@ -146,10 +136,7 @@ class ManageBatches extends Page implements HasTable
                         ->minValue(0)
                         ->type('text')
                         ->stripCharacters('.')
-                        ->extraInputAttributes([
-                            'onkeydown' => "return !['-','e','E','+','.',','].includes(event.key)",
-                            'oninput' => "let v=this.value.replace(/\\D/g,'');this.value=v.replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');",
-                        ])
+                        ->extraInputAttributes(NumberInputHelper::integer())
                         ->prefix('Rp'),
                     ]),
                 DeleteAction::make(),

@@ -15,12 +15,15 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\IngredientResource\Pages\ListIngredients;
 use App\Filament\Resources\IngredientResource\Pages\EditIngredient;
 use App\Filament\Resources\IngredientResource\Pages\ManageBatches;
 use App\Models\Ingredient;
+use App\Filament\Helpers\NumberInputHelper;
+use App\Filament\Helpers\TextInputHelper;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -45,7 +48,8 @@ class IngredientResource extends Resource
                 ->label('Ingredient Name')
                 ->required()
                 ->maxLength(255)
-                ->unique(ignoreRecord: true),
+                ->unique(ignoreRecord: true)
+                ->extraInputAttributes(TextInputHelper::string()),
             Select::make('unit')
                 ->label('Unit')
                 ->options(Ingredient::UNITS)
@@ -56,15 +60,11 @@ class IngredientResource extends Resource
             TextInput::make('low_stock_threshold')
                 ->label('Low Stock Threshold')
                 ->required()
-                ->integer()
-                ->minValue(0)
-                ->default(0)
                 ->type('text')
+                ->extraInputAttributes(NumberInputHelper::decimal())
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
                 ->stripCharacters('.')
-                ->extraInputAttributes([
-                    'onkeydown' => "return !['-','e','E','+','.',','].includes(event.key)",
-                    'oninput' => "let v=this.value.replace(/\\D/g,'');this.value=v.replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');",
-                ])
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                 ->suffix(fn ($get) => $get('unit') ? ' ' . $get('unit') : ''),
             Toggle::make('is_active')
                 ->label('Active')
@@ -81,16 +81,12 @@ class IngredientResource extends Resource
                     TextInput::make('quantity')
                         ->label('Jumlah')
                         ->required()
-                        ->numeric()
                         ->minValue(0)
                         ->step(0.1)
                         ->type('text')
                         ->stripCharacters('.')
                         ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                        ->extraInputAttributes([
-                            'onkeydown' => "return !['-','e','E','+'].includes(event.key)",
-                            'oninput' => "let v=this.value.replace(/[^0-9,]/g,'');let parts=v.split(',');let intPart=parts[0].replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');let decPart=parts.length>1?parts.slice(1).join('').slice(0,1):'';this.value=decPart.length?intPart+','+decPart:intPart;",
-                        ])
+                        ->extraInputAttributes(NumberInputHelper::decimal())
                         ->suffix(fn ($get) => $get('../../unit') ? ' ' . $get('../../unit') : ''),
                     DatePicker::make('expiry_date')
                         ->label('Tanggal Kadaluarsa')
@@ -98,7 +94,7 @@ class IngredientResource extends Resource
                         ->native(false),
                     DateTimePicker::make('received_at')
                         ->label('Diterima Tanggal')
-                        ->required()
+                        ->nullable()
                         ->default(now())
                         ->native(false),
                     TextInput::make('cost_per_unit')
@@ -108,10 +104,7 @@ class IngredientResource extends Resource
                         ->minValue(0)
                         ->type('text')
                         ->stripCharacters('.')
-                        ->extraInputAttributes([
-                            'onkeydown' => "return !['-','e','E','+','.',','].includes(event.key)",
-                            'oninput' => "let v=this.value.replace(/\\D/g,'');this.value=v.replace(/\\B(?=(\\d{3})+(?!\\d))/g,'.');",
-                        ])
+                        ->extraInputAttributes(NumberInputHelper::integer())
                         ->prefix(fn ($get) => $get('../../unit') ? 'Rp/' . $get('../../unit') : 'Rp'),
                 ])
                 ->defaultItems(0)
@@ -132,7 +125,7 @@ class IngredientResource extends Resource
                     ->sortable(),
                 TextColumn::make('low_stock_threshold')
                     ->label('Low Stock Threshold')
-                    ->numeric(decimalPlaces: 0)
+                    ->numeric(decimalPlaces: 2, decimalSeparator: ',', thousandsSeparator: '.')
                     ->suffix(fn (Ingredient $record) => ' ' . $record->unit)
                     ->sortable(),
                 TextColumn::make('total_stock')
@@ -140,7 +133,7 @@ class IngredientResource extends Resource
                     ->getStateUsing(fn (Ingredient $record) => $record->getTotalStock() + 0)
                     ->suffix(fn (Ingredient $record) => ' ' . $record->unit)
                     ->badge()
-                    ->color(fn (Ingredient $record) => $record->getTotalStock() < (int) $record->low_stock_threshold ? 'danger' : 'success')
+                    ->color(fn (Ingredient $record) => $record->getTotalStock() < (float) $record->low_stock_threshold ? 'danger' : 'success')
                     ->sortable(query: function ($query, string $direction): void {
                         $query->orderByRaw('(SELECT COALESCE(SUM(quantity), 0) FROM ingredient_batches WHERE ingredient_batches.ingredient_id = ingredients.id) ' . $direction);
                     }),
@@ -164,7 +157,8 @@ class IngredientResource extends Resource
                     ->label('Batch')
                     ->icon('heroicon-o-cube')
                     ->url(fn ($record) => static::getUrl('batches', ['record' => $record])),
-                EditAction::make(),
+                EditAction::make()->modal(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

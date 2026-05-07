@@ -1,11 +1,44 @@
+# Auto detect text files and enforce LF line endings
 * text=auto eol=lf
 
+# Text files — explicit LF
+*.blade.php text eol=lf
+*.css text eol=lf
+*.html text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.php text eol=lf
+*.scss text eol=lf
+*.sh text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.vue text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+# Binary files — never normalize
+*.eot binary
+*.gif binary
+*.ico binary
+*.jpeg binary
+*.jpg binary
+*.png binary
+*.svg binary
+*.ttf binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+
+# Diff settings
 *.blade.php diff=html
 *.css diff=css
 *.html diff=html
 *.md diff=markdown
 *.php diff=php
 
+# Export-ignore (not included in archives)
 /.github export-ignore
 CHANGELOG.md export-ignore
 .styleci.yml export-ignore

@@ -21,17 +21,15 @@ class StockReconciliationService
         float $quantity,
         string $adjustmentType,
         string $reason,
-        ?int $recordedBy = null,
-        ?string $reference = null,
-        ?int $approvedBy = null,
-        ?int $ingredientBatchId = null,
+        ?int $reportedBy = null,
+        ?string $adjustedAt = null,
     ): StockAdjustment {
         if ($quantity <= 0) {
-            throw new RuntimeException('Quantity adjustment harus lebih dari 0.');
+            throw new RuntimeException('Jumlah penyesuaian harus lebih dari 0.');
         }
 
         if (! in_array($adjustmentType, StockAdjustment::TYPES, true)) {
-            throw new RuntimeException('Adjustment type tidak valid.');
+            throw new RuntimeException('Tipe penyesuaian tidak valid.');
         }
 
         return DB::transaction(function () use (
@@ -39,27 +37,24 @@ class StockReconciliationService
             $quantity,
             $adjustmentType,
             $reason,
-            $recordedBy,
-            $reference,
-            $approvedBy,
-            $ingredientBatchId
+            $reportedBy,
+            $adjustedAt,
         ) {
             $ingredient = Ingredient::with('batches')->findOrFail($ingredientId);
             $quantityBefore = (float) $ingredient->getTotalStock();
 
             if ($adjustmentType === StockAdjustment::TYPE_DECREASE) {
+                $signedQuantity = -$quantity;
+
                 $adjustment = StockAdjustment::create([
                     'ingredient_id' => $ingredientId,
-                    'ingredient_batch_id' => null,
                     'adjustment_type' => $adjustmentType,
-                    'quantity' => $quantity,
+                    'quantity' => $signedQuantity,
                     'quantity_before' => $quantityBefore,
                     'quantity_after' => $quantityBefore,
                     'reason' => $reason,
-                    'reference' => $reference,
-                    'recorded_by' => $recordedBy,
-                    'approved_by' => $approvedBy,
-                    'adjusted_at' => now(),
+                    'reported_by' => $reportedBy,
+                    'adjusted_at' => $adjustedAt ?? now(),
                 ]);
 
                 $this->inventoryService->decreaseStockForIngredient(
@@ -70,8 +65,7 @@ class StockReconciliationService
                         'source_type' => 'stock_adjustment',
                         'source_id' => (string) $adjustment->id,
                         'stock_adjustment_id' => $adjustment->id,
-                        'recorded_by' => $recordedBy,
-                        'reference' => $reference,
+                        'recorded_by' => $reportedBy,
                         'notes' => $reason,
                     ]
                 );
@@ -85,11 +79,7 @@ class StockReconciliationService
                 return $adjustment;
             }
 
-            $batch = $ingredientBatchId
-                ? IngredientBatch::whereKey($ingredientBatchId)
-                    ->where('ingredient_id', $ingredientId)
-                    ->first()
-                : $ingredient->batches()->orderByDesc('received_at')->first();
+            $batch = $ingredient->batches()->orderByDesc('received_at')->first();
 
             if (! $batch) {
                 throw new RuntimeException('Tidak ada batch untuk bahan ini. Tambahkan batch terlebih dahulu.');
@@ -103,16 +93,13 @@ class StockReconciliationService
 
             $adjustment = StockAdjustment::create([
                 'ingredient_id' => $ingredientId,
-                'ingredient_batch_id' => $batch->id,
                 'adjustment_type' => $adjustmentType,
                 'quantity' => $quantity,
                 'quantity_before' => $quantityBefore,
                 'quantity_after' => $quantityAfter,
                 'reason' => $reason,
-                'reference' => $reference,
-                'recorded_by' => $recordedBy,
-                'approved_by' => $approvedBy,
-                'adjusted_at' => now(),
+                'reported_by' => $reportedBy,
+                'adjusted_at' => $adjustedAt ?? now(),
             ]);
 
             StockMovement::create([
@@ -126,9 +113,8 @@ class StockReconciliationService
                 'quantity_change' => $quantity,
                 'quantity_after' => (float) $batch->quantity,
                 'unit_cost' => $batch->cost_per_unit,
-                'reference' => $reference,
                 'notes' => $reason,
-                'recorded_by' => $recordedBy,
+                'recorded_by' => $reportedBy,
             ]);
 
             return $adjustment;

@@ -17,11 +17,14 @@ use App\Filament\Resources\MenuResource\Pages\EditMenu;
 use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers;
 use App\Models\Menu;
+use App\Filament\Helpers\NumberInputHelper;
+use App\Filament\Helpers\TextInputHelper;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Resources\Resource;
 use App\Services\MenuImageService;
 use Filament\Tables;
@@ -45,16 +48,14 @@ class MenuResource extends Resource
             TextInput::make('name')
                 ->label('Nama Menu')
                 ->required()
-                ->maxLength(255),
+                ->maxLength(255)
+                ->extraInputAttributes(TextInputHelper::string()),
             TextInput::make('slug')
                 ->label('Slug')
                 ->required()
                 ->unique(ignoreRecord: true)
-                ->maxLength(255),
-            Textarea::make('description')
-                ->label('Deskripsi')
-                ->rows(2)
-                ->nullable(),
+                ->maxLength(255)
+                ->extraInputAttributes(TextInputHelper::string()),
             Select::make('category_id')
                 ->label('Kategori')
                 ->relationship('category', 'name')
@@ -65,7 +66,7 @@ class MenuResource extends Resource
                 ->label('Gambar Menu')
                 ->directory('menus/')
                 ->disk('public')
-                ->image()
+                ->fetchFileInformation(false)
                 ->imagePreviewHeight('200')
                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                 ->maxSize(5120)
@@ -77,28 +78,71 @@ class MenuResource extends Resource
             TextInput::make('price')
                 ->label('Harga Normal')
                 ->required()
-                ->numeric()
+                ->type('text')
                 ->minValue(0)
-                ->prefix('Rp'),
+                ->prefix('Rp')
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::decimal())
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
+            Toggle::make('is_student_discount')
+                ->label('Ada Diskon Mahasiswa')
+                ->default(true)
+                ->inline(false)
+                ->live(),
             TextInput::make('cashback')
                 ->label('Cashback Mahasiswa')
-                ->numeric()
+                ->type('text')
                 ->minValue(0)
                 ->default(0)
-                ->prefix('Rp'),
+                ->prefix('Rp')
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::decimal())
+                ->disabled(fn (Get $get) => ! $get('is_student_discount'))
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
             Toggle::make('is_available')
                 ->label('Tersedia')
                 ->default(true)
                 ->inline(false),
-            Toggle::make('is_student_discount')
-                ->label('Ada Diskon Mahasiswa')
-                ->default(true)
-                ->inline(false),
             Toggle::make('is_stock_calculated')
-                ->label('Stok Otomatis dari Resep')
-                ->dehydrated(false)
-                ->disabled()
-                ->helperText('Nilai ini otomatis aktif jika menu memiliki resep bahan.'),
+                ->label('Ada Resep Menu')
+                ->live()
+                ->afterStateUpdated(function ($state, $record) {
+                    if (! $state && $record && $record->exists) {
+                        $record->menuIngredients()->delete();
+                    }
+                }),
+            Repeater::make('menuIngredients')
+                ->relationship('menuIngredients')
+                ->label('Bahan Menu')
+                ->addActionLabel('+ Tambah Bahan')
+                ->visible(fn (Get $get) => $get('is_stock_calculated'))
+                ->columnSpanFull()
+                ->schema([
+                    Select::make('ingredient_id')
+                        ->label('Bahan')
+                        ->relationship('ingredient', 'name')
+                        ->required()
+                        ->searchable()
+                        ->preload()
+                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name . ' (' . $record->unit . ')'),
+                    TextInput::make('quantity_used')
+                        ->label('Jumlah per Porsi')
+                        ->required()
+                        ->type('text')
+                        ->minValue(0.01)
+                        ->stripCharacters('.')
+                        ->extraInputAttributes(NumberInputHelper::decimal())
+                        ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                        ->suffix(function ($state, $record) {
+                            if ($record && $record->ingredient_id) {
+                                $ingredient = \App\Models\Ingredient::find($record->ingredient_id);
+                                return $ingredient ? ' ' . $ingredient->unit : '';
+                            }
+                            return '';
+                        }),
+                ]),
         ]);
     }
 

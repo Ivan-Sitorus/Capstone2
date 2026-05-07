@@ -11,18 +11,13 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Actions\EditAction;
+use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Resources\StockAdjustmentResource\RelationManagers\MovementsRelationManager;
 use App\Filament\Resources\StockAdjustmentResource\Pages\ListStockAdjustments;
-use App\Filament\Resources\StockAdjustmentResource\Pages\CreateStockAdjustment;
-use App\Filament\Resources\StockAdjustmentResource\Pages\EditStockAdjustment;
-use App\Filament\Resources\StockAdjustmentResource\Pages;
-use App\Filament\Resources\StockAdjustmentResource\RelationManagers;
-use App\Models\IngredientBatch;
 use App\Models\StockAdjustment;
-use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 class StockAdjustmentResource extends Resource
 {
@@ -40,16 +35,15 @@ class StockAdjustmentResource extends Resource
     {
         return $schema->components([
             Select::make('ingredient_id')
-                ->label('Ingredient')
+                ->label('Bahan')
                 ->relationship('ingredient', 'name')
                 ->required()
                 ->searchable()
                 ->preload()
-                ->live()
                 ->disabledOn('edit')
                 ->getOptionLabelFromRecordUsing(fn ($record) => $record->name . ' (' . $record->unit . ')'),
             Select::make('adjustment_type')
-                ->label('Adjustment Type')
+                ->label('Tipe Penyesuaian')
                 ->options([
                     StockAdjustment::TYPE_INCREASE => 'Increase',
                     StockAdjustment::TYPE_DECREASE => 'Decrease',
@@ -59,116 +53,85 @@ class StockAdjustmentResource extends Resource
                 ->live()
                 ->disabledOn('edit'),
             TextInput::make('quantity')
-                ->label('Quantity')
+                ->label('Jumlah')
                 ->required()
-                ->numeric()
-                ->minValue(0.01)
-                ->step(0.01)
-                ->disabledOn('edit'),
-            Select::make('ingredient_batch_id')
-                ->label('Target Batch (optional)')
-                ->options(function (Get $get) {
-                    $ingredientId = (int) ($get('ingredient_id') ?? 0);
-
-                    if ($ingredientId <= 0) {
-                        return [];
-                    }
-
-                    return IngredientBatch::query()
-                        ->where('ingredient_id', $ingredientId)
-                        ->orderByDesc('received_at')
-                        ->get()
-                        ->mapWithKeys(function (IngredientBatch $batch) {
-                            $receivedAt = $batch->received_at?->format('d M Y H:i') ?? '-';
-                            $label = 'Batch #' . $batch->id . ' | Qty ' . number_format((float) $batch->quantity, 2) . ' | Received ' . $receivedAt;
-
-                            return [$batch->id => $label];
-                        })
-                        ->all();
-                })
-                ->searchable()
-                ->visible(fn (Get $get): bool => $get('adjustment_type') === StockAdjustment::TYPE_INCREASE)
-                ->helperText('Kosongkan untuk menggunakan batch terbaru berdasarkan waktu received_at.')
-                ->disabledOn('edit'),
+                ->disabledOn('edit')
+                ->prefix(fn (Get $get) => $get('adjustment_type') === StockAdjustment::TYPE_DECREASE ? '-' : '+')
+                ->extraAttributes(NumberInputHelper::decimal()),
             Textarea::make('reason')
-                ->label('Reason')
+                ->label('Alasan')
                 ->required()
                 ->rows(3)
                 ->maxLength(65535)
                 ->disabledOn('edit'),
-            TextInput::make('reference')
-                ->label('Reference')
-                ->maxLength(255)
-                ->nullable()
-                ->disabledOn('edit'),
-            Select::make('approved_by')
-                ->label('Approved By')
-                ->relationship('approvedBy', 'name')
+            Select::make('reported_by')
+                ->label('Dilaporkan Oleh')
+                ->relationship('reportedBy', 'name')
                 ->searchable()
                 ->preload()
-                ->nullable()
+                ->default(fn () => Auth::id())
                 ->disabledOn('edit'),
             DateTimePicker::make('adjusted_at')
-                ->label('Adjusted At')
+                ->label('Tanggal Kejadian')
                 ->seconds(false)
-                ->disabled()
-                ->dehydrated(false)
-                ->visibleOn('edit'),
+                ->default(now())
+                ->disabledOn('edit'),
         ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with(['ingredient', 'recordedBy', 'approvedBy']))
+            ->modifyQueryUsing(fn ($query) => $query->with(['ingredient', 'reportedBy']))
             ->columns([
-                TextColumn::make('id')
-                    ->label('ID')
+                TextColumn::make('adjusted_at')
+                    ->label('Tanggal')
+                    ->dateTime()
                     ->sortable(),
                 TextColumn::make('ingredient.name')
-                    ->label('Ingredient')
+                    ->label('Bahan')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('adjustment_type')
-                    ->label('Type')
+                    ->label('Tipe')
                     ->badge()
-                    ->color(fn (string $state): string => $state === StockAdjustment::TYPE_INCREASE ? 'success' : 'warning')
+                    ->color(fn (string $state): string => $state === StockAdjustment::TYPE_INCREASE ? 'primary' : 'danger')
                     ->formatStateUsing(fn (string $state): string => $state === StockAdjustment::TYPE_INCREASE ? 'Increase' : 'Decrease'),
                 TextColumn::make('quantity')
-                    ->label('Qty')
-                    ->numeric()
+                    ->label('Jumlah')
+                    ->numeric(decimalPlaces: 2)
                     ->suffix(fn (StockAdjustment $record) => ' ' . ($record->ingredient?->unit ?? ''))
                     ->sortable(),
                 TextColumn::make('quantity_before')
-                    ->label('Before')
-                    ->numeric()
+                    ->label('Sebelum')
+                    ->numeric(decimalPlaces: 2)
                     ->sortable(),
                 TextColumn::make('quantity_after')
-                    ->label('After')
-                    ->numeric()
+                    ->label('Sesudah')
+                    ->numeric(decimalPlaces: 2)
                     ->sortable(),
-                TextColumn::make('recordedBy.name')
-                    ->label('Recorded By')
+                TextColumn::make('reason')
+                    ->label('Alasan')
+                    ->limit(50)
+                    ->tooltip(fn (StockAdjustment $record) => $record->reason),
+                TextColumn::make('reportedBy.name')
+                    ->label('Dilaporkan Oleh')
                     ->default('-')
-                    ->sortable(),
-                TextColumn::make('adjusted_at')
-                    ->label('Adjusted At')
-                    ->dateTime()
                     ->sortable(),
             ])
             ->filters([
                 SelectFilter::make('ingredient')
                     ->relationship('ingredient', 'name')
-                    ->label('Ingredient'),
+                    ->label('Bahan'),
                 SelectFilter::make('adjustment_type')
-                    ->label('Type')
+                    ->label('Tipe')
                     ->options([
                         StockAdjustment::TYPE_INCREASE => 'Increase',
                         StockAdjustment::TYPE_DECREASE => 'Decrease',
                     ]),
             ])
             ->recordActions([
-                EditAction::make()->label('Detail'),
+                EditAction::make()->label('Detail')->modal(),
             ])
             ->toolbarActions([])
             ->defaultSort('adjusted_at', 'desc');
@@ -185,8 +148,6 @@ class StockAdjustmentResource extends Resource
     {
         return [
             'index' => ListStockAdjustments::route('/'),
-            'create' => CreateStockAdjustment::route('/create'),
-            'edit' => EditStockAdjustment::route('/{record}/edit'),
         ];
     }
 }

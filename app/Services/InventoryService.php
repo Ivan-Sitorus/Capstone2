@@ -8,7 +8,6 @@ use App\Models\IngredientBatch;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\StockMovement;
-use App\Models\WasteRecord;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -126,25 +125,6 @@ class InventoryService
         });
     }
 
-    public function decreaseStockForWasteRecord(WasteRecord $wasteRecord): array
-    {
-        return DB::transaction(function () use ($wasteRecord) {
-            return $this->deductIngredientStock(
-                ingredientId: (int) $wasteRecord->ingredient_id,
-                requiredQuantity: (float) $wasteRecord->quantity,
-                context: [
-                    'movement_type' => 'waste',
-                    'source_type' => 'waste_record',
-                    'source_id' => (string) $wasteRecord->id,
-                    'waste_record_id' => $wasteRecord->id,
-                    'recorded_by' => $wasteRecord->recorded_by,
-                    'reference' => 'WR-' . $wasteRecord->id,
-                    'notes' => $wasteRecord->reason,
-                ]
-            );
-        });
-    }
-
     public function canFulfillOrder(array $items): array
     {
         $insufficient = [];
@@ -222,7 +202,6 @@ class InventoryService
                 'ingredient_batch_id' => $batch->id,
                 'order_id' => $context['order_id'] ?? null,
                 'order_item_id' => $context['order_item_id'] ?? null,
-                'waste_record_id' => $context['waste_record_id'] ?? null,
                 'stock_adjustment_id' => $context['stock_adjustment_id'] ?? null,
                 'movement_type' => $context['movement_type'] ?? 'sale',
                 'source_type' => $context['source_type'] ?? null,

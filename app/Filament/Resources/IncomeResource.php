@@ -13,16 +13,19 @@ use Filament\Actions\EditAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\IncomeResource\Pages\ListIncomes;
-use App\Filament\Resources\IncomeResource\Pages\CreateIncome;
-use App\Filament\Resources\IncomeResource\Pages\EditIncome;
-use App\Filament\Resources\IncomeResource\Pages;
 use App\Models\Income;
+use App\Filament\Helpers\NumberInputHelper;
+use App\Filament\Helpers\TextInputHelper;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 
+/**
+ * @deprecated Incomes migrated to unexpected_transactions.
+ * This resource is kept for historical reference but is no longer accessible.
+ * Navigation is hidden and all routes are disabled.
+ */
 class IncomeResource extends Resource
 {
     protected static ?string $model = Income::class;
@@ -43,7 +46,8 @@ class IncomeResource extends Resource
             TextInput::make('source')
                 ->label('Source')
                 ->required()
-                ->maxLength(255),
+                ->maxLength(255)
+                ->extraInputAttributes(TextInputHelper::string()),
             Select::make('category')
                 ->label('Category')
                 ->options([
@@ -58,9 +62,12 @@ class IncomeResource extends Resource
             TextInput::make('amount')
                 ->label('Amount')
                 ->required()
-                ->numeric()
-                ->minValue(0)
-                ->prefix('Rp'),
+                ->type('text')
+                ->prefix('Rp')
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::decimal())
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
             DatePicker::make('date')
                 ->label('Date')
                 ->required()
@@ -117,7 +124,7 @@ class IncomeResource extends Resource
                     ]),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->modal(),
                 DeleteAction::make(),
             ])
             ->toolbarActions([
@@ -130,10 +137,6 @@ class IncomeResource extends Resource
 
     public static function getPages(): array
     {
-        return [
-            'index' => ListIncomes::route('/'),
-            'create' => CreateIncome::route('/create'),
-            'edit' => EditIncome::route('/{record}/edit'),
-        ];
+        return [];
     }
 }

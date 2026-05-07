@@ -20,12 +20,13 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\RestoreBulkAction;
 use Filament\Actions\ForceDeleteBulkAction;
 use App\Filament\Resources\PromotionResource\Pages\ListPromotions;
-use App\Filament\Resources\PromotionResource\Pages\CreatePromotion;
 use App\Filament\Resources\PromotionResource\Pages\EditPromotion;
 use App\Filament\Resources\PromotionResource\Pages;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\Promotion;
+use App\Filament\Helpers\NumberInputHelper;
+use App\Filament\Helpers\TextInputHelper;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -49,7 +50,8 @@ class PromotionResource extends Resource
             TextInput::make('name')
                 ->label('Promotion Name')
                 ->required()
-                ->maxLength(255),
+                ->maxLength(255)
+                ->extraInputAttributes(TextInputHelper::string()),
             Select::make('type')
                 ->label('Promotion Type')
                 ->options([
@@ -64,15 +66,21 @@ class PromotionResource extends Resource
             TextInput::make('discount_value')
                 ->label('Discount Value')
                 ->required()
-                ->numeric()
-                ->minValue(0)
-                ->prefix('Rp / %'),
+                ->type('text')
+                ->prefix('Rp / %')
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::integer(99999999))
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 0, ',', '.') : ''),
             TextInput::make('min_purchase')
                 ->label('Minimum Purchase')
-                ->numeric()
-                ->minValue(0)
+                ->nullable()
+                ->type('text')
                 ->prefix('Rp')
-                ->nullable(),
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::integer(99999999))
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 0, ',', '.') : ''),
             DatePicker::make('start_date')
                 ->label('Start Date')
                 ->required()
@@ -95,17 +103,21 @@ class PromotionResource extends Resource
                 ->native(false),
             TextInput::make('usage_limit')
                 ->label('Usage Limit')
-                ->numeric()
-                ->integer()
-                ->minValue(1)
-                ->nullable(),
+                ->nullable()
+                ->type('text')
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::integer(999999))
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 0, ',', '.') : ''),
             TextInput::make('usage_count')
                 ->label('Usage Count')
-                ->numeric()
-                ->integer()
                 ->default(0)
                 ->disabled()
-                ->dehydrated(false),
+                ->dehydrated(false)
+                ->type('text')
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::integer(999999))
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 0, ',', '.') : ''),
             Textarea::make('description')
                 ->label('Description')
                 ->rows(3)
@@ -218,7 +230,7 @@ class PromotionResource extends Resource
                 TrashedFilter::make(),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()->modal(),
                 DeleteAction::make(),
                 RestoreAction::make(),
                 ForceDeleteAction::make(),
@@ -237,7 +249,6 @@ class PromotionResource extends Resource
     {
         return [
             'index' => ListPromotions::route('/'),
-            'create' => CreatePromotion::route('/create'),
             'edit' => EditPromotion::route('/{record}/edit'),
         ];
     }

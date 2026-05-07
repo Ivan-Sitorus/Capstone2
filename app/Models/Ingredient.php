@@ -31,7 +31,7 @@ class Ingredient extends Model
     {
         return [
             'is_active' => 'boolean',
-            'low_stock_threshold' => 'integer',
+            'low_stock_threshold' => 'decimal:2',
         ];
     }
 
@@ -59,11 +59,6 @@ class Ingredient extends Model
     public function stockMovements()
     {
         return $this->hasMany(StockMovement::class);
-    }
-
-    public function wasteRecords()
-    {
-        return $this->hasMany(WasteRecord::class);
     }
 
     public function stockAdjustments()

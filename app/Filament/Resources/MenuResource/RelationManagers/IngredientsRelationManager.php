@@ -58,7 +58,7 @@ class IngredientsRelationManager extends RelationManager
                     ->getStateUsing(fn ($record) => number_format($record->ingredient?->getTotalStock() ?? 0, 2))
                     ->suffix(fn ($record) => ' ' . ($record->ingredient->unit ?? ''))
                     ->badge()
-                    ->color(fn ($record) => ($record->ingredient?->getTotalStock() ?? 0) < ($record->ingredient->low_stock_threshold ?? 0) ? 'danger' : 'success'),
+                    ->color(fn ($record) => ($record->ingredient?->getTotalStock() ?? 0) < (float) ($record->ingredient->low_stock_threshold ?? 0) ? 'danger' : 'success'),
             ])
             ->headerActions([
                 CreateAction::make(),
