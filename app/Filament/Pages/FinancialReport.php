@@ -127,7 +127,7 @@ class FinancialReport extends Page
                         ->icon('heroicon-o-trash')
                         ->color('danger')
                         ->requiresConfirmation()
-                        ->visible(fn () => ! empty($this->form->getState()['template_id']))
+                        ->visible(fn () => filled($this->selectedTemplateId))
                         ->action(fn () => $this->deleteTemplate($this->form->getState()['template_id'])),
                 ])->columnSpanFull(),
             ])
