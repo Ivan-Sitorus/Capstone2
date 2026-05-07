@@ -19,6 +19,7 @@ return new class extends Migration
             $table->boolean('is_available')->default(true);
             $table->boolean('is_student_discount')->default(false);
             $table->unsignedBigInteger('student_price')->nullable();
+            $table->unsignedBigInteger('cashback')->nullable();
             $table->timestamps();
 
             $table->index('category_id');

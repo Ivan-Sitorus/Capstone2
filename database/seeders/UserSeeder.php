@@ -29,15 +29,7 @@ class UserSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now(),
             ],
-            [
-                'name' => 'Budi Pelanggan',
-                'email' => 'budi@customer.com',
-                'password' => Hash::make('password'),
-                'role' => 'customer',
-                'phone' => null,
-                'created_at' => now(),
-                'updated_at' => now(),
-            ],
+
         ]);
     }
 }

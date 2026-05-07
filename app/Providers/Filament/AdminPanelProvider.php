@@ -45,6 +45,8 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->font('Sans-Serif')
             ->spa()
+            ->sidebarCollapsibleOnDesktop()
+            ->collapsedSidebarWidth('4rem')
             ->sidebarWidth('15rem')
             ->widgets([
                 AccountWidget::class,

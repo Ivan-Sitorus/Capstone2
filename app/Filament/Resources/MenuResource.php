@@ -25,6 +25,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Resources\Resource;
 use App\Services\MenuImageService;
 use Filament\Tables;
@@ -49,6 +50,8 @@ class MenuResource extends Resource
                 ->label('Nama Menu')
                 ->required()
                 ->maxLength(255)
+                ->live(onBlur: true)
+                ->afterStateUpdated(fn ($state, Set $set) => $set('slug', \Illuminate\Support\Str::slug($state)))
                 ->extraInputAttributes(TextInputHelper::string()),
             TextInput::make('slug')
                 ->label('Slug')

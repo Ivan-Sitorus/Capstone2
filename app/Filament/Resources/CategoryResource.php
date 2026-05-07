@@ -16,6 +16,7 @@ use App\Filament\Resources\CategoryResource\Pages;
 use App\Models\Category;
 use App\Filament\Helpers\TextInputHelper;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -41,6 +42,8 @@ class CategoryResource extends Resource
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->maxLength(100)
+                ->live(onBlur: true)
+                ->afterStateUpdated(fn ($state, Set $set) => $set('slug', \Illuminate\Support\Str::slug($state)))
                 ->extraInputAttributes(TextInputHelper::string(100)),
             TextInput::make('slug')
                 ->label('Slug')
@@ -65,7 +68,8 @@ class CategoryResource extends Resource
                     ->sortable(),
                 TextColumn::make('slug')
                     ->label('Slug')
-                    ->searchable(),
+                    ->searchable()
+                    ->hidden(),
                 TextColumn::make('menus_count')
                     ->label('Jumlah Menu')
                     ->counts('menus')

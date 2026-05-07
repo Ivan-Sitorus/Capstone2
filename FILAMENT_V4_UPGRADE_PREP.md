@@ -50,7 +50,7 @@ Catatan:
 Contoh baseline test minimal:
 
 ```powershell
-php artisan test tests/Feature/Inventory/DailyIngredientUsageAggregationTest.php tests/Feature/Admin/WasteRecordFlowTest.php --testdox
+php artisan test tests/Feature/Inventory/DailyIngredientUsageAggregationTest.php --testdox
 ```
 
 ## 4. Runbook Upgrade v4 (Windows PowerShell)

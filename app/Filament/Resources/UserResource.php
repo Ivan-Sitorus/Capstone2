@@ -62,10 +62,9 @@ class UserResource extends Resource
                 ->options([
                     'admin'    => 'Admin',
                     'cashier'  => 'Kasir',
-                    'customer' => 'Pelanggan',
                 ])
                 ->required()
-                ->default('customer'),
+                ->default('cashier'),
             TextInput::make('phone')
                 ->label('No. HP')
                 ->nullable()
@@ -92,13 +91,11 @@ class UserResource extends Resource
                     ->color(fn (string $state): string => match ($state) {
                         'admin'    => 'success',
                         'cashier'  => 'info',
-                        'customer' => 'warning',
                         default    => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'admin'    => 'Admin',
                         'cashier'  => 'Kasir',
-                        'customer' => 'Pelanggan',
                         default    => $state,
                     })
                     ->sortable(),
@@ -114,7 +111,6 @@ class UserResource extends Resource
                     ->options([
                         'admin'    => 'Admin',
                         'cashier'  => 'Kasir',
-                        'customer' => 'Pelanggan',
                     ]),
             ])
             ->recordActions([

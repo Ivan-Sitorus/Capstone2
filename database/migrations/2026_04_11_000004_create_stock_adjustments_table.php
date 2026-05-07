@@ -15,7 +15,7 @@ return new class extends Migration
             $table->decimal('quantity', 12, 2);
             $table->decimal('quantity_before', 12, 2);
             $table->decimal('quantity_after', 12, 2);
-            $table->text('reason');
+            $table->string('reason', 255)->nullable();
             $table->foreignId('reported_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('adjusted_at')->useCurrent();
             $table->timestamps();

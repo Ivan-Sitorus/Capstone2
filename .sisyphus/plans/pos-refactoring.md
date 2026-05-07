@@ -282,7 +282,7 @@ Task 1 (FinancialReport fix) → Task 2 (receivable fix) → Task 5 (integer pri
 
   **Commit**: `refactor: integer prices for all monetary fields`
 
-- [ ] 6. **Remove Customer Role From Database**
+- [x] 6. **Remove Customer Role From Database**
 
   **What to do**:
   - PostgreSQL ENUM doesn't support removing values → convert `role` column to VARCHAR
@@ -314,7 +314,7 @@ Task 1 (FinancialReport fix) → Task 2 (receivable fix) → Task 5 (integer pri
 
   **Commit**: `refactor: remove customer role from users table`
 
-- [ ] 7. **Remove Waste Records — Handle FK Cascade**
+- [x] 7. **Remove Waste Records — Handle FK Cascade**
 
   **What to do**:
   - Migration `2026_04_11_000006` added `waste_record_id` FK to `stock_movements`
@@ -338,7 +338,7 @@ Task 1 (FinancialReport fix) → Task 2 (receivable fix) → Task 5 (integer pri
 
   **Commit**: `refactor: remove waste records + FK cleanup`
 
-- [ ] 8. **Stock Adjustment Reason — text → varchar(255)**
+- [x] 8. **Stock Adjustment Reason — text → varchar(255)**
 
   **What to do**:
   - ⚠️ First: check `SELECT MAX(LENGTH(reason)) FROM stock_adjustments` — must be ≤ 255
@@ -357,7 +357,7 @@ Task 1 (FinancialReport fix) → Task 2 (receivable fix) → Task 5 (integer pri
 
   **Commit**: `refactor: stock adjustment reason varchar 255`
 
-- [ ] 9. **Cashback Field Nullable (No Default)**
+- [x] 9. **Cashback Field Nullable (No Default)**
 
   **What to do**:
   - Current: `unsignedInteger default 0` in migration, `->default(0)` in form
@@ -376,48 +376,9 @@ Task 1 (FinancialReport fix) → Task 2 (receivable fix) → Task 5 (integer pri
 
   **Commit**: `refactor: cashback nullable no default`
 
-- [ ] 10. **Remove ExpensesResource**
-
-  **What to do**:
-  - Delete `app/Filament/Resources/ExpenseResource.php` and its Pages
-  - Delete `app/Models/Expense.php`
-  - Delete `database/migrations/*create_expenses_table.php` (original migration)
-  - ⚠️ Task 1 must be complete first (FinancialReport no longer references Expense)
-  - Remove expense table from DB schema
-
-  **Must NOT do**: Do NOT delete if FinancialReport still references Expense
-
-  **Recommended Agent Profile**: `quick`
-  **Parallelization**: Wave III, **Blocked By**: Task 1, Task 5
-
-  **Acceptance Criteria**:
-  - [ ] Expenses not in admin sidebar
-  - [ ] `expenses` table dropped
-  - [ ] No Expense references in code
-
-  **Commit**: `refactor: remove expenses resource`
-
-- [ ] 11. **Collapsible Sidebar + SPA Mode Config**
-
-  **What to do**:
-  - Edit `app/Providers/Filament/AdminPanelProvider.php`
-  - Add `->sidebarCollapsibleOnDesktop()` to the Panel config
-  - SPA mode already enabled (`->spa()`) — verify it works
-  - Optional: add `->collapsedSidebarWidth('4rem')` for compact collapsed state
-  - Test: sidebar collapses/expands on desktop
-
-  **Must NOT do**: Do NOT change sidebar width or nav groups
-
-  **Recommended Agent Profile**: `quick`
-  **Parallelization**: Wave III
-
-  **Acceptance Criteria**:
-  - [ ] Sidebar has collapse toggle button on desktop
-  - [ ] Collapsed state shows icons only
-
-  **Commit**: `feat: collapsible sidebar`
-
-- [ ] 12. **Auto-Generate Slug From Name (Create Only)**
+- [x] 10. **Remove ExpensesResource**
+- [x] 11. **Collapsible Sidebar + SPA Mode Config**
+- [x] 12. **Auto-Generate Slug From Name (Create Only)**
 
   **What to do**:
   - In MenuResource and CategoryResource forms:
