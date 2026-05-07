@@ -45,9 +45,12 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->font('Sans-Serif')
             ->spa()
+            ->spaUrlExceptions([
+                '/admin/financial-report*',
+            ])
             ->sidebarCollapsibleOnDesktop()
             ->collapsedSidebarWidth('4rem')
-            ->sidebarWidth('15rem')
+            ->sidebarWidth('17rem')
             ->widgets([
                 AccountWidget::class,
             ])
