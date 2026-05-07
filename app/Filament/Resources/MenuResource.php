@@ -75,7 +75,7 @@ class MenuResource extends Resource
                         ->required()
                         ->unique(ignoreRecord: true),
                 ])
-                ->createOptionButtonLabel('+ Kategori Baru'),
+                ->createOptionAction(fn (\Filament\Actions\Action $action) => $action->label('+ Kategori Baru')),
             FileUpload::make('image')
                 ->label('Gambar Menu')
                 ->directory('menus/')
