@@ -20,6 +20,7 @@ return new class extends Migration
             $table->boolean('is_student_discount')->default(false);
             $table->unsignedBigInteger('student_price')->nullable();
             $table->unsignedBigInteger('cashback')->nullable();
+            $table->boolean('is_stock_calculated')->default(false);
             $table->timestamps();
 
             $table->index('category_id');
