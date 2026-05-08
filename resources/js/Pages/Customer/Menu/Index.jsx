@@ -27,8 +27,8 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 overflow: 'hidden',
             }}>
-                {menu.image
-                    ? <img src={menu.image} alt={menu.name}
+                {menu.image_url
+                    ? <img src={menu.image_url} alt={menu.name}
                            loading={priority ? 'eager' : 'lazy'}
                            decoding={priority ? 'sync' : 'async'}
                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}

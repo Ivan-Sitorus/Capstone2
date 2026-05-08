@@ -27,7 +27,7 @@ export default function MenuCard({ menu, onAdd }) {
             }}>
                 {menu.image
                     ? <img
-                        src={menu.image}
+                        src={menu.image_url}
                         alt={menu.name}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         onError={e => { e.target.style.display = 'none'; }}
