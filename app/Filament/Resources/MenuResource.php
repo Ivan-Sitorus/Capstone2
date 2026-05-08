@@ -57,6 +57,7 @@ class MenuResource extends Resource
                 ->label('Slug')
                 ->required()
                 ->unique(ignoreRecord: true)
+                ->hidden()
                 ->maxLength(255)
                 ->extraInputAttributes(TextInputHelper::string()),
             Select::make('category_id')
@@ -87,19 +88,14 @@ class MenuResource extends Resource
                 ->maxSize(5120)
                 ->nullable()
                 ->saveUploadedFileUsing(function ($file) {
-                    $oldPath = $this->record?->image;
-                    return app(MenuImageService::class)->convertAndStore($file, $oldPath);
+                    return app(MenuImageService::class)->convertAndStore($file);
                 }),
             TextInput::make('price')
                 ->label('Harga Normal')
                 ->required()
-                ->type('text')
+                ->integer()
                 ->minValue(0)
-                ->prefix('Rp')
-                ->stripCharacters('.')
-                ->extraInputAttributes(NumberInputHelper::decimal())
-                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
+                ->prefix('Rp'),
             Toggle::make('is_student_discount')
                 ->label('Ada Diskon Mahasiswa')
                 ->default(true)
@@ -107,15 +103,10 @@ class MenuResource extends Resource
                 ->live(),
             TextInput::make('cashback')
                 ->label('Cashback Mahasiswa')
-                ->type('text')
+                ->integer()
                 ->minValue(0)
-                ->default(0)
                 ->prefix('Rp')
-                ->stripCharacters('.')
-                ->extraInputAttributes(NumberInputHelper::decimal())
-                ->disabled(fn (Get $get) => ! $get('is_student_discount'))
-                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
+                ->disabled(fn (Get $get) => ! $get('is_student_discount')),
             Toggle::make('is_available')
                 ->label('Tersedia')
                 ->default(true)
