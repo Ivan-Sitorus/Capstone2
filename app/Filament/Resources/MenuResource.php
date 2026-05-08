@@ -14,8 +14,6 @@ use Filament\Actions\DeleteBulkAction;
 use App\Filament\Resources\MenuResource\RelationManagers\IngredientsRelationManager;
 use App\Filament\Resources\MenuResource\Pages\ListMenus;
 use App\Filament\Resources\MenuResource\Pages\EditMenu;
-use App\Filament\Resources\MenuResource\Pages;
-use App\Filament\Resources\MenuResource\RelationManagers;
 use App\Models\Menu;
 use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Helpers\TextInputHelper;
@@ -28,7 +26,6 @@ use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Resources\Resource;
 use App\Services\MenuImageService;
-use Filament\Tables;
 use Filament\Tables\Table;
 
 class MenuResource extends Resource
@@ -93,8 +90,10 @@ class MenuResource extends Resource
             TextInput::make('price')
                 ->label('Harga Normal')
                 ->required()
-                ->integer()
-                ->minValue(0)
+                ->type('text')
+                ->minValue(0.01)
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::integer())
                 ->prefix('Rp'),
             Toggle::make('is_student_discount')
                 ->label('Ada Diskon Mahasiswa')
@@ -103,8 +102,10 @@ class MenuResource extends Resource
                 ->live(),
             TextInput::make('cashback')
                 ->label('Cashback Mahasiswa')
-                ->integer()
+                ->type('text')
                 ->minValue(0)
+                ->stripCharacters('.')
+                ->extraInputAttributes(NumberInputHelper::integer())
                 ->prefix('Rp')
                 ->disabled(fn (Get $get) => ! $get('is_student_discount')),
             Toggle::make('is_available')
@@ -150,7 +151,7 @@ class MenuResource extends Resource
                         ->stripCharacters('.')
                         ->extraInputAttributes(NumberInputHelper::decimal())
                         ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                        ->suffix(function ($state, $record) {
+                        ->suffix(function ($record) {
                             if ($record && $record->ingredient_id) {
                                 $ingredient = \App\Models\Ingredient::find($record->ingredient_id);
                                 return $ingredient ? ' ' . $ingredient->unit : '';

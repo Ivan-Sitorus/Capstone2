@@ -6,6 +6,7 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Format;
 
 class MenuImageService
 {
@@ -20,14 +21,15 @@ class MenuImageService
         }
 
         $manager = new ImageManager(new Driver());
-        $image = $manager->read($file);
-        $image->scale(800);
+        $image = $manager->decode($file);
+        $image->scale(width: 800);
 
         $filename = 'menu_' . time() . '_' . uniqid() . '.webp';
         $path = 'menus/' . $filename;
 
-        $encoded = $image->toWebp(70)->encode();
-        Storage::disk('public')->put($path, $encoded->toString());
+        $encoded = $image->encodeUsingFormat(Format::Webp, quality: 70);
+        $binary = base64_decode($encoded->toBase64());
+        Storage::disk('public')->put($path, $binary);
 
         return $path;
     }
@@ -37,14 +39,5 @@ class MenuImageService
         if ($path && Storage::disk('public')->exists($path)) {
             Storage::disk('public')->delete($path);
         }
-    }
-
-    public function getImageUrl(?string $path): ?string
-    {
-        if (!$path) {
-            return null;
-        }
-
-        return Storage::disk('public')->url($path);
     }
 }
