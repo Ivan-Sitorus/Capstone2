@@ -40,4 +40,12 @@ class MenuImageService
             Storage::disk('public')->delete($path);
         }
     }
+
+    public function getImageUrl(?string $path): ?string
+    {
+        if (! $path) {
+            return null;
+        }
+        return Storage::disk('public')->url($path);
+    }
 }
