@@ -27,7 +27,7 @@ class MenuImageService
         $filename = 'menu_' . time() . '_' . uniqid() . '.webp';
         $path = 'menus/' . $filename;
 
-        $encoded = $image->encodeUsingFormat(Format::Webp, quality: 70);
+        $encoded = $image->encodeUsingFormat(Format::WEBP, quality: 70);
         $binary = base64_decode($encoded->toBase64());
         Storage::disk('public')->put($path, $binary);
 
