@@ -36,6 +36,12 @@ class Menu extends Model
 
     protected static function booted(): void
     {
+        static::creating(function (self $menu): void {
+            if (blank($menu->slug)) {
+                $menu->slug = \Illuminate\Support\Str::slug($menu->name);
+            }
+        });
+
         static::deleting(function (self $menu): void {
             app(MenuImageService::class)->delete($menu->image);
         });
