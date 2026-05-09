@@ -46,6 +46,6 @@ class MenuImageService
         if (! $path) {
             return null;
         }
-        return Storage::disk('public')->url($path);
+        return asset('storage/' . $path);
     }
 }

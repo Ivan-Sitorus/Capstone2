@@ -6,7 +6,7 @@
     "keywords": ["laravel", "framework"],
     "license": "MIT",
     "require": {
-        "php": "^8.2 || ^8.5",
+        "php": "^8.5",
         "barryvdh/laravel-dompdf": "*",
         "filament/filament": "^5.0",
         "inertiajs/inertia-laravel": "^2.0",
@@ -15,7 +15,7 @@
         "laravel/mcp": "^0.7.0",
         "laravel/reverb": "^1.10",
         "laravel/tinker": "^3.0",
-        "maatwebsite/excel": "^3.1",
+        "maatwebsite/excel": "4.x-dev",
         "predis/predis": "^3.4",
         "tightenco/ziggy": "^2.6"
     },
@@ -92,7 +92,7 @@
             "php-http/discovery": true
         },
         "platform": {
-            "php": "8.4.1"
+            "php": "8.5.6"
         }
     },
     "minimum-stability": "stable",

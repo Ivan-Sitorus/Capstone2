@@ -9,6 +9,7 @@ use App\Http\Controllers\Cashier\CashierOrderController;
 use App\Http\Controllers\Cashier\CashierPesananAktifController;
 use App\Http\Controllers\Cashier\CashierPesananBaruController;
 use App\Http\Controllers\Cashier\CashierRiwayatController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -32,7 +33,7 @@ Route::prefix('cashier')->middleware(['auth', 'role:cashier,admin'])->group(func
     Route::patch('/order/{order}/confirm-payment', [CashierOrderController::class, 'confirmPayment'])->name('cashier.order.confirm-payment');
     Route::patch('/order/{order}/confirm-qris', [CashierOrderController::class, 'confirmQris'])->name('cashier.order.confirm-qris');
     Route::patch('/order/{order}/reject-qris',  [CashierOrderController::class, 'rejectQris'])->name('cashier.order.reject-qris');
-    Route::get('/profil', fn() => Inertia::render('Cashier/Profil', ['user' => auth()->user()]))->name('cashier.profil');
+    Route::get('/profil', fn() => Inertia::render('Cashier/Profil', ['user' => Auth::user()]))->name('cashier.profil');
     Route::get('/pending-count', \App\Http\Controllers\Cashier\CashierPendingCountController::class)->name('cashier.pending-count');
 });
 

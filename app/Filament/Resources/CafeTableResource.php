@@ -2,8 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\CafeTableResource\Pages\CreateCafeTable;
-use App\Filament\Resources\CafeTableResource\Pages\EditCafeTable;
+use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Resources\CafeTableResource\Pages\ListCafeTables;
 use App\Models\CafeTable;
 use Filament\Forms\Components\TextInput;
@@ -11,7 +10,11 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Infolists\Components\ImageEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -36,7 +39,11 @@ class CafeTableResource extends Resource
                 ->required()
                 ->numeric()
                 ->minValue(1)
-                ->unique(ignoreRecord: true),
+                ->maxValue(99)
+                ->unique(ignoreRecord: true)
+                ->extraAttributes(
+                    NumberInputHelper::integer(99)
+                ),
             Toggle::make('is_available')
                 ->label('Tersedia')
                 ->default(true)
@@ -75,32 +82,64 @@ class CafeTableResource extends Resource
                     }),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->modalWidth('md'),
                 Action::make('view_qr')
                     ->label('Lihat QR')
                     ->icon('heroicon-o-qr-code')
                     ->modalHeading(fn (CafeTable $record) => 'QR Code Meja ' . $record->table_number)
                     ->modalWidth('md')
-                    ->modalContent(function (CafeTable $record) {
-                        $dataUri = $record->qr_code_svg_data_uri;
-
-                        return view('filament.cafe-table-qr-modal', [
-                            'record' => $record,
-                            'dataUri' => $dataUri,
-                        ]);
-                    })
+                    ->infolist(fn (CafeTable $record) => [
+                        ImageEntry::make('qr_image')
+                            ->hiddenLabel()
+                            ->state(fn () => $record->qr_code_svg_data_uri)
+                            ->width(200)
+                            ->height(200)
+                            ->extraImgAttributes([
+                                'style' => 'border-radius:8px;border:1px solid #e5e7eb;padding:8px;margin:0 auto;display:block;',
+                            ]),
+                        TextEntry::make('qr_url')
+                            ->hiddenLabel()
+                            ->state(fn () => $record->qr_code_url)
+                            ->color('primary')
+                            ->extraAttributes([
+                                'class' => 'underline',
+                            ])
+                            ->copyable()
+                            ->copyMessage('Tersalin!')
+                            ->copyMessageDuration(1500)
+                            ->alignCenter(),
+                    ])
                     ->modalSubmitAction(false)
-                    ->modalCancelActionLabel('Tutup'),
+                    ->modalCancelActionLabel('Tutup')
+                    ->modalFooterActions([
+                        Action::make('download_qr_png')
+                            ->label('Download PNG')
+                            ->icon('heroicon-o-arrow-down-tray')
+                            ->action(function (CafeTable $record) {
+                                return response()->streamDownload(
+                                    fn () => print($record->generatePngDownload()),
+                                    sprintf('qr-meja-%d.png', $record->table_number),
+                                    ['Content-Type' => 'image/png'],
+                                );
+                            }),
+                    ]),
+                DeleteAction::make()
+                    ->requiresConfirmation()
+                    ->modalHeading(fn (CafeTable $record) => 'Hapus Meja ' . $record->table_number)
+                    ->modalWidth('md'),
             ])
-            ->toolbarActions([]);
+            ->toolbarActions([])
+            ->bulkActions([
+                DeleteBulkAction::make()
+                    ->modalHeading('Hapus meja terpilih'),
+            ]);
     }
 
     public static function getPages(): array
     {
         return [
             'index' => ListCafeTables::route('/'),
-            'create' => CreateCafeTable::route('/create'),
-            'edit' => EditCafeTable::route('/{record}/edit'),
         ];
     }
 }

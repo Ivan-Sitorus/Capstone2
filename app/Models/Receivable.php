@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class Receivable extends Model
@@ -91,9 +92,9 @@ class Receivable extends Model
     /**
      * Scope to filter overdue receivables.
      */
-    public function scopeOverdue($query)
+    public function scopeOverdue(Builder $query): void
     {
-        return $query->where('status', '!=', self::STATUS_PAID)
+        $query->where('status', '!=', self::STATUS_PAID)
             ->whereNotNull('due_date')
             ->where('due_date', '<', now());
     }
@@ -101,17 +102,17 @@ class Receivable extends Model
     /**
      * Scope to filter pending receivables.
      */
-    public function scopePending($query)
+    public function scopePending(Builder $query): void
     {
-        return $query->where('status', self::STATUS_PENDING);
+        $query->where('status', self::STATUS_PENDING);
     }
 
     /**
      * Scope to filter paid receivables.
      */
-    public function scopePaid($query)
+    public function scopePaid(Builder $query): void
     {
-        return $query->where('status', self::STATUS_PAID);
+        $query->where('status', self::STATUS_PAID);
     }
 
     public function order()

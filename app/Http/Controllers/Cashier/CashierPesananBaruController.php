@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Cashier;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
-use App\Jobs\BroadcastPendingCount;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\Order;

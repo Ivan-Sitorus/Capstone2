@@ -4,6 +4,10 @@ namespace App\Models;
 
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
+use chillerlan\QRCode\Common\EccLevel;
+use chillerlan\QRCode\Output\QRGdImagePNG;
+use chillerlan\QRCode\Output\QRMarkupSVG;
+use chillerlan\QRCode\Output\QROutputInterface;
 use Illuminate\Database\Eloquent\Model;
 
 class CafeTable extends Model
@@ -32,10 +36,9 @@ class CafeTable extends Model
     public function getQrCodeSvgAttribute(): string
     {
         $options = new QROptions([
-            'outputType'  => QRCode::OUTPUT_MARKUP_SVG,
-            'eccLevel'    => QRCode::ECC_L,
-            'scale'       => 5,
-            'imageBase64' => false,
+            'outputInterface' => QRMarkupSVG::class,
+            'eccLevel'        => EccLevel::L,
+            'outputBase64'    => false,
         ]);
 
         return (new QRCode($options))->render($this->qr_code);
@@ -44,6 +47,34 @@ class CafeTable extends Model
     public function getQrCodeSvgDataUriAttribute(): string
     {
         return 'data:image/svg+xml;base64,' . base64_encode($this->qr_code_svg);
+    }
+
+    public function getQrCodePngDataUriAttribute(): string
+    {
+        $options = new QROptions([
+            'outputInterface' => QRGdImagePNG::class,
+            'eccLevel'        => EccLevel::L,
+            'outputBase64'    => true,
+            'scale'           => 10,
+        ]);
+
+        return 'data:image/png;base64,' . (new QRCode($options))->render($this->qr_code);
+    }
+
+    public function generatePngDownload(): string
+    {
+        $options = new QROptions([
+            'outputType'   => QROutputInterface::GDIMAGE_PNG,
+            'eccLevel'     => EccLevel::L,
+            'scale'        => 10,
+        ]);
+
+        $raw = (new QRCode($options))->render($this->qr_code);
+
+        // render() returns data:image/png;base64,XXXX — strip the prefix
+        $base64 = substr($raw, strpos($raw, ',') + 1);
+
+        return base64_decode($base64);
     }
 
     protected static function booted(): void

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -51,13 +52,13 @@ class CashierSession extends Model
         return round($this->shift_start->diffInMinutes($this->shift_end) / 60, 2);
     }
 
-    public function scopeActive($query)
+    public function scopeActive(Builder $query): void
     {
-        return $query->whereNull('shift_end');
+        $query->whereNull('shift_end');
     }
 
-    public function scopeToday($query)
+    public function scopeToday(Builder $query): void
     {
-        return $query->whereDate('shift_start', today());
+        $query->whereDate('shift_start', today());
     }
 }

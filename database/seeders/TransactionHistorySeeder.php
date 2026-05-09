@@ -106,7 +106,6 @@ class TransactionHistorySeeder extends Seeder
 
         $ordersToInsert    = [];
         $orderItemsToInsert = [];
-        $now               = now();
 
         foreach ($menuData as $menuIndex => $m) {
             $menuName   = $m['name'];

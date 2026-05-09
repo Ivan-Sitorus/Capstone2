@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Cashier;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
 class CashierPesananAktifController extends Controller
@@ -51,7 +50,7 @@ class CashierPesananAktifController extends Controller
             'created_at'      => $o->created_at->toISOString(),
             'items_summary'   => $o->items->map(fn($i) => $i->quantity . 'x ' . $i->menu->name)->join(', '),
             'total_amount'    => $o->total_amount,
-            'payment_proof'   => $o->payment_proof ? Storage::disk('public')->url($o->payment_proof) : null,
+            'payment_proof'   => $o->payment_proof ? asset('storage/' . $o->payment_proof) : null,
             'rejection_note'  => $o->rejection_note,
             'is_paid'         => (bool) $o->is_paid,
             'items'           => $o->items->map(fn($i) => [

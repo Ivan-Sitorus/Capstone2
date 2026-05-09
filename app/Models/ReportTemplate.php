@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class ReportTemplate extends Model
@@ -17,13 +18,13 @@ class ReportTemplate extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function scopeForUser($query, $userId)
+    public function scopeForUser(Builder $query, int $userId): void
     {
-        return $query->where('user_id', $userId);
+        $query->where('user_id', $userId);
     }
 
-    public function scopeOfType($query, $type)
+    public function scopeOfType(Builder $query, string $type): void
     {
-        return $query->where('type', $type);
+        $query->where('type', $type);
     }
 }

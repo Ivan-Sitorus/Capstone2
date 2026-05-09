@@ -75,7 +75,6 @@ class PredictionHistorySeeder extends Seeder
         $orderNum   = 3000;
         $orders     = [];
         $orderItems = [];
-        $now        = now()->toDateTimeString();
 
         $current = $startDate->copy();
         mt_srand(2025);

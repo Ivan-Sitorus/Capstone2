@@ -55,6 +55,42 @@ services:
             test: ["CMD", "redis-cli", "ping"]
             retries: 3
             timeout: 5s
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        image: 'w9cafe-pos:latest'
+        profiles:
+            - prod
+        environment:
+            APP_ENV: '${APP_ENV:-production}'
+            APP_DEBUG: '${APP_DEBUG:-false}'
+            APP_URL: '${APP_URL:-http://localhost:8080}'
+            DB_CONNECTION: '${DB_CONNECTION:-pgsql}'
+            DB_HOST: 'pgsql'
+            DB_PORT: '${DB_PORT:-5432}'
+            DB_DATABASE: '${DB_DATABASE:-pos_cafe}'
+            DB_USERNAME: '${DB_USERNAME:-postgres}'
+            DB_PASSWORD: '${DB_PASSWORD:-secret}'
+            REDIS_HOST: 'redis'
+            REDIS_PORT: '${REDIS_PORT:-6379}'
+            REDIS_PASSWORD: '${REDIS_PASSWORD:-null}'
+            WWWUSER: '${WWWUSER:-1000}'
+            WWWGROUP: '${WWWGROUP:-1000}'
+        volumes:
+            - '.:/var/www/html'
+            - 'storage-data:/var/www/html/storage/app/public'
+        ports:
+            - '${PROD_APP_PORT:-8081}:80'
+        networks:
+            - sail
+        depends_on:
+            pgsql:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:80/"]
 networks:
     sail:
         driver: bridge
@@ -62,4 +98,6 @@ volumes:
     sail-pgsql:
         driver: local
     sail-redis:
+        driver: local
+    storage-data:
         driver: local

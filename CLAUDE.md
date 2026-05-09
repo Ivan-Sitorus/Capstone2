@@ -17,9 +17,9 @@ Modul Admin, Inventori, Data Mining dikerjakan di fase terpisah.
 
 | Layer | Teknologi |
 |---|---|
-| Framework Backend | Laravel 11 |
-| Bahasa | PHP 8.2+ |
-| Database Utama | PostgreSQL 16 |
+| Framework Backend | Laravel 13.8 |
+| Bahasa | PHP 8.5.6 |
+| Database Utama | PostgreSQL 18 |
 | Database Offline | IndexedDB (browser, via `idb`) |
 | ORM | Eloquent |
 | Auth | Laravel Sanctum (session-based, multi-role) |
@@ -29,6 +29,7 @@ Modul Admin, Inventori, Data Mining dikerjakan di fase terpisah.
 | State Management | Zustand (cart) |
 | Build Tool | Vite |
 | Web Server | Nginx |
+| Deployment | Docker (PHP-FPM + NGINX + Supervisor) |
 | Payment | Manual (Cash / QRIS) |
 
 > **Data Mining (FastAPI + Colab):** Di-skip untuk fase ini.
@@ -871,7 +872,8 @@ export default function StatusBadge({ status }) {
 APP_NAME="W9 Cafe POS"
 APP_ENV=local
 APP_KEY=
-APP_URL=http://localhost
+APP_PORT=8080
+APP_URL=http://localhost:8080
 
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1

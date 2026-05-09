@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Ingredient;
-use App\Models\IngredientBatch;
 use App\Models\StockAdjustment;
 use App\Models\StockMovement;
 use Illuminate\Support\Facades\DB;

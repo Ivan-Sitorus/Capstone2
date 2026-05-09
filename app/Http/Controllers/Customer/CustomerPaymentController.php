@@ -6,15 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\RedirectResponse;
+use Inertia\Response as InertiaResponse;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class CustomerPaymentController extends Controller
 {
-    public function showChoose(string $orderCode): Response
+    public function showChoose(string $orderCode): InertiaResponse|RedirectResponse
     {
         $order = Order::with(['items.menu', 'cafeTable'])
             ->where('order_code', $orderCode)
@@ -35,7 +35,7 @@ class CustomerPaymentController extends Controller
         ]);
     }
 
-    public function chooseCash(Request $request, Order $order): JsonResponse
+    public function chooseCash(Order $order): JsonResponse
     {
         if ($order->status !== Order::STATUS_PENDING) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
@@ -44,7 +44,7 @@ class CustomerPaymentController extends Controller
         return response()->json(['message' => 'ok', 'order_code' => $order->order_code]);
     }
 
-    public function chooseQris(Request $request, Order $order): JsonResponse
+    public function chooseQris(Order $order): JsonResponse
     {
         if ($order->status !== Order::STATUS_PENDING) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
@@ -63,7 +63,7 @@ class CustomerPaymentController extends Controller
         return redirect('/customer/riwayat');
     }
 
-    public function showQrisUpload(string $orderCode): Response
+    public function showQrisUpload(string $orderCode): InertiaResponse
     {
         $order = Order::where('order_code', $orderCode)->firstOrFail();
 
@@ -110,7 +110,7 @@ class CustomerPaymentController extends Controller
         return response()->json(['message' => 'Bukti berhasil dikirim']);
     }
 
-    public function showQrisStatus(string $orderCode): Response
+    public function showQrisStatus(string $orderCode): InertiaResponse
     {
         $order = Order::where('order_code', $orderCode)->firstOrFail();
         return Inertia::render('Customer/Payment/QrisStatus', ['order' => $this->orderData($order)]);

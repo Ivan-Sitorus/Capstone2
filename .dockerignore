@@ -12,17 +12,20 @@ node_modules
 vendor
 
 # Cache, logs, and temp
-storage/framework/cache/data/*
-storage/framework/sessions/*
-storage/framework/views/*
-storage/logs/*
+storage/logs
+storage/framework/cache
+storage/framework/sessions
+storage/framework/views
+storage/framework/testing
 storage/app/private/*
 
 # Testing
 tests
 k6
+test-results
 .phpunit.result.cache
-phpunit.xml
+phpunit*
+playwright*
 
 # Tooling
 .sisyphus
@@ -34,5 +37,7 @@ phpunit.xml
 # Packages
 *.deb
 
-# Self (prevent recursive issues)
+# Self
 .dockerignore
+docker-compose.yml
+Dockerfile

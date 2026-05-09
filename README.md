@@ -9,14 +9,16 @@ Sistem POS berbasis web PWA untuk W9 Cafe STIE Totalwin Semarang.
 
 | Layer | Teknologi |
 |---|---|
-| Backend | Laravel 11, PHP 8.2+ |
-| Database | PostgreSQL 16 |
-| Frontend | React 18 + Inertia.js v2 |
-| CSS | Bootstrap 5 |
-| Build | Vite |
+| Backend | Laravel 13, PHP 8.5.6 |
+| Runtime | Node.js 24.x |
+| Database | PostgreSQL 18 |
+| Frontend | React 19 + Inertia.js v2 |
+| CSS | Bootstrap 5.3 + Tailwind 4 |
+| Build | Vite 7 |
 | Auth | Laravel Sanctum (session-based) |
 | Payment | Manual (Cash / QRIS) |
 | State | Zustand (cart) + IndexedDB (offline) |
+| Docker | NGINX + PHP-FPM + Supervisor |
 
 ---
 
@@ -69,6 +71,25 @@ DB_USERNAME=postgres
 DB_PASSWORD=
 
 # No payment gateway configured (cash/qris only)
+```
+
+---
+
+## Using Docker (Production)
+
+```bash
+docker compose --profile prod up -d
+```
+
+App runs on **http://localhost:8081**. The `prod` profile starts:
+
+- **app** — single-container NGINX + PHP-FPM + Supervisor (port 8081)
+- **pgsql** — PostgreSQL 18 (port 5432)
+- **redis** — Redis cache (port 6379)
+
+```bash
+# Run migrations and seed on first launch
+docker compose exec -T app php artisan migrate:fresh --seed
 ```
 
 ---

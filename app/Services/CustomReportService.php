@@ -3,9 +3,6 @@
 namespace App\Services;
 
 use App\Models\Category;
-use App\Models\IngredientBatch;
-use App\Models\Order;
-use App\Models\UnexpectedTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
