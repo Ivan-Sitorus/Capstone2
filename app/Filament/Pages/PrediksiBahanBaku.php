@@ -58,7 +58,7 @@ class PrediksiBahanBaku extends Page
         $this->errorMsg = null;
 
         try {
-            $response = Http::timeout(600)->post('http://127.0.0.1:8001/prediction-bahan-baku');
+            $response = Http::timeout(600)->post(config('services.datamining.url') . '/prediction-bahan-baku');
 
             if (! $response->successful()) {
                 throw new \Exception('FastAPI merespons dengan status ' . $response->status());

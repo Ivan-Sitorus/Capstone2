@@ -6,6 +6,9 @@ use App\Models\Category;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @deprecated Use App\Services\FinancialReportService instead. Will be removed in next major version.
+ */
 class CustomReportService
 {
     /**

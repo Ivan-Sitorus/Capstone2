@@ -18,6 +18,7 @@ services:
             XDEBUG_MODE: '${SAIL_XDEBUG_MODE:-off}'
             XDEBUG_CONFIG: '${SAIL_XDEBUG_CONFIG:-client_host=host.docker.internal}'
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
+            DATAMINING_URL: 'http://datamining:8001'
         volumes:
             - '.:/var/www/html'
         networks:
@@ -77,6 +78,7 @@ services:
             REDIS_PASSWORD: '${REDIS_PASSWORD:-null}'
             WWWUSER: '${WWWUSER:-1000}'
             WWWGROUP: '${WWWGROUP:-1000}'
+            DATAMINING_URL: 'http://datamining:8001'
         volumes:
             - '.:/var/www/html'
             - 'storage-data:/var/www/html/storage/app/public'
@@ -89,8 +91,35 @@ services:
                 condition: service_healthy
             redis:
                 condition: service_healthy
+            datamining:
+                condition: service_started
         healthcheck:
             test: ["CMD", "curl", "-f", "http://localhost:80/"]
+    datamining:
+        build:
+            context: ./datamining
+            dockerfile: Dockerfile
+        image: 'w9cafe-datamining:latest'
+        profiles:
+            - prod
+        environment:
+            DB_HOST: 'pgsql'
+            DB_PORT: '${DB_PORT:-5432}'
+            DB_NAME: '${DB_DATABASE:-cafe}'
+            DB_USER: '${DB_USERNAME:-sail}'
+            DB_PASSWORD: '${DB_PASSWORD:-password}'
+        ports:
+            - '${DATAMINING_PORT:-8001}:8001'
+        networks:
+            - sail
+        depends_on:
+            pgsql:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8001/health')"]
+            interval: 10s
+            retries: 5
+            start_period: 30s
 networks:
     sail:
         driver: bridge

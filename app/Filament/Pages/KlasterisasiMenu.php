@@ -57,7 +57,7 @@ class KlasterisasiMenu extends Page
         $this->errorMsg  = null;
 
         try {
-            $response = Http::timeout(120)->post('http://127.0.0.1:8001/clustering');
+            $response = Http::timeout(120)->post(config('services.datamining.url') . '/clustering');
 
             if (! $response->successful()) {
                 throw new \Exception('FastAPI merespons dengan status ' . $response->status());

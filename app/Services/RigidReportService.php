@@ -8,6 +8,9 @@ use App\Models\Receivable;
 use App\Models\UnexpectedTransaction;
 use Carbon\Carbon;
 
+/**
+ * @deprecated Use App\Services\FinancialReportService instead. Will be removed in next major version.
+ */
 class RigidReportService
 {
     /**

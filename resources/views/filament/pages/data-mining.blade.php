@@ -16,25 +16,15 @@
     </div>
 
     {{-- Tab navigasi --}}
-    <div class="flex gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
-        @foreach([
-            ['key' => 'forecast',     'label' => 'Prediksi Penjualan',    'icon' => 'heroicon-o-chart-bar'],
-            ['key' => 'top_menu',     'label' => 'Menu Terlaris',         'icon' => 'heroicon-o-star'],
-            ['key' => 'association',  'label' => 'Aturan Asosiasi',       'icon' => 'heroicon-o-link'],
-            ['key' => 'peak_hour',    'label' => 'Jam Ramai',             'icon' => 'heroicon-o-clock'],
-        ] as $tab)
-            <button
-                wire:click="$set('activeTab', '{{ $tab['key'] }}')"
-                class="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors
-                    {{ $activeTab === $tab['key']
-                        ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 dark:hover:text-gray-300' }}"
-            >
-                <x-dynamic-component :component="$tab['icon']" class="w-4 h-4"/>
-                {{ $tab['label'] }}
-            </button>
-        @endforeach
-    </div>
+    <x-filament.tab-navigation
+        :tabs="[
+            ['key' => 'forecast',    'label' => 'Prediksi Penjualan',  'icon' => 'heroicon-o-chart-bar'],
+            ['key' => 'top_menu',    'label' => 'Menu Terlaris',       'icon' => 'heroicon-o-star'],
+            ['key' => 'association', 'label' => 'Aturan Asosiasi',     'icon' => 'heroicon-o-link'],
+            ['key' => 'peak_hour',   'label' => 'Jam Ramai',           'icon' => 'heroicon-o-clock'],
+        ]"
+        :active="$activeTab"
+    />
 
     {{-- Tab: Prediksi Penjualan --}}
     @if($activeTab === 'forecast')

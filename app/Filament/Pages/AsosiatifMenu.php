@@ -59,7 +59,7 @@ class AsosiatifMenu extends Page
 
         try {
             // TODO: Ganti URL jika endpoint berbeda
-            $response = Http::timeout(120)->post('http://127.0.0.1:8001/association');
+            $response = Http::timeout(120)->post(config('services.datamining.url') . '/association');
 
             if (! $response->successful()) {
                 throw new \Exception('FastAPI merespons dengan status ' . $response->status());

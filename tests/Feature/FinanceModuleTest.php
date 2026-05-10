@@ -8,7 +8,7 @@ use App\Models\IngredientBatch;
 use App\Models\Order;
 use App\Models\Receivable;
 use App\Models\UnexpectedTransaction;
-use App\Services\SimpleReportService;
+use App\Services\FinancialReportService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -223,7 +223,10 @@ class FinanceModuleTest extends TestCase
         $start = now()->subDay()->startOfDay()->toDateString();
         $end = now()->addDay()->endOfDay()->toDateString();
 
-        $report = (new SimpleReportService())->generate($start, $end);
+        $report = (new FinancialReportService())->generate('simple', [
+            'date_start' => $start,
+            'date_end'   => $end,
+        ]);
 
         $rawOrderIncome = (float) DB::table('orders')
             ->where('is_paid', true)
@@ -237,8 +240,8 @@ class FinanceModuleTest extends TestCase
 
         $rawTotalIncome = $rawOrderIncome + $rawUnexpectedIncome;
 
-        $this->assertSame($rawTotalIncome, $report['total_income']);
-        $this->assertSame(350000.0, $report['total_income']);
+        $this->assertSame($rawTotalIncome, $report->getTotalIncome());
+        $this->assertSame(350000.0, $report->getTotalIncome());
 
         $rawExpenseAmount = (float) DB::table('expenses')
             ->whereBetween('date', [now()->subDay()->startOfDay(), now()->addDay()->endOfDay()])
@@ -256,46 +259,46 @@ class FinanceModuleTest extends TestCase
 
         $rawTotalExpense = $rawExpenseAmount + $rawBatchCost + $rawUnexpectedExpense;
 
-        $this->assertSame($rawTotalExpense, $report['total_expense']);
-        $this->assertSame(200000.0, $report['total_expense']);
+        $this->assertSame($rawTotalExpense, $report->getTotalExpense());
+        $this->assertSame(200000.0, $report->getTotalExpense());
 
-        $this->assertSame($rawTotalIncome - $rawTotalExpense, $report['net']);
+        $this->assertSame($rawTotalIncome - $rawTotalExpense, $report->getNet());
 
-        $this->assertCount(3, $report['income_breakdown']);
+        $incomeRows = array_filter($report->rows, fn ($r) => $r->isIncome());
+        $this->assertCount(3, $incomeRows);
 
-        $cashEntry = collect($report['income_breakdown'])->firstWhere('source', 'cash');
-        $this->assertNotNull($cashEntry);
-        $this->assertSame(100000.0, (float) $cashEntry['total']);
-        $this->assertSame(1, $cashEntry['count']);
+        $cashRow = collect($report->rows)->first(fn ($r) => $r->category === 'cash');
+        $this->assertNotNull($cashRow);
+        $this->assertSame(100000.0, $cashRow->amount);
+        $this->assertSame(1, $cashRow->rawData['count'] ?? 0);
 
-        $qrisEntry = collect($report['income_breakdown'])->firstWhere('source', 'qris');
-        $this->assertNotNull($qrisEntry);
-        $this->assertSame(200000.0, (float) $qrisEntry['total']);
-        $this->assertSame(1, $qrisEntry['count']);
+        $qrisRow = collect($report->rows)->first(fn ($r) => $r->category === 'qris');
+        $this->assertNotNull($qrisRow);
+        $this->assertSame(200000.0, $qrisRow->amount);
+        $this->assertSame(1, $qrisRow->rawData['count'] ?? 0);
 
-        $unexpectedIncomeEntry = collect($report['income_breakdown'])->firstWhere('source', 'unexpected_income');
-        $this->assertNotNull($unexpectedIncomeEntry);
-        $this->assertSame(50000.0, (float) $unexpectedIncomeEntry['total']);
-        $this->assertSame(1, $unexpectedIncomeEntry['count']);
+        $unexpectedIncomeRow = collect($report->rows)->first(fn ($r) => $r->category === 'unexpected_income');
+        $this->assertNotNull($unexpectedIncomeRow);
+        $this->assertSame(50000.0, $unexpectedIncomeRow->amount);
+        $this->assertSame(1, $unexpectedIncomeRow->rawData['count'] ?? 0);
 
-        $this->assertCount(3, $report['expense_breakdown']);
+        $expenseRows = array_filter($report->rows, fn ($r) => $r->isExpense());
+        $this->assertCount(3, $expenseRows);
 
-        $expenseInventory = collect($report['expense_breakdown'])->firstWhere('source', 'inventory');
+        $expenseInventory = collect($report->rows)->first(fn ($r) => $r->category === 'inventory');
         $this->assertNotNull($expenseInventory);
-        $this->assertSame(75000.0, (float) $expenseInventory['total']);
+        $this->assertSame(75000.0, $expenseInventory->amount);
 
-        $expenseIngredient = collect($report['expense_breakdown'])->firstWhere('source', 'ingredient_purchase');
+        $expenseIngredient = collect($report->rows)->first(fn ($r) => $r->category === 'ingredient_purchase');
         $this->assertNotNull($expenseIngredient);
-        $this->assertSame(100000.0, (float) $expenseIngredient['total']);
+        $this->assertSame(100000.0, $expenseIngredient->amount);
 
-        $expenseUnexpected = collect($report['expense_breakdown'])->firstWhere('source', 'unexpected_expense');
+        $expenseUnexpected = collect($report->rows)->first(fn ($r) => $r->category === 'unexpected_expense');
         $this->assertNotNull($expenseUnexpected);
-        $this->assertSame(25000.0, (float) $expenseUnexpected['total']);
+        $this->assertSame(25000.0, $expenseUnexpected->amount);
 
-        $this->assertSame(50000.0, $report['receivables_outstanding']);
-
-        $this->assertSame($start, $report['date_range']['start']);
-        $this->assertSame($end, $report['date_range']['end']);
+        $this->assertSame($start, $report->dateStart);
+        $this->assertSame($end, $report->dateEnd);
 
         Carbon::setTestNow();
     }

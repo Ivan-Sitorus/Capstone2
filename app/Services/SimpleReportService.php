@@ -9,6 +9,9 @@ use App\Models\UnexpectedTransaction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * @deprecated Use App\Services\FinancialReportService instead. Will be removed in next major version.
+ */
 class SimpleReportService
 {
     /**

@@ -30,4 +30,12 @@ class GeneratedReport extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Convert the stored result JSON back to a ReportData DTO.
+     */
+    public function toReportData(): \App\DTO\ReportData
+    {
+        return \App\DTO\ReportData::fromGeneratedReport($this->result ?? []);
+    }
 }

@@ -29,3 +29,7 @@ Thumbs.db
 /datamining/*.pyc
 /tests/playwright/auth/
 /tests/playwright/report/
+/datamining/.venv/
+/supervisord.pid
+/.demofilamentphp/
+/.sisyphus/
