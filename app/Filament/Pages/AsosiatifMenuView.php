@@ -18,16 +18,13 @@ class AsosiatifMenuView extends Page
 
     protected static bool $shouldRegisterNavigation = false;
 
-    protected static ?string $slug = 'association/{record}';
+    protected static ?string $slug = 'association/{id}';
 
     public DataMiningRun $record;
 
-    public array $filters = ['record_id' => null];
-
-    public function mount(string $record): void
+    public function mount(string $id): void
     {
-        $this->record = DataMiningRun::findOrFail($record);
-        $this->filters['record_id'] = $this->record->id;
+        $this->record = DataMiningRun::findOrFail($id);
     }
 
     public function getView(): string
