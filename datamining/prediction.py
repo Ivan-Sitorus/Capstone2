@@ -309,7 +309,8 @@ def plot_feature_importance(item_data: dict, items: list) -> str:
     ax.legend()
     ax.grid(axis="y", linestyle="--", alpha=0.5)
     fig.tight_layout()
-    return _fig_to_base64(fig)
+    # OLD: return _fig_to_base64(fig)
+    return ""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -353,7 +354,8 @@ def plot_evaluation(eval_results: dict, items: list) -> str:
         fontsize=14, fontweight="bold", y=1.01,
     )
     fig.tight_layout()
-    return _fig_to_base64(fig)
+    # OLD: return _fig_to_base64(fig)
+    return ""
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -412,7 +414,8 @@ def plot_per_item(items: list, item_data: dict, forecasts: dict):
         fontsize=15, fontweight="bold", y=1.01,
     )
     fig_all.tight_layout()
-    chart_all_items = _fig_to_base64(fig_all)
+    # OLD: chart_all_items = _fig_to_base64(fig_all)
+    chart_all_items = ""
 
     # Individual per-menu charts
     charts_per_menu = []
@@ -420,7 +423,8 @@ def plot_per_item(items: list, item_data: dict, forecasts: dict):
         fig_single, ax_single = plt.subplots(figsize=(14, 5))
         _build_per_item_ax(ax_single, item, item_data[item]["train"], forecasts[item])
         fig_single.tight_layout()
-        charts_per_menu.append({"nama": item, "chart": _fig_to_base64(fig_single)})
+        # OLD: charts_per_menu.append({"nama": item, "chart": _fig_to_base64(fig_single)})
+        charts_per_menu.append({"nama": item, "chart": ""})
 
     return chart_all_items, charts_per_menu
 
@@ -582,7 +586,8 @@ def run_prediction_pipeline(df: pd.DataFrame) -> dict:
     ax_sum.yaxis.grid(True)
     ax_sum.xaxis.grid(False)
     fig_sum.tight_layout(pad=2)
-    chart_summary = _fig_to_base64(fig_sum)
+    # OLD: chart_summary = _fig_to_base64(fig_sum)
+    chart_summary = ""
 
     # ── Output akhir ───────────────────────────────────────────────────────
     return {
@@ -606,5 +611,126 @@ def run_prediction_pipeline(df: pd.DataFrame) -> dict:
             "evaluation":         chart_eval,
             "all_items":          chart_all_items,
             "per_menu":           charts_per_menu,
+        },
+        "chart_data": {
+            "forecast_all": {
+                "type": "bar",
+                "data": {
+                    "labels": [s["nama_menu"] for s in summary_table],
+                    "datasets": [{
+                        "label": "Total Prediksi",
+                        "data": [s["total_forecast"] for s in summary_table],
+                    }],
+                },
+            },
+            "feature_importance": {
+                "type": "bar",
+                "data": {
+                    "labels": items,
+                    "datasets": [
+                        {
+                            "label": "Weekday",
+                            "data": [
+                                float(item_data[i]["full"][item_data[i]["full"]["is_weekend"] == 0]["y"].mean())
+                                if len(item_data[i]["full"][item_data[i]["full"]["is_weekend"] == 0]) > 0 else 0.0
+                                for i in items
+                            ],
+                        },
+                        {
+                            "label": "Weekend",
+                            "data": [
+                                float(item_data[i]["full"][item_data[i]["full"]["is_weekend"] == 1]["y"].mean())
+                                if len(item_data[i]["full"][item_data[i]["full"]["is_weekend"] == 1]) > 0 else 0.0
+                                for i in items
+                            ],
+                        },
+                    ],
+                },
+            },
+            "evaluation": {
+                "mae": {
+                    "type": "bar",
+                    "data": {
+                        "labels": items,
+                        "datasets": [{"label": "MAE", "data": [eval_results[i]["MAE"] for i in items]}],
+                    },
+                },
+                "rmse": {
+                    "type": "bar",
+                    "data": {
+                        "labels": items,
+                        "datasets": [{"label": "RMSE", "data": [eval_results[i]["RMSE"] for i in items]}],
+                    },
+                },
+                "mape": {
+                    "type": "bar",
+                    "data": {
+                        "labels": items,
+                        "datasets": [{"label": "MAPE", "data": [eval_results[i]["MAPE"] for i in items]}],
+                    },
+                },
+                "smape": {
+                    "type": "bar",
+                    "data": {
+                        "labels": items,
+                        "datasets": [{"label": "SMAPE", "data": [eval_results[i]["SMAPE"] for i in items]}],
+                    },
+                },
+            },
+            "all_items": {
+                "type": "line",
+                "data": {
+                    "labels": [str(d.date()) for d in forecasts[items[0]]["ds"].tolist()] if items else [],
+                    "datasets": (
+                        [
+                            {
+                                "label": f"{item} Aktual",
+                                "data": [
+                                    float(v) if not (isinstance(v, float) and math.isnan(v)) else None
+                                    for v in forecasts[item]["y"].tolist()
+                                ],
+                            }
+                            for item in items
+                        ] + [
+                            {
+                                "label": f"{item} Prediksi",
+                                "data": [
+                                    float(v) if not (isinstance(v, float) and math.isnan(v)) else None
+                                    for v in forecasts[item]["yhat"].tolist()
+                                ],
+                            }
+                            for item in items
+                        ]
+                    ),
+                },
+            },
+            "per_menu": [
+                {
+                    "nama": item,
+                    "chart_data": {
+                        "type": "line",
+                        "data": {
+                            "labels": [str(d.date()) for d in forecasts[item]["ds"].tolist()],
+                            "datasets": [
+                                {
+                                    "label": "Aktual",
+                                    "data": [
+                                        float(v) if not (isinstance(v, float) and math.isnan(v)) else None
+                                        for v in forecasts[item]["y"].tolist()
+                                    ],
+                                },
+                                {
+                                    "label": "Prediksi",
+                                    "data": [
+                                        float(v) if not (isinstance(v, float) and math.isnan(v)) else None
+                                        for v in forecasts[item]["yhat"].tolist()
+                                    ],
+                                },
+                            ],
+                        },
+                    },
+                }
+                for item in items
+            ],
         },
     }

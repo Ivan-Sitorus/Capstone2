@@ -294,7 +294,8 @@ def run_pipeline(df: pd.DataFrame) -> dict:
                edgecolor="#e5e7eb", fancybox=False)
     ax1.yaxis.grid(True); ax1.xaxis.grid(False)
     fig1.tight_layout(pad=2)
-    chart_bar = fig_to_base64(fig1)
+    # OLD: chart_bar = fig_to_base64(fig1)
+    chart_bar = ""
 
     # ── VISUALISASI 2: Elbow curve — diperbesar ────────────────────────
     fig2, ax2 = plt.subplots(figsize=(9, 5))
@@ -316,7 +317,8 @@ def run_pipeline(df: pd.DataFrame) -> dict:
     ax2.set_xticks(list(k_range))
     ax2.legend(framealpha=0.9, edgecolor="#e5e7eb", fancybox=False)
     fig2.tight_layout(pad=2)
-    chart_elbow = fig_to_base64(fig2)
+    # OLD: chart_elbow = fig_to_base64(fig2)
+    chart_elbow = ""
 
     # ── VISUALISASI 3: Silhouette Score per K — diperbesar ─────────────
     fig3, ax3 = plt.subplots(figsize=(9, 5))
@@ -337,7 +339,8 @@ def run_pipeline(df: pd.DataFrame) -> dict:
     ax3.set_xticks(list(k_range))
     ax3.legend(framealpha=0.9, edgecolor="#e5e7eb", fancybox=False)
     fig3.tight_layout(pad=2)
-    chart_silhouette = fig_to_base64(fig3)
+    # OLD: chart_silhouette = fig_to_base64(fig3)
+    chart_silhouette = ""
 
     # ── Susun output per klaster ───────────────────────────────────────
     clusters_out = []
@@ -379,6 +382,39 @@ def run_pipeline(df: pd.DataFrame) -> dict:
             "bar":        chart_bar,
             "elbow":      chart_elbow,
             "silhouette": chart_silhouette,
+        },
+        "chart_data": {
+            "bar": {
+                "type": "bar",
+                "data": {
+                    "labels": df_clustering["Nama Item"].tolist(),
+                    "datasets": [{
+                        "label": "Jumlah Penjualan",
+                        "data": [float(x) for x in df_clustering["Jumlah"].tolist()],
+                        "backgroundColor": [palette_map.get(cat, "#9ca3af") for cat in df_clustering["Kategori"].tolist()],
+                    }],
+                },
+            },
+            "elbow": {
+                "type": "line",
+                "data": {
+                    "labels": list(k_range),
+                    "datasets": [{
+                        "label": "Inertia",
+                        "data": inertias,
+                    }],
+                },
+            },
+            "silhouette": {
+                "type": "line",
+                "data": {
+                    "labels": list(k_range),
+                    "datasets": [{
+                        "label": "Silhouette Score",
+                        "data": silhouette_scores,
+                    }],
+                },
+            },
         },
     }
 

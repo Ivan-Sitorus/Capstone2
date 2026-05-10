@@ -308,7 +308,8 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
         plt.setp(ax.get_xticklabels(), rotation=28, ha="right")
         fig.tight_layout(pad=1.5)
 
-        per_ingredient_charts.append({"nama": bahan, "chart": _fig_to_b64(fig)})
+        # OLD: per_ingredient_charts.append({"nama": bahan, "chart": _fig_to_b64(fig)})
+        per_ingredient_charts.append({"nama": bahan, "chart": ""})
 
         all_items_store.append({
             "bahan":   bahan,
@@ -344,7 +345,8 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
     ax_fa.set_xticklabels(ax_fa.get_xticklabels(), ha="right")
     ax_fa.yaxis.grid(True); ax_fa.xaxis.grid(False)
     fig_fa.tight_layout(pad=2)
-    chart_forecast_all = _fig_to_b64(fig_fa)
+    # OLD: chart_forecast_all = _fig_to_b64(fig_fa)
+    chart_forecast_all = ""
 
     # ─────────────────────────────────────────────────────────────────────
     # GRAFIK 2 — feature_importance: Weekday vs Weekend per bahan baku
@@ -372,7 +374,8 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
     ax_fi.legend(framealpha=0.9, edgecolor="#e5e7eb", fancybox=False)
     ax_fi.yaxis.grid(True); ax_fi.xaxis.grid(False)
     fig_fi.tight_layout(pad=2)
-    chart_feature_importance = _fig_to_b64(fig_fi)
+    # OLD: chart_feature_importance = _fig_to_b64(fig_fi)
+    chart_feature_importance = ""
 
     # ─────────────────────────────────────────────────────────────────────
     # GRAFIK 3 — evaluation 2×2: MAE, RMSE, MAPE, SMAPE
@@ -402,7 +405,8 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
         fontsize=12, fontweight="bold", y=1.01,
     )
     fig_ev.tight_layout(pad=2)
-    chart_evaluation = _fig_to_b64(fig_ev)
+    # OLD: chart_evaluation = _fig_to_b64(fig_ev)
+    chart_evaluation = ""
 
     # ─────────────────────────────────────────────────────────────────────
     # GRAFIK 4 — all_items: grid prediksi vs aktual semua bahan baku
@@ -434,7 +438,8 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
 
     fig_all.suptitle("Prediksi vs Aktual — Semua Bahan Baku", fontsize=12, fontweight="bold")
     fig_all.tight_layout(pad=2)
-    chart_all_items = _fig_to_b64(fig_all)
+    # OLD: chart_all_items = _fig_to_b64(fig_all)
+    chart_all_items = ""
 
     # ─────────────────────────────────────────────────────────────────────
     # Forecast range dates
@@ -460,5 +465,124 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
             "evaluation":         chart_evaluation,
             "all_items":          chart_all_items,
             "per_ingredient":     per_ingredient_charts,
+        },
+        "chart_data": {
+            "forecast_all": {
+                "type": "bar",
+                "data": {
+                    "labels": [s["nama_bahan_baku"] for s in summary_rows],
+                    "datasets": [{
+                        "label": "Total Prediksi",
+                        "data": [s["total_forecast"] for s in summary_rows],
+                    }],
+                },
+            },
+            "feature_importance": {
+                "type": "bar",
+                "data": {
+                    "labels": ingredients,
+                    "datasets": [
+                        {
+                            "label": "Weekday",
+                            "data": [
+                                float(df_capped[(df_capped["Bahan_Baku"] == b) & (df_capped["Day_Type"] == "Weekday")]["Jumlah_Digunakan"].mean())
+                                if len(df_capped[(df_capped["Bahan_Baku"] == b) & (df_capped["Day_Type"] == "Weekday")]) > 0 else 0.0
+                                for b in ingredients
+                            ],
+                        },
+                        {
+                            "label": "Weekend",
+                            "data": [
+                                float(df_capped[(df_capped["Bahan_Baku"] == b) & (df_capped["Day_Type"] == "Weekend")]["Jumlah_Digunakan"].mean())
+                                if len(df_capped[(df_capped["Bahan_Baku"] == b) & (df_capped["Day_Type"] == "Weekend")]) > 0 else 0.0
+                                for b in ingredients
+                            ],
+                        },
+                    ],
+                },
+            },
+            "evaluation": {
+                "mae": {
+                    "type": "bar",
+                    "data": {
+                        "labels": [s["nama_bahan_baku"] for s in summary_rows],
+                        "datasets": [{"label": "MAE", "data": [s["mae"] for s in summary_rows]}],
+                    },
+                },
+                "rmse": {
+                    "type": "bar",
+                    "data": {
+                        "labels": [s["nama_bahan_baku"] for s in summary_rows],
+                        "datasets": [{"label": "RMSE", "data": [s["rmse"] for s in summary_rows]}],
+                    },
+                },
+                "mape": {
+                    "type": "bar",
+                    "data": {
+                        "labels": [s["nama_bahan_baku"] for s in summary_rows],
+                        "datasets": [{"label": "MAPE", "data": [s["mape"] for s in summary_rows]}],
+                    },
+                },
+                "smape": {
+                    "type": "bar",
+                    "data": {
+                        "labels": [s["nama_bahan_baku"] for s in summary_rows],
+                        "datasets": [{"label": "SMAPE", "data": [s["smape"] for s in summary_rows]}],
+                    },
+                },
+            },
+            "all_items": {
+                "type": "line",
+                "data": {
+                    "labels": [str(d.date()) for d in all_items_store[0]["test_ds"]] if all_items_store else [],
+                    "datasets": [
+                        {
+                            "label": f"{it['bahan']} Aktual",
+                            "data": [
+                                float(v) if not (isinstance(v, float) and math.isnan(v)) else None
+                                for v in it["test_y"]
+                            ],
+                        }
+                        for it in all_items_store
+                    ] + [
+                        {
+                            "label": f"{it['bahan']} Prediksi",
+                            "data": [
+                                float(v) if not (isinstance(v, float) and math.isnan(v)) else None
+                                for v in it["pred_y"]
+                            ],
+                        }
+                        for it in all_items_store
+                    ],
+                },
+            },
+            "per_ingredient": [
+                {
+                    "nama": it["bahan"],
+                    "chart_data": {
+                        "type": "line",
+                        "data": {
+                            "labels": [str(d.date()) for d in it["test_ds"]],
+                            "datasets": [
+                                {
+                                    "label": "Aktual",
+                                    "data": [
+                                        float(v) if not (isinstance(v, float) and math.isnan(v)) else None
+                                        for v in it["test_y"]
+                                    ],
+                                },
+                                {
+                                    "label": "Prediksi",
+                                    "data": [
+                                        float(v) if not (isinstance(v, float) and math.isnan(v)) else None
+                                        for v in it["pred_y"]
+                                    ],
+                                },
+                            ],
+                        },
+                    },
+                }
+                for it in all_items_store
+            ],
         },
     }

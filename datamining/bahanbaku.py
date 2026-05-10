@@ -341,7 +341,8 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
     ax1.yaxis.grid(True)
     ax1.xaxis.grid(False)
     fig1.tight_layout(pad=2)
-    chart_bar = _to_b64(fig1)
+    # OLD: chart_bar = _to_b64(fig1)
+    chart_bar = ""
 
     # ── Cell 39: Elbow Curve ───────────────────────────────────────────
     fig2, ax2 = plt.subplots(figsize=(8, 5))
@@ -365,7 +366,8 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
     ax2.set_xticks(list(k_range_e))
     ax2.legend(framealpha=0.9, edgecolor="#e5e7eb", fancybox=False)
     fig2.tight_layout(pad=2)
-    chart_elbow = _to_b64(fig2)
+    # OLD: chart_elbow = _to_b64(fig2)
+    chart_elbow = ""
 
     # ── Silhouette Score per K ─────────────────────────────────────────
     fig3, ax3 = plt.subplots(figsize=(8, 5))
@@ -387,7 +389,8 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
     ax3.set_xticks(list(k_range))
     ax3.legend(framealpha=0.9, edgecolor="#e5e7eb", fancybox=False)
     fig3.tight_layout(pad=2)
-    chart_silhouette = _to_b64(fig3)
+    # OLD: chart_silhouette = _to_b64(fig3)
+    chart_silhouette = ""
 
     return {
         "status":             "success",
@@ -402,5 +405,38 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
             "bar":        chart_bar,
             "elbow":      chart_elbow,
             "silhouette": chart_silhouette,
+        },
+        "chart_data": {
+            "bar": {
+                "type": "bar",
+                "data": {
+                    "labels": df_baku["Bahan_Baku"].tolist(),
+                    "datasets": [{
+                        "label": "Jumlah Penggunaan",
+                        "data": [float(x) for x in df_baku["Jumlah_Digunakan"].tolist()],
+                        "backgroundColor": [palette_map.get(cat, "#9ca3af") for cat in df_baku["Kategori"].tolist()],
+                    }],
+                },
+            },
+            "elbow": {
+                "type": "line",
+                "data": {
+                    "labels": list(k_range_e),
+                    "datasets": [{
+                        "label": "Inertia",
+                        "data": inertias,
+                    }],
+                },
+            },
+            "silhouette": {
+                "type": "line",
+                "data": {
+                    "labels": list(k_range),
+                    "datasets": [{
+                        "label": "Silhouette Score",
+                        "data": silhouette_scores,
+                    }],
+                },
+            },
         },
     }

@@ -234,7 +234,8 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
         ax1.xaxis.grid(True)
         ax1.yaxis.grid(False)
         fig1.tight_layout(pad=2)
-        chart_top_rules = _to_b64(fig1)
+        # OLD: chart_top_rules = _to_b64(fig1)
+        chart_top_rules = None
 
     # Chart 2: Support vs Confidence scatter
     chart_sup_conf = None
@@ -250,7 +251,8 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
         ax2.set_ylabel("Confidence")
         ax2.set_title("Support vs Confidence (warna = Lift)", fontsize=12, fontweight="bold", pad=10)
         fig2.tight_layout(pad=2)
-        chart_sup_conf = _to_b64(fig2)
+        # OLD: chart_sup_conf = _to_b64(fig2)
+        chart_sup_conf = None
 
     # Chart 3: Frequent 1-Itemsets horizontal bar
     chart_freq_item = None
@@ -269,7 +271,8 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
         ax3.xaxis.grid(True)
         ax3.yaxis.grid(False)
         fig3.tight_layout(pad=2)
-        chart_freq_item = _to_b64(fig3)
+        # OLD: chart_freq_item = _to_b64(fig3)
+        chart_freq_item = None
 
     return {
         "status":             "success",
@@ -287,5 +290,35 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
             "top_rules": chart_top_rules,
             "sup_conf":  chart_sup_conf,
             "freq_item": chart_freq_item,
+        },
+        "chart_data": {
+            "top_rules": {
+                "type": "bar",
+                "options": {"indexAxis": "y"},
+                "data": {
+                    "labels": [f"{r['menu_pertama']} → {r['menu_kedua']}" for r in rules_out],
+                    "datasets": [{"label": "Lift", "data": [r["lift"] for r in rules_out]}],
+                },
+            } if rules_out else None,
+            "sup_conf": {
+                "type": "scatter",
+                "data": {
+                    "datasets": [{
+                        "label": "Rules",
+                        "data": [
+                            {"x": float(row["support"]), "y": float(row["confidence"])}
+                            for _, row in rules_2.iterrows()
+                        ],
+                    }],
+                },
+            } if len(rules_2) > 0 else None,
+            "freq_item": {
+                "type": "bar",
+                "options": {"indexAxis": "y"},
+                "data": {
+                    "labels": [f["item"] for f in freq1_out[:15]],
+                    "datasets": [{"label": "Frekuensi", "data": [f["jumlah_kemunculan"] for f in freq1_out[:15]]}],
+                },
+            } if freq1_out else None,
         },
     }
