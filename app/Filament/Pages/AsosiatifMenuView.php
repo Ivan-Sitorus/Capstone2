@@ -6,11 +6,11 @@ use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class AsosiatifMenuView extends Page
 {
@@ -57,30 +57,33 @@ class AsosiatifMenuView extends Page
 
         return $schema->components([
             Tabs::make('Detail')
+                ->columnSpanFull()
                 ->tabs([
                     Tab::make('Hasil Asosiasi')
+                        ->icon(Heroicon::Link)
                         ->schema([
                             Section::make('Ringkasan')
+                                ->columns(4)
                                 ->schema([
-                                    Grid::make(4)->schema([
-                                        TextEntry::make('total_rules')
-                                            ->label('Total Rules')
-                                            ->state($r['total_rules'] ?? 0),
-                                        TextEntry::make('total_transactions')
-                                            ->label('Total Transaksi')
-                                            ->state($r['total_transactions'] ?? 0),
-                                        TextEntry::make('min_support')
-                                            ->label('Min Support')
-                                            ->state(fn (): string => isset($r['min_support']) ? number_format($r['min_support'] * 100, 1) . '%' : '-'),
-                                        TextEntry::make('min_confidence')
-                                            ->label('Min Confidence')
-                                            ->state(fn (): string => isset($r['min_confidence']) ? number_format($r['min_confidence'] * 100, 1) . '%' : '-'),
-                                    ]),
+                                    TextEntry::make('total_rules')
+                                        ->label('Total Rules')
+                                        ->state($r['total_rules'] ?? 0),
+                                    TextEntry::make('total_transactions')
+                                        ->label('Total Transaksi')
+                                        ->state($r['total_transactions'] ?? 0),
+                                    TextEntry::make('min_support')
+                                        ->label('Min Support')
+                                        ->state(fn (): string => isset($r['min_support']) ? number_format($r['min_support'] * 100, 1) . '%' : '-'),
+                                    TextEntry::make('min_confidence')
+                                        ->label('Min Confidence')
+                                        ->state(fn (): string => isset($r['min_confidence']) ? number_format($r['min_confidence'] * 100, 1) . '%' : '-'),
                                 ]),
                             Section::make('Aturan Asosiasi')
+                                ->description('Aturan asosiasi yang dihasilkan dari algoritma Apriori')
+                                ->collapsible()
                                 ->schema([
                                     RepeatableEntry::make('rules')
-                                        ->label('')
+                                        ->hiddenLabel()
                                         ->state(fn (): array => $r['rules'] ?? [])
                                         ->schema([
                                             TextEntry::make('menu_pertama')->label('Menu Pertama'),
@@ -97,10 +100,26 @@ class AsosiatifMenuView extends Page
                                         ])
                                         ->columns(5),
                                 ]),
+                            Section::make('Frequent Itemsets')
+                                ->collapsible()
+                                ->schema([
+                                    RepeatableEntry::make('frequent_itemsets')
+                                        ->hiddenLabel()
+                                        ->state(fn (): array => $r['frequent_itemsets'] ?? [])
+                                        ->schema([
+                                            TextEntry::make('items')->label('Itemset'),
+                                            TextEntry::make('support')
+                                                ->label('Support')
+                                                ->state(fn (array $state): string => number_format(($state['support'] ?? 0) * 100, 2) . '%'),
+                                        ])
+                                        ->columns(2),
+                                ]),
                         ]),
                     Tab::make('Detail Teknis')
+                        ->icon(Heroicon::Cog)
                         ->schema([
                             Section::make('Parameter Model')
+                                ->columns(2)
                                 ->schema([
                                     TextEntry::make('type')->label('Tipe')->state($this->record->analysis_type),
                                     TextEntry::make('status')->label('Status')->state($this->record->status),
@@ -113,9 +132,9 @@ class AsosiatifMenuView extends Page
                                     TextEntry::make('min_confidence_param')
                                         ->label('Min Confidence')
                                         ->state(fn (): string => isset($r['min_confidence']) ? number_format($r['min_confidence'] * 100, 1) . '%' : '-'),
-                                ])
-                                ->columns(2),
+                                ]),
                             Section::make('Preprocessing Logs')
+                                ->collapsible()
                                 ->schema(function () use ($r) {
                                     $logs = $r['preprocessing_logs'] ?? [];
                                     $entries = [];

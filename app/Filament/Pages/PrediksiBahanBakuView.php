@@ -6,11 +6,11 @@ use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class PrediksiBahanBakuView extends Page
 {
@@ -42,10 +42,6 @@ class PrediksiBahanBakuView extends Page
         return [
             \App\Filament\Widgets\IngredientForecastAllChart::class,
             \App\Filament\Widgets\FeatureImportanceChart::class,
-            \App\Filament\Widgets\EvalMaeChart::class,
-            \App\Filament\Widgets\EvalRmseChart::class,
-            \App\Filament\Widgets\EvalMapeChart::class,
-            \App\Filament\Widgets\EvalSmapeChart::class,
         ];
     }
 
@@ -60,73 +56,117 @@ class PrediksiBahanBakuView extends Page
 
         return $schema->components([
             Tabs::make('Detail')
+                ->columnSpanFull()
                 ->tabs([
                     Tab::make('Hasil Prediksi')
+                        ->icon(Heroicon::Beaker)
                         ->schema([
                             Section::make('Ringkasan')
+                                ->columns(3)
                                 ->schema([
-                                    Grid::make(3)->schema([
-                                        TextEntry::make('total_ingredients')
-                                            ->label('Bahan Baku Dianalisis')
-                                            ->state($r['total_ingredients'] ?? 0),
-                                        TextEntry::make('forecast_days')
-                                            ->label('Horizon Prediksi')
-                                            ->state(($r['forecast_days'] ?? 0) . ' hari'),
-                                        TextEntry::make('date_range')
-                                            ->label('Periode Data')
-                                            ->state(
-                                                ($r['date_range']['from'] ?? '-')
-                                                . ' s/d '
-                                                . ($r['date_range']['to'] ?? '-')
-                                            ),
-                                    ]),
+                                    TextEntry::make('total_ingredients')
+                                        ->label('Bahan Baku Dianalisis')
+                                        ->state($r['total_ingredients'] ?? 0),
+                                    TextEntry::make('forecast_days')
+                                        ->label('Hari Prediksi')
+                                        ->state($r['forecast_days'] ?? 0),
+                                    TextEntry::make('total_forecast')
+                                        ->label('Total Forecast (unit)')
+                                        ->state(array_sum(array_column($r['predictions'] ?? [], 'total_forecast'))),
                                 ]),
-                            Section::make('Evaluasi Model per Bahan Baku')
+                            Section::make('Detail Forecast per Bahan Baku')
+                                ->description('Prediksi per bahan baku untuk periode forecast')
+                                ->collapsible()
+                                ->schema(function () use ($r) {
+                                    $predictions = $r['predictions'] ?? [];
+                                    $entries = [];
+                                    foreach ($predictions as $i => $pred) {
+                                        $nama = $pred['nama_bahan_baku'] ?? "Bahan Baku {$i}";
+                                        $forecastDays = $pred['forecast'] ?? [];
+                                        $entries[] = Section::make($nama)
+                                            ->schema([
+                                                TextEntry::make("pred_total_{$i}")
+                                                    ->label('Total Forecast')
+                                                    ->state(($pred['total_forecast'] ?? 0) . ' unit'),
+                                                RepeatableEntry::make("pred_detail_{$i}")
+                                                    ->label('Forecast Harian')
+                                                    ->state(fn (): array => $forecastDays)
+                                                    ->schema([
+                                                        TextEntry::make('tanggal'),
+                                                        TextEntry::make('hari'),
+                                                        TextEntry::make('day_type'),
+                                                        TextEntry::make('prediksi')->label('Prediksi (unit)'),
+                                                        TextEntry::make('batas_bawah')->label('Bawah'),
+                                                        TextEntry::make('batas_atas')->label('Atas'),
+                                                    ])
+                                                    ->columns(6),
+                                            ]);
+                                    }
+                                    return $entries;
+                                }),
+                            Section::make('Summary Table')
+                                ->description('Total prediksi per bahan baku (diurutkan tertinggi)')
+                                ->collapsible()
                                 ->schema([
-                                    RepeatableEntry::make('predictions')
-                                        ->label('')
-                                        ->state(fn (): array => $r['predictions'] ?? [])
+                                    RepeatableEntry::make('summary_table')
+                                        ->hiddenLabel()
+                                        ->state(fn (): array => $r['summary_table'] ?? [])
                                         ->schema([
                                             TextEntry::make('nama_bahan_baku')->label('Bahan Baku'),
                                             TextEntry::make('satuan')->label('Satuan'),
-                                            TextEntry::make('mae')->label('MAE'),
-                                            TextEntry::make('rmse')->label('RMSE'),
-                                            TextEntry::make('mape')->label('MAPE (%)'),
-                                            TextEntry::make('smape')->label('SMAPE (%)'),
+                                            TextEntry::make('total_forecast')->label('Total Forecast')->numeric(decimalPlaces: 1),
+                                            TextEntry::make('avg_per_day')->label('Rata/Hari')->numeric(decimalPlaces: 2),
                                             TextEntry::make('model')->label('Model'),
                                         ])
-                                        ->columns(4),
+                                        ->columns(5),
                                 ]),
-                            Section::make('Ringkasan Forecast')
-                                ->schema(function () use ($r) {
-                                    $rows = $r['summary_table'] ?? [];
-                                    $entries = [];
-                                    foreach ($rows as $i => $row) {
-                                        $entries[] = TextEntry::make("summary_{$i}")
-                                            ->label($row['nama_bahan_baku'] ?? "Item {$i}")
-                                            ->state(
-                                                'Total: ' . number_format($row['total_forecast'] ?? 0, 1)
-                                                . ' ' . ($row['satuan'] ?? '')
-                                                . ' — Rata-rata/hari: ' . number_format($row['avg_per_day'] ?? 0, 1)
-                                                . ' — MAPE: ' . number_format($row['mape'] ?? 0, 2) . '%'
-                                            );
-                                    }
-
-                                    return $entries;
-                                }),
                         ]),
                     Tab::make('Detail Teknis')
+                        ->icon(Heroicon::Cog)
                         ->schema([
                             Section::make('Parameter Model')
+                                ->columns(2)
                                 ->schema([
                                     TextEntry::make('type')->label('Tipe')->state($this->record->analysis_type),
                                     TextEntry::make('status')->label('Status')->state($this->record->status),
                                     TextEntry::make('run_at')->label('Waktu Eksekusi')->state($this->record->run_at?->format('d M Y, H:i:s')),
                                     TextEntry::make('date_range_start')->label('Data Dari')->state($this->record->date_range_start?->format('d M Y')),
                                     TextEntry::make('date_range_end')->label('Data Sampai')->state($this->record->date_range_end?->format('d M Y')),
-                                ])
-                                ->columns(2),
+                                ]),
+                            Section::make('Evaluasi Model')
+                                ->description('Metrik evaluasi per bahan baku pada data test (25%)')
+                                ->collapsible()
+                                ->schema([
+                                    RepeatableEntry::make('evaluation_metrics')
+                                        ->hiddenLabel()
+                                        ->state(function () use ($r) {
+                                            return collect($r['predictions'] ?? [])->map(fn ($p) => [
+                                                'nama' => $p['nama_bahan_baku'] ?? '-',
+                                                'satuan' => $p['satuan'] ?? '',
+                                                'mae' => $p['mae'] ?? 0,
+                                                'rmse' => $p['rmse'] ?? 0,
+                                                'mape' => $p['mape'] ?? 0,
+                                                'smape' => $p['smape'] ?? 0,
+                                            ])->all();
+                                        })
+                                        ->schema([
+                                            TextEntry::make('nama')->label('Bahan Baku'),
+                                            TextEntry::make('satuan')->label('Satuan'),
+                                            TextEntry::make('mae')->label('MAE')->numeric(decimalPlaces: 2),
+                                            TextEntry::make('rmse')->label('RMSE')->numeric(decimalPlaces: 2),
+                                            TextEntry::make('mape')
+                                                ->label('MAPE (%)')
+                                                ->numeric(decimalPlaces: 1)
+                                                ->suffix('%'),
+                                            TextEntry::make('smape')
+                                                ->label('SMAPE (%)')
+                                                ->numeric(decimalPlaces: 1)
+                                                ->suffix('%'),
+                                        ])
+                                        ->columns(6),
+                                ]),
                             Section::make('Preprocessing Logs')
+                                ->collapsible()
                                 ->schema(function () use ($r) {
                                     $logs = $r['preprocessing_logs'] ?? [];
                                     $entries = [];
@@ -135,7 +175,6 @@ class PrediksiBahanBakuView extends Page
                                             ->label($log['tahap'] ?? "Step {$i}")
                                             ->state($log['detail'] ?? '');
                                     }
-
                                     return $entries;
                                 }),
                         ]),

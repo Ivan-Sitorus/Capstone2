@@ -54,7 +54,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
     pecl install redis && docker-php-ext-enable redis && \
     pecl install imagick && docker-php-ext-enable imagick
 
-# ── PHP opcache (production settings) + imagick skip version check ───
+# ── PHP opcache (production settings) + custom ini ───────────────────
 RUN { \
         echo "opcache.enable=1"; \
         echo "opcache.memory_consumption=128"; \
@@ -63,7 +63,8 @@ RUN { \
         echo "opcache.revalidate_freq=2"; \
         echo "opcache.fast_shutdown=1"; \
         echo "imagick.skip_version_check=1"; \
-    } > /usr/local/etc/php/conf.d/99-opcache.ini
+        echo "memory_limit=256M"; \
+    } > /usr/local/etc/php/conf.d/99-pos.ini
 
 # ── PHP-FPM: listen on Unix socket ───────────────────────────────────
 RUN sed -i 's|^;listen = 127.0.0.1:9000|listen = /var/run/php-fpm.sock|' \

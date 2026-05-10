@@ -6,11 +6,11 @@ use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Pages\Page;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class KlasterisasiBahanBakuView extends Page
 {
@@ -57,27 +57,29 @@ class KlasterisasiBahanBakuView extends Page
 
         return $schema->components([
             Tabs::make('Detail')
+                ->columnSpanFull()
                 ->tabs([
                     Tab::make('Hasil Klaster')
+                        ->icon(Heroicon::Beaker)
                         ->schema([
                             Section::make('Ringkasan')
+                                ->columns(3)
                                 ->schema([
-                                    Grid::make(3)->schema([
-                                        TextEntry::make('best_k')
-                                            ->label('K Optimal')
-                                            ->state($r['best_k'] ?? '-'),
-                                        TextEntry::make('silhouette')
-                                            ->label('Silhouette Score')
-                                            ->state(round($r['silhouette_score'] ?? 0, 4)),
-                                        TextEntry::make('total_ingredients')
-                                            ->label('Bahan Baku Dianalisis')
-                                            ->state($r['total_ingredients'] ?? 0),
-                                    ]),
+                                    TextEntry::make('best_k')
+                                        ->label('K Optimal')
+                                        ->state($r['best_k'] ?? '-'),
+                                    TextEntry::make('silhouette')
+                                        ->label('Silhouette Score')
+                                        ->state(round($r['silhouette_score'] ?? 0, 4)),
+                                    TextEntry::make('total_ingredients')
+                                        ->label('Bahan Baku Dianalisis')
+                                        ->state($r['total_ingredients'] ?? 0),
                                 ]),
                             Section::make('Klaster')
+                                ->collapsible()
                                 ->schema([
                                     RepeatableEntry::make('clusters')
-                                        ->label('')
+                                        ->hiddenLabel()
                                         ->state(fn (): array => $r['clusters'] ?? [])
                                         ->schema([
                                             TextEntry::make('label'),
@@ -88,6 +90,8 @@ class KlasterisasiBahanBakuView extends Page
                                         ->columns(4),
                                 ]),
                             Section::make('Tabel Hasil')
+                                ->description('Detail bahan baku per klaster')
+                                ->collapsible()
                                 ->schema(function () use ($r) {
                                     $rows = $r['table_rows'] ?? [];
                                     $entries = [];
@@ -101,17 +105,19 @@ class KlasterisasiBahanBakuView extends Page
                                 }),
                         ]),
                     Tab::make('Detail Teknis')
+                        ->icon(Heroicon::Cog)
                         ->schema([
                             Section::make('Parameter Model')
+                                ->columns(2)
                                 ->schema([
                                     TextEntry::make('type')->label('Tipe')->state($this->record->analysis_type),
                                     TextEntry::make('status')->label('Status')->state($this->record->status),
                                     TextEntry::make('run_at')->label('Waktu Eksekusi')->state($this->record->run_at?->format('d M Y, H:i:s')),
                                     TextEntry::make('date_range_start')->label('Data Dari')->state($this->record->date_range_start?->format('d M Y')),
                                     TextEntry::make('date_range_end')->label('Data Sampai')->state($this->record->date_range_end?->format('d M Y')),
-                                ])
-                                ->columns(2),
+                                ]),
                             Section::make('Preprocessing Logs')
+                                ->collapsible()
                                 ->schema(function () use ($r) {
                                     $logs = $r['preprocessing_logs'] ?? [];
                                     $entries = [];
