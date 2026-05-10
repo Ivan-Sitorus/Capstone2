@@ -4,15 +4,16 @@ namespace App\Filament\Widgets;
 
 use App\Models\DataMiningRun;
 use Filament\Widgets\ChartWidget;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class FreqItemChart extends ChartWidget
 {
-    use InteractsWithPageFilters;
+    public ?int $recordId = null;
 
     protected ?string $heading = 'Frequent Items';
 
     protected int|string|array $columnSpan = 'full';
+
+    protected ?string $maxHeight = '300px';
 
     protected function getType(): string
     {
@@ -21,7 +22,7 @@ class FreqItemChart extends ChartWidget
 
     protected function getData(): array
     {
-        $recordId = $this->pageFilters['record_id'] ?? null;
+        $recordId = $this->recordId ?? null;
         if (!$recordId) {
             return ['datasets' => [], 'labels' => []];
         }
@@ -38,7 +39,7 @@ class FreqItemChart extends ChartWidget
 
     protected function getOptions(): ?array
     {
-        $recordId = $this->pageFilters['record_id'] ?? null;
+        $recordId = $this->recordId ?? null;
         if (!$recordId) {
             return ['indexAxis' => 'y'];
         }

@@ -40,9 +40,9 @@ class KlasterisasiMenuView extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\ClusteringBarChart::class,
-            \App\Filament\Widgets\ElbowChart::class,
-            \App\Filament\Widgets\SilhouetteChart::class,
+            \App\Filament\Widgets\ClusteringBarChart::make(['recordId' => $this->record->id]),
+            \App\Filament\Widgets\ElbowChart::make(['recordId' => $this->record->id]),
+            \App\Filament\Widgets\SilhouetteChart::make(['recordId' => $this->record->id]),
         ];
     }
 

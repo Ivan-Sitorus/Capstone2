@@ -40,8 +40,8 @@ class PrediksiMenuView extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\ForecastAllChart::class,
-            \App\Filament\Widgets\FeatureImportanceChart::class,
+            \App\Filament\Widgets\ForecastAllChart::make(['recordId' => $this->record->id]),
+            \App\Filament\Widgets\FeatureImportanceChart::make(['recordId' => $this->record->id]),
         ];
     }
 

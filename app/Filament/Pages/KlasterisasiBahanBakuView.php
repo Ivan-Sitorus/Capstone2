@@ -40,9 +40,9 @@ class KlasterisasiBahanBakuView extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\IngredientBarChart::class,
-            \App\Filament\Widgets\ElbowChart::class,
-            \App\Filament\Widgets\SilhouetteChart::class,
+            \App\Filament\Widgets\IngredientBarChart::make(['recordId' => $this->record->id]),
+            \App\Filament\Widgets\ElbowChart::make(['recordId' => $this->record->id]),
+            \App\Filament\Widgets\SilhouetteChart::make(['recordId' => $this->record->id]),
         ];
     }
 

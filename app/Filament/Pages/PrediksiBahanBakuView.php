@@ -40,8 +40,8 @@ class PrediksiBahanBakuView extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\IngredientForecastAllChart::class,
-            \App\Filament\Widgets\FeatureImportanceChart::class,
+            \App\Filament\Widgets\IngredientForecastAllChart::make(['recordId' => $this->record->id]),
+            \App\Filament\Widgets\FeatureImportanceChart::make(['recordId' => $this->record->id]),
         ];
     }
 

@@ -40,9 +40,9 @@ class AsosiatifMenuView extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\TopRulesChart::class,
-            \App\Filament\Widgets\SupConfChart::class,
-            \App\Filament\Widgets\FreqItemChart::class,
+            \App\Filament\Widgets\TopRulesChart::make(['recordId' => $this->record->id]),
+            \App\Filament\Widgets\SupConfChart::make(['recordId' => $this->record->id]),
+            \App\Filament\Widgets\FreqItemChart::make(['recordId' => $this->record->id]),
         ];
     }
 
