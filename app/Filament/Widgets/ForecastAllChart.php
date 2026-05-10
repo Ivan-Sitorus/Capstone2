@@ -33,8 +33,21 @@ class ForecastAllChart extends ChartWidget
         }
 
         $chartData = $record->result['chart_data']['forecast_all'] ?? [];
-
-        return $chartData['data'] ?? ['datasets' => [], 'labels' => []];
+        $data = $chartData['data'] ?? ['datasets' => [], 'labels' => []];
+        foreach ($data['datasets'] as &$dataset) {
+            if (!isset($dataset['backgroundColor'])) {
+                $dataset['backgroundColor'] = match ($this->getType()) {
+                    'bar' => '#3b82f6',
+                    'line' => 'transparent',
+                    'scatter' => '#3b82f6',
+                    default => '#3b82f6',
+                };
+            }
+            if (!isset($dataset['borderColor'])) {
+                $dataset['borderColor'] = '#1d4ed8';
+            }
+        }
+        return $data;
     }
 
     protected function getOptions(): ?array

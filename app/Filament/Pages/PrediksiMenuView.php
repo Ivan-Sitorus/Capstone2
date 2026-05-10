@@ -58,11 +58,13 @@ class PrediksiMenuView extends Page
             Tabs::make('Detail')
                 ->columnSpanFull()
                 ->tabs([
+                    // ── TAB: HASIL PREDIKSI (business-facing) ──────────
                     Tab::make('Hasil Prediksi')
                         ->icon(Heroicon::PresentationChartLine)
                         ->schema([
-                            Section::make('Ringkasan')
-                                ->columns(3)
+                            // STAT CARDS: 3 key metrics at a glance
+                            Section::make('Sekilas')
+                                ->columns(4)
                                 ->schema([
                                     TextEntry::make('total_menu')
                                         ->label('Menu Dianalisis')
@@ -73,9 +75,43 @@ class PrediksiMenuView extends Page
                                     TextEntry::make('total_forecast')
                                         ->label('Total Forecast (unit)')
                                         ->state(array_sum(array_column($r['predictions'] ?? [], 'total_forecast'))),
+                                    TextEntry::make('avg_mape')
+                                        ->label('Rata-rata MAPE')
+                                        ->state(function () use ($r) {
+                                            $mapes = array_column($r['predictions'] ?? [], 'mape');
+                                            return count($mapes) > 0
+                                                ? round(array_sum($mapes) / count($mapes), 1) . '%'
+                                                : 'N/A';
+                                        }),
                                 ]),
-                            Section::make('Detail Forecast per Menu')
-                                ->description('Prediksi per menu untuk periode forecast')
+
+                            // RANKING TABLE: top menus by predicted sales
+                            Section::make('Ranking Prediksi Menu')
+                                ->description('Diurutkan dari total prediksi tertinggi. Gunakan untuk perencanaan stok dan persiapan.')
+                                ->schema([
+                                    RepeatableEntry::make('summary_table')
+                                        ->hiddenLabel()
+                                        ->state(fn (): array => $r['summary_table'] ?? [])
+                                        ->schema([
+                                            TextEntry::make('nama_menu')->label('Menu'),
+                                            TextEntry::make('total_forecast')
+                                                ->label('Total Prediksi')
+                                                ->numeric(decimalPlaces: 0)
+                                                ->suffix(' unit'),
+                                            TextEntry::make('mape')
+                                                ->label('MAPE')
+                                                ->state(fn (array $state): string => number_format($state['mape'] ?? 0, 1) . '%')
+                                                ->color(fn (array $state): string =>
+                                                    ($state['mape'] ?? 100) <= 20 ? 'success' :
+                                                    (($state['mape'] ?? 100) <= 50 ? 'warning' : 'danger')
+                                                ),
+                                        ])
+                                        ->columns(3),
+                                ]),
+
+                            // DETAIL FORECAST: per-menu daily breakdown
+                            Section::make('Detail Forecast Harian')
+                                ->description('Prediksi per menu untuk 2 hari ke depan')
                                 ->collapsible()
                                 ->schema(function () use ($r) {
                                     $predictions = $r['predictions'] ?? [];
@@ -86,40 +122,35 @@ class PrediksiMenuView extends Page
                                         $entries[] = Section::make($nama)
                                             ->schema([
                                                 TextEntry::make("pred_total_{$i}")
-                                                    ->label('Total Forecast')
+                                                    ->label('Total')
                                                     ->state(($pred['total_forecast'] ?? 0) . ' unit'),
                                                 RepeatableEntry::make("pred_detail_{$i}")
-                                                    ->label('Forecast Harian')
+                                                    ->label('Rincian Harian')
                                                     ->state(fn (): array => $forecastDays)
                                                     ->schema([
                                                         TextEntry::make('tanggal'),
                                                         TextEntry::make('hari'),
-                                                        TextEntry::make('day_type'),
-                                                        TextEntry::make('prediksi')->label('Prediksi'),
-                                                        TextEntry::make('batas_bawah')->label('Bawah'),
-                                                        TextEntry::make('batas_atas')->label('Atas'),
+                                                        TextEntry::make('day_type')
+                                                            ->label('Tipe')
+                                                            ->badge()
+                                                            ->color(fn (string $state): string =>
+                                                                $state === 'Weekend' ? 'warning' : 'info'
+                                                            ),
+                                                        TextEntry::make('prediksi')
+                                                            ->label('Prediksi')
+                                                            ->badge()
+                                                            ->color('primary'),
+                                                        TextEntry::make('batas_bawah')->label('Batas Bawah'),
+                                                        TextEntry::make('batas_atas')->label('Batas Atas'),
                                                     ])
                                                     ->columns(6),
                                             ]);
                                     }
                                     return $entries;
                                 }),
-                            Section::make('Summary Table')
-                                ->description('Total prediksi per menu (diurutkan tertinggi)')
-                                ->collapsible()
-                                ->schema([
-                                    RepeatableEntry::make('summary_table')
-                                        ->hiddenLabel()
-                                        ->state(fn (): array => $r['summary_table'] ?? [])
-                                        ->schema([
-                                            TextEntry::make('nama_menu')->label('Menu'),
-                                            TextEntry::make('total_forecast')->label('Total Forecast')->numeric(decimalPlaces: 1),
-                                            TextEntry::make('avg_per_day')->label('Rata/Hari')->numeric(decimalPlaces: 2),
-                                            TextEntry::make('model')->label('Model'),
-                                        ])
-                                        ->columns(4),
-                                ]),
                         ]),
+
+                    // ── TAB: DETAIL TEKNIS (data scientist) ────────────
                     Tab::make('Detail Teknis')
                         ->icon(Heroicon::Cog)
                         ->schema([
@@ -129,18 +160,21 @@ class PrediksiMenuView extends Page
                                     TextEntry::make('type')->label('Tipe')->state($this->record->analysis_type),
                                     TextEntry::make('status')->label('Status')->state($this->record->status),
                                     TextEntry::make('run_at')->label('Waktu Eksekusi')->state($this->record->run_at?->format('d M Y, H:i:s')),
-                                    TextEntry::make('date_range_start')->label('Data Dari')->state($this->record->date_range_start?->format('d M Y')),
-                                    TextEntry::make('date_range_end')->label('Data Sampai')->state($this->record->date_range_end?->format('d M Y')),
+                                    TextEntry::make('date_range')->label('Periode Data')
+                                        ->state(($r['date_range']['from'] ?? '?') . ' s/d ' . ($r['date_range']['to'] ?? '?')),
+                                    TextEntry::make('forecast_range')->label('Periode Prediksi')
+                                        ->state(($r['forecast_range']['from'] ?? '?') . ' s/d ' . ($r['forecast_range']['to'] ?? '?')),
                                 ]),
+
                             Section::make('Evaluasi Model')
-                                ->description('Metrik evaluasi per menu pada data test (25%)')
-                                ->collapsible()
+                                ->description('Metrik error per menu pada data test (25%). MAPE ≤20% = akurat, ≤50% = cukup, >50% = kurang akurat.')
+                                ->collapsed()
                                 ->schema([
                                     RepeatableEntry::make('evaluation_metrics')
                                         ->hiddenLabel()
                                         ->state(function () use ($r) {
                                             return collect($r['predictions'] ?? [])->map(fn ($p) => [
-                                                'nama' => $p['nama_menu'] ?? $p['nama_bahan_baku'] ?? '-',
+                                                'nama' => $p['nama_menu'] ?? '-',
                                                 'mae' => $p['mae'] ?? 0,
                                                 'rmse' => $p['rmse'] ?? 0,
                                                 'mape' => $p['mape'] ?? 0,
@@ -154,7 +188,11 @@ class PrediksiMenuView extends Page
                                             TextEntry::make('mape')
                                                 ->label('MAPE (%)')
                                                 ->numeric(decimalPlaces: 1)
-                                                ->suffix('%'),
+                                                ->suffix('%')
+                                                ->color(fn (array $state): string =>
+                                                    ($state['mape'] ?? 100) <= 20 ? 'success' :
+                                                    (($state['mape'] ?? 100) <= 50 ? 'warning' : 'danger')
+                                                ),
                                             TextEntry::make('smape')
                                                 ->label('SMAPE (%)')
                                                 ->numeric(decimalPlaces: 1)
@@ -162,8 +200,9 @@ class PrediksiMenuView extends Page
                                         ])
                                         ->columns(5),
                                 ]),
+
                             Section::make('Preprocessing Logs')
-                                ->collapsible()
+                                ->collapsed()
                                 ->schema(function () use ($r) {
                                     $logs = $r['preprocessing_logs'] ?? [];
                                     $entries = [];
