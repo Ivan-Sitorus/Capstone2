@@ -90,13 +90,13 @@ class AsosiatifMenuView extends Page
                                             TextEntry::make('menu_kedua')->label('Menu Kedua'),
                                             TextEntry::make('support')
                                                 ->label('Support')
-                                                ->state(fn (array $state): string => number_format(($state['support'] ?? 0) * 100, 2) . '%'),
+                                                ->formatStateUsing(fn ($state) => number_format(($state ?? 0) * 100, 2) . '%'),
                                             TextEntry::make('confidence')
                                                 ->label('Confidence')
-                                                ->state(fn (array $state): string => number_format(($state['confidence'] ?? 0) * 100, 2) . '%'),
+                                                ->formatStateUsing(fn ($state) => number_format(($state ?? 0) * 100, 2) . '%'),
                                             TextEntry::make('lift')
                                                 ->label('Lift')
-                                                ->state(fn (array $state): string => number_format($state['lift'] ?? 0, 2)),
+                                                ->numeric(decimalPlaces: 2),
                                         ])
                                         ->columns(5),
                                 ]),
@@ -110,7 +110,7 @@ class AsosiatifMenuView extends Page
                                             TextEntry::make('items')->label('Itemset'),
                                             TextEntry::make('support')
                                                 ->label('Support')
-                                                ->state(fn (array $state): string => number_format(($state['support'] ?? 0) * 100, 2) . '%'),
+                                                ->formatStateUsing(fn ($state) => number_format(($state ?? 0) * 100, 2) . '%'),
                                         ])
                                         ->columns(2),
                                 ]),
