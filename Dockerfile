@@ -63,7 +63,6 @@ RUN { \
         echo "opcache.revalidate_freq=2"; \
         echo "opcache.fast_shutdown=1"; \
         echo "imagick.skip_version_check=1"; \
-        echo "memory_limit=256M"; \
     } > /usr/local/etc/php/conf.d/99-pos.ini
 
 # ── PHP-FPM: listen on Unix socket ───────────────────────────────────
