@@ -22,9 +22,12 @@ class PrediksiMenuView extends Page
 
     public DataMiningRun $record;
 
+    public array $filters = ['record_id' => null];
+
     public function mount(string $record): void
     {
         $this->record = DataMiningRun::findOrFail($record);
+        $this->filters['record_id'] = $this->record->id;
     }
 
     public function getView(): string
@@ -35,6 +38,23 @@ class PrediksiMenuView extends Page
     public function getTitle(): string
     {
         return 'Detail Prediksi Menu';
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\ForecastAllChart::class,
+            \App\Filament\Widgets\FeatureImportanceChart::class,
+            \App\Filament\Widgets\EvalMaeChart::class,
+            \App\Filament\Widgets\EvalRmseChart::class,
+            \App\Filament\Widgets\EvalMapeChart::class,
+            \App\Filament\Widgets\EvalSmapeChart::class,
+        ];
+    }
+
+    public function getHeaderWidgetsColumns(): int | array
+    {
+        return 2;
     }
 
     public function content(Schema $schema): Schema

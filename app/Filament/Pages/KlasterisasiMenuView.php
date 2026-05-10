@@ -22,9 +22,12 @@ class KlasterisasiMenuView extends Page
 
     public DataMiningRun $record;
 
+    public array $filters = ['record_id' => null];
+
     public function mount(string $record): void
     {
         $this->record = DataMiningRun::findOrFail($record);
+        $this->filters['record_id'] = $this->record->id;
     }
 
     public function getView(): string
@@ -35,6 +38,20 @@ class KlasterisasiMenuView extends Page
     public function getTitle(): string
     {
         return 'Detail Klasterisasi Menu';
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\ClusteringBarChart::class,
+            \App\Filament\Widgets\ElbowChart::class,
+            \App\Filament\Widgets\SilhouetteChart::class,
+        ];
+    }
+
+    public function getHeaderWidgetsColumns(): int | array
+    {
+        return 2;
     }
 
     public function content(Schema $schema): Schema

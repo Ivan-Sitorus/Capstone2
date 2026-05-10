@@ -22,9 +22,12 @@ class AsosiatifMenuView extends Page
 
     public DataMiningRun $record;
 
+    public array $filters = ['record_id' => null];
+
     public function mount(string $record): void
     {
         $this->record = DataMiningRun::findOrFail($record);
+        $this->filters['record_id'] = $this->record->id;
     }
 
     public function getView(): string
@@ -35,6 +38,20 @@ class AsosiatifMenuView extends Page
     public function getTitle(): string
     {
         return 'Detail Aturan Asosiasi';
+    }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            \App\Filament\Widgets\TopRulesChart::class,
+            \App\Filament\Widgets\SupConfChart::class,
+            \App\Filament\Widgets\FreqItemChart::class,
+        ];
+    }
+
+    public function getHeaderWidgetsColumns(): int | array
+    {
+        return 2;
     }
 
     public function content(Schema $schema): Schema
