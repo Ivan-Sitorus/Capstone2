@@ -17,13 +17,7 @@ const CREDENTIALS = {
     expectedUrl: /\/cashier\/dashboard/,
   },
   customer: {
-    email: 'budi@student.com',
-    password: 'password',
     storageState: path.join(AUTH_DIR, 'customer.json'),
-    expectedUrl: /\/customer\/menu/,
-    loginUrl: '/customer/login',
-    name: 'Budi Santoso',
-    nim: '21120122140001',
   },
 };
 
@@ -37,22 +31,28 @@ async function doLogin({ page, email, password, expectedUrl }) {
   await expect(page).toHaveURL(expectedUrl, { timeout: 15000 });
 }
 
-async function doCustomerLogin({ page, name, nim, expectedUrl }) {
-  await page.goto('/customer/login');
-  await page.waitForSelector('input[name="name"], input[placeholder*="nama"], input[type="text"]', { timeout: 15000 });
-  await page.fill('input[name="name"], input[placeholder*="nama"], input[type="text"]', name);
-  await page.fill('input[type="password"]', nim);
-  await page.click('button[type="submit"]');
-  await expect(page).toHaveURL(expectedUrl, { timeout: 15000 });
+async function doCustomerSetup({ page, storageState }) {
+  // Customer identitas form is embedded in /customer/menu
+  await page.goto('/customer/menu?table=1');
+  
+  // Fill name and phone on the identitas form
+  await page.waitForSelector('input[type="text"]', { timeout: 15000 });
+  await page.fill('input[type="text"]', 'Budi Test');
+  await page.fill('input[type="tel"]', '081234567890');
+  
+  // Click the Masuk button
+  await page.click('button:has-text("Masuk")');
+  await expect(page).toHaveURL(/\/customer\/menu/, { timeout: 15000 });
+  await page.context().storageState({ path: storageState });
 }
 
 for (const [role, creds] of Object.entries(CREDENTIALS)) {
   setup(`authenticate as ${role}`, async ({ page }) => {
     if (role === 'customer') {
-      await doCustomerLogin({ page, ...creds });
+      await doCustomerSetup({ page, storageState: creds.storageState });
     } else {
       await doLogin({ page, ...creds });
+      await page.context().storageState({ path: creds.storageState });
     }
-    await page.context().storageState({ path: creds.storageState });
   });
 }
