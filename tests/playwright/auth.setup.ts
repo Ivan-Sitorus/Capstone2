@@ -17,10 +17,13 @@ const CREDENTIALS = {
     expectedUrl: /\/cashier\/dashboard/,
   },
   customer: {
-    email: 'budi@customer.com',
+    email: 'budi@student.com',
     password: 'password',
     storageState: path.join(AUTH_DIR, 'customer.json'),
     expectedUrl: /\/customer\/menu/,
+    loginUrl: '/customer/login',
+    name: 'Budi Santoso',
+    nim: '21120122140001',
   },
 };
 
@@ -30,13 +33,26 @@ async function doLogin({ page, email, password, expectedUrl }) {
   await page.fill('input[type="email"], input[name="email"]', email);
   await page.fill('input[type="password"], input[name="password"]', password);
   await page.click('button[type="submit"]');
-  // Inertia.location triggers a full page navigation on auth success
-  await page.waitForURL(expectedUrl, { timeout: 15000 });
+  // Inertia SPA may navigate before waitForURL catches it — use toHaveURL instead
+  await expect(page).toHaveURL(expectedUrl, { timeout: 15000 });
+}
+
+async function doCustomerLogin({ page, name, nim, expectedUrl }) {
+  await page.goto('/customer/login');
+  await page.waitForSelector('input[name="name"], input[placeholder*="nama"], input[type="text"]', { timeout: 15000 });
+  await page.fill('input[name="name"], input[placeholder*="nama"], input[type="text"]', name);
+  await page.fill('input[type="password"]', nim);
+  await page.click('button[type="submit"]');
+  await expect(page).toHaveURL(expectedUrl, { timeout: 15000 });
 }
 
 for (const [role, creds] of Object.entries(CREDENTIALS)) {
   setup(`authenticate as ${role}`, async ({ page }) => {
-    await doLogin({ page, ...creds });
+    if (role === 'customer') {
+      await doCustomerLogin({ page, ...creds });
+    } else {
+      await doLogin({ page, ...creds });
+    }
     await page.context().storageState({ path: creds.storageState });
   });
 }
