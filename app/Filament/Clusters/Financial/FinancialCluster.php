@@ -3,6 +3,7 @@
 namespace App\Filament\Clusters\Financial;
 
 use Filament\Clusters\Cluster;
+use Filament\Pages\Enums\SubNavigationPosition;
 
 class FinancialCluster extends Cluster
 {
@@ -15,4 +16,6 @@ class FinancialCluster extends Cluster
     protected static ?int $navigationSort = 4;
 
     protected static ?string $title = 'Financial Reports';
+
+    protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 }
