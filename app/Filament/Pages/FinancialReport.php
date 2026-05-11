@@ -8,6 +8,9 @@ use App\Services\FinancialReportService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -23,12 +26,27 @@ class FinancialReport extends Page implements HasTable
     protected static ?string $navigationLabel = 'Financial Reports';
     protected static ?string $title = 'Financial Reports';
     protected static ?int $navigationSort = 4;
-    protected string $view = 'filament.pages.financial-report';
     public string $activeTab = 'generated';
 
     public function mount(): void
     {
         $this->activeTab = 'generated';
+    }
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema->components([
+            Tabs::make('reportTabs')
+                ->tabs([
+                    Tab::make('Generated Reports')
+                        ->icon('heroicon-o-document-text')
+                        ->extraAttributes(['wire:click' => "\$set('activeTab', 'generated')"]),
+                    Tab::make('Saved Templates')
+                        ->icon('heroicon-o-bookmark')
+                        ->extraAttributes(['wire:click' => "\$set('activeTab', 'templates')"]),
+                ])
+                ->activeTab($this->activeTab === 'generated' ? 1 : 2),
+        ]);
     }
 
     public function generateReportName(array $data): string
@@ -80,6 +98,16 @@ class FinancialReport extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
+            Action::make('tab_generated')
+                ->label('Generated')
+                ->icon('heroicon-o-document-text')
+                ->color($this->activeTab === 'generated' ? 'primary' : 'gray')
+                ->action(fn () => $this->activeTab = 'generated'),
+            Action::make('tab_templates')
+                ->label('Saved')
+                ->icon('heroicon-o-bookmark')
+                ->color($this->activeTab === 'templates' ? 'primary' : 'gray')
+                ->action(fn () => $this->activeTab = 'templates'),
             Action::make('generate_report')
                 ->label('Generate Report')
                 ->icon('heroicon-o-plus-circle')
