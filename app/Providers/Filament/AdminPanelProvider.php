@@ -38,6 +38,7 @@ class AdminPanelProvider extends PanelProvider
             ->brandName('W9 Cafe — Admin')
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([
                 Dashboard::class,
             ])
@@ -45,8 +46,8 @@ class AdminPanelProvider extends PanelProvider
             ->font('Sans-Serif')
             ->spa()
             ->spaUrlExceptions([
-                '/admin/financial-report*',
                 '/admin/view-report*',
+                '/admin/templates',
             ])
             ->sidebarCollapsibleOnDesktop()
             ->collapsedSidebarWidth('4rem')
