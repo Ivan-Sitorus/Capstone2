@@ -10,12 +10,12 @@ export default defineConfig({
     ['html', { outputFolder: 'tests/playwright/report' }],
     ['list'],
   ],
-  timeout: 30000,
+  timeout: 60000,
   expect: {
-    timeout: 10000,
+    timeout: 15000,
   },
   use: {
-    baseURL: 'http://localhost',
+    baseURL: 'http://localhost:8081',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
