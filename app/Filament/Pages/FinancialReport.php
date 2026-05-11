@@ -8,6 +8,7 @@ use App\Services\FinancialReportService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
+use Filament\Schemas\Components\EmbeddedTable;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
@@ -46,6 +47,7 @@ class FinancialReport extends Page implements HasTable
                         ->extraAttributes(['wire:click' => "\$set('activeTab', 'templates')"]),
                 ])
                 ->activeTab($this->activeTab === 'generated' ? 1 : 2),
+            EmbeddedTable::make(),
         ]);
     }
 
@@ -98,16 +100,6 @@ class FinancialReport extends Page implements HasTable
     protected function getHeaderActions(): array
     {
         return [
-            Action::make('tab_generated')
-                ->label('Generated')
-                ->icon('heroicon-o-document-text')
-                ->color($this->activeTab === 'generated' ? 'primary' : 'gray')
-                ->action(fn () => $this->activeTab = 'generated'),
-            Action::make('tab_templates')
-                ->label('Saved')
-                ->icon('heroicon-o-bookmark')
-                ->color($this->activeTab === 'templates' ? 'primary' : 'gray')
-                ->action(fn () => $this->activeTab = 'templates'),
             Action::make('generate_report')
                 ->label('Generate Report')
                 ->icon('heroicon-o-plus-circle')
