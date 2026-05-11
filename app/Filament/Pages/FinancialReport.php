@@ -72,6 +72,11 @@ class FinancialReport extends Page implements HasTable
 
     public function getTitle(): string { return 'Financial Reports'; }
 
+    public function updatedActiveTab(): void
+    {
+        $this->resetTable();
+    }
+
     protected function getHeaderActions(): array
     {
         return [
