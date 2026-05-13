@@ -168,7 +168,7 @@
 /* ════════════════════════════════════════════════════════════
    DARK MODE — Cashier (warm dark navy)
    ════════════════════════════════════════════════════════════ */
-.dark[data-interface="cashier"] {
+html.dark [data-interface="cashier"] {
   --background: oklch(0.18 0.01 80);
   --foreground: oklch(0.90 0.005 85);
   --card: oklch(0.22 0.01 80);
@@ -202,7 +202,7 @@
 /* ════════════════════════════════════════════════════════════
    DARK MODE — Customer (warm dark terracotta)
    ════════════════════════════════════════════════════════════ */
-.dark[data-interface="customer"] {
+html.dark [data-interface="customer"] {
   --background: oklch(0.18 0.01 80);
   --foreground: oklch(0.90 0.005 85);
   --card: oklch(0.22 0.01 80);
@@ -227,7 +227,7 @@
 /* ════════════════════════════════════════════════════════════
    DARK MODE — Kitchen (warm dark sage)
    ════════════════════════════════════════════════════════════ */
-.dark[data-interface="kitchen"] {
+html.dark [data-interface="kitchen"] {
   --background: oklch(0.18 0.01 80);
   --foreground: oklch(0.90 0.005 85);
   --card: oklch(0.22 0.01 80);
