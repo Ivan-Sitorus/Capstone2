@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import {
     LayoutDashboard,
     ShoppingCart,
@@ -13,6 +12,7 @@ import {
     PanelLeftClose,
     PanelLeftOpen,
 } from 'lucide-react';
+import ThemeToggle from '@/Components/Common/ThemeToggle';
 
 const navItems = [
     { label: 'Dashboard',       href: '/cashier/dashboard',     icon: LayoutDashboard },
@@ -77,7 +77,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
     }, [isSidebarCollapsed]);
 
     return (
-        <div
+        <div data-interface="cashier"
             style={{
                 display: 'flex',
                 minHeight: '100vh',
@@ -290,6 +290,9 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                 </main>
             ) : (
                 <main style={{ flex: 1, background: '#F8FAFC', padding: 32, minHeight: '100vh' }}>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+                        <ThemeToggle />
+                    </div>
                     <div style={{
                         background: 'white',
                         borderRadius: 12,

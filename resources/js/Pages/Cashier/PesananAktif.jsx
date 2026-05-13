@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { router, Head } from '@inertiajs/react';
 import axios from 'axios';
 import { X, QrCode } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CashierLayout from '@/Layouts/CashierLayout';
 import OrderCard from '@/Components/Cashier/OrderCard';
 import StatusBadge from '@/Components/Common/StatusBadge';
@@ -14,9 +16,8 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
     const [processing,   setProcessing]   = useState(false);
     const [localOrders,  setLocalOrders]  = useState(initialOrders ?? []);
     const pendingRemoveRef = useRef(new Set());
-    const pendingStatusRef = useRef(new Map()); // orderId → optimistic status
+    const pendingStatusRef = useRef(new Map());
 
-    // Sync saat Inertia reload — jaga optimistic state agar polling tidak timpa perubahan in-flight
     useEffect(() => {
         setLocalOrders(
             (initialOrders ?? [])
@@ -28,19 +29,16 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         );
     }, [initialOrders]);
 
-    /* ── Auto-refresh: 20s saat tab aktif, pause saat tersembunyi ── */
     useEffect(() => {
         const reload = () => {
             if (document.visibilityState === 'hidden') return;
             router.reload({ only: ['orders', 'counts'] });
         };
 
-        // WebSocket (Reverb) — update instan saat ada event broadcast
         if (window.Echo) {
             window.Echo.channel('orders').listen('.OrderStatusUpdated', reload);
         }
 
-        // Polling 5s sebagai fallback jika Reverb tidak aktif
         const id = setInterval(reload, 5_000);
         const onVisible = () => { if (document.visibilityState === 'visible') reload(); };
         document.addEventListener('visibilitychange', onVisible);
@@ -52,12 +50,11 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         };
     }, []);
 
-    /* ── Tabs ── */
     const tabs = [
-        { key: 'all',         label: `Semua (${counts.all})`,                  color: { text: '#475569', bg: '#F1F5F9', border: '#CBD5E1' } },
-        { key: 'pending',     label: `Pending (${counts.pending})`,             color: { text: '#D97706', bg: '#FFFBEB', border: '#FCD34D' } },
-        { key: 'diproses',    label: `Diproses (${counts.diproses})`,           color: { text: '#3B6FD4', bg: '#EFF6FF', border: '#93C5FD' } },
-        { key: 'belum_bayar', label: `Belum Bayar (${counts.belum_bayar ?? 0})`, color: { text: '#EF4444', bg: '#FEF2F2', border: '#FCA5A5' } },
+        { key: 'all',         label: `Semua (${counts.all})`,                  className: 'bg-muted text-foreground border-border/50' },
+        { key: 'pending',     label: `Pending (${counts.pending})`,             className: 'bg-amber-50 text-amber-600 border-amber-300' },
+        { key: 'diproses',    label: `Diproses (${counts.diproses})`,           className: 'bg-blue-50 text-blue-600 border-blue-300' },
+        { key: 'belum_bayar', label: `Belum Bayar (${counts.belum_bayar ?? 0})`, className: 'bg-red-50 text-red-500 border-red-300' },
     ];
 
     const filteredOrders = (() => {
@@ -69,13 +66,11 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         }
     })();
 
-    /* ── Actions ── */
     async function handleConfirmQris() {
         if (processing || !qrisOrder) return;
         const orderId = qrisOrder.id;
         setProcessing(true);
 
-        // Optimistic: tutup modal + langsung tampilkan sebagai diproses
         pendingStatusRef.current.set(orderId, 'diproses');
         setLocalOrders(prev => prev.map(o =>
             o.id === orderId ? { ...o, status: 'diproses', payment_proof: null } : o
@@ -152,40 +147,31 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
 
     return (
         <><Head title="Pesanan Aktif | W9 Cafe" /><CashierLayout title="Pesanan Aktif" fullscreen>
-            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 32, background: '#F8FAFC', minWidth: 0 }}>
-            <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 24, border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
+            <div className="flex-1 overflow-y-auto overflow-x-hidden p-8 bg-muted min-w-0">
+            <Card className="shadow-sm">
+            <CardContent className="p-6">
 
-            {/* ── Header ── */}
-            <div style={{ marginBottom: 20 }}>
-                <h1 style={{
-                    fontSize: 26, fontWeight: 700, color: '#0F172A',
-                    margin: '0 0 4px', letterSpacing: '-0.5px',
-                }}>
+            <div className="mb-5">
+                <h1 className="text-3xl font-bold text-foreground m-0 mb-1 tracking-tight">
                     Pesanan Aktif
                 </h1>
-                <p style={{ fontSize: 14, color: '#64748B', margin: 0 }}>
+                <p className="text-sm text-muted-foreground m-0">
                     Kelola semua pesanan yang sedang diproses
                 </p>
             </div>
 
-            {/* ── Filter Tabs ── */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 24, flexWrap: 'wrap' }}>
+            <div className="flex gap-2 mb-6 flex-wrap">
                 {tabs.map(tab => {
                     const active = activeTab === tab.key;
-                    const color  = tab.color;
                     return (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            style={{
-                                height: 36, padding: '0 16px', borderRadius: 100,
-                                fontSize: 13, fontWeight: active ? 700 : 500,
-                                cursor: 'pointer', transition: 'all 0.15s',
-                                background: color.bg,
-                                color:      color.text,
-                                border:     `1.5px solid ${active ? color.border : 'transparent'}`,
-                                opacity:    active ? 1 : 0.65,
-                            }}
+                            className={`h-9 px-4 rounded-full text-sm cursor-pointer shrink-0 transition-all duration-150 font-semibold border ${
+                                active
+                                    ? tab.className + ' opacity-100'
+                                    : 'bg-transparent text-muted-foreground border-transparent opacity-65'
+                            }`}
                         >
                             {tab.label}
                         </button>
@@ -193,18 +179,12 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                 })}
             </div>
 
-            {/* ── Order Grid ── */}
             {filteredOrders.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#64748B', paddingTop: 64, fontSize: 14 }}>
+                <div className="text-center pt-16 text-sm text-muted-foreground">
                     Tidak ada pesanan aktif
                 </div>
             ) : (
-                <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-                    gap: 18,
-                    alignItems: 'start',
-                }}>
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[18px] items-start">
                     {filteredOrders.map(order => (
                         <OrderCard
                             key={order.id}
@@ -218,212 +198,121 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                 </div>
             )}
 
-            {/* ── 4c: QRIS Konfirmasi Modal ── */}
             {qrisOrder && (
-                <div style={{
-                    position: 'fixed', inset: 0,
-                    background: 'rgba(0,0,0,0.40)',
-                    zIndex: 200,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    padding: '16px',
-                }}>
-                    <div style={{
-                        background: '#FFFFFF',
-                        borderRadius: 20,
-                        width: '100%', maxWidth: 600,
-                        maxHeight: 'calc(100vh - 32px)',
-                        display: 'flex', flexDirection: 'column',
-                        boxShadow: '0 12px 40px rgba(15,23,42,0.125), 0 2px 6px rgba(15,23,42,0.031)',
-                        overflow: 'hidden',
-                    }}>
-                        {/* ── Header ── */}
-                        <div style={{
-                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                            padding: '14px 20px',
-                            borderBottom: '1px solid #E2E8F0',
-                            flexShrink: 0,
-                        }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                <span style={{
-                                    fontSize: 16, fontWeight: 700, color: '#0F172A',
-                                    fontFamily: '"DM Sans", system-ui',
-                                }}>
+                <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/40">
+                    <div className="bg-card rounded-2xl w-full max-w-2xl flex flex-col overflow-hidden shadow-[0_12px_40px_rgba(15,23,42,0.125),0_2px_6px_rgba(15,23,42,0.031)]"
+                        style={{ maxHeight: 'calc(100vh - 32px)' }}
+                    >
+                        <div className="flex justify-between items-center px-5 py-3.5 border-b border-border shrink-0">
+                            <div className="flex flex-col gap-0.5">
+                                <span className="text-base font-bold text-foreground">
                                     Konfirmasi Pembayaran QRIS
                                 </span>
-                                <span style={{
-                                    fontSize: 12, color: '#64748B',
-                                    fontFamily: 'Outfit, system-ui',
-                                }}>
+                                <span className="text-xs text-muted-foreground">
                                     #{qrisOrder.order_code}{qrisOrder.table_number ? ` · Meja ${qrisOrder.table_number}` : ''}
                                 </span>
                             </div>
                             <button
                                 onClick={() => setQrisOrder(null)}
                                 aria-label="Tutup modal"
-                                style={{
-                                    width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                                    background: '#F1F5F9', border: 'none', cursor: 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    color: '#64748B',
-                                }}
+                                className="w-8 h-8 rounded-lg shrink-0 flex items-center justify-center border-none cursor-pointer bg-muted text-muted-foreground"
                             >
                                 <X size={16} />
                             </button>
                         </div>
 
-                        {/* ── Body (scrollable) ── */}
-                        <div style={{ padding: '14px 20px', display: 'flex', gap: 14, overflowY: 'auto', flex: 1 }}>
-
-                            {/* LEFT: Bukti gambar */}
-                            <div style={{ flex: '0 0 200px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                <span style={{
-                                    fontSize: 11, fontWeight: 600, color: '#64748B',
-                                    fontFamily: 'Outfit, system-ui', letterSpacing: '0.3px',
-                                }}>
+                        <div className="px-5 py-3.5 flex gap-3.5 overflow-y-auto flex-1">
+                            <div className="flex-[0_0_200px] flex flex-col gap-2">
+                                <span className="text-xs font-semibold tracking-wide text-muted-foreground">
                                     BUKTI TRANSFER
                                 </span>
-                                <div style={{
-                                    background: '#F1F5F9', borderRadius: 10,
-                                    border: '1px solid #E2E8F0', padding: 6,
-                                    display: 'flex', flexDirection: 'column', gap: 5,
-                                }}>
+                                <div className="flex flex-col gap-1 rounded-xl p-1.5 bg-muted border border-border">
                                     <img
                                         src={qrisOrder.payment_proof}
                                         alt="Bukti QRIS"
-                                        style={{
-                                            width: '100%', height: 150,
-                                            objectFit: 'contain', borderRadius: 6,
-                                            cursor: 'pointer', display: 'block',
-                                        }}
+                                        className="w-full h-[150px] object-contain rounded-md cursor-pointer block"
                                         onClick={() => window.open(qrisOrder.payment_proof, '_blank')}
                                     />
-                                    <span style={{ fontSize: 10, color: '#64748B', fontFamily: 'Outfit, system-ui', textAlign: 'center' }}>
+                                    <span className="text-xs text-center text-muted-foreground">
                                         Klik untuk perbesar
                                     </span>
                                 </div>
                             </div>
 
-                            {/* RIGHT: Info + items + textarea */}
-                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 10, minWidth: 0 }}>
-
-                                {/* Payment info */}
-                                <div style={{
-                                    background: '#F8FAFC', borderRadius: 10,
-                                    border: '1px solid #E2E8F0', padding: '10px 14px',
-                                    display: 'flex', flexDirection: 'column', gap: 7,
-                                }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>Metode</span>
-                                        <span style={{
-                                            display: 'flex', alignItems: 'center', gap: 4,
-                                            fontSize: 12, fontWeight: 600, color: '#0F172A',
-                                            fontFamily: 'Outfit, system-ui',
-                                        }}>
-                                            <QrCode size={12} color="#3B6FD4" />
+                            <div className="flex-1 flex flex-col gap-2.5 min-w-0">
+                                <div className="flex flex-col gap-1.5 rounded-xl px-3.5 py-2.5 bg-muted/50 border border-border">
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs text-muted-foreground">Metode</span>
+                                        <span className="flex items-center gap-1 text-xs font-semibold text-foreground">
+                                            <QrCode size={12} className="text-primary" />
                                             QRIS
                                         </span>
                                     </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>Waktu Bayar</span>
-                                        <span style={{ fontSize: 12, fontWeight: 500, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs text-muted-foreground">Waktu Bayar</span>
+                                        <span className="text-xs font-medium text-foreground">
                                             {formatTime(qrisOrder.created_at)} · {formatDate(qrisOrder.created_at)}
                                         </span>
                                     </div>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>Status</span>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-xs text-muted-foreground">Status</span>
                                         <StatusBadge status={qrisOrder.status} />
                                     </div>
-                                    <div style={{ height: 1, background: '#E2E8F0' }} />
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>Total</span>
-                                        <span style={{
-                                            fontSize: 16, fontWeight: 700, color: '#3B6FD4',
-                                            fontFamily: '"DM Sans", system-ui',
-                                        }}>
+                                    <div className="h-px bg-border" />
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-sm font-bold text-foreground">Total</span>
+                                        <span className="text-base font-bold text-primary">
                                             {formatRupiah(qrisOrder.total_amount)}
                                         </span>
                                     </div>
                                 </div>
 
-                                {/* Detail pesanan */}
-                                <div style={{
-                                    background: '#F8FAFC', borderRadius: 10,
-                                    border: '1px solid #E2E8F0', padding: '10px 14px',
-                                    display: 'flex', flexDirection: 'column', gap: 6,
-                                }}>
-                                    <span style={{
-                                        fontSize: 11, fontWeight: 600, color: '#64748B',
-                                        fontFamily: 'Outfit, system-ui', letterSpacing: '0.3px',
-                                    }}>
+                                <div className="flex flex-col gap-1.5 rounded-xl px-3.5 py-2.5 bg-muted/50 border border-border">
+                                    <span className="text-xs font-semibold tracking-wide text-muted-foreground">
                                         DETAIL PESANAN
                                     </span>
                                     {qrisOrder.items?.map((item, i) => (
-                                        <div key={i} style={{
-                                            display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                        }}>
-                                            <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                                                <span style={{ fontSize: 12, fontWeight: 600, color: '#3B6FD4', fontFamily: 'Outfit, system-ui' }}>
+                                        <div key={i} className="flex justify-between items-center">
+                                            <span className="flex items-center gap-1">
+                                                <span className="text-xs font-semibold text-primary">
                                                     {item.quantity}x
                                                 </span>
-                                                <span style={{ fontSize: 12, fontWeight: 500, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>
+                                                <span className="text-xs font-medium text-foreground">
                                                     {item.name}
                                                 </span>
                                             </span>
-                                            <span style={{ fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>
+                                            <span className="text-xs text-muted-foreground">
                                                 {formatRupiah(item.subtotal)}
                                             </span>
                                         </div>
                                     ))}
                                 </div>
-
                             </div>
                         </div>
 
-                        {/* ── Footer ── */}
-                        <div style={{
-                            padding: '12px 20px 14px',
-                            borderTop: '1px solid #E2E8F0',
-                            display: 'flex', gap: 10,
-                            flexShrink: 0,
-                        }}>
-                            {/* Tolak */}
-                            <button
+                        <div className="flex gap-2.5 px-5 py-3 border-t border-border shrink-0">
+                            <Button
+                                variant="destructive"
                                 onClick={handleRejectQris}
                                 disabled={processing}
-                                style={{
-                                    flex: 1, height: 40,
-                                    background: processing ? '#E8A898' : '#C95D4A',
-                                    color: '#FFFFFF', border: 'none', borderRadius: 10,
-                                    fontSize: 13, fontWeight: 600,
-                                    fontFamily: 'Outfit, system-ui',
-                                    cursor: processing ? 'not-allowed' : 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                }}
+                                className="flex-1"
                             >
                                 Tolak
-                            </button>
-                            {/* Konfirmasi Pembayaran */}
-                            <button
+                            </Button>
+                            <Button
                                 onClick={handleConfirmQris}
                                 disabled={processing}
-                                style={{
-                                    flex: 2, height: 40,
-                                    background: processing ? '#8EC4A0' : '#5A9A6E',
-                                    color: '#FFFFFF', border: 'none', borderRadius: 10,
-                                    fontSize: 13, fontWeight: 700,
-                                    fontFamily: '"DM Sans", system-ui',
-                                    cursor: processing ? 'not-allowed' : 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    boxShadow: processing ? 'none' : '0 3px 10px rgba(22,163,74,0.145)',
-                                }}
+                                className="flex-[2] shadow-[0_3px_10px_rgba(22,163,74,0.145)]"
+                                style={{ background: processing ? '#8EC4A0' : undefined }}
                             >
                                 Konfirmasi Pembayaran
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
             )}
-            </div>
+            </CardContent>
+            </Card>
             </div>
         </CashierLayout></>
     );

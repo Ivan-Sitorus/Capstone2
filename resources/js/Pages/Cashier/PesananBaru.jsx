@@ -1,12 +1,17 @@
 import { useState, useMemo, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
-import { Search, X, Banknote, QrCode, ShieldCheck, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { Search, X, Banknote, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen, Printer, Percent } from 'lucide-react';
+import { QRCodeCanvas } from 'qrcode.react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
 import CashierLayout from '@/Layouts/CashierLayout';
 import MenuGridItem from '@/Components/Cashier/MenuGridItem';
 import KeranjangItem from '@/Components/Cashier/KeranjangItem';
-import { formatRupiah } from '@/helpers';
+import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import { cn } from '@/lib/utils';
 
-export default function PesananBaru({ categories }) {
+export default function PesananBaru({ categories, promotions }) {
     const [cartItems,      setCartItems]     = useState([]);
     const [activeCategory, setActiveCategory] = useState('Semua');
     const [search,         setSearch]         = useState('');
@@ -17,6 +22,7 @@ export default function PesananBaru({ categories }) {
     const [nameError,      setNameError]      = useState(false);
     const [showSuccess,    setShowSuccess]    = useState(false);
     const [successTotal,   setSuccessTotal]   = useState(0);
+    const [successOrderCode, setSuccessOrderCode] = useState('');
     const [isCartCollapsed, setIsCartCollapsed] = useState(false);
     const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(() => {
         if (typeof window === 'undefined') return false;
@@ -27,7 +33,6 @@ export default function PesananBaru({ categories }) {
         return { width: window.innerWidth, height: window.innerHeight };
     });
 
-    /* ── Derived ── */
     const allMenus = useMemo(
         () => categories.flatMap(c => c.menus.map(m => ({ ...m, category: { name: c.name } }))),
         [categories]
@@ -80,7 +85,6 @@ export default function PesananBaru({ categories }) {
         return () => window.removeEventListener('cashier-sidebar-toggle', onSidebarToggle);
     }, []);
 
-    /* ── Cart actions ── */
     function addToCart(menu) {
         setCartItems(prev => {
             const existing = prev.find(i => i.menuId === menu.id);
@@ -91,7 +95,6 @@ export default function PesananBaru({ categories }) {
     const increment = (menuId) => setCartItems(prev => prev.map(i => i.menuId === menuId ? { ...i, quantity: i.quantity + 1 } : i));
     const decrement = (menuId) => setCartItems(prev => prev.map(i => i.menuId === menuId ? { ...i, quantity: i.quantity - 1 } : i).filter(i => i.quantity > 0));
 
-    /* ── Modal open/close ── */
     function openModal() {
         setPayMethod('cash');
         setShowPayModal(true);
@@ -103,7 +106,6 @@ export default function PesananBaru({ categories }) {
         setNameError(false);
     }
 
-    /* ── Step 1: proceed from choose ── */
     function handleChooseProceed() {
         if (!customerName.trim()) {
             setNameError(true);
@@ -113,7 +115,6 @@ export default function PesananBaru({ categories }) {
         submitOrder(payMethod);
     }
 
-    /* ── Submit ── */
     function submitOrder(method) {
         const orderTotal = grandTotal;
         setProcessing(true);
@@ -121,10 +122,12 @@ export default function PesananBaru({ categories }) {
             '/cashier/pesanan-baru',
             { items: cartItems.map(i => ({ menu_id: i.menuId, quantity: i.quantity })), payment_method: method, customer_name: customerName.trim() || null, is_mahasiswa: isMahasiswa },
             {
-                onSuccess: () => {
+                onSuccess: (page) => {
                     setProcessing(false);
                     setShowPayModal(false);
                     setSuccessTotal(orderTotal);
+                    const flash = page?.props?.flash || {};
+                    setSuccessOrderCode(flash.receipt_order_code || '');
                     setShowSuccess(true);
                 },
                 onError: () => setProcessing(false),
@@ -140,58 +143,79 @@ export default function PesananBaru({ categories }) {
         router.visit('/cashier/pesanan-aktif');
     }
 
-    /* ── Design tokens ── */
-    const T = {
-        accent:     '#3B6FD4',
-        accentBg:   '#EFF6FF',
-        accentRing: '#BFDBFE',
-        text:       '#111827',
-        sub:        '#6C757D',
-        border:     '#E9ECEF',
-        elevated:   '#FFFFFF',
-        surface:    '#FFFFFF',
-        panelBg:    '#F8F9FA',
-    };
+    /* ─── PAYMENT METHOD CONFIG ─── */
+    const methods = [
+        {
+            key: 'cash',
+            label: 'Bayar ke Kasir (Cash)',
+            desc: 'Bayar langsung di kasir setelah pesanan dikonfirmasi',
+            icon: <Banknote size={22} />,
+            iconBg: (active) => active ? 'bg-blue-100' : 'bg-muted',
+            iconColor: (active) => active ? 'text-primary' : 'text-muted-foreground',
+        },
+        {
+            key: 'qris',
+            label: 'QRIS',
+            desc: 'Pindai kode QR & konfirmasi kasir',
+            icon: <img src="/images/logo-qris.png" alt="QRIS" className="w-7 h-7 object-contain" />,
+            iconBg: (active) => active ? 'bg-blue-100' : 'bg-muted',
+            iconColor: () => '',
+        },
+        {
+            key: 'bayar_nanti',
+            label: 'Bayar Nanti',
+            desc: 'Simpan pesanan, pelanggan bayar nanti',
+            icon: <Clock size={22} />,
+            iconBg: (active) => active ? 'bg-blue-100' : 'bg-muted',
+            iconColor: (active) => active ? 'text-primary' : 'text-muted-foreground',
+        },
+    ];
 
     return (
         <><Head title="Pesanan Baru | W9 Cafe" /><CashierLayout title="Pesanan Baru" fullscreen>
-            <div style={{ display: 'flex', flexDirection: isPortrait ? 'column' : 'row', height: '100vh', overflow: 'hidden' }}>
+            <div className="flex" style={{ flexDirection: isPortrait ? 'column' : 'row', height: '100vh', overflow: 'hidden' }}>
 
                 {/* ══ PANEL TENGAH ══ */}
                 <div
-                    style={{
-                        flex: 1,
-                        padding: isPortrait ? 14 : 24,
-                        background: T.panelBg,
-                        overflowY: 'auto',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 16,
-                        height: isPortrait ? 'auto' : '100vh',
-                        minHeight: 0,
-                    }}
+                    className="flex flex-col gap-4 overflow-y-auto min-h-0 flex-1 bg-muted"
+                    style={{ padding: isPortrait ? 14 : 24, height: isPortrait ? 'auto' : '100vh' }}
                 >
                     {/* Search */}
-                    <div style={{ position: 'relative' }}>
-                        <Search size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none' }} />
-                        <input
-                            type="text" value={search} onChange={e => setSearch(e.target.value)}
+                    <div className="relative">
+                        <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none" />
+                        <Input
+                            type="text"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
                             placeholder="Cari menu..."
-                            style={{ width: '100%', height: 44, border: `1px solid ${T.border}`, borderRadius: 8, padding: '0 40px 0 44px', fontSize: 14, color: T.text, background: T.surface, outline: 'none', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(15,23,42,0.04)' }}
+                            className="w-full h-11 pl-11 pr-10 shadow-[0_2px_8px_rgba(15,23,42,0.04)]"
                         />
                         {search && (
-                            <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: 0, display: 'flex' }}>
+                            <button
+                                onClick={() => setSearch('')}
+                                className="absolute right-3 top-1/2 -translate-y-1/2 bg-none border-none cursor-pointer p-0 flex text-muted-foreground/70"
+                                aria-label="Hapus pencarian"
+                            >
                                 <X size={16} />
                             </button>
                         )}
                     </div>
 
                     {/* Category chips */}
-                    <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 4, flexShrink: 0 }}>
+                    <div className="flex gap-2 overflow-x-auto pb-1 shrink-0">
                         {['Semua', ...categories.map(c => c.name)].map(cat => {
                             const active = activeCategory === cat;
                             return (
-                                <button key={cat} onClick={() => setActiveCategory(cat)} style={{ height: 36, padding: '0 16px', borderRadius: 100, border: active ? 'none' : '1.5px solid #C4C9D4', cursor: 'pointer', fontSize: 13, fontWeight: active ? 600 : 500, background: active ? T.accent : T.surface, color: active ? '#FFFFFF' : '#374151', whiteSpace: 'nowrap', transition: 'background 0.15s, color 0.15s', flexShrink: 0 }}>
+                                <button
+                                    key={cat}
+                                    onClick={() => setActiveCategory(cat)}
+                                    className={cn(
+                                        'h-9 px-4 rounded-full cursor-pointer text-sm whitespace-nowrap shrink-0 transition-colors duration-150 font-medium',
+                                        active
+                                            ? 'bg-primary text-primary-foreground font-semibold border-none'
+                                            : 'bg-card text-muted-foreground border border-border',
+                                    )}
+                                >
                                     {cat}
                                 </button>
                             );
@@ -200,9 +224,9 @@ export default function PesananBaru({ categories }) {
 
                     {/* Menu grid */}
                     {filteredMenus.length === 0 ? (
-                        <div style={{ textAlign: 'center', color: '#94A3B8', paddingTop: 48, fontSize: 14 }}>Tidak ada menu ditemukan</div>
+                        <div className="text-center pt-12 text-sm text-muted-foreground/70">Tidak ada menu ditemukan</div>
                     ) : (
-                        <div style={{ display: 'grid', gridTemplateColumns: menuGridColumns, gap: isPortrait ? 10 : 16 }}>
+                        <div className="grid" style={{ gridTemplateColumns: menuGridColumns, gap: isPortrait ? 10 : 16 }}>
                             {filteredMenus.map(menu => <MenuGridItem key={menu.id} menu={menu} onAdd={addToCart} />)}
                         </div>
                     )}
@@ -210,41 +234,25 @@ export default function PesananBaru({ categories }) {
 
                 {/* ══ PANEL KANAN — Keranjang ══ */}
                 <div
+                    className="flex flex-col shrink-0 overflow-y-auto overflow-x-hidden bg-card"
                     style={{
                         width: isPortrait ? '100%' : cartPanelWidth,
-                        background: T.surface,
-                        borderLeft: isPortrait ? 'none' : `1px solid ${T.border}`,
-                        borderTop: isPortrait ? `1px solid ${T.border}` : 'none',
+                        borderLeft: isPortrait ? 'none' : '1px solid hsl(var(--border))',
+                        borderTop: isPortrait ? '1px solid hsl(var(--border))' : 'none',
                         padding: isCartCollapsed ? '14px 12px' : (isPortrait ? '14px 16px 16px' : 24),
-                        display: 'flex',
-                        flexDirection: 'column',
-                        flexShrink: 0,
                         height: isPortrait ? (isCartCollapsed ? 72 : '44vh') : '100vh',
-                        overflowY: 'auto',
-                        overflowX: 'hidden',
                         transition: 'width 0.2s ease, height 0.2s ease, padding 0.2s ease',
                     }}
                 >
-                    <div style={{ display: 'flex', justifyContent: isCartCollapsed ? 'center' : 'space-between', alignItems: 'center', marginBottom: isCartCollapsed ? 0 : 16, gap: 10 }}>
-                        {!isCartCollapsed && <span style={{ fontSize: 16, fontWeight: 700, color: T.text, letterSpacing: '-0.2px' }}>Keranjang Pesanan</span>}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: T.accent, color: 'white', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{totalQty}</span>
+                    <div className="flex items-center gap-2.5" style={{ justifyContent: isCartCollapsed ? 'center' : 'space-between', marginBottom: isCartCollapsed ? 0 : 16 }}>
+                        {!isCartCollapsed && <span className="text-base font-bold tracking-tight text-foreground">Keranjang Pesanan</span>}
+                        <div className="flex items-center gap-2">
+                            <span className="rounded-full flex items-center justify-center text-xs font-bold bg-primary text-primary-foreground w-7 h-7">{totalQty}</span>
                             <button
                                 type="button"
                                 onClick={() => setIsCartCollapsed(prev => !prev)}
                                 title={isCartCollapsed ? 'Expand keranjang' : 'Collapse keranjang'}
-                                style={{
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: 8,
-                                    border: `1px solid ${T.border}`,
-                                    background: T.panelBg,
-                                    color: '#334155',
-                                    display: 'inline-flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    cursor: 'pointer',
-                                }}
+                                className="w-8 h-8 rounded-lg inline-flex items-center justify-center cursor-pointer bg-muted text-muted-foreground border border-border"
                             >
                                 {isCartCollapsed ? <PanelRightOpen size={16} /> : <PanelRightClose size={16} />}
                             </button>
@@ -252,50 +260,95 @@ export default function PesananBaru({ categories }) {
                     </div>
                     {!isCartCollapsed && (
                         <>
-                            <div style={{ flex: 1, overflowY: 'auto' }}>
+                            <div className="flex-1 overflow-y-auto">
                                 {cartItems.length === 0 ? (
-                                    <p style={{ color: '#94A3B8', textAlign: 'center', marginTop: 40, fontSize: 14 }}>Keranjang kosong</p>
+                                    <p className="text-center mt-10 text-sm text-muted-foreground/70">Keranjang kosong</p>
                                 ) : (
                                     cartItems.map(item => <KeranjangItem key={item.menuId} item={item} onIncrement={increment} onDecrement={decrement} />)
                                 )}
                             </div>
-                            <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 16, marginTop: 'auto' }}>
+                            {/* Active Promotions */}
+                            {promotions && promotions.length > 0 && cartItems.length > 0 && (
+                                <div className="py-3 border-t border-border">
+                                    <div className="flex items-center gap-1.5 mb-2">
+                                        <Percent size={14} className="text-primary" />
+                                        <span className="text-xs font-semibold uppercase tracking-wide text-primary">
+                                            Promo Aktif
+                                        </span>
+                                        <span className="text-[10px] rounded-full px-1.5 py-px font-semibold bg-primary/10 text-primary">
+                                            {promotions.length}
+                                        </span>
+                                    </div>
+                                    {promotions.map(promo => (
+                                        <div key={promo.id} className="flex items-start justify-between py-1 gap-2 border-b border-border">
+                                            <div className="min-w-0 flex-1">
+                                                <span className="text-xs font-semibold text-foreground">
+                                                    {promo.name}
+                                                </span>
+                                                {promo.is_student_only && (
+                                                    <span className="text-[10px] ml-1.5 rounded-full px-1.5 py-px bg-[#FFF0E8] text-[#E8763A]">
+                                                        Mahasiswa
+                                                    </span>
+                                                )}
+                                                <span className="block text-[11px] truncate text-muted-foreground">
+                                                    {promo.type === 'percentage'
+                                                        ? `Diskon ${Number(promo.discount_value)}%`
+                                                        : promo.type === 'fixed_amount'
+                                                            ? `Potongan ${formatRupiah(Number(promo.discount_value))}`
+                                                            : promo.description}
+                                                    {promo.min_purchase > 0 && ` (min. ${formatRupiah(Number(promo.min_purchase))})`}
+                                                </span>
+                                            </div>
+                                            <span className="text-[11px] font-semibold shrink-0 mt-0.5 text-green-600">
+                                                Aktif
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                            <div className="pt-4 mt-auto border-t border-border">
                         {/* Toggle Mahasiswa */}
                         <div
                             onClick={() => setIsMahasiswa(p => !p)}
-                            style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, cursor: 'pointer', userSelect: 'none' }}
+                            className="flex items-center gap-2 mb-3 cursor-pointer select-none"
                         >
-                            <div style={{
-                                width: 16, height: 16, borderRadius: 4, flexShrink: 0,
-                                border: `1.5px solid ${isMahasiswa ? T.accent : '#CBD5E1'}`,
-                                background: isMahasiswa ? T.accent : 'white',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>
-                                {isMahasiswa && <span style={{ color: 'white', fontSize: 11, lineHeight: 1 }}>✓</span>}
+                            <div
+                                className="flex items-center justify-center shrink-0 w-4 h-4 rounded border transition-colors duration-150"
+                                style={{
+                                    borderColor: isMahasiswa ? 'hsl(var(--primary))' : '#CBD5E1',
+                                    background: isMahasiswa ? 'hsl(var(--primary))' : 'white',
+                                }}
+                            >
+                                {isMahasiswa && <span className="text-primary-foreground text-[11px] leading-none">✓</span>}
                             </div>
-                            <span style={{ fontSize: 13, color: T.sub }}>Mahasiswa STIE Totalwin Semarang</span>
+                            <span className="text-sm text-muted-foreground">Mahasiswa STIE Totalwin Semarang</span>
                         </div>
 
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                            <span style={{ fontSize: 14, color: T.sub }}>Subtotal</span>
-                            <span style={{ fontSize: 14, fontWeight: 500, color: T.text }}>{formatRupiah(total)}</span>
+                        <div className="flex justify-between mb-2">
+                            <span className="text-sm text-muted-foreground">Subtotal</span>
+                            <span className="text-sm font-medium text-foreground">{formatRupiah(total)}</span>
                         </div>
                         {isMahasiswa && totalCashback > 0 && (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                <span style={{ fontSize: 13, color: '#16A34A' }}>Cashback Mahasiswa</span>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: '#16A34A' }}>- {formatRupiah(totalCashback)}</span>
+                            <div className="flex justify-between mb-2">
+                                <span className="text-sm text-green-600">Cashback Mahasiswa</span>
+                                <span className="text-sm font-semibold text-green-600">- {formatRupiah(totalCashback)}</span>
                             </div>
                         )}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderTop: `1px solid ${T.border}`, marginBottom: 16 }}>
-                            <span style={{ fontSize: 16, fontWeight: 700, color: T.text }}>Total</span>
-                            <span style={{ fontSize: 16, fontWeight: 700, color: T.text }}>{formatRupiah(grandTotal)}</span>
+                        <div className="flex justify-between py-3 mb-4 border-t border-border">
+                            <span className="text-base font-bold text-foreground">Total</span>
+                            <span className="text-base font-bold text-foreground">{formatRupiah(grandTotal)}</span>
                         </div>
                         <button
                             onClick={openModal} disabled={cartItems.length === 0}
-                            style={{ width: '100%', height: 52, background: cartItems.length === 0 ? '#CBD5E1' : T.accent, color: 'white', border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 700, cursor: cartItems.length === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', boxShadow: cartItems.length > 0 ? '0 4px 16px rgba(59,111,212,0.30)' : 'none', transition: 'background 0.15s' }}
+                            className={cn(
+                                'w-full h-13 border-none rounded-xl text-base font-bold flex items-center justify-between px-5 transition-colors duration-150',
+                                cartItems.length === 0
+                                    ? 'bg-slate-300 text-white cursor-not-allowed'
+                                    : 'bg-primary text-white cursor-pointer shadow-[0_4px_16px_rgba(59,111,212,0.30)]',
+                            )}
                         >
                             <span>BAYAR</span>
-                            <span style={{ fontSize: 18 }}>{formatRupiah(grandTotal)}</span>
+                            <span className="text-lg">{formatRupiah(grandTotal)}</span>
                         </button>
                             </div>
                         </>
@@ -306,187 +359,195 @@ export default function PesananBaru({ categories }) {
             {/* ══ MODAL ══ */}
             {showPayModal && (
                 <div
-                    style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}
+                    className="fixed inset-0 flex items-center justify-center z-1000 p-6 bg-[rgba(15,23,42,0.55)]"
                     onClick={e => { if (e.target === e.currentTarget) closeModal(); }}
                 >
-                    <div style={{ background: T.surface, borderRadius: 24, width: '100%', maxWidth: 440, boxShadow: '0 24px 64px rgba(15,23,42,0.18), 0 2px 8px rgba(15,23,42,0.06)', overflow: 'hidden' }}>
+                    <div className="w-full bg-card overflow-hidden shadow-[0_24px_64px_rgba(15,23,42,0.18),0_2px_8px_rgba(15,23,42,0.06)]" style={{ borderRadius: 24, maxWidth: 440 }}>
 
-                        {/* ─── Pilih Cara Bayar ─── */}
                         {(<>
-                                {/* Header */}
-                                <div style={{ padding: '22px 24px 16px', borderBottom: '1px solid #E2E8F0' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                                        <button onClick={closeModal} style={{ width: 36, height: 36, borderRadius: 12, background: '#F1F5F9', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                            <X size={20} color="#0F172A" />
-                                        </button>
-                                        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                            <span style={{ fontSize: 20, fontWeight: 700, color: '#0F172A', fontFamily: '"DM Sans", system-ui', lineHeight: 1.2 }}>Metode Pembayaran</span>
-                                            <span style={{ fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>{cartItems.length} item · {formatRupiah(total)}</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Body */}
-                                <div style={{ padding: '0 24px 24px', display: 'flex', flexDirection: 'column', gap: 18, maxHeight: '68vh', overflowY: 'auto' }}>
-
-                                    {/* Nama Pelanggan */}
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6, paddingTop: 8, borderTop: '1px solid #E2E8F0', marginTop: 4 }}>
-                                        <label style={{ fontSize: 13, fontWeight: 500, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>Nama Pelanggan</label>
-                                        <div style={{ position: 'relative' }}>
-                                            <User size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none' }} />
-                                            <input
-                                                type="text"
-                                                value={customerName}
-                                                onChange={e => { setCustomerName(e.target.value); if (nameError) setNameError(false); }}
-                                                placeholder="Masukkan nama pelanggan..."
-                                                style={{ width: '100%', height: 44, border: `1px solid ${nameError ? '#EF4444' : '#E2E8F0'}`, borderRadius: 12, padding: '0 14px 0 42px', fontSize: 14, color: '#0F172A', background: nameError ? '#FEF2F2' : '#FFFFFF', outline: 'none', boxSizing: 'border-box', fontFamily: 'Outfit, system-ui', transition: 'border-color 0.15s' }}
-                                                onFocus={e => e.target.style.borderColor = nameError ? '#EF4444' : '#3B6FD4'}
-                                                onBlur={e => e.target.style.borderColor = nameError ? '#EF4444' : '#E2E8F0'}
-                                            />
-                                        </div>
-                                        {nameError && (
-                                            <p style={{ margin: '4px 0 0', fontSize: 12, color: '#EF4444', fontFamily: 'Outfit, system-ui' }}>
-                                                Nama pelanggan wajib diisi
-                                            </p>
-                                        )}
-                                    </div>
-
-                                    {/* Metode Pembayaran */}
-                                    <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#64748B', fontFamily: 'Outfit, system-ui', letterSpacing: 0.5 }}>Metode Pembayaran</p>
-
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: -8 }}>
-                                        {/* Cash */}
-                                        <button
-                                            onClick={() => setPayMethod('cash')}
-                                            style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px 16px 16px', borderRadius: 16, cursor: 'pointer', textAlign: 'left', border: payMethod === 'cash' ? '2px solid #3B6FD4' : '1px solid #E2E8F0', background: payMethod === 'cash' ? '#EFF6FF' : '#FFFFFF', boxShadow: payMethod === 'cash' ? '0 2px 10px rgba(59,111,212,0.10)' : 'none', transition: 'all 0.15s' }}
-                                        >
-                                            <div style={{ width: 42, height: 42, borderRadius: 12, background: payMethod === 'cash' ? '#DBEAFE' : '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                <Banknote size={22} color={payMethod === 'cash' ? '#3B6FD4' : '#64748B'} />
-                                            </div>
-                                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                <span style={{ fontSize: 15, fontWeight: 600, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>Bayar ke Kasir (Cash)</span>
-                                                <span style={{ fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>Bayar langsung di kasir setelah pesanan dikonfirmasi</span>
-                                            </div>
-                                            <div style={{ width: 22, height: 22, borderRadius: '50%', border: payMethod === 'cash' ? '2px solid #3B6FD4' : '1.5px solid #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                {payMethod === 'cash' && <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#3B6FD4' }} />}
-                                            </div>
-                                        </button>
-
-                                        {/* QRIS */}
-                                        <button
-                                            onClick={() => setPayMethod('qris')}
-                                            style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px 16px 16px', borderRadius: 16, cursor: 'pointer', textAlign: 'left', border: payMethod === 'qris' ? '2px solid #3B6FD4' : '1px solid #E2E8F0', background: payMethod === 'qris' ? '#EFF6FF' : '#FFFFFF', boxShadow: payMethod === 'qris' ? '0 2px 10px rgba(59,111,212,0.10)' : 'none', transition: 'all 0.15s' }}
-                                        >
-                                            <div style={{ width: 42, height: 42, borderRadius: 12, background: payMethod === 'qris' ? '#DBEAFE' : '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                <img src="/images/logo-qris.png" alt="QRIS" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-                                            </div>
-                                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                <span style={{ fontSize: 15, fontWeight: 600, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>QRIS</span>
-                                                <span style={{ fontSize: 12, color: '#94A3B8', fontFamily: 'Outfit, system-ui' }}>Scan QR code & konfirmasi kasir</span>
-                                            </div>
-                                            <div style={{ width: 22, height: 22, borderRadius: '50%', border: payMethod === 'qris' ? '2px solid #3B6FD4' : '1.5px solid #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                {payMethod === 'qris' && <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#3B6FD4' }} />}
-                                            </div>
-                                        </button>
-
-                                        {/* Bayar Nanti */}
-                                        <button
-                                            onClick={() => setPayMethod('bayar_nanti')}
-                                            style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '16px 18px 16px 16px', borderRadius: 16, cursor: 'pointer', textAlign: 'left', border: payMethod === 'bayar_nanti' ? '2px solid #3B6FD4' : '1px solid #E2E8F0', background: payMethod === 'bayar_nanti' ? '#EFF6FF' : '#FFFFFF', boxShadow: payMethod === 'bayar_nanti' ? '0 2px 10px rgba(59,111,212,0.10)' : 'none', transition: 'all 0.15s' }}
-                                        >
-                                            <div style={{ width: 42, height: 42, borderRadius: 12, background: payMethod === 'bayar_nanti' ? '#DBEAFE' : '#F1F5F9', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                <Clock size={22} color={payMethod === 'bayar_nanti' ? '#3B6FD4' : '#64748B'} />
-                                            </div>
-                                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                                <span style={{ fontSize: 15, fontWeight: 600, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>Bayar Nanti</span>
-                                                <span style={{ fontSize: 12, color: '#94A3B8', fontFamily: 'Outfit, system-ui' }}>Simpan pesanan, pelanggan bayar nanti</span>
-                                            </div>
-                                            <div style={{ width: 22, height: 22, borderRadius: '50%', border: payMethod === 'bayar_nanti' ? '2px solid #3B6FD4' : '1.5px solid #CBD5E1', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                                                {payMethod === 'bayar_nanti' && <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#3B6FD4' }} />}
-                                            </div>
-                                        </button>
-                                    </div>
-
-                                    {/* Security note */}
-                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5, padding: '0 0 4px' }}>
-                                        <Lock size={11} color="#94A3B8" />
-                                        <span style={{ fontSize: 11, color: '#94A3B8', fontFamily: 'Outfit, system-ui' }}></span>
-                                    </div>
-                                </div>
-
-                                {/* CTA */}
-                                <div style={{ padding: '0 24px 24px' }}>
-                                    <button
-                                        onClick={handleChooseProceed} disabled={processing}
-                                        style={{ width: '100%', height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, background: processing ? '#93AEDF' : '#3B6FD4', color: '#FFFFFF', border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 700, fontFamily: '"DM Sans", system-ui', cursor: processing ? 'not-allowed' : 'pointer', boxShadow: '0 4px 16px rgba(59,111,212,0.28)' }}
-                                    >
-                                        {processing ? 'Memproses...' : 'Konfirmasi Pembayaran'}
+                            <div className="px-6 py-[22px] pb-4 border-b border-border">
+                                <div className="flex items-center gap-3.5">
+                                    <button onClick={closeModal} className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border-none cursor-pointer bg-muted">
+                                        <X size={20} className="text-foreground" />
                                     </button>
+                                    <div className="flex flex-col gap-0.5">
+                                        <span className="text-xl font-bold leading-tight text-foreground">
+                                            Metode Pembayaran
+                                        </span>
+                                        <span className="text-xs text-muted-foreground">
+                                            {cartItems.length} item · {formatRupiah(total)}
+                                        </span>
+                                    </div>
                                 </div>
-                            </>
+                            </div>
+
+                            <div className="flex flex-col gap-[18px] px-6 pb-6 overflow-y-auto" style={{ maxHeight: '68vh' }}>
+                                <div className="flex flex-col gap-1.5 pt-2 border-t border-border mt-1">
+                                    <label className="text-sm font-medium text-foreground">Nama Pelanggan</label>
+                                    <div className="relative">
+                                        <User size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground/70 pointer-events-none" />
+                                        <Input
+                                            type="text"
+                                            value={customerName}
+                                            onChange={e => { setCustomerName(e.target.value); if (nameError) setNameError(false); }}
+                                            placeholder="Masukkan nama pelanggan..."
+                                            className={cn(
+                                                'w-full h-11 pl-11',
+                                                nameError && 'border-destructive bg-destructive/5',
+                                            )}
+                                        />
+                                    </div>
+                                    {nameError && (
+                                        <p className="m-0 mt-1 text-xs text-destructive">
+                                            Nama pelanggan wajib diisi
+                                        </p>
+                                    )}
+                                </div>
+
+                                <p className="m-0 text-sm font-semibold tracking-wide text-muted-foreground">Metode Pembayaran</p>
+
+                                <div className="flex flex-col gap-2.5 -mt-2">
+                                    {methods.map(m => {
+                                        const active = payMethod === m.key;
+                                        return (
+                                            <button
+                                                key={m.key}
+                                                onClick={() => setPayMethod(m.key)}
+                                                className={cn(
+                                                    'flex items-center gap-3.5 rounded-2xl cursor-pointer text-left p-4 transition-all duration-150',
+                                                    active
+                                                        ? 'border-2 border-primary bg-primary/5 shadow-[0_2px_10px_rgba(59,111,212,0.10)]'
+                                                        : 'border border-border bg-card',
+                                                )}
+                                            >
+                                                <div className={cn(
+                                                    'w-10.5 h-10.5 rounded-xl flex items-center justify-center shrink-0',
+                                                    m.iconBg(active),
+                                                    m.iconColor(active),
+                                                )}>
+                                                    {m.icon}
+                                                </div>
+                                                <div className="flex-1 flex flex-col gap-0.5">
+                                                    <span className="text-base font-semibold text-foreground">
+                                                        {m.label}
+                                                    </span>
+                                                    <span className="text-xs text-muted-foreground">
+                                                        {m.desc}
+                                                    </span>
+                                                </div>
+                                                <div className={cn(
+                                                    'w-5.5 h-5.5 rounded-full flex items-center justify-center shrink-0',
+                                                    active ? 'border-2 border-primary' : 'border border-muted-foreground/40',
+                                                )}>
+                                                    {active && <div className="w-3 h-3 rounded-full bg-primary" />}
+                                                </div>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+
+                                <div className="flex justify-center items-center gap-1 pb-1">
+                                    <Lock size={11} className="text-muted-foreground/70" />
+                                </div>
+                            </div>
+
+                            <div className="px-6 pb-6">
+                                <Button
+                                    onClick={handleChooseProceed}
+                                    disabled={processing}
+                                    className="w-full h-13.5 text-base font-bold shadow-[0_4px_16px_rgba(59,111,212,0.28)]"
+                                >
+                                    {processing ? 'Memproses...' : 'Konfirmasi Pembayaran'}
+                                </Button>
+                            </div>
+                        </>
                         )}
 
                     </div>
                 </div>
             )}
-            {/* ══ SUCCESS POPUP (3c Pencil — blue kasir theme) ══ */}
+            {/* ══ RECEIPT MODAL ══ */}
             {showSuccess && (
-                <div style={{
-                    position: 'fixed', inset: 0,
-                    background: 'rgba(0,0,0,0.50)',
-                    zIndex: 2000,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                    <div style={{
-                        background: '#FFFFFF',
-                        borderRadius: 24,
-                        width: 320,
-                        padding: '28px 24px 24px',
-                        display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16,
-                        boxShadow: '0 8px 30px rgba(15,23,42,0.18)',
-                    }}>
-                        <div style={{
-                            width: 72, height: 72, borderRadius: 36,
-                            background: '#F0FDF4',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                            <CircleCheck size={40} color="#22C55E" strokeWidth={2} />
+                <div className="fixed inset-0 z-2000 flex items-start justify-center py-8 px-4 overflow-y-auto bg-[rgba(15,23,42,0.55)]"
+                     onClick={e => { if (e.target === e.currentTarget) handleSuccessOk(); }}
+                >
+                    <div className="w-full max-w-[400px] bg-card rounded-2xl shadow-xl overflow-hidden">
+                        <div className="text-center pt-7 pb-4 px-6 border-b-2 border-dashed border-border">
+                            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-3">
+                                <CircleCheck size={28} className="text-green-500" strokeWidth={2} />
+                            </div>
+                            <h2 className="text-lg font-bold m-0 text-foreground">Pembayaran Berhasil</h2>
+                            <p className="text-sm m-0 mt-1 text-muted-foreground">Struk digital tersedia</p>
                         </div>
 
-                        <span style={{ fontSize: 18, fontWeight: 700, color: '#0F172A', fontFamily: '"DM Sans", system-ui', textAlign: 'center' }}>
-                            Pesanan Diterima!
-                        </span>
+                        <div className="px-6 py-4">
+                            <div className="flex justify-between items-center py-2 border-b border-border">
+                                <span className="text-sm text-muted-foreground">No. Pesanan</span>
+                                <span className="text-sm font-bold text-foreground">#{successOrderCode}</span>
+                            </div>
 
-                        <span style={{ fontSize: 13, color: '#64748B', fontFamily: 'Outfit, system-ui', textAlign: 'center', lineHeight: 1.5, width: '100%' }}>
-                            Pesanan berhasil dibuat dan siap diproses. Anda akan diarahkan ke Pesanan Aktif.
-                        </span>
+                            <div className="py-3 border-b border-border">
+                                <p className="text-xs font-semibold mb-2 uppercase tracking-wider text-muted-foreground/70">
+                                    Item ({cartItems.length})
+                                </p>
+                                {cartItems.map((item, idx) => (
+                                    <div key={item.menuId} className="flex justify-between items-center py-1.5 text-sm">
+                                        <span className="text-foreground/80">
+                                            {item.quantity}x {item.name}
+                                        </span>
+                                        <span className="font-medium text-foreground">
+                                            {formatRupiah(item.price * item.quantity)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
 
-                        <div style={{
-                            background: '#EFF6FF', borderRadius: 14,
-                            width: '100%', padding: '12px 16px',
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-                        }}>
-                            <span style={{ fontSize: 11, fontWeight: 500, color: '#94A3B8', fontFamily: 'Outfit, system-ui' }}>
-                                Total Pembayaran
-                            </span>
-                            <span style={{ fontSize: 22, fontWeight: 700, color: '#3B6FD4', fontFamily: '"DM Sans", system-ui' }}>
-                                {formatRupiah(successTotal)}
-                            </span>
+                            <div className="flex justify-between items-center py-3 border-b border-border">
+                                <span className="text-base font-bold text-foreground">Total</span>
+                                <span className="text-lg font-bold text-primary">{formatRupiah(successTotal)}</span>
+                            </div>
+
+                            <div className="flex flex-col items-center py-4">
+                                {successOrderCode && (
+                                    <div className="bg-card p-2 rounded-xl shadow-sm border border-border">
+                                        <QRCodeCanvas
+                                            value={window.location.origin + '/receipt/' + successOrderCode}
+                                            size={120}
+                                            level="M"
+                                            fgColor="hsl(var(--foreground))"
+                                            style={{ display: 'block' }}
+                                        />
+                                    </div>
+                                )}
+                                <p className="text-xs mt-2 m-0 text-center text-muted-foreground/70">
+                                    Pindai QR untuk lihat struk
+                                </p>
+                            </div>
+
+                            <div className="text-xs text-center text-muted-foreground/70">
+                                {formatDate(new Date().toISOString())} · {formatTime(new Date().toISOString())}
+                            </div>
                         </div>
 
-                        <button
-                            onClick={handleSuccessOk}
-                            style={{
-                                width: '100%', height: 46,
-                                background: '#3B6FD4', color: '#FFFFFF',
-                                border: 'none', borderRadius: 14,
-                                fontSize: 15, fontWeight: 700, fontFamily: '"DM Sans", system-ui',
-                                cursor: 'pointer',
-                                boxShadow: '0 4px 14px rgba(59,111,212,0.30)',
-                            }}
-                        >
-                            OK
-                        </button>
+                        <div className="px-6 pb-6 flex flex-col gap-2">
+                            <Button
+                                variant="outline"
+                                onClick={() => {
+                                    const url = window.location.origin + '/receipt/' + successOrderCode;
+                                    window.open(url, '_blank');
+                                }}
+                                className="w-full h-11 flex items-center justify-center gap-2"
+                            >
+                                <Printer size={16} />
+                                Cetak / Lihat Struk
+                            </Button>
+                            <Button
+                                onClick={handleSuccessOk}
+                                className="w-full h-11"
+                            >
+                                Lanjut ke Pesanan Aktif
+                            </Button>
+                        </div>
                     </div>
                 </div>
             )}

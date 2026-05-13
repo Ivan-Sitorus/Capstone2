@@ -1,3 +1,4 @@
+import { Card, CardContent } from '@/components/ui/card';
 import { formatRupiah } from '@/helpers';
 
 const metrics = (totalPenjualan, jumlahTransaksi, pesananAktif) => [
@@ -8,32 +9,18 @@ const metrics = (totalPenjualan, jumlahTransaksi, pesananAktif) => [
 
 export default function StatBar({ totalPenjualan, jumlahTransaksi, pesananAktif }) {
     return (
-        <div style={{ display: 'flex', gap: 20, marginBottom: 24 }}>
-            {metrics(totalPenjualan, jumlahTransaksi, pesananAktif).map((m, i) => (
-                <div key={i} style={{
-                    flex: 1,
-                    background: '#FFFFFF',
-                    border: '1px solid #E2E8F0',
-                    borderRadius: 16,
-                    padding: 20,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 8,
-                    boxShadow: '0 4px 14px rgba(15,23,42,0.06)',
-                }}>
-                    <div style={{
-                        fontSize: 28,
-                        fontWeight: 700,
-                        color: '#0F172A',
-                        letterSpacing: '-1px',
-                        lineHeight: 1,
-                    }}>
-                        {m.value}
-                    </div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>
-                        {m.label}
-                    </div>
-                </div>
+        <div className="flex gap-5 mb-6">
+            {metrics(totalPenjualan, jumlahTransaksi, pesananAktif).map((m) => (
+                <Card key={m.label} size="sm" className="flex-1 shadow-sm">
+                    <CardContent className="flex flex-col gap-2">
+                        <div className="text-3xl font-bold text-foreground tracking-tight leading-none">
+                            {m.value}
+                        </div>
+                        <div className="text-xs font-medium text-muted-foreground">
+                            {m.label}
+                        </div>
+                    </CardContent>
+                </Card>
             ))}
         </div>
     );

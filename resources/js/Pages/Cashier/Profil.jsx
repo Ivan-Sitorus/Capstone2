@@ -1,12 +1,11 @@
-import { useState } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { User, LogOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import CashierLayout from '@/Layouts/CashierLayout';
 import { formatDate } from '@/helpers';
 
 export default function Profil({ user }) {
-    const [logoutHover, setLogoutHover] = useState(false);
-
     function handleLogout() {
         router.post('/logout');
     }
@@ -26,128 +25,75 @@ export default function Profil({ user }) {
 
     return (
         <><Head title="Profil Saya | W9 Cafe" /><CashierLayout title="Profil Saya" fullscreen>
-            <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: '#F8FAFC' }}>
-            <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 24, border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
+            <div className="flex-1 overflow-y-auto p-8 bg-muted">
+            <div className="bg-card rounded-xl p-6 border border-border shadow-sm">
 
             {/* ── Page header ── */}
-            <div style={{ marginBottom: 28 }}>
-                <h1 style={{
-                    fontSize: 26, fontWeight: 700, color: '#0F172A',
-                    margin: '0 0 4px', letterSpacing: '-0.5px',
-                }}>
+            <div className="mb-7">
+                <h1 className="text-3xl font-bold text-foreground m-0 mb-1 tracking-tight">
                     Profil Saya
                 </h1>
-                <p style={{ fontSize: 14, color: '#64748B', margin: 0 }}>
+                <p className="text-sm text-muted-foreground m-0">
                     Kelola informasi akun Anda
                 </p>
             </div>
 
             {/* ── 2-column layout ── */}
-            <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
+            <div className="flex flex-col lg:flex-row gap-6 items-start">
 
                 {/* ── LEFT: Avatar card ── */}
-                <div style={{
-                    width: 320, flexShrink: 0,
-                    background: '#FFFFFF', borderRadius: 16,
-                    border: '1px solid #E2E8F0',
-                    boxShadow: '0 4px 14px rgba(15,23,42,0.06)',
-                    padding: 32,
-                    display: 'flex', flexDirection: 'column',
-                    alignItems: 'center', gap: 20,
-                }}>
-                    {/* Avatar circle */}
-                    <div style={{
-                        width: 96, height: 96, borderRadius: '50%',
-                        background: '#3B6FD4',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 4px 16px rgba(59,111,212,0.25)',
-                        flexShrink: 0,
-                    }}>
-                        <User size={44} color="#FFFFFF" />
-                    </div>
+                <div className="w-full lg:w-80 shrink-0">
+                    <Card className="shadow-md">
+                        <CardContent className="flex flex-col items-center gap-5 py-8">
+                            {/* Avatar circle */}
+                            <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-[0_4px_16px_rgba(59,111,212,0.25)]">
+                                <User size={44} className="text-primary-foreground" />
+                            </div>
 
-                    {/* Name */}
-                    <div style={{ textAlign: 'center' }}>
-                        <div style={{
-                            fontSize: 20, fontWeight: 700, color: '#0F172A', marginBottom: 8,
-                        }}>
-                            {user.name}
-                        </div>
+                            {/* Name */}
+                            <div className="text-center">
+                                <div className="text-xl font-bold text-foreground mb-2">
+                                    {user.name}
+                                </div>
 
-                        {/* Role badge */}
-                        <span style={{
-                            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
-                            height: 28, padding: '0 12px', borderRadius: 100,
-                            background: '#EFF6FF',
-                            fontSize: 12, fontWeight: 600, color: '#3B6FD4',
-                        }}>
-                            {roleLabel}
-                        </span>
-                    </div>
+                                {/* Role badge */}
+                                <span className="inline-flex items-center justify-center h-7 px-3 rounded-full bg-muted text-xs font-semibold text-primary">
+                                    {roleLabel}
+                                </span>
+                            </div>
 
-                    {/* Logout button */}
-                    <button
-                        onClick={handleLogout}
-                        onMouseEnter={() => setLogoutHover(true)}
-                        onMouseLeave={() => setLogoutHover(false)}
-                        style={{
-                            width: '100%', height: 44,
-                            background: logoutHover ? '#B91C1C' : '#DC2626',
-                            color: '#FFFFFF', border: 'none', borderRadius: 8,
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            gap: 8, fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                            boxShadow: '0 2px 8px rgba(220,38,38,0.25)',
-                            transition: 'background 0.15s',
-                        }}
-                    >
-                        <LogOut size={16} />
-                        Keluar dari Akun
-                    </button>
+                            {/* Tombol Keluar */}
+                            <Button
+                                onClick={handleLogout}
+                                variant="destructive"
+                                className="w-full h-11 flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(220,38,38,0.25)] hover:bg-[#B91C1C]"
+                            >
+                                <LogOut size={16} />
+                                Keluar dari Akun
+                            </Button>
+                        </CardContent>
+                    </Card>
                 </div>
 
                 {/* ── RIGHT: Info card ── */}
-                <div style={{
-                    flex: 1, minWidth: 0,
-                    background: '#FFFFFF', borderRadius: 16,
-                    border: '1px solid #E2E8F0',
-                    boxShadow: '0 4px 14px rgba(15,23,42,0.06)',
-                    overflow: 'hidden',
-                }}>
-                    {/* Card title */}
-                    <div style={{
-                        padding: '16px 24px',
-                        background: '#F1F5F9',
-                        borderBottom: '1px solid #E2E8F0',
-                    }}>
-                        <span style={{ fontSize: 16, fontWeight: 600, color: '#0F172A' }}>
-                            Informasi Akun
-                        </span>
-                    </div>
-
-                    {/* Fields */}
-                    <div style={{
-                        padding: 24,
-                        display: 'flex', flexDirection: 'column', gap: 20,
-                    }}>
-                        {fields.map(field => (
-                            <div key={field.label} style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                                <label style={{
-                                    fontSize: 13, fontWeight: 500, color: '#64748B', display: 'block',
-                                }}>
-                                    {field.label}
-                                </label>
-                                <div style={{
-                                    height: 44, borderRadius: 8,
-                                    background: '#F1F5F9', border: '1px solid #E2E8F0',
-                                    padding: '0 14px',
-                                    display: 'flex', alignItems: 'center',
-                                    fontSize: 14, color: '#0F172A',
-                                }}>
-                                    {field.value}
+                <div className="flex-1 min-w-0">
+                    <Card className="shadow-md overflow-hidden">
+                        <CardHeader className="bg-muted border-b border-border">
+                            <CardTitle>Informasi Akun</CardTitle>
+                        </CardHeader>
+                        <CardContent className="flex flex-col gap-5 p-6">
+                            {fields.map(field => (
+                                <div key={field.label} className="flex flex-col gap-1.5">
+                                    <label className="text-sm font-medium block text-muted-foreground">
+                                        {field.label}
+                                    </label>
+                                    <div className="h-11 rounded-lg bg-muted border border-border px-3.5 flex items-center text-sm text-foreground">
+                                        {field.value}
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </CardContent>
+                    </Card>
                 </div>
 
             </div>

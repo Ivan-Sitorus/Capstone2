@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import BottomNav from '@/Components/Customer/BottomNav';
+import ThemeToggle from '@/Components/Common/ThemeToggle';
 
 export default function CustomerLayout({ children, activeTab = 'menu', showBottomNav = true }) {
     const { flash } = usePage().props;
@@ -16,7 +17,7 @@ export default function CustomerLayout({ children, activeTab = 'menu', showBotto
     }, [flash]);
 
     return (
-        <div style={{
+        <div data-interface="customer" style={{
             maxWidth: 430,
             margin: '0 auto',
             minHeight: '100vh',
@@ -24,6 +25,9 @@ export default function CustomerLayout({ children, activeTab = 'menu', showBotto
             position: 'relative',
             paddingBottom: showBottomNav ? 92 : 0,
         }}>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 16px' }}>
+                <ThemeToggle />
+            </div>
             {children}
             {showBottomNav && <BottomNav activeTab={activeTab} />}
 

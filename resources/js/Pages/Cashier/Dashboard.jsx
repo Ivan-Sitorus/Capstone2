@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { router, Link, Head } from '@inertiajs/react';
 import { Calendar, Plus, ClipboardList, Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import CashierLayout from '@/Layouts/CashierLayout';
 import StatBar from '@/Components/Cashier/StatBar';
 import StatusBadge from '@/Components/Common/StatusBadge';
@@ -14,37 +16,25 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
     }, []);
 
     return (
-        <><Head title="Dashboard | W9 Cafe" /><CashierLayout title="Dashboard" fullscreen>
-            <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: '#F8FAFC' }}>
-            <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 24, border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
+        <><Head title="Dasbor | W9 Cafe" /><CashierLayout title="Dasbor" fullscreen>
+            <div className="flex-1 overflow-y-auto p-8 bg-muted">
+            <Card className="shadow-sm">
+            <CardContent className="p-6">
 
             {/* ── A. Header ── */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 28 }}>
+            <div className="flex justify-between items-start mb-7">
                 <div>
-                    <h1 style={{ fontSize: 26, fontWeight: 700, color: '#0F172A', margin: '0 0 4px', letterSpacing: '-0.5px' }}>
-                        Dashboard
+                    <h1 className="text-3xl font-bold text-foreground m-0 mb-1 tracking-tight">
+                        Dasbor
                     </h1>
-                    <p style={{ fontSize: 14, color: '#64748B', margin: 0 }}>
+                    <p className="text-sm text-muted-foreground m-0">
                         Selamat datang, Kasir! Berikut ringkasan hari ini.
                     </p>
                 </div>
 
                 {/* Date chip */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    background: '#FFFFFF',
-                    border: '1px solid #E2E8F0',
-                    borderRadius: 8,
-                    padding: '8px 14px',
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: '#0F172A',
-                    boxShadow: '0 2px 8px rgba(15,23,42,0.04)',
-                    flexShrink: 0,
-                }}>
-                    <Calendar size={16} color="#64748B" />
+                <div className="flex items-center gap-2 bg-card border border-border rounded-lg px-3.5 py-2 text-sm font-medium text-foreground shrink-0 shadow-[0_2px_8px_rgba(15,23,42,0.04)]">
+                    <Calendar size={16} className="text-muted-foreground" />
                     {formatDate(now)}, {formatTime(now)}
                 </div>
             </div>
@@ -57,91 +47,57 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
             />
 
             {/* ── C. Quick Actions ── */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 28 }}>
-                <button
+            <div className="flex gap-3 mb-7">
+                <Button
                     onClick={() => router.visit('/cashier/pesanan-baru')}
-                    style={{
-                        display: 'flex', alignItems: 'center', gap: 8,
-                        height: 44, padding: '0 20px',
-                        background: '#3B6FD4', color: 'white',
-                        border: 'none', borderRadius: 8,
-                        fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                        boxShadow: '0 4px 16px rgba(59,111,212,0.25)',
-                    }}
+                    className="shadow-[0_4px_16px_rgba(59,111,212,0.25)]"
                 >
                     <Plus size={16} />
                     Pesanan Baru
-                </button>
+                </Button>
 
-                <button
+                <Button
+                    variant="outline"
                     onClick={() => router.visit('/cashier/pesanan-aktif')}
-                    style={{
-                        display: 'flex', alignItems: 'center', gap: 8,
-                        height: 44, padding: '0 20px',
-                        background: '#FFFFFF', color: '#0F172A',
-                        border: '1px solid #E2E8F0', borderRadius: 8,
-                        fontSize: 14, fontWeight: 500, cursor: 'pointer',
-                        boxShadow: '0 2px 8px rgba(15,23,42,0.04)',
-                    }}
+                    className="shadow-sm"
                 >
                     <ClipboardList size={16} />
                     Lihat Pesanan
-                </button>
+                </Button>
 
-                <button
+                <Button
+                    variant="outline"
                     onClick={() => router.visit('/cashier/riwayat')}
-                    style={{
-                        display: 'flex', alignItems: 'center', gap: 8,
-                        height: 44, padding: '0 20px',
-                        background: '#FFFFFF', color: '#0F172A',
-                        border: '1px solid #E2E8F0', borderRadius: 8,
-                        fontSize: 14, fontWeight: 500, cursor: 'pointer',
-                        boxShadow: '0 2px 8px rgba(15,23,42,0.04)',
-                    }}
+                    className="shadow-sm"
                 >
                     <Clock size={16} />
                     Riwayat
-                </button>
+                </Button>
             </div>
 
             {/* ── D. Transaksi Terbaru ── */}
             <div>
                 {/* Section header */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-                    <h2 style={{ fontSize: 18, fontWeight: 600, color: '#0F172A', margin: 0, letterSpacing: '-0.2px' }}>
+                <div className="flex justify-between items-center mb-4">
+                    <h2 className="text-lg font-semibold text-foreground m-0 tracking-tight">
                         Transaksi Terbaru
                     </h2>
                     <Link
                         href="/cashier/riwayat"
-                        style={{ fontSize: 13, fontWeight: 500, color: '#3B6FD4', textDecoration: 'none' }}
+                        className="text-sm font-medium text-primary no-underline"
                     >
                         Lihat Semua →
                     </Link>
                 </div>
 
                 {/* Table card */}
-                <div style={{
-                    background: '#FFFFFF',
-                    border: '1px solid #E2E8F0',
-                    borderRadius: 16,
-                    overflow: 'hidden',
-                    boxShadow: '0 4px 14px rgba(15,23,42,0.06)',
-                }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <Card className="shadow-md">
+                    <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
                         <thead>
-                            <tr style={{ background: '#F1F5F9' }}>
+                            <tr className="bg-muted">
                                 {['ID Pesanan', 'Item', 'Total', 'Pembayaran', 'Status'].map((h, i) => (
-                                    <th key={i} style={{
-                                        padding: '12px 16px',
-                                        fontSize: 12,
-                                        fontWeight: 600,
-                                        color: '#475569',
-                                        textAlign: 'left',
-                                        textTransform: 'uppercase',
-                                        letterSpacing: '0.4px',
-                                        borderBottom: '1px solid #E2E8F0',
-                                        whiteSpace: 'nowrap',
-                                    }}>
+                                    <th key={i} className="px-4 py-3 text-xs font-semibold text-left uppercase tracking-wide border-b border-border whitespace-nowrap text-foreground">
                                         {h}
                                     </th>
                                 ))}
@@ -150,7 +106,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                         <tbody>
                             {transaksiTerbaru.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} style={{ padding: '32px 16px', textAlign: 'center', color: '#94A3B8', fontSize: 14 }}>
+                                    <td colSpan={5} className="px-4 py-8 text-center text-sm text-muted-foreground">
                                         Belum ada transaksi hari ini
                                     </td>
                                 </tr>
@@ -158,28 +114,23 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                                 transaksiTerbaru.map((trx, i) => (
                                     <tr
                                         key={trx.id}
-                                        style={{
-                                            borderBottom: i < transaksiTerbaru.length - 1 ? '1px solid #E2E8F0' : 'none',
-                                            transition: 'background 0.12s',
-                                        }}
-                                        onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
-                                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                        className="border-b border-border hover:bg-muted/50 transition-colors duration-100"
                                     >
-                                        <td style={{ padding: '14px 16px', fontSize: 13, fontWeight: 600, color: '#0F172A', whiteSpace: 'nowrap' }}>
+                                        <td className="px-4 py-3.5 text-sm font-semibold text-foreground whitespace-nowrap">
                                             #{trx.order_code}
                                         </td>
-                                        <td style={{ padding: '14px 16px', fontSize: 13, color: '#64748B', maxWidth: 400 }}>
-                                            <span style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                                        <td className="px-4 py-3.5 text-sm text-muted-foreground max-w-[400px]">
+                                            <span className="block truncate">
                                                 {trx.items_summary || '-'}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '14px 16px', fontSize: 13, fontWeight: 600, color: '#0F172A', whiteSpace: 'nowrap' }}>
+                                        <td className="px-4 py-3.5 text-sm font-semibold text-foreground whitespace-nowrap">
                                             {formatRupiah(trx.total_amount)}
                                         </td>
-                                        <td style={{ padding: '14px 16px', fontSize: 13, color: '#64748B', textTransform: 'capitalize' }}>
+                                        <td className="px-4 py-3.5 text-sm capitalize text-muted-foreground">
                                             {trx.payment_method || '-'}
                                         </td>
-                                        <td style={{ padding: '14px 16px' }}>
+                                        <td className="px-4 py-3.5">
                                             <StatusBadge status={trx.status} />
                                         </td>
                                     </tr>
@@ -187,10 +138,12 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                             )}
                         </tbody>
                     </table>
-                </div>
+                    </div>
+                </Card>
             </div>
 
-            </div>
+            </CardContent>
+            </Card>
             </div>
         </CashierLayout></>
     );

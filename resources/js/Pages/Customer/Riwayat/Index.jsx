@@ -4,10 +4,11 @@ import { ClipboardList, X } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import RiwayatCard from '@/Components/Customer/RiwayatCard';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import { cn } from '@/lib/utils';
 
 const TABS = [
     { key: 'all',      label: 'Semua'    },
-    { key: 'pending',  label: 'Pending'  },
+    { key: 'pending',  label: 'Menunggu'  },
     { key: 'diproses', label: 'Diproses' },
     { key: 'selesai',  label: 'Selesai'  },
 ];
@@ -29,23 +30,12 @@ function groupByDate(orders, fmtDate) {
 }
 
 const METHOD_LABEL = { cash: 'Tunai', qris: 'QRIS' };
-const F = '"Plus Jakarta Sans", system-ui, sans-serif';
 
 export default function CustomerRiwayat({ orders = [] }) {
     const [activeTab,    setActiveTab]    = useState('all');
     const [receiptOrder, setReceiptOrder] = useState(null);
+    const [logoError,    setLogoError]    = useState(false);
 
-    useEffect(() => {
-        if (!document.getElementById('pjs-font')) {
-            const link = document.createElement('link');
-            link.id   = 'pjs-font';
-            link.rel  = 'stylesheet';
-            link.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
-            document.head.appendChild(link);
-        }
-    }, []);
-
-    /* Nama pelanggan dari sessionStorage sebagai fallback */
     const sessionName = (() => {
         try {
             const s = sessionStorage.getItem('w9_customer');
@@ -53,8 +43,9 @@ export default function CustomerRiwayat({ orders = [] }) {
         } catch (_) { return null; }
     })();
 
-    /* Jika phone ada di sessionStorage tapi belum ada di URL → reload dengan phone */
     useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        if (!params.get('phone')) {(() => {
         const params = new URLSearchParams(window.location.search);
         if (!params.get('phone')) {
             try {
@@ -72,7 +63,6 @@ export default function CustomerRiwayat({ orders = [] }) {
         }
     }, []);
 
-    /* Auto-refresh tiap 8 detik selama ada order aktif */
     useEffect(() => {
         const hasActive = orders.some(o => o.status !== 'selesai');
         if (!hasActive) return;
@@ -95,76 +85,48 @@ export default function CustomerRiwayat({ orders = [] }) {
 
     return (
         <CustomerLayout activeTab="riwayat">
-            <div style={{
-                display: 'flex', flexDirection: 'column',
-                minHeight: 'calc(100vh - 92px)',
-                background: '#F5F5F0',
-            }}>
+            <div className="flex flex-col bg-muted" style={{ minHeight: 'calc(100vh - 92px)' }}>
 
-                {/* Stats bar */}
-                <div style={{ padding: '16px 16px 0' }}>
-                    <div style={{
-                        background: '#EFEFEA', borderRadius: 14,
-                        padding: '12px 16px',
-                        display: 'inline-block', minWidth: 120,
-                    }}>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: '#A8998A', letterSpacing: 0.6, marginBottom: 4 }}>
-                            TOTAL ORDER
+                <div className="px-4 pt-4">
+                    <div className="bg-muted/50 rounded-[14px] px-4 py-3 inline-block min-w-[120px]">
+                        <div className="text-[10px] font-bold text-muted-foreground/60 tracking-[0.6px] mb-1">
+                            TOTAL PESANAN
                         </div>
-                        <div style={{ fontSize: 22, fontWeight: 800, color: '#1A1814', fontFamily: F, letterSpacing: -0.5 }}>
+                        <div className="text-[22px] font-extrabold text-foreground tracking-tight">
                             {orders.length}
                         </div>
                     </div>
                 </div>
 
-                {/* Tab bar */}
-                <div style={{
-                    display: 'flex', alignItems: 'center', gap: 4,
-                    padding: '14px 16px 10px',
-                    overflowX: 'auto',
-                }}>
+                <div className="flex items-center gap-1 px-4 pb-[10px] pt-[14px] overflow-x-auto">
                     {TABS.map(tab => (
                         <button
                             key={tab.key}
                             onClick={() => setActiveTab(tab.key)}
-                            style={{
-                                flexShrink: 0,
-                                borderRadius: 999, border: 'none', cursor: 'pointer',
-                                padding: '7px 18px',
-                                fontSize: 13,
-                                fontFamily: F,
-                                background: activeTab === tab.key ? '#E8763A' : 'transparent',
-                                color:      activeTab === tab.key ? '#FFFFFF' : '#A8998A',
-                                fontWeight: activeTab === tab.key ? 700 : 500,
-                                boxShadow:  activeTab === tab.key ? '0 3px 10px rgba(232,118,58,0.30)' : 'none',
-                                transition: 'background 0.15s, color 0.15s, box-shadow 0.15s',
-                            }}
+                            className={cn(
+                                'shrink-0 rounded-full border-none cursor-pointer px-[18px] py-[7px] text-[13px] min-h-[44px]',
+                                'transition-colors duration-150',
+                                activeTab === tab.key
+                                    ? 'bg-primary text-primary-foreground font-bold shadow-[0_3px_10px_rgba(232,118,58,0.30)]'
+                                    : 'bg-transparent text-muted-foreground font-medium',
+                            )}
                         >
                             {tab.label}
                         </button>
                     ))}
                 </div>
 
-                {/* Order list */}
-                <div style={{ padding: '0 16px 28px', display: 'flex', flexDirection: 'column', gap: 0, flex: 1 }}>
+                <div className="px-4 pb-7 flex flex-col gap-0 flex-1">
                     {filteredOrders.length === 0 ? (
-                        <div style={{
-                            display: 'flex', flexDirection: 'column',
-                            alignItems: 'center', justifyContent: 'center',
-                            padding: '56px 0', gap: 14,
-                        }}>
-                            <div style={{
-                                width: 72, height: 72, borderRadius: 20,
-                                background: '#EFEFEA',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>
-                                <ClipboardList size={30} color="#C4B5A5" />
+                        <div className="flex flex-col items-center justify-center py-[56px] gap-[14px]">
+                            <div className="w-[72px] h-[72px] rounded-[20px] bg-muted/50 flex items-center justify-center">
+                                <ClipboardList size={30} className="text-muted-foreground/40" />
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-                                <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1814', fontFamily: F }}>
+                            <div className="flex flex-col items-center gap-1">
+                                <span className="text-[15px] font-bold text-foreground">
                                     Belum ada pesanan
                                 </span>
-                                <span style={{ fontSize: 12.5, color: '#A8998A', fontFamily: F }}>
+                                <span className="text-[12.5px] text-muted-foreground/70">
                                     Pesanan kamu akan muncul di sini
                                 </span>
                             </div>
@@ -172,15 +134,10 @@ export default function CustomerRiwayat({ orders = [] }) {
                     ) : (
                         Array.from(grouped.entries()).map(([dateLabel, groupOrders]) => (
                             <div key={dateLabel}>
-                                <div style={{
-                                    fontSize: 11, fontWeight: 700, color: '#A8998A',
-                                    letterSpacing: 0.8,
-                                    fontFamily: F,
-                                    padding: '14px 0 8px',
-                                }}>
+                                <div className="text-[11px] font-bold text-muted-foreground/60 tracking-[0.8px] pt-[14px] pb-2">
                                     {dateLabel}
                                 </div>
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                <div className="flex flex-col gap-[10px]">
                                     {groupOrders.map(order => (
                                         <RiwayatCard
                                             key={order.id}
@@ -196,168 +153,111 @@ export default function CustomerRiwayat({ orders = [] }) {
 
             </div>
 
-            {/* ── Receipt Modal (Struk) ── */}
             {receiptOrder && (
                 <div
                     onClick={() => setReceiptOrder(null)}
-                    style={{
-                        position: 'fixed', inset: 0,
-                        background: 'rgba(26,24,20,0.60)',
-                        backdropFilter: 'blur(4px)',
-                        zIndex: 300,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        padding: '24px 20px',
-                    }}
+                    className="fixed inset-0 z-[300] flex items-center justify-center px-5 py-6"
+                    style={{ background: 'rgba(26,24,20,0.60)', backdropFilter: 'blur(4px)' }}
                 >
                     <div
                         onClick={e => e.stopPropagation()}
-                        style={{
-                            background: '#FFFFFF',
-                            borderRadius: 24,
-                            width: '100%', maxWidth: 340,
-                            maxHeight: 'calc(100vh - 48px)',
-                            display: 'flex', flexDirection: 'column',
-                            boxShadow: '0 20px 60px rgba(26,24,20,0.28)',
-                            overflow: 'hidden',
-                            fontFamily: F,
-                        }}
+                        className="bg-card rounded-[24px] w-full max-w-[340px] flex flex-col overflow-hidden"
+                        style={{ maxHeight: 'calc(100vh - 48px)', boxShadow: '0 20px 60px rgba(26,24,20,0.28)' }}
                     >
-                        {/* Color bar top */}
-                        <div style={{ height: 3, background: 'linear-gradient(90deg, #E8763A, #FB923C)', flexShrink: 0 }} />
+                        <div className="h-[3px] shrink-0" style={{ background: 'linear-gradient(90deg, #E8763A, #FB923C)' }} />
 
-                        {/* Close button */}
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 16px 0' }}>
+                        <div className="flex justify-end px-4 pt-3">
                             <button
                                 onClick={() => setReceiptOrder(null)}
-                                style={{
-                                    width: 32, height: 32, borderRadius: '50%',
-                                    background: '#F7F4F0', border: '1px solid #EDE8E2',
-                                    cursor: 'pointer',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                }}
+                                className="w-8 h-8 rounded-full bg-muted/30 border border-border cursor-pointer flex items-center justify-center"
                             >
-                                <X size={15} color="#8C7B6B" />
+                                <X size={15} className="text-muted-foreground/50" />
                             </button>
                         </div>
 
-                        {/* Scrollable content */}
-                        <div style={{ overflowY: 'auto', flex: 1, padding: '4px 24px 8px' }}>
-
-                            {/* Logo + cafe name */}
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, paddingBottom: 18 }}>
-                                <div style={{
-                                    width: 54, height: 54, borderRadius: 14,
-                                    overflow: 'hidden',
-                                    boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
-                                    background: '#1B3A4B',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                }}>
-                                    <img
-                                        src="/images/logo.jpg"
-                                        alt="W9"
-                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                                        onError={e => {
-                                            e.target.style.display = 'none';
-                                            e.target.parentElement.innerHTML = '<span style="color:white;font-size:18px;font-style:italic;font-weight:700">w9</span>';
-                                        }}
-                                    />
+                        <div className="overflow-y-auto flex-1 px-6 pb-2 pt-1">
+                            <div className="flex flex-col items-center gap-2 pb-[18px]">
+                                <div className="w-[54px] h-[54px] rounded-[14px] overflow-hidden flex items-center justify-center"
+                                     style={{ boxShadow: '0 4px 14px rgba(0,0,0,0.15)', background: logoError ? '#1B3A4B' : 'transparent' }}>
+                                    {logoError ? (
+                                        <span style={{color:'white', fontSize:'18px', fontStyle:'italic', fontWeight:700}}>w9</span>
+                                    ) : (
+                                        <img
+                                            src="/images/logo.jpg"
+                                            alt="W9"
+                                            className="w-full h-full object-cover"
+                                            onError={() => setLogoError(true)}
+                                        />
+                                    )}
                                 </div>
-                                <span style={{
-                                    fontSize: 17, fontWeight: 800, color: '#1A1814',
-                                    fontFamily: F,
-                                    letterSpacing: -0.3,
-                                }}>
+                                <span className="text-[17px] font-extrabold text-foreground tracking-tight">
                                     W9 Cafe
                                 </span>
                             </div>
 
-                            {/* Divider */}
-                            <div style={{ height: 1, background: '#EDE8E2', marginBottom: 16 }} />
+                            <div className="h-px bg-border mb-4" />
 
-                            {/* Info rows */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 16 }}>
+                            <div className="flex flex-col gap-[9px] mb-4">
                                 {[
                                     { label: 'No. Pesanan', value: receiptOrder.order_code },
                                     { label: 'Tanggal',     value: `${formatDate(receiptOrder.created_at)}, ${formatTime(receiptOrder.created_at)}` },
                                     { label: 'Pelanggan',   value: receiptOrder.customer_name ?? sessionName ?? '—' },
                                     { label: 'Pembayaran',  value: METHOD_LABEL[receiptOrder.payment_method] ?? '—' },
                                 ].map(row => (
-                                    <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
-                                        <span style={{ fontSize: 12.5, color: '#A8998A', flexShrink: 0 }}>
+                                    <div key={row.label} className="flex justify-between items-baseline gap-3">
+                                        <span className="text-[12.5px] text-muted-foreground/70 shrink-0">
                                             {row.label}
                                         </span>
-                                        <span style={{ fontSize: 13, fontWeight: 600, color: '#1A1814', textAlign: 'right' }}>
+                                        <span className="text-[13px] font-semibold text-foreground text-right">
                                             {row.value}
                                         </span>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Divider */}
-                            <div style={{ height: 1, background: '#EDE8E2', marginBottom: 14 }} />
+                            <div className="h-px bg-border mb-[14px]" />
 
-                            {/* Items table header */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: '#A8998A', flex: 1, letterSpacing: 0.4 }}>ITEM</span>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: '#A8998A', width: 32, textAlign: 'center', letterSpacing: 0.4 }}>QTY</span>
-                                <span style={{ fontSize: 11, fontWeight: 700, color: '#A8998A', width: 80, textAlign: 'right', letterSpacing: 0.4 }}>HARGA</span>
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-[11px] font-bold text-muted-foreground/60 flex-1 tracking-[0.4px]">ITEM</span>
+                                <span className="text-[11px] font-bold text-muted-foreground/60 w-8 text-center tracking-[0.4px]">JML</span>
+                                <span className="text-[11px] font-bold text-muted-foreground/60 w-20 text-right tracking-[0.4px]">HARGA</span>
                             </div>
 
-                            {/* Items */}
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
+                            <div className="flex flex-col gap-2 mb-[14px]">
                                 {(receiptOrder.items ?? []).map((item, i) => (
-                                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 13, color: '#1A1814', flex: 1 }}>{item.name}</span>
-                                        <span style={{ fontSize: 13, color: '#A8998A', width: 32, textAlign: 'center' }}>{item.quantity}×</span>
-                                        <span style={{ fontSize: 13, color: '#1A1814', width: 80, textAlign: 'right' }}>{formatRupiah(item.subtotal)}</span>
+                                    <div key={i} className="flex justify-between items-center">
+                                        <span className="text-[13px] text-foreground flex-1">{item.name}</span>
+                                        <span className="text-[13px] text-muted-foreground/70 w-8 text-center">{item.quantity}×</span>
+                                        <span className="text-[13px] text-foreground w-20 text-right">{formatRupiah(item.subtotal)}</span>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Divider */}
-                            <div style={{ height: 1, background: '#EDE8E2', marginBottom: 12 }} />
+                            <div className="h-px bg-border mb-3" />
 
-                            {/* Subtotal */}
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                <span style={{ fontSize: 13, color: '#A8998A' }}>Subtotal</span>
-                                <span style={{ fontSize: 13, color: '#6B5E52' }}>{formatRupiah(receiptOrder.total_amount)}</span>
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-[13px] text-muted-foreground/70">Subtotal</span>
+                                <span className="text-[13px] text-muted-foreground">{formatRupiah(receiptOrder.total_amount)}</span>
                             </div>
 
-                            {/* Total */}
-                            <div style={{
-                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                marginBottom: 20, padding: '10px 12px',
-                                background: '#FFF5EF', borderRadius: 10,
-                                border: '1px solid #FCDFC9',
-                            }}>
-                                <span style={{ fontSize: 15, fontWeight: 800, color: '#1A1814', fontFamily: F }}>Total</span>
-                                <span style={{ fontSize: 16, fontWeight: 800, color: '#E8763A', fontFamily: F, letterSpacing: -0.3 }}>
+                            <div className="flex justify-between items-center mb-5 px-3 py-[10px] bg-secondary rounded-[10px] border border-primary/20">
+                                <span className="text-[15px] font-extrabold text-foreground">Total</span>
+                                <span className="text-base font-extrabold text-primary tracking-tight">
                                     {formatRupiah(receiptOrder.total_amount)}
                                 </span>
                             </div>
 
-                            {/* Thank you */}
-                            <div style={{ textAlign: 'center', marginBottom: 18 }}>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: '#A8998A', fontFamily: F }}>
+                            <div className="text-center mb-[18px]">
+                                <span className="text-[13px] font-semibold text-muted-foreground/60">
                                     Terima kasih sudah memesan!
                                 </span>
                             </div>
                         </div>
 
-                        {/* Footer: Tutup button */}
-                        <div style={{ padding: '10px 20px 22px', flexShrink: 0, borderTop: '1px solid #F0EBE4' }}>
+                        <div className="px-5 pb-[22px] pt-[10px] shrink-0 border-t border-border">
                             <button
                                 onClick={() => setReceiptOrder(null)}
-                                style={{
-                                    width: '100%', height: 50,
-                                    background: 'linear-gradient(135deg, #E8763A, #F08050)',
-                                    color: '#FFFFFF',
-                                    border: 'none', borderRadius: 14,
-                                    fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                                    fontFamily: F,
-                                    boxShadow: '0 6px 18px rgba(232,118,58,0.35)',
-                                    letterSpacing: -0.2,
-                                }}
+                                className="w-full h-[50px] text-primary-foreground border-none rounded-[14px] text-[15px] font-bold cursor-pointer bg-primary shadow-[0_6px_18px_rgba(232,118,58,0.35)]"
                             >
                                 Tutup
                             </button>
