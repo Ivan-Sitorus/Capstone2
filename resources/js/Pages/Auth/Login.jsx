@@ -37,7 +37,8 @@ export default function Login() {
                     <ThemeToggle />
                 </div>
 
-                <Card className="w-full max-w-[400px]">
+                <form onSubmit={handleSubmit} className="w-full max-w-[400px]">
+                <Card>
                     <CardHeader>
                         <CardTitle>Masuk ke Akun Anda</CardTitle>
                         <CardDescription>
@@ -93,6 +94,7 @@ export default function Login() {
                         </Button>
                     </CardContent>
                 </Card>
+                </form>
             </div>
         </div>
     );
