@@ -1,30 +1,21 @@
 import { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
-import { ShoppingBag, Coffee } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
 import { formatRupiah } from '@/helpers';
-
-const F = '"Plus Jakarta Sans", system-ui, sans-serif';
+import SharedCartItem from '@/Components/Shared/SharedCartItem';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 
 export default function CustomerCart() {
-    const { items, tableId, updateQty, total, count } = useCart();
-    const [loading,      setLoading]      = useState(false);
-    const [errorMsg,     setErrorMsg]     = useState('');
-    const [isMahasiswa,  setIsMahasiswa]  = useState(false);
+    const { items, tableId, removeItem, updateQty, total, count } = useCart();
+    const [loading, setLoading] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
+    const [isMahasiswa, setIsMahasiswa] = useState(false);
 
     const isEmpty = items.length === 0;
-
-    useEffect(() => {
-        if (!document.getElementById('pjs-font')) {
-            const link = document.createElement('link');
-            link.id   = 'pjs-font';
-            link.rel  = 'stylesheet';
-            link.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
-            document.head.appendChild(link);
-        }
-    }, []);
 
     useEffect(() => {
         try {
@@ -41,16 +32,6 @@ export default function CustomerCart() {
         : 0;
 
     const grandTotal = total - totalCashback;
-
-    function handleIncrement(menuId) {
-        const item = items.find(i => i.menuId === menuId);
-        if (item) updateQty(menuId, item.quantity + 1);
-    }
-
-    function handleDecrement(menuId) {
-        const item = items.find(i => i.menuId === menuId);
-        if (item) updateQty(menuId, item.quantity - 1);
-    }
 
     async function handleCheckout() {
         if (isEmpty) return;
@@ -69,10 +50,10 @@ export default function CustomerCart() {
         setLoading(true);
         try {
             const res = await axios.post('/api/order', {
-                customer_name:  customer.name,
+                customer_name: customer.name,
                 customer_phone: customer.phone,
-                table_id:       customer.tableId,
-                is_mahasiswa:   isMahasiswa,
+                table_id: customer.tableId,
+                is_mahasiswa: isMahasiswa,
                 items: items.map(i => ({ menu_id: i.menuId, quantity: i.quantity })),
             });
 
@@ -90,200 +71,103 @@ export default function CustomerCart() {
 
     return (
         <CustomerLayout activeTab="cart">
-            {/* ── Header ── */}
-            <div style={{ background: '#FFFFFF', padding: '0 20px', borderBottom: '1px solid #F0EBE5' }}>
-                <div style={{ height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 18, fontWeight: 800, color: '#1A1814', fontFamily: F, letterSpacing: -0.3 }}>
+            <div className="bg-card px-5 border-b border-border">
+                <div className="h-[54px] flex items-center justify-center">
+                    <span className="text-lg font-extrabold text-foreground tracking-tight">
                         Keranjang
                     </span>
                 </div>
                 {!isEmpty && (
-                    <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 10 }}>
-                        <span style={{ fontSize: 12.5, color: '#A8998A', fontFamily: F }}>
+                    <div className="flex justify-center pb-2.5">
+                        <span className="text-xs text-muted-foreground">
                             {count} item
                         </span>
                     </div>
                 )}
             </div>
 
-            {/* ── Empty state ── */}
             {isEmpty ? (
-                <div style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    justifyContent: 'center', padding: '60px 24px', gap: 16,
-                    background: '#F5F5F0', minHeight: 'calc(100vh - 180px)',
-                }}>
-                    <div style={{
-                        width: 80, height: 80, borderRadius: 20,
-                        background: '#EFEFEA',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                        <ShoppingBag size={36} color="#C4B5A5" />
+                <div className="flex flex-col items-center justify-center gap-5 px-6 h-[calc(100vh-180px)]">
+                    <div className="w-20 h-20 rounded-[20px] bg-muted flex items-center justify-center">
+                        <ShoppingBag size={36} className="text-muted-foreground/40" />
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                        <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1814', margin: 0, fontFamily: F }}>
+                    <div className="flex flex-col items-center gap-1.5 text-center">
+                        <p className="text-base font-bold text-foreground">
                             Keranjang Kosong
                         </p>
-                        <p style={{ fontSize: 13, color: '#A8998A', margin: 0, textAlign: 'center', fontFamily: F }}>
+                        <p className="text-sm text-muted-foreground">
                             Tambahkan menu favoritmu dari halaman menu
                         </p>
                     </div>
-                    <button
+                    <Button
                         onClick={() => router.visit(`/customer/menu?table=${tableId ?? ''}`)}
-                        style={{
-                            marginTop: 8, height: 46, padding: '0 28px',
-                            background: '#E8763A', color: '#FFFFFF',
-                            border: 'none', borderRadius: 50,
-                            fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                            fontFamily: F,
-                            boxShadow: '0 4px 14px rgba(232,118,58,0.28)',
-                        }}
+                        className="h-[46px] px-7 !rounded-full text-sm font-semibold"
                     >
                         Kembali ke Menu
-                    </button>
+                    </Button>
                 </div>
             ) : (
-                <>
-                    <div style={{ background: '#F5F5F0', padding: '14px 16px 160px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div className="flex flex-col bg-muted h-[calc(100vh-180px)]">
+                    <div className="flex-1 overflow-y-auto bg-card px-4 pt-3.5">
+                        {items.map((item) => (
+                            <SharedCartItem
+                                key={item.menuId}
+                                item={item}
+                                variant="customer"
+                                onUpdate={(id, qty) => {
+                                    if (qty <= 0) removeItem(id);
+                                    else updateQty(id, qty);
+                                }}
+                                onRemove={(id) => removeItem(id)}
+                            />
+                        ))}
+                    </div>
 
-                        {/* Cart items */}
-                        {items.map((item) => {
-                            const itemCashback   = isMahasiswa ? (item.cashback ?? 0) : 0;
-                            const effectivePrice = item.price - itemCashback;
-                            const itemSubtotal   = effectivePrice * item.quantity;
-                            return (
-                                <div
-                                    key={item.menuId}
-                                    style={{
-                                        background: '#FFFFFF',
-                                        borderRadius: 16,
-                                        padding: '14px 16px',
-                                        boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
-                                    }}
-                                >
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                                        {/* Image circle */}
-                                        <div style={{
-                                            width: 52, height: 52, borderRadius: '50%',
-                                            background: 'linear-gradient(135deg, #C4956A, #A67B55)',
-                                            flexShrink: 0,
-                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                            overflow: 'hidden',
-                                        }}>
-                                            {item.image
-                                                ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                : <Coffee size={22} color="rgba(255,255,255,0.8)" />
-                                            }
-                                        </div>
+                    <div className="shrink-0 px-4 pb-4 pt-3 bg-muted">
+                        <Card className="rounded-2xl !ring-0 border border-border">
+                            <CardContent className="px-[18px] py-4">
+                                <div className="text-[11px] font-bold text-muted-foreground tracking-[0.8px] mb-3.5 uppercase">
+                                    Ringkasan Pesanan
+                                </div>
 
-                                        {/* Text */}
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1814', fontFamily: F, marginBottom: 3 }}>
-                                                {item.name}
-                                            </div>
-                                            <div style={{ fontSize: 12.5, color: '#A8998A', fontFamily: F }}>
-                                                {formatRupiah(effectivePrice)} × {item.quantity}
-                                            </div>
-                                            <div style={{ fontSize: 16, fontWeight: 800, color: '#1A1814', fontFamily: F, marginTop: 6, letterSpacing: -0.3 }}>
-                                                {formatRupiah(itemSubtotal)}
-                                            </div>
-                                        </div>
+                                <div className="flex justify-between mb-2.5">
+                                    <span className="text-sm text-muted-foreground">Subtotal</span>
+                                    <span className="text-sm text-foreground font-medium">{formatRupiah(total)}</span>
+                                </div>
 
-                                        {/* Qty controls */}
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginTop: 2 }}>
-                                            <button
-                                                onClick={() => handleDecrement(item.menuId)}
-                                                style={{
-                                                    width: 30, height: 30, borderRadius: 8,
-                                                    background: '#FFFFFF', border: '1.5px solid #D6CFC8',
-                                                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    fontSize: 18, fontWeight: 500, color: '#6B5E52', fontFamily: F,
-                                                }}
-                                            >
-                                                −
-                                            </button>
-                                            <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1814', minWidth: 18, textAlign: 'center', fontFamily: F }}>
-                                                {item.quantity}
-                                            </span>
-                                            <button
-                                                onClick={() => handleIncrement(item.menuId)}
-                                                style={{
-                                                    width: 30, height: 30, borderRadius: 8,
-                                                    background: '#E8763A', border: 'none',
-                                                    cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    fontSize: 18, fontWeight: 600, color: '#FFFFFF',
-                                                    boxShadow: '0 2px 8px rgba(232,118,58,0.30)',
-                                                }}
-                                            >
-                                                +
-                                            </button>
-                                        </div>
+                                {isMahasiswa && totalCashback > 0 && (
+                                    <div className="flex justify-between mb-2.5">
+                                        <span className="text-sm text-green-600">Cashback Mahasiswa</span>
+                                        <span className="text-sm text-green-600">- {formatRupiah(totalCashback)}</span>
                                     </div>
+                                )}
+
+                                <div className="h-px bg-border mb-3.5" />
+
+                                <div className="flex justify-between items-center">
+                                    <span className="text-base font-bold text-foreground">Total</span>
+                                    <span className="text-lg font-extrabold text-foreground tracking-tight">
+                                        {formatRupiah(grandTotal)}
+                                    </span>
                                 </div>
-                            );
-                        })}
-
-                        {/* Order summary */}
-                        <div style={{
-                            background: '#FFFFFF', borderRadius: 16,
-                            padding: '16px 18px',
-                            boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
-                        }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: '#A8998A', letterSpacing: 0.8, marginBottom: 14, fontFamily: F }}>
-                                RINGKASAN PESANAN
-                            </div>
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                                <span style={{ fontSize: 14, color: '#6B5E52', fontFamily: F }}>Subtotal</span>
-                                <span style={{ fontSize: 14, color: '#1A1814', fontFamily: F }}>{formatRupiah(total)}</span>
-                            </div>
-
-                            {isMahasiswa && totalCashback > 0 && (
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                                    <span style={{ fontSize: 14, color: '#16A34A', fontFamily: F }}>Cashback Mahasiswa</span>
-                                    <span style={{ fontSize: 14, color: '#16A34A', fontFamily: F }}>- {formatRupiah(totalCashback)}</span>
-                                </div>
-                            )}
-
-                            <div style={{ height: 1, background: '#F0EBE4', marginBottom: 14 }} />
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontSize: 16, fontWeight: 700, color: '#1A1814', fontFamily: F }}>Total</span>
-                                <span style={{ fontSize: 18, fontWeight: 800, color: '#1A1814', fontFamily: F, letterSpacing: -0.4 }}>
-                                    {formatRupiah(grandTotal)}
-                                </span>
-                            </div>
-                        </div>
+                            </CardContent>
+                        </Card>
 
                         {errorMsg && (
-                            <div style={{
-                                background: '#FEF2F2', border: '1px solid #FECACA',
-                                borderRadius: 12, padding: '10px 14px',
-                                fontSize: 13, color: '#DC2626', fontFamily: F,
-                            }}>
+                            <div className="bg-destructive/10 border border-destructive/30 rounded-xl px-[14px] py-[10px] text-sm text-destructive mt-3">
                                 {errorMsg}
                             </div>
                         )}
 
-                        {/* ── Pay button (inline, bawah ringkasan) ── */}
-                        <button
+                        <Button
                             onClick={handleCheckout}
                             disabled={loading}
-                            style={{
-                                width: '100%', height: 52,
-                                background: loading ? '#C4B5A5' : '#E8763A',
-                                color: '#FFFFFF', border: 'none', borderRadius: 14,
-                                fontSize: 15, fontWeight: 700,
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                boxShadow: loading ? 'none' : '0 6px 18px rgba(232,118,58,0.35)',
-                                fontFamily: F, letterSpacing: -0.2,
-                            }}
+                            className="w-full h-[52px] !rounded-full text-[15px] font-bold mt-3"
                         >
-                            {loading ? 'Memproses...' : `Lanjut Pembayaran  ${formatRupiah(grandTotal)}`}
-                        </button>
+                            {loading ? 'Memproses...' : `Bayar Sekarang  ${formatRupiah(grandTotal)}`}
+                        </Button>
                     </div>
-                </>
+                </div>
             )}
         </CustomerLayout>
     );

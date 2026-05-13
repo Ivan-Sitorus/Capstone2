@@ -2,101 +2,159 @@ import { useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import { cn } from '@/lib/utils';
 
-const STATUS_CONFIG = {
-    pending:    { icon: '⏳', label: 'Menunggu Pembayaran', color: '#D4A04A', bg: '#FDF6E8' },
-    confirmed:  { icon: '✓',  label: 'Pesanan Dikonfirmasi', color: '#5A9A6E', bg: '#EDF7F0' },
-    preparing:  { icon: '👨‍🍳', label: 'Sedang Diproses',    color: '#4A7EC9', bg: '#EBF2FB' },
-    ready:      { icon: '🛎', label: 'Siap Diambil',        color: '#5A9A6E', bg: '#EDF7F0' },
-    completed:  { icon: '✅', label: 'Selesai',             color: '#5A9A6E', bg: '#EDF7F0' },
-    cancelled:  { icon: '✕',  label: 'Dibatalkan',          color: '#C0544A', bg: '#FDEDEC' },
+const ORDER_FLOW = ['pending', 'confirmed', 'preparing', 'ready', 'completed'];
+
+const STEPS = [
+    { key: 'pending',    icon: '⏳', label: 'Menunggu\nPembayaran' },
+    { key: 'confirmed',  icon: '✓',  label: 'Dikonfirmasi' },
+    { key: 'preparing',  icon: '👨‍🍳', label: 'Diproses' },
+    { key: 'ready',      icon: '🛎',  label: 'Siap Diambil' },
+    { key: 'completed',  icon: '✅',  label: 'Selesai' },
+];
+
+const s = {
+    cancelledCard: {
+        background: '#FDEDEC',
+        border: '1px solid rgba(192,84,74,0.19)',
+        borderRadius: 20,
+        padding: '20px 24px',
+        textAlign: 'center',
+    },
 };
 
 export default function OrderStatus({ order }) {
-    const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
+    const currentIdx = ORDER_FLOW.indexOf(order.status);
+    const isTerminal = ['completed', 'cancelled'].includes(order.status);
 
-    // Poll status tiap 10 detik selama masih aktif
     useEffect(() => {
-        if (['completed', 'cancelled'].includes(order.status)) return;
+        if (isTerminal) return;
         const id = setInterval(() => {
             router.reload({ only: ['order'] });
         }, 10_000);
         return () => clearInterval(id);
     }, [order.status]);
 
+    const stepState = (i) => {
+        if (order.status === 'cancelled') return 'muted';
+        if (i < currentIdx) return 'completed';
+        if (i === currentIdx) return order.status === 'completed' ? 'completed' : 'active';
+        return 'future';
+    };
+
     return (
         <CustomerLayout activeTab="riwayat">
-            <div style={{
-                display: 'flex', flexDirection: 'column',
-                gap: 16, padding: '24px 24px 24px',
-            }}>
+            <div className="flex flex-col gap-4 p-6 pb-24">
 
-                {/* Status card */}
-                <div style={{
-                    background: cfg.bg, borderRadius: 20,
-                    padding: '28px 24px', textAlign: 'center',
-                    border: `1px solid ${cfg.color}30`,
-                }}>
-                    <div style={{ fontSize: 44, marginBottom: 12 }}>{cfg.icon}</div>
-                    <div style={{
-                        fontSize: 18, fontWeight: 700, color: cfg.color,
-                        fontFamily: '"DM Sans", system-ui, sans-serif',
-                        marginBottom: 4,
-                    }}>
-                        {cfg.label}
+                {order.status === 'cancelled' && (
+                    <div style={s.cancelledCard}>
+                        <div className="text-3xl mb-2">✕</div>
+                        <div className="text-base font-semibold text-[#C0544A]">
+                            Pesanan Dibatalkan
+                        </div>
+                        <div className="text-xs mt-1 text-muted-foreground">
+                            #{order.order_code}
+                        </div>
                     </div>
-                    <div style={{ fontSize: 13, color: '#8C7B6B', fontFamily: 'Outfit, system-ui, sans-serif' }}>
-                        #{order.order_code}
+                )}
+
+                <div className="bg-card border border-border rounded-xl p-5">
+                    <div className="flex items-start w-full">
+                        {STEPS.flatMap((step, i) => {
+                            const state = stepState(i);
+                            const isCompleted = state === 'completed';
+                            const isActive = state === 'active';
+
+                            const elements = [
+                                <div key={step.key} className="flex flex-col items-center shrink-0">
+                                    <div className={cn(
+                                        'w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold shrink-0',
+                                        'transition-colors duration-200',
+                                        isCompleted && 'bg-[var(--green-success)] text-white',
+                                        isActive && 'bg-primary text-primary-foreground animate-pulse',
+                                        !isCompleted && !isActive && 'bg-muted text-muted-foreground',
+                                    )}>
+                                        {isCompleted ? '✓' : step.icon}
+                                    </div>
+                                    <span className={cn(
+                                        'text-[10px] leading-tight text-center mt-1.5 whitespace-pre-line',
+                                        isActive ? 'text-primary font-semibold' : 'text-muted-foreground',
+                                    )}>
+                                        {step.label}
+                                    </span>
+                                </div>,
+                            ];
+
+                            if (i < STEPS.length - 1) {
+                                const connectorGreen = stepState(i) === 'completed';
+                                elements.push(
+                                    <div
+                                        key={`conn-${i}`}
+                                        className={cn(
+                                            'flex-1 h-[3px] rounded-sm mt-[14px] mx-1',
+                                            connectorGreen
+                                                ? 'bg-[var(--green-success)]'
+                                                : 'bg-[var(--gray-border)]',
+                                        )}
+                                    />,
+                                );
+                            }
+
+                            return elements;
+                        })}
                     </div>
                 </div>
 
-                {/* Detail card */}
-                <div style={{
-                    background: '#FFFFFF', borderRadius: 20,
-                    border: '1px solid #EDE8E2', padding: 20,
-                    boxShadow: '0 4px 14px rgba(45,32,22,0.06)',
-                    display: 'flex', flexDirection: 'column', gap: 14,
-                }}>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: '#2D2016', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+                <div className="bg-card border border-border rounded-xl p-5">
+                    <h3 className="text-sm font-semibold text-foreground mb-4">
                         Detail Pesanan
-                    </span>
+                    </h3>
 
-                    {[
-                        ['Tanggal', `${formatTime(order.created_at)} - ${formatDate(order.created_at)}`],
-                        ['Item',    order.items_summary],
-                        ['Metode',  order.payment_method ? order.payment_method.toUpperCase() : '-'],
-                        ['Total',   formatRupiah(order.total_amount)],
-                    ].map(([label, value]) => (
-                        <div key={label} style={{
-                            display: 'flex', justifyContent: 'space-between',
-                            paddingBottom: 12, borderBottom: '1px solid #F5F0EB',
-                        }}>
-                            <span style={{ fontSize: 13, color: '#B5A898', fontFamily: 'Outfit, system-ui, sans-serif' }}>
-                                {label}
-                            </span>
-                            <span style={{
-                                fontSize: 13, fontWeight: 600, color: '#2D2016',
-                                fontFamily: 'Outfit, system-ui, sans-serif',
-                                maxWidth: '55%', textAlign: 'right',
-                            }}>
-                                {value}
+                    <div className="flex flex-col gap-3">
+                        {(order.items ?? []).length > 0 ? (
+                            <div className="flex flex-col gap-2">
+                                {(order.items ?? []).map((item, i) => (
+                                    <div key={i} className="flex justify-between items-center">
+                                        <span className="text-sm text-foreground">
+                                            {item.quantity}x {item.menu?.name || item.name}
+                                        </span>
+                                        <span className="text-sm font-medium text-foreground">
+                                            {formatRupiah(item.subtotal)}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-muted-foreground">{order.items_summary}</p>
+                        )}
+
+                        <div className="h-px bg-border my-2" />
+
+                        {[
+                            ['Tanggal', `${formatDate(order.created_at)}, ${formatTime(order.created_at)}`],
+                            ['Metode', order.payment_method?.toUpperCase() ?? '-'],
+                        ].map(([label, value]) => (
+                            <div key={label} className="flex justify-between items-center">
+                                <span className="text-sm text-muted-foreground">{label}</span>
+                                <span className="text-sm font-medium text-foreground">{value}</span>
+                            </div>
+                        ))}
+
+                        <div className="h-px bg-border my-1" />
+
+                        <div className="flex justify-between items-center px-3 py-[10px] bg-secondary rounded-[10px] border border-primary/20">
+                            <span className="text-sm font-bold text-foreground">Total</span>
+                            <span className="text-base font-extrabold text-primary">
+                                {formatRupiah(order.total_amount)}
                             </span>
                         </div>
-                    ))}
+                    </div>
                 </div>
 
-                {/* Back button */}
                 <button
                     onClick={() => router.visit('/customer/menu')}
-                    style={{
-                        background: '#E8763A', color: '#FFFFFF',
-                        border: 'none', borderRadius: 50,
-                        height: 52, width: '100%',
-                        fontSize: 15, fontWeight: 600,
-                        fontFamily: 'Outfit, system-ui, sans-serif',
-                        cursor: 'pointer',
-                        boxShadow: '0 2px 8px rgba(232,118,58,0.25)',
-                    }}
+                    className="w-full h-[52px] bg-primary text-primary-foreground rounded-full text-sm font-bold cursor-pointer shadow-[0_6px_18px_rgba(232,118,58,0.35)]"
                 >
                     Pesan Lagi
                 </button>

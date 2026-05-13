@@ -5,6 +5,7 @@ import useCart from '@/Hooks/useCart';
 import { ChevronLeft, Banknote, QrCode, MapPin, Wallet } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
+import { cn } from '@/lib/utils';
 
 export default function PaymentChoose({ order, items, table_number }) {
     const [selected,   setSelected]   = useState(null);
@@ -21,7 +22,7 @@ export default function PaymentChoose({ order, items, table_number }) {
             if (selected === 'cash') {
                 await axios.post(`/api/order/${order.id}/pay/cash`);
                 clearCart();
-                setShowCashModal(true);          // tampilkan modal C5b
+                setShowCashModal(true);
             } else {
                 await axios.post(`/api/order/${order.id}/pay/qris`);
                 router.visit(`/customer/payment/${order.order_code}/qris`);
@@ -34,7 +35,6 @@ export default function PaymentChoose({ order, items, table_number }) {
     }
 
     function handleMengerti() {
-        // Kembali ke menu, bawa tableId dari sessionStorage
         let tableId = null;
         try {
             const saved = sessionStorage.getItem('w9_customer');
@@ -49,172 +49,123 @@ export default function PaymentChoose({ order, items, table_number }) {
             title: 'Bayar ke Kasir (Cash)',
             desc:  'Bayar langsung di kasir setelah pesanan dikonfirmasi',
             Icon:  Banknote,
-            iconBg: '#FEF3EC',
-            iconColor: '#E8763A',
+            iconBg: 'bg-secondary',
+            iconColor: 'text-primary',
         },
         {
             key:   'qris',
             title: 'QRIS',
-            desc:  'Scan QR code & upload bukti pembayaran',
+            desc:  'Pindai kode QR & unggah bukti pembayaran',
             Icon:  QrCode,
-            iconBg: '#F5F0EB',
-            iconColor: '#8C7B6B',
+            iconBg: 'bg-muted',
+            iconColor: 'text-muted-foreground/60',
         },
     ];
 
     return (
         <CustomerLayout activeTab="cart">
-            {/* ── Header ── */}
-            <div style={{
-                background: '#FFFFFF',
-                borderBottom: '1px solid #F0EBE5',
-                padding: '22px 24px 16px',
-                display: 'flex', flexDirection: 'column', gap: 4,
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div className="bg-card border-b border-border px-6 pb-4 pt-[22px] flex flex-col gap-1">
+                <div className="flex items-center gap-[14px]">
                     <button
                         onClick={() => router.visit('/customer/cart')}
-                        style={{
-                            width: 36, height: 36, borderRadius: 12,
-                            background: '#F0EBE5', border: 'none', cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            flexShrink: 0,
-                        }}
+                        className="w-9 h-9 rounded-[12px] bg-muted border-none cursor-pointer flex items-center justify-center shrink-0"
                     >
-                        <ChevronLeft size={20} color="#2D2016" />
+                        <ChevronLeft size={20} className="text-foreground" />
                     </button>
                     <div>
-                        <div style={{ fontSize: 20, fontWeight: 700, color: '#2D2016', fontFamily: '"DM Sans", system-ui' }}>
+                        <div className="text-xl font-bold text-foreground">
                             Pilih Cara Bayar
                         </div>
-                        <div style={{ fontSize: 12, color: '#8C7B6B', fontFamily: 'Outfit, system-ui' }}>
+                        <div className="text-xs text-muted-foreground">
                             Pesanan #{order.order_code}
                         </div>
                     </div>
                 </div>
                 {table_number && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 50 }}>
-                        <MapPin size={12} color="#B5A898" />
-                        <span style={{ fontSize: 12, fontWeight: 500, color: '#B5A898', fontFamily: 'Outfit, system-ui' }}>
+                    <div className="flex items-center gap-1.5 pl-[50px]">
+                        <MapPin size={12} className="text-muted-foreground/40" />
+                        <span className="text-xs font-medium text-muted-foreground/50">
                             Meja {table_number}
                         </span>
                     </div>
                 )}
             </div>
 
-            {/* ── Content ── */}
-            <div style={{
-                padding: '0 24px 24px',
-                display: 'flex', flexDirection: 'column', gap: 18,
-            }}>
+            <div className="px-6 pb-6 flex flex-col gap-[18px]">
 
-                {/* Ringkasan label */}
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#8C7B6B', letterSpacing: 0.5, fontFamily: 'Outfit, system-ui', paddingTop: 18 }}>
+                <div className="text-[13px] font-semibold text-muted-foreground/60 tracking-[0.5px] pt-[18px]">
                     RINGKASAN PESANAN
                 </div>
 
-                {/* Order summary card */}
-                <div style={{
-                    background: '#FFFFFF', borderRadius: 20,
-                    border: '1px solid #EDE8E2',
-                    boxShadow: '0 3px 12px rgba(45,32,22,0.05)',
-                    overflow: 'hidden',
-                }}>
+                <div className="bg-card rounded-[20px] border border-border overflow-hidden shadow-[0_3px_12px_rgba(45,32,22,0.05)]">
                     {items.map((item, idx) => (
                         <div
                             key={idx}
-                            style={{
-                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                padding: '14px 18px',
-                                borderBottom: idx < items.length - 1 ? '1px solid #F5F0EB' : 'none',
-                            }}
+                            className="flex justify-between items-center px-[18px] py-[14px]"
+                            style={{ borderBottom: idx < items.length - 1 ? '1px solid var(--border)' : 'none' }}
                         >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <div style={{
-                                    width: 26, height: 26, borderRadius: 8,
-                                    background: '#FEF3EC',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    flexShrink: 0,
-                                }}>
-                                    <span style={{ fontSize: 11, fontWeight: 700, color: '#E8763A', fontFamily: 'Outfit, system-ui' }}>
+                            <div className="flex items-center gap-[10px]">
+                                <div className="w-[26px] h-[26px] rounded-lg bg-secondary flex items-center justify-center shrink-0">
+                                    <span className="text-[11px] font-bold text-primary">
                                         {item.qty}x
                                     </span>
                                 </div>
-                                <span style={{ fontSize: 14, fontWeight: 500, color: '#2D2016', fontFamily: 'Outfit, system-ui' }}>
+                                <span className="text-sm font-medium text-foreground">
                                     {item.name}
                                 </span>
                             </div>
-                            <span style={{ fontSize: 14, fontWeight: 600, color: '#2D2016', fontFamily: 'Outfit, system-ui' }}>
+                            <span className="text-sm font-semibold text-foreground">
                                 {formatRupiah(item.subtotal)}
                             </span>
                         </div>
                     ))}
-                    {/* Divider */}
-                    <div style={{ height: 1, background: '#EDE8E2' }} />
-                    {/* Total row */}
-                    <div style={{
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        padding: '10px 18px 16px',
-                    }}>
-                        <span style={{ fontSize: 16, fontWeight: 700, color: '#2D2016', fontFamily: '"DM Sans", system-ui' }}>
+                    <div className="h-px bg-border" />
+                    <div className="flex justify-between items-center px-[18px] pb-4 pt-[10px]">
+                        <span className="text-base font-bold text-foreground">
                             Total
                         </span>
-                        <span style={{ fontSize: 18, fontWeight: 700, color: '#E8763A', fontFamily: '"DM Sans", system-ui' }}>
+                        <span className="text-lg font-bold text-primary">
                             {formatRupiah(order.total_amount)}
                         </span>
                     </div>
                 </div>
 
-                {/* Metode label */}
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#8C7B6B', letterSpacing: 0.5, fontFamily: 'Outfit, system-ui' }}>
+                <div className="text-[13px] font-semibold text-muted-foreground/60 tracking-[0.5px]">
                     METODE PEMBAYARAN
                 </div>
 
-                {/* Payment methods */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                <div className="flex flex-col gap-[10px]">
                     {METHODS.map(({ key, title, desc, Icon, iconBg, iconColor }) => {
                         const active = selected === key;
                         return (
                             <div
                                 key={key}
                                 onClick={() => setSelected(key)}
-                                style={{
-                                    background: active ? '#FFFBF8' : '#FFFFFF',
-                                    borderRadius: 16,
-                                    border: `${active ? 2 : 1}px solid ${active ? '#E8763A' : '#EDE8E2'}`,
-                                    boxShadow: active ? '0 2px 10px rgba(232,118,58,0.12)' : 'none',
-                                    padding: '16px 18px 16px 16px',
-                                    display: 'flex', alignItems: 'center', gap: 14,
-                                    cursor: 'pointer', transition: 'all 0.15s',
-                                }}
+                                className={cn(
+                                    'rounded-[16px] px-4 py-4 flex items-center gap-[14px] cursor-pointer transition-all duration-150',
+                                    active ? 'bg-secondary border-2 border-primary shadow-[0_2px_10px_rgba(232,118,58,0.12)]' : 'bg-card border border-border',
+                                )}
                             >
-                                <div style={{
-                                    width: 42, height: 42, borderRadius: 12,
-                                    background: active ? '#FEF3EC' : iconBg,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    flexShrink: 0,
-                                }}>
+                                <div className={cn('w-[42px] h-[42px] rounded-[12px] flex items-center justify-center shrink-0', active ? 'bg-secondary' : iconBg)}>
                                     {key === 'qris'
-                                        ? <img src="/images/logo-qris.png" alt="QRIS" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-                                        : <Icon size={22} color={active ? '#E8763A' : iconColor} />
+                                        ? <img src="/images/logo-qris.png" alt="QRIS" className="w-7 h-7 object-contain" />
+                                        : <Icon size={22} className={active ? 'text-primary' : iconColor} />
                                     }
                                 </div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: 15, fontWeight: 600, color: '#2D2016', fontFamily: 'Outfit, system-ui' }}>
+                                <div className="flex-1">
+                                    <div className="text-[15px] font-semibold text-foreground">
                                         {title}
                                     </div>
-                                    <div style={{ fontSize: 12, color: '#8C7B6B', marginTop: 2, fontFamily: 'Outfit, system-ui' }}>
+                                    <div className="text-xs text-muted-foreground mt-0.5">
                                         {desc}
                                     </div>
                                 </div>
-                                {/* Radio */}
-                                <div style={{
-                                    width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-                                    border: `${active ? 2 : 1.5}px solid ${active ? '#E8763A' : '#D6CFC6'}`,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                }}>
+                                <div className={cn(
+                                    'w-[22px] h-[22px] rounded-full shrink-0 flex items-center justify-center',
+                                    active ? 'border-2 border-primary' : 'border-[1.5px] border-muted-foreground/30',
+                                )}>
                                     {active && (
-                                        <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#E8763A' }} />
+                                        <div className="w-3 h-3 rounded-full bg-primary" />
                                     )}
                                 </div>
                             </div>
@@ -222,140 +173,74 @@ export default function PaymentChoose({ order, items, table_number }) {
                     })}
                 </div>
 
-                {/* Spacer */}
-                <div style={{ flex: 1 }} />
+                <div className="flex-1" />
 
                 {error && (
-                    <div style={{
-                        background: '#FEF2F2', border: '1px solid #FECACA',
-                        borderRadius: 10, padding: '10px 14px',
-                        fontSize: 13, color: '#DC2626', fontFamily: 'Outfit, system-ui',
-                    }}>
+                    <div className="bg-destructive/10 border border-destructive/30 rounded-[10px] px-[14px] py-[10px] text-[13px] text-destructive">
                         {error}
                     </div>
                 )}
 
-                {/* CTA */}
                 <button
                     onClick={handleLanjut}
                     disabled={!selected || loading}
-                    style={{
-                        width: '100%', height: 54,
-                        background: !selected ? '#EDE8E2' : '#E8763A',
-                        color: !selected ? '#9AA3AF' : '#FFFFFF',
-                        border: 'none', borderRadius: 18,
-                        fontSize: 16, fontWeight: 700,
-                        cursor: !selected ? 'default' : 'pointer',
-                        boxShadow: !selected ? 'none' : '0 4px 16px rgba(232,118,58,0.30)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                        fontFamily: '"DM Sans", system-ui',
-                        transition: 'all 0.15s',
-                    }}
+                    className={cn(
+                        'w-full h-[54px] border-none rounded-[18px] text-base font-bold flex items-center justify-center gap-2 transition-all duration-150',
+                        !selected ? 'bg-muted text-muted-foreground/50 cursor-default' : 'bg-primary text-primary-foreground cursor-pointer shadow-[0_4px_16px_rgba(232,118,58,0.30)]',
+                    )}
                 >
                     {loading ? 'Memproses...' : 'Konfirmasi Pembayaran'}
                 </button>
             </div>
 
-            {/* ── C5b Modal: Notif Tunai ── */}
             {showCashModal && (
-                <div style={{
-                    position: 'fixed', inset: 0,
-                    background: 'rgba(0,0,0,0.50)',
-                    zIndex: 200,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    padding: '0 24px',
-                }}>
-                    <div style={{
-                        background: '#FFFFFF',
-                        borderRadius: 24,
-                        width: '100%', maxWidth: 300,
-                        padding: '28px 24px 24px',
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', gap: 16,
-                        boxShadow: '0 8px 30px rgba(45,32,22,0.20)',
-                    }}>
-                        {/* Icon circle */}
-                        <div style={{
-                            width: 72, height: 72, borderRadius: '50%',
-                            background: '#FEF3EC',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        }}>
-                            <Wallet size={36} color="#E8763A" />
+                <div className="fixed inset-0 z-[200] flex items-center justify-center px-6"
+                     style={{ background: 'rgba(0,0,0,0.50)' }}>
+                    <div className="bg-card rounded-[24px] w-full max-w-[300px] px-6 pb-6 pt-7 flex flex-col items-center gap-4 shadow-[0_8px_30px_rgba(45,32,22,0.20)]">
+                        <div className="w-[72px] h-[72px] rounded-full bg-secondary flex items-center justify-center">
+                            <Wallet size={36} className="text-primary" />
                         </div>
 
-                        {/* Title */}
-                        <span style={{
-                            fontSize: 18, fontWeight: 700, color: '#2D2016',
-                            fontFamily: '"DM Sans", system-ui', textAlign: 'center',
-                        }}>
+                        <span className="text-lg font-bold text-foreground text-center">
                             Bayar di Kasir
                         </span>
 
-                        {/* Desc */}
-                        <span style={{
-                            fontSize: 13, color: '#8C7B6B', lineHeight: 1.5,
-                            fontFamily: 'Outfit, system-ui', textAlign: 'center',
-                        }}>
+                        <span className="text-[13px] text-muted-foreground leading-relaxed text-center">
                             Silakan tunjukkan pesanan ini ke kasir dan lakukan pembayaran tunai.
                         </span>
 
-                        {/* Amount box */}
-                        <div style={{
-                            width: '100%', background: '#FEF8F4',
-                            borderRadius: 14, padding: '12px 16px',
-                            display: 'flex', flexDirection: 'column',
-                            alignItems: 'center', gap: 2,
-                        }}>
-                            <span style={{ fontSize: 11, fontWeight: 500, color: '#B5A898', fontFamily: 'Outfit, system-ui' }}>
+                        <div className="w-full bg-secondary rounded-[14px] px-4 py-3 flex flex-col items-center gap-0.5">
+                            <span className="text-[11px] font-medium text-muted-foreground/50">
                                 No. Pesanan
                             </span>
-                            <span style={{
-                                fontSize: 15, fontWeight: 700, color: '#2D2016',
-                                fontFamily: '"DM Sans", system-ui', letterSpacing: 0.3,
-                                marginBottom: 6,
-                            }}>
+                            <span className="text-[15px] font-bold text-foreground tracking-[0.3px] mb-1.5">
                                 #{order.order_code}
                             </span>
-                            <span style={{ fontSize: 11, fontWeight: 500, color: '#B5A898', fontFamily: 'Outfit, system-ui' }}>
+                            <span className="text-[11px] font-medium text-muted-foreground/50">
                                 Total Pembayaran
                             </span>
-                            <span style={{
-                                fontSize: 22, fontWeight: 700, color: '#E8763A',
-                                fontFamily: '"DM Sans", system-ui', letterSpacing: -0.5,
-                            }}>
+                            <span className="text-[22px] font-bold text-primary tracking-tight">
                                 {formatRupiah(order.total_amount)}
                             </span>
                         </div>
 
-                        {/* Info riwayat */}
-                        <div style={{
-                            width: '100%',
-                            background: '#F5F0EB',
-                            borderRadius: 12,
-                            padding: '10px 14px',
-                            display: 'flex', alignItems: 'flex-start', gap: 8,
-                        }}>
-                            <span style={{
-                                fontSize: 12, color: '#6B5E52', lineHeight: 1.5,
-                                fontFamily: 'Outfit, system-ui',
-                            }}>
+                        <div className="w-full bg-muted rounded-[12px] px-[14px] py-[10px] flex items-start gap-2">
+                            <span className="text-xs text-muted-foreground leading-relaxed">
                                 Pantau status pesananmu di tab{' '}
-                                <strong style={{ color: '#E8763A' }}>Riwayat</strong>
+                                <strong className="text-primary">Riwayat</strong>
                                 {' '}untuk melihat update dari kasir.
                             </span>
                         </div>
 
-                        {/* Mengerti button */}
+                        <button
+                            onClick={() => router.visit(`/receipt/${order.order_code}`)}
+                            className="w-full h-[46px] bg-transparent border border-muted-foreground/30 rounded-[14px] text-[14px] font-semibold cursor-pointer text-muted-foreground"
+                        >
+                            Lihat Struk Digital
+                        </button>
                         <button
                             onClick={handleMengerti}
-                            style={{
-                                width: '100%', height: 46,
-                                background: '#E8763A', color: '#FFFFFF',
-                                border: 'none', borderRadius: 14,
-                                fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                                fontFamily: '"DM Sans", system-ui',
-                                boxShadow: '0 3px 10px rgba(232,118,58,0.25)',
-                            }}
+                            className="w-full h-[46px] bg-primary text-primary-foreground border-none rounded-[14px] text-[15px] font-bold cursor-pointer shadow-[0_3px_10px_rgba(232,118,58,0.25)]"
                         >
                             Mengerti
                         </button>

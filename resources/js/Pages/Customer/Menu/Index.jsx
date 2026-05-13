@@ -1,111 +1,13 @@
-import { useState, useEffect, useMemo } from 'react';
-import { router, Head } from '@inertiajs/react';
-import { Search, ShoppingBag, Coffee } from 'lucide-react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { router, Head, Link } from '@inertiajs/react';
+import { Search, ShoppingBag } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
 import { formatRupiah } from '@/helpers';
-
-const F = '"Plus Jakarta Sans", system-ui, sans-serif';
-
-/* ── Inline menu item card (2-col grid, vertical) ───────────────────── */
-function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false, isMahasiswa = false }) {
-    const cashback = Number(menu.cashback ?? 0);
-
-    return (
-        <div style={{
-            background: '#FFFFFF',
-            borderRadius: 16,
-            overflow: 'hidden',
-            boxShadow: '0 1px 8px rgba(26,24,20,0.07)',
-            display: 'flex',
-            flexDirection: 'column',
-        }}>
-            {/* Image */}
-            <div style={{
-                width: '100%', aspectRatio: '4/3',
-                background: 'linear-gradient(135deg, #C4956A 0%, #A67B55 100%)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                overflow: 'hidden',
-            }}>
-                {menu.image_url
-                    ? <img src={menu.image_url} alt={menu.name}
-                           loading={priority ? 'eager' : 'lazy'}
-                           decoding={priority ? 'sync' : 'async'}
-                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                           onError={e => { e.target.style.display = 'none'; }} />
-                    : <Coffee size={36} color="#FFFFFF" strokeWidth={1.5} />
-                }
-            </div>
-
-            {/* Info */}
-            <div style={{ padding: '10px 12px 12px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <div style={{
-                    fontSize: 13, fontWeight: 700, color: '#1A1814',
-                    fontFamily: F, lineHeight: 1.3, marginBottom: 4,
-                }}>
-                    {menu.name}
-                </div>
-                <div style={{
-                    fontSize: 13, fontWeight: 600, color: '#E8763A',
-                    fontFamily: F, marginBottom: cashback > 0 ? 4 : 8,
-                }}>
-                    {formatRupiah(Number(menu.price))}
-                </div>
-                {isMahasiswa && cashback > 0 && (
-                    <div style={{
-                        fontSize: 10, color: '#16A34A', fontFamily: F,
-                        display: 'flex', alignItems: 'center', gap: 3,
-                        marginBottom: 8,
-                    }}>
-                        <span style={{ fontSize: 6, lineHeight: 1 }}>●</span>
-                        Cashback {formatRupiah(cashback)}
-                    </div>
-                )}
-
-                {/* Action */}
-                <div style={{ marginTop: 'auto' }}>
-                    {cartItem ? (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
-                            <button onClick={onDecrement} style={{
-                                width: 30, height: 30, borderRadius: 8,
-                                background: '#F5F0EB', border: 'none', cursor: 'pointer',
-                                fontSize: 18, fontWeight: 500, color: '#6B5E52',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontFamily: F,
-                            }}>−</button>
-                            <span style={{
-                                fontSize: 15, fontWeight: 700, color: '#1A1814',
-                                minWidth: 20, textAlign: 'center', fontFamily: F,
-                            }}>
-                                {cartItem.quantity}
-                            </span>
-                            <button onClick={onIncrement} style={{
-                                width: 30, height: 30, borderRadius: 8,
-                                background: '#E8763A', border: 'none', cursor: 'pointer',
-                                fontSize: 18, fontWeight: 600, color: '#FFFFFF',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                boxShadow: '0 3px 10px rgba(232,118,58,0.32)',
-                                fontFamily: F,
-                            }}>+</button>
-                        </div>
-                    ) : (
-                        <button onClick={onAdd} style={{
-                            width: '100%',
-                            background: '#E8763A', color: '#FFFFFF',
-                            border: 'none', borderRadius: 50,
-                            padding: '8px 0',
-                            fontSize: 12, fontWeight: 700,
-                            fontFamily: F, cursor: 'pointer',
-                            boxShadow: '0 3px 10px rgba(232,118,58,0.28)',
-                        }}>
-                            + Tambah
-                        </button>
-                    )}
-                </div>
-            </div>
-        </div>
-    );
-}
+import SharedMenuItem from '@/Components/Shared/SharedMenuItem';
+import { cn } from '@/lib/utils';
 
 /* ── Main page ─────────────────────────────────────────────────────── */
 export default function CustomerMenu({ categories, table }) {
@@ -113,10 +15,11 @@ export default function CustomerMenu({ categories, table }) {
     const [search,         setSearch]         = useState('');
     const [customer,       setCustomer]       = useState(null);
     const [ready,          setReady]          = useState(false);
+    const [logoError,      setLogoError]      = useState(false);
 
-    const { items, addItem, updateQty, setTable, total, count } = useCart();
+    const { items, addItem, removeItem, updateQty, setTable, total, count } = useCart();
 
-    /* Auth guard — jalankan sebelum render konten */
+    /* Auth guard */
     useEffect(() => {
         try {
             const saved = sessionStorage.getItem('w9_customer');
@@ -126,12 +29,6 @@ export default function CustomerMenu({ categories, table }) {
                 return;
             }
             const data = JSON.parse(saved);
-            if (!data.name || !data.phone) {
-                sessionStorage.removeItem('w9_customer');
-                const fb = table?.id ?? '';
-                router.visit(fb ? `/order?table=${fb}` : '/order');
-                return;
-            }
             if (table?.id && data.tableId !== table.id) {
                 sessionStorage.removeItem('w9_customer');
                 router.visit(`/order?table=${table.id}`);
@@ -183,6 +80,33 @@ export default function CustomerMenu({ categories, table }) {
         return Object.entries(map).map(([label, menus]) => ({ label, menus }));
     }, [filtered, activeCategory]);
 
+    const handleVisitCart = useCallback(() => router.visit('/customer/cart'), []);
+
+    const renderMenuGrid = useCallback((menuList) => (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {menuList.map(menu => {
+                const cartItem = cartMap[menu.id];
+                const inCart = cartItem && cartItem.quantity > 0;
+                return (
+                    <SharedMenuItem
+                        key={menu.id}
+                        menu={menu}
+                        variant="customer"
+                        inCart={inCart}
+                        quantity={cartItem?.quantity || 0}
+                        onAdd={() => addItem(menu)}
+                        onIncrement={() => addItem(menu)}
+                        onDecrement={cartItem ? () => {
+                            const newQty = cartItem.quantity - 1;
+                            if (newQty <= 0) removeItem(menu.id);
+                            else updateQty(menu.id, newQty);
+                        } : undefined}
+                    />
+                );
+            })}
+        </div>
+    ), [cartMap, addItem, removeItem, updateQty]);
+
     if (!ready) return null;
 
     return (
@@ -190,245 +114,127 @@ export default function CustomerMenu({ categories, table }) {
             <Head>
                 <title>Menu — W9 Cafe</title>
                 <meta name="description" content="Pesan makanan dan minuman favorit Anda di W9 Cafe STIE Totalwin." />
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
             </Head>
 
-            {/* ── Header ── */}
-            <div style={{ background: '#FFFFFF', padding: '20px 20px 16px' }}>
-                {/* Logo + Greeting row */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-                    {/* Logo */}
-                    <div style={{
-                        width: 52, height: 52, borderRadius: 14, overflow: 'hidden', flexShrink: 0,
-                        background: 'radial-gradient(ellipse 140% 140% at 50% 30%, #2A4F5F 0%, #1B3A4B 100%)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
-                    }}>
-                        <img
-                            src="/images/logo.jpg"
-                            alt="W9 Cafe"
-                            fetchPriority="high"
-                            loading="eager"
-                            width="52"
-                            height="52"
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            onError={e => { e.target.style.display = 'none'; }}
-                        />
+            <div className="bg-card px-5 pt-5 pb-4">
+                <div className="flex items-center gap-3.5 mb-3.5">
+                    <div className="w-[52px] h-[52px] rounded-[14px] overflow-hidden shrink-0 flex items-center justify-center bg-[#1B3A4B] shadow-[0_4px_14px_rgba(0,0,0,0.18)]">
+                        {logoError ? (
+                            <span className="text-white text-lg italic font-bold">w9</span>
+                        ) : (
+                            <img
+                                src="/images/logo.jpg"
+                                alt="W9 Cafe"
+                                fetchPriority="high"
+                                loading="eager"
+                                width="52"
+                                height="52"
+                                className="w-full h-full object-cover"
+                                onError={() => setLogoError(true)}
+                            />
+                        )}
                     </div>
 
-                    {/* Text */}
                     <div>
-                        <div style={{
-                            fontSize: 12, color: '#A8998A',
-                            fontFamily: F, marginBottom: 1,
-                        }}>
+                        <div className="text-xs text-muted-foreground/70 mb-0.5">
                             Selamat datang,
                         </div>
-                        <div style={{
-                            fontSize: 20, fontWeight: 800, color: '#1A1814',
-                            fontFamily: F, letterSpacing: -0.4, lineHeight: 1.2,
-                        }}>
+                        <div className="text-xl font-extrabold text-foreground tracking-tight leading-tight">
                             {customer?.name ?? 'Pelanggan'}
                         </div>
-                        <div style={{
-                            fontSize: 11, color: '#A8998A', fontFamily: F, marginTop: 1,
-                        }}>
+                        <div className="text-[11px] text-muted-foreground/70 mt-0.5">
                             Meja {table?.table_number ?? customer?.tableNumber ?? '-'}
                         </div>
                     </div>
                 </div>
 
-                {/* Search */}
-                <div style={{ position: 'relative' }}>
-                    <Search size={17} style={{
-                        position: 'absolute', left: 16, top: '50%',
-                        transform: 'translateY(-50%)',
-                        color: '#C4B5A5', pointerEvents: 'none',
-                    }} />
-                    <input
-                        type="text"
+                <div className="relative">
+                    <Search
+                        size={17}
+                        className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground/40 pointer-events-none"
+                    />
+                    <Input
                         value={search}
                         onChange={e => setSearch(e.target.value)}
                         placeholder="Cari menu favoritmu..."
-                        style={{
-                            width: '100%', height: 46,
-                            background: '#F5F0EB',
-                            border: 'none', borderRadius: 50,
-                            padding: '0 20px 0 44px',
-                            fontSize: 14, color: '#1A1814',
-                            fontFamily: F, outline: 'none',
-                            boxSizing: 'border-box',
-                        }}
+                        className="w-full h-[46px] pl-11 rounded-full bg-muted border-none text-sm text-foreground"
                     />
                 </div>
             </div>
 
-            {/* ── Category chips ── */}
-            <div style={{
-                background: '#FFFFFF',
-                borderBottom: '1px solid #F5F0EB',
-            }}>
-                <div style={{
-                    display: 'flex', gap: 8,
-                    overflowX: 'auto', scrollbarWidth: 'none',
-                    padding: '12px 20px 14px',
-                }}>
+            <div className="bg-card border-b border-border">
+                <div className="flex gap-2 overflow-x-auto scrollbar-none px-5 pt-3 pb-3.5">
                     {[{ id: 'all', name: 'Semua' }, ...categories].map(c => {
                         const active = activeCategory === (c.id === 'all' ? 'all' : c.name);
                         return (
-                            <button
+                            <Button
                                 key={c.id}
+                                variant={active ? 'default' : 'outline'}
+                                className={cn(
+                                    'shrink-0 rounded-full px-[18px] py-2 text-[13px] whitespace-nowrap cursor-pointer transition-colors duration-150',
+                                    active && 'shadow-[0_3px_10px_rgba(232,118,58,0.28)] font-bold',
+                                )}
                                 onClick={() => setActiveCategory(c.id === 'all' ? 'all' : c.name)}
-                                style={{
-                                    flexShrink: 0,
-                                    background: active ? '#E8763A' : '#F5F0EB',
-                                    borderRadius: 50, border: 'none',
-                                    padding: '8px 18px',
-                                    fontSize: 13,
-                                    fontWeight: active ? 700 : 500,
-                                    color: active ? '#FFFFFF' : '#8C7B6B',
-                                    fontFamily: F, cursor: 'pointer',
-                                    whiteSpace: 'nowrap',
-                                    transition: 'background 0.15s, color 0.15s',
-                                    boxShadow: active ? '0 3px 10px rgba(232,118,58,0.28)' : 'none',
-                                }}
                             >
                                 {c.name}
-                            </button>
+                            </Button>
                         );
                     })}
                 </div>
             </div>
 
-            {/* ── Menu list ── */}
-            <div style={{
-                padding: '16px 20px',
-                paddingBottom: count > 0 ? 90 : 32,
-                background: '#F5F0EB',
-                minHeight: 'calc(100vh - 180px)',
-            }}>
+            <div className={cn('px-5 pt-4 bg-muted min-h-[calc(100vh-180px)]', count > 0 ? 'pb-[90px]' : 'pb-8')}>
                 {filtered.length === 0 ? (
-                    <div style={{
-                        textAlign: 'center', color: '#B5A898',
-                        padding: '56px 0', fontSize: 14, fontFamily: F,
-                    }}>
+                    <div className="text-center text-muted-foreground/60 py-14 text-sm">
                         Tidak ada menu ditemukan
                     </div>
                 ) : activeCategory === 'all' ? (
-                    /* Flat list saat "Semua" — jarak seragam */
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        {filtered.map((menu, idx) => (
-                            <MenuItemCard
-                                key={menu.id}
-                                menu={menu}
-                                priority={idx < 4}
-                                cartItem={cartMap[menu.id]}
-                                isMahasiswa={!!customer?.isMahasiswa}
-                                onAdd={() => addItem(menu)}
-                                onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
-                                onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
-                            />
-                        ))}
-                    </div>
+                    renderMenuGrid(filtered)
                 ) : (
-                    /* Grouped dengan section header saat kategori tertentu dipilih */
                     grouped.map(group => (
-                        <div key={group.label} style={{ marginBottom: 22 }}>
-                            <div style={{
-                                display: 'flex', justifyContent: 'space-between',
-                                alignItems: 'center', marginBottom: 12,
-                            }}>
-                                <span style={{
-                                    fontSize: 16, fontWeight: 700,
-                                    color: '#1A1814', fontFamily: F,
-                                }}>
+                        <div key={group.label} className="mb-5">
+                            <div className="flex justify-between items-center mb-3">
+                                <span className="text-base font-bold text-foreground">
                                     {group.label}
                                 </span>
-                                <span style={{
-                                    fontSize: 12, color: '#A8998A', fontFamily: F,
-                                }}>
+                                <span className="text-xs text-muted-foreground/70">
                                     {group.menus.length} menu
                                 </span>
                             </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                {group.menus.map(menu => (
-                                    <MenuItemCard
-                                        key={menu.id}
-                                        menu={menu}
-                                        cartItem={cartMap[menu.id]}
-                                        isMahasiswa={!!customer?.isMahasiswa}
-                                        onAdd={() => addItem(menu)}
-                                        onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
-                                        onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
-                                    />
-                                ))}
-                            </div>
+                            {renderMenuGrid(group.menus)}
                         </div>
                     ))
                 )}
             </div>
 
-            {/* ── Fixed cart bar ── */}
             {count > 0 && (
-                <div style={{
-                    position: 'fixed', bottom: 0,
-                    left: '50%', transform: 'translateX(-50%)',
-                    width: '100%', maxWidth: 430,
-                    background: '#1A1814',
-                    padding: '12px 16px',
-                    display: 'flex', alignItems: 'center',
-                    justifyContent: 'space-between',
-                    zIndex: 100,
-                    boxShadow: '0 -4px 24px rgba(0,0,0,0.22)',
-                }}>
-                    {/* Left */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div style={{ position: 'relative', flexShrink: 0 }}>
-                            <ShoppingBag size={22} color="#FFFFFF" />
-                            <span style={{
-                                position: 'absolute', top: -7, right: -7,
-                                background: '#E8763A', color: '#FFFFFF',
-                                borderRadius: '50%', width: 18, height: 18,
-                                fontSize: 10, fontWeight: 700, fontFamily: F,
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>
+                <div className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-[#1A1814] px-4 py-3 flex items-center justify-between z-50 shadow-[0_-4px_24px_rgba(0,0,0,0.22)]">
+                    <div className="flex items-center gap-3">
+                        <div className="relative shrink-0">
+                            <ShoppingBag size={22} className="text-white" />
+                            <span className="absolute -top-[7px] -right-[7px] bg-primary text-primary-foreground rounded-full w-[18px] h-[18px] text-[10px] font-bold flex items-center justify-center">
                                 {count}
                             </span>
                         </div>
                         <div>
-                            <div style={{ fontSize: 11, color: '#A8998A', fontFamily: F }}>
+                            <div className="text-[11px] text-white/60">
                                 {count} item di keranjang
                             </div>
-                            <div style={{
-                                fontSize: 14, fontWeight: 700, color: '#FFFFFF',
-                                fontFamily: F, letterSpacing: -0.2,
-                            }}>
+                            <div className="text-sm font-bold text-white tracking-tight">
                                 {formatRupiah(total)}
                             </div>
                         </div>
                     </div>
 
-                    {/* Right */}
-                    <button
-                        onClick={() => router.visit('/customer/cart')}
-                        style={{
-                            background: '#E8763A', color: '#FFFFFF',
-                            border: 'none', borderRadius: 12,
-                            padding: '10px 18px',
-                            fontSize: 13, fontWeight: 700,
-                            fontFamily: F, cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                            boxShadow: '0 4px 14px rgba(232,118,58,0.35)',
-                            letterSpacing: -0.1,
-                        }}
+                    <Link
+                        href="/customer/cart"
+                        className="bg-primary text-primary-foreground rounded-xl px-[18px] py-[10px] text-[13px] font-bold whitespace-nowrap shadow-[0_4px_14px_rgba(232,118,58,0.35)] tracking-tight inline-flex items-center gap-1"
                     >
-                        Lihat Keranjang →
-                    </button>
+                        Lihat Keranjang
+                        <span className="inline-block">→</span>
+                    </Link>
                 </div>
             )}
-
         </CustomerLayout>
     );
 }

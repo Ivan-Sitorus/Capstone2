@@ -5,6 +5,7 @@ import { ChevronLeft, Camera, Send, CheckCircle } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
 import useCart from '@/Hooks/useCart';
+import { cn } from '@/lib/utils';
 
 export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, rejectedMessage }) {
     const [file,      setFile]      = useState(null);
@@ -45,7 +46,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
             clearCart();
             setUploaded(true);
         } catch (err) {
-            setError(err.response?.data?.message ?? 'Upload gagal. Coba lagi.');
+            setError(err.response?.data?.message ?? 'Unggah gagal. Coba lagi.');
         } finally {
             setUploading(false);
         }
@@ -53,135 +54,94 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
 
     return (
         <CustomerLayout activeTab="cart">
-            {/* ── Header ── */}
-            <div style={{
-                background: '#FFFFFF',
-                borderBottom: '1px solid #F0EBE5',
-                padding: '22px 24px 16px',
-            }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            <div className="bg-card border-b border-border px-6 pb-4 pt-[22px]">
+                <div className="flex items-center gap-[14px]">
                     <button
                         onClick={() => router.visit(`/customer/payment/${order.order_code}/choose`)}
-                        style={{
-                            width: 36, height: 36, borderRadius: 12,
-                            background: '#F0EBE5', border: 'none', cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            flexShrink: 0,
-                        }}
+                        className="w-9 h-9 rounded-[12px] bg-muted border-none cursor-pointer flex items-center justify-center shrink-0"
                     >
-                        <ChevronLeft size={20} color="#2D2016" />
+                        <ChevronLeft size={20} className="text-foreground" />
                     </button>
                     <div>
-                        <div style={{ fontSize: 20, fontWeight: 700, color: '#2D2016', fontFamily: '"DM Sans", system-ui' }}>
+                        <div className="text-xl font-bold text-foreground">
                             Pembayaran QRIS
                         </div>
-                        <div style={{ fontSize: 12, color: '#8C7B6B', fontFamily: 'Outfit, system-ui' }}>
+                        <div className="text-xs text-muted-foreground">
                             #{order.order_code}
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* ── Content ── */}
-            <div style={{ padding: '0 24px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-                {/* Rejection banner */}
+            <div className="px-6 pb-5 flex flex-col gap-[14px]">
                 {rejectedMessage && !uploaded && (
-                    <div style={{
-                        background: '#FEF2F2', border: '1px solid #FECACA',
-                        borderRadius: 14, padding: 14, marginTop: 14,
-                    }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', marginBottom: 4, fontFamily: 'Outfit, system-ui' }}>
+                    <div className="bg-destructive/10 border border-destructive/30 rounded-[14px] p-[14px] mt-[14px]">
+                        <div className="text-[13px] font-bold text-destructive mb-1">
                             Bukti Ditolak Kasir
                         </div>
-                        <div style={{ fontSize: 13, color: '#5C4A3A', fontFamily: 'Outfit, system-ui' }}>{rejectedMessage}</div>
-                        <div style={{ fontSize: 12, color: '#8C7B6B', marginTop: 6, fontFamily: 'Outfit, system-ui' }}>
-                            Silakan upload ulang bukti pembayaran yang valid.
+                        <div className="text-[13px] text-muted-foreground">{rejectedMessage}</div>
+                        <div className="text-xs text-muted-foreground/70 mt-1.5">
+                            Silakan unggah ulang bukti pembayaran yang valid.
                         </div>
                     </div>
                 )}
 
                 {!uploaded ? (
                     <>
-                        {/* QR card */}
-                        <div style={{
-                            background: '#FFFFFF', borderRadius: 20,
-                            border: '1px solid #EDE8E2',
-                            boxShadow: '0 3px 14px rgba(45,32,22,0.05)',
-                            padding: '18px 20px 14px',
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
-                            marginTop: rejectedMessage ? 0 : 14,
-                        }}>
-                            {/* QR image */}
-                            <div style={{
-                                width: 170, height: 170, borderRadius: 14,
-                                overflow: 'hidden',
-                                boxShadow: '0 2px 8px rgba(45,32,22,0.10)',
-                                background: '#F5F0EB',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>
+                        <div className="bg-card rounded-[20px] border border-border px-5 pb-[14px] pt-[18px] flex flex-col items-center gap-[10px] shadow-[0_3px_14px_rgba(45,32,22,0.05)]" style={{ marginTop: rejectedMessage ? 0 : 14 }}>
+                            <div className="w-[170px] h-[170px] rounded-[14px] overflow-hidden bg-muted flex items-center justify-center shadow-[0_2px_8px_rgba(45,32,22,0.10)]">
                                 <img
                                     src={qrisImage}
                                     alt="QRIS W9 Cafe"
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                                    className="w-full h-full object-contain"
                                     onError={e => { e.target.src = '/images/logo.jpg'; }}
                                 />
                             </div>
 
-                            <span style={{ fontSize: 14, fontWeight: 500, color: '#8C7B6B', fontFamily: 'Outfit, system-ui' }}>
+                            <span className="text-sm font-medium text-muted-foreground">
                                 {qrisName || 'W9 Cafe STIE Totalwin'}
                             </span>
 
-                            <span style={{
-                                fontSize: 24, fontWeight: 700, color: '#E8763A',
-                                fontFamily: '"DM Sans", system-ui', letterSpacing: -0.5,
-                            }}>
+                            <span className="text-2xl font-bold text-primary tracking-tight">
                                 {formatRupiah(totalAmount)}
                             </span>
 
-                            <span style={{
-                                fontSize: 11, color: '#B5A898', textAlign: 'center',
-                                maxWidth: 260, fontFamily: 'Outfit, system-ui',
-                            }}>
-                                Scan QR menggunakan aplikasi dompet digital Anda
+                            <span className="text-[11px] text-muted-foreground/50 text-center max-w-[260px]">
+                                Pindai QR menggunakan aplikasi dompet digital Anda
                             </span>
 
-                            {/* Divider */}
-                            <div style={{ width: '100%', height: 1, background: '#F0EBE5' }} />
+                            <div className="w-full h-px bg-border" />
 
-                            {/* Upload section */}
-                            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                                <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: '#2D2016', fontFamily: 'Outfit, system-ui' }}>
-                                        Upload Bukti Pembayaran
+                            <div className="w-full flex flex-col items-center gap-2">
+                                <div className="w-full flex items-center gap-1">
+                                    <span className="text-[13px] font-semibold text-foreground">
+                                        Unggah Bukti Pembayaran
                                     </span>
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: '#E8763A' }}>*</span>
+                                    <span className="text-[13px] font-semibold text-primary">*</span>
                                 </div>
 
-                                <label htmlFor="proof-upload" style={{ width: '100%', cursor: 'pointer' }}>
-                                    <div style={{
-                                        width: '100%', height: preview ? 'auto' : 80,
-                                        background: '#FAF8F5',
-                                        borderRadius: 14,
-                                        border: `1px solid ${file ? '#E8763A' : '#D6CFC6'}`,
-                                        display: 'flex', flexDirection: 'column',
-                                        alignItems: 'center', justifyContent: 'center', gap: 6,
-                                        overflow: 'hidden',
-                                        padding: preview ? 0 : undefined,
-                                    }}>
+                                <label htmlFor="proof-upload" className="w-full cursor-pointer">
+                                    <div
+                                        className={cn(
+                                            'w-full bg-muted/30 rounded-[14px] flex flex-col items-center justify-center gap-1.5 overflow-hidden transition-colors',
+                                            file ? 'border border-primary' : 'border border-muted-foreground/20',
+                                        )}
+                                        style={{ height: preview ? 'auto' : 80, padding: preview ? 0 : undefined }}
+                                    >
                                         {preview ? (
                                             <img
                                                 src={preview}
                                                 alt="preview"
-                                                style={{ width: '100%', maxHeight: 200, objectFit: 'contain' }}
+                                                className="w-full object-contain"
+                                                style={{ maxHeight: 200 }}
                                             />
                                         ) : (
                                             <>
-                                                <Camera size={24} color="#B5A898" />
-                                                <span style={{ fontSize: 13, fontWeight: 600, color: '#2D2016', fontFamily: 'Outfit, system-ui' }}>
+                                                <Camera size={24} className="text-muted-foreground/40" />
+                                                <span className="text-[13px] font-semibold text-foreground">
                                                     Pilih atau Foto Bukti Bayar
                                                 </span>
-                                                <span style={{ fontSize: 11, color: '#B5A898', fontFamily: 'Outfit, system-ui' }}>
+                                                <span className="text-[11px] text-muted-foreground/50">
                                                     JPG, PNG, max 5MB
                                                 </span>
                                             </>
@@ -190,73 +150,52 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                     <input
                                         id="proof-upload" type="file"
                                         accept="image/jpeg,image/png,image/jpg,image/webp"
-                                        style={{ display: 'none' }}
+                                        className="hidden"
                                         onChange={handleFileChange}
                                         capture="environment"
                                     />
                                 </label>
 
                                 {error && (
-                                    <p style={{ color: '#DC2626', fontSize: 12, margin: '2px 0 0', fontFamily: 'Outfit, system-ui', alignSelf: 'flex-start' }}>
+                                    <p className="text-destructive text-xs mt-0.5 self-start" style={{ margin: '2px 0 0' }}>
                                         {error}
                                     </p>
                                 )}
                             </div>
                         </div>
 
-                        {/* Spacer */}
-                        <div style={{ flex: 1 }} />
+                        <div className="flex-1" />
 
-                        {/* CTA */}
                         <button
                             onClick={handleUpload}
                             disabled={!file || uploading}
-                            style={{
-                                width: '100%', height: 54,
-                                background: !file ? '#EDE8E2' : '#E8763A',
-                                color: !file ? '#9AA3AF' : '#FFFFFF',
-                                border: 'none', borderRadius: 18,
-                                fontSize: 16, fontWeight: 700,
-                                cursor: !file ? 'default' : 'pointer',
-                                boxShadow: !file ? 'none' : '0 4px 16px rgba(232,118,58,0.30)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                                fontFamily: '"DM Sans", system-ui',
-                            }}
+                            className={cn(
+                                'w-full h-[54px] border-none rounded-[18px] text-base font-bold flex items-center justify-center gap-2',
+                                !file ? 'bg-muted text-muted-foreground/50 cursor-default' : 'bg-primary text-primary-foreground cursor-pointer shadow-[0_4px_16px_rgba(232,118,58,0.30)]',
+                            )}
                         >
                             <Send size={18} />
                             {uploading ? 'Mengupload...' : 'Kirim Bukti Pembayaran'}
                         </button>
                     </>
                 ) : (
-                    /* Setelah upload berhasil */
-                    <div style={{ textAlign: 'center', padding: '40px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                        <CheckCircle size={72} color="#28A745" />
-                        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#2D2016', margin: 0, fontFamily: '"DM Sans", system-ui' }}>
+                    <div className="text-center py-10 flex flex-col items-center gap-4">
+                        <CheckCircle size={72} className="text-green-500" />
+                        <h2 className="text-[22px] font-bold text-foreground m-0">
                             Bukti Dikirim!
                         </h2>
-                        <p style={{ fontSize: 14, color: '#8C7B6B', margin: 0, lineHeight: 1.6, fontFamily: 'Outfit, system-ui' }}>
-                            Kasir sedang memverifikasi pembayaran Anda.<br/>
-                            Harap tunggu konfirmasi.
+                        <p className="text-sm text-muted-foreground m-0 leading-relaxed">
+                            Pembayaran Anda sedang diverifikasi kasir.
                         </p>
-                        <div style={{
-                            width: '100%', background: '#F5F0EB',
-                            borderRadius: 12, padding: '10px 14px',
-                            textAlign: 'left',
-                        }}>
-                            <span style={{ fontSize: 12, color: '#6B5E52', lineHeight: 1.5, fontFamily: 'Outfit, system-ui' }}>
-                                Pantau status pesananmu di tab{' '}
-                                <strong style={{ color: '#E8763A' }}>Riwayat</strong>
-                                {' '}untuk melihat update dari kasir.
-                            </span>
-                        </div>
+                        <button
+                            onClick={() => router.visit(`/receipt/${order.order_code}`)}
+                            className="w-full h-[52px] bg-primary text-primary-foreground border-none rounded-[18px] text-[15px] font-bold cursor-pointer flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(232,118,58,0.30)]"
+                        >
+                            Lihat Struk Digital
+                        </button>
                         <button
                             onClick={() => router.visit('/customer/riwayat')}
-                            style={{
-                                width: '100%', height: 52, background: '#E8763A', color: 'white',
-                                border: 'none', borderRadius: 18, fontSize: 15, fontWeight: 700,
-                                cursor: 'pointer', fontFamily: '"DM Sans", system-ui',
-                                boxShadow: '0 4px 16px rgba(232,118,58,0.30)',
-                            }}
+                            className="w-full h-[46px] bg-transparent border border-muted-foreground/30 rounded-[18px] text-[14px] font-semibold cursor-pointer text-muted-foreground"
                         >
                             Cek Status Pesanan
                         </button>
