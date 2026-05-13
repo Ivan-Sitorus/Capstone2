@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import {
     LayoutDashboard,
@@ -13,6 +13,18 @@ import {
     PanelLeftOpen,
 } from 'lucide-react';
 import ThemeToggle from '@/Components/Common/ThemeToggle';
+import { cn } from '@/lib/utils';
+import {
+    Sidebar,
+    SidebarContent,
+    SidebarFooter,
+    SidebarHeader,
+    SidebarMenu,
+    SidebarMenuItem,
+    SidebarProvider,
+    SidebarRail,
+    SidebarTrigger,
+} from '@/components/ui/sidebar';
 
 const navItems = [
     { label: 'Dashboard',       href: '/cashier/dashboard',     icon: LayoutDashboard },
@@ -22,16 +34,34 @@ const navItems = [
     { label: 'Profil',          href: '/cashier/profil',        icon: User },
 ];
 
-export default function CashierLayout({ children, title = 'Dashboard', fullscreen = false }) {
+const SIDEBAR_STORAGE_KEY = 'cashier-sidebar-collapsed';
+const SIDEBAR_EXPANDED_W = 260;
+const SIDEBAR_COLLAPSED_W = 84;
+
+export default function CashierLayout({ children, fullscreen = false }) {
     const { flash, pendingOrderCount: initialCount } = usePage().props;
     const [pendingCount, setPendingCount] = useState(initialCount ?? 0);
     const [toast, setToast] = useState(null);
-    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
-        if (typeof window === 'undefined') return false;
-        return window.localStorage.getItem('cashier-sidebar-collapsed') === 'true';
-    });
-    const sidebarWidth = isSidebarCollapsed ? 84 : 260;
 
+    // ── Sidebar state: persisted in localStorage, initiates from there ──
+    const [sidebarOpen, setSidebarOpen] = useState(() => {
+        if (typeof window === 'undefined') return true;
+        return window.localStorage.getItem(SIDEBAR_STORAGE_KEY) !== 'true';
+    });
+
+    // ── onOpenChange: sync localStorage + dispatch custom event ──
+    const handleSidebarChange = useCallback((open) => {
+        setSidebarOpen(open);
+        if (typeof window === 'undefined') return;
+        const collapsed = !open;
+        const width = open ? SIDEBAR_EXPANDED_W : SIDEBAR_COLLAPSED_W;
+        window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(collapsed));
+        window.dispatchEvent(new CustomEvent('cashier-sidebar-toggle', {
+            detail: { collapsed, width },
+        }));
+    }, []);
+
+    // ── Flash toast ──
     useEffect(() => {
         if (flash?.success) {
             setToast({ type: 'success', message: flash.success });
@@ -45,293 +75,189 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
         }
     }, [flash]);
 
+    // ── WebSocket badge (Reverb / Echo) ──
     useEffect(() => {
         setPendingCount(initialCount ?? 0);
     }, [initialCount]);
 
     useEffect(() => {
-        // WebSocket via Laravel Reverb — zero polling, push-based update
         if (!window.Echo) return;
-
         const channel = window.Echo.channel('orders');
-
         channel.listen('.OrderStatusUpdated', (e) => {
             setPendingCount(e.pendingCount);
         });
-
         return () => {
             window.Echo.leaveChannel('orders');
         };
     }, []);
 
-    useEffect(() => {
-        if (typeof window === 'undefined') return;
-        window.localStorage.setItem('cashier-sidebar-collapsed', String(isSidebarCollapsed));
-
-        window.dispatchEvent(new CustomEvent('cashier-sidebar-toggle', {
-            detail: {
-                collapsed: isSidebarCollapsed,
-                width: sidebarWidth,
-            },
-        }));
-    }, [isSidebarCollapsed]);
+    // ── Active route detection ──
+    const currentPath = usePage().url;
 
     return (
-        <div data-interface="cashier"
+        <SidebarProvider
+            data-interface="cashier"
+            open={sidebarOpen}
+            onOpenChange={handleSidebarChange}
             style={{
-                display: 'flex',
-                minHeight: '100vh',
-                fontFamily: "'Inter', system-ui, sans-serif",
-                '--cashier-sidebar-width': `${sidebarWidth}px`,
+                '--sidebar-width': `${SIDEBAR_EXPANDED_W / 16}rem`,
+                '--sidebar-width-icon': `${SIDEBAR_COLLAPSED_W / 16}rem`,
             }}
+            className="font-sans"
         >
-
-            {/* ── SIDEBAR ── */}
-            <aside style={{
-                width: sidebarWidth,
-                minHeight: '100vh',
-                background: '#0F172A',
-                display: 'flex',
-                flexDirection: 'column',
-                flexShrink: 0,
-                transition: 'width 0.2s ease',
-            }}>
-
-                {/* Brand / Logo */}
-                <div style={{
-                    padding: '24px 20px',
-                    borderBottom: '1px solid rgba(255,255,255,0.06)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                }}>
-                    {isSidebarCollapsed ? (
-                        <button
-                            type="button"
-                            onClick={() => setIsSidebarCollapsed(prev => !prev)}
-                            title="Expand sidebar"
-                            aria-label="Expand sidebar"
-                            style={{
-                                width: 40,
-                                height: 40,
-                                borderRadius: 10,
-                                border: '1px solid rgba(255,255,255,0.14)',
-                                background: '#1E293B',
-                                color: '#E2E8F0',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                flexShrink: 0,
-                                boxShadow: '0 2px 10px rgba(0,0,0,0.20)',
-                            }}
-                        >
-                            <PanelLeftOpen size={18} />
-                        </button>
-                    ) : (
-                        <img
-                            src="/images/logo.jpg"
-                            alt="W9 Cafe"
-                            width={40}
-                            height={40}
-                            style={{
-                                width: 40,
-                                height: 40,
-                                borderRadius: 10,
-                                objectFit: 'cover',
-                                flexShrink: 0,
-                                boxShadow: '0 2px 10px rgba(0,0,0,0.20)',
-                            }}
-                        />
-                    )}
-                    {!isSidebarCollapsed && (
-                        <span style={{ color: 'white', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap' }}>W9 Cafe</span>
-                    )}
-                    {!isSidebarCollapsed && (
-                        <button
-                            type="button"
-                            onClick={() => setIsSidebarCollapsed(prev => !prev)}
-                            title="Collapse sidebar"
-                            aria-label="Collapse sidebar"
-                            style={{
-                                marginLeft: 'auto',
-                                width: 32,
-                                height: 32,
-                                borderRadius: 8,
-                                border: '1px solid rgba(255,255,255,0.14)',
-                                background: '#1E293B',
-                                color: '#E2E8F0',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                cursor: 'pointer',
-                                flexShrink: 0,
-                            }}
-                        >
-                            <PanelLeftClose size={16} />
-                        </button>
-                    )}
-                </div>
-
-                {/* Nav */}
-                <nav style={{ flex: 1, padding: '20px 20px 0', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
-                    {navItems.map(({ label, href, icon: Icon }) => {
-                        const active = window.location.pathname === href;
-                        const showBadge = label === 'Pesanan Aktif' && pendingCount > 0;
-                        return (
-                            <Link
-                                key={href}
-                                href={href}
-                                prefetch
-                                cacheFor="1m"
-                                style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: isSidebarCollapsed ? 0 : 12,
-                                    height: 44,
-                                    padding: isSidebarCollapsed ? '0 12px' : '0 16px',
-                                    borderRadius: 8,
-                                    textDecoration: 'none',
-                                    fontSize: 14,
-                                    fontWeight: active ? 600 : 500,
-                                    color: active ? '#FFFFFF' : '#94A3B8',
-                                    background: active ? '#3B6FD4' : 'transparent',
-                                    transition: 'background 0.15s, color 0.15s',
-                                    justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                                }}
-                                onMouseEnter={e => { if (!active) e.currentTarget.style.background = '#1E293B'; }}
-                                onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}
+            <Sidebar collapsible="icon" className="border-r border-sidebar-border">
+                {/* ── Brand Header ── */}
+                <SidebarHeader className="flex-row items-center gap-3 p-4 border-b border-sidebar-border">
+                    {sidebarOpen ? (
+                        <>
+                            <img
+                                src="/images/logo.jpg"
+                                alt="W9 Cafe"
+                                className="size-10 rounded-[10px] object-cover shrink-0 shadow-lg"
+                            />
+                            <span className="text-sidebar-foreground font-bold text-base whitespace-nowrap select-none">
+                                W9 Cafe
+                            </span>
+                            <ThemeToggle />
+                            <button
+                                type="button"
+                                onClick={() => handleSidebarChange(false)}
+                                title="Collapse sidebar"
+                                aria-label="Collapse sidebar"
+                                className="ml-auto size-8 rounded-lg border border-sidebar-border bg-sidebar-accent text-sidebar-foreground inline-flex items-center justify-center cursor-pointer shrink-0 hover:brightness-125 transition-[filter]"
                             >
-                                <span style={{ position: 'relative', display: 'inline-flex' }}>
-                                    <Icon size={20} />
-                                    {isSidebarCollapsed && showBadge && (
-                                        <span style={{
-                                            background: '#EF4444',
-                                            color: '#FFFFFF',
-                                            borderRadius: '50%',
-                                            minWidth: 16,
-                                            height: 16,
-                                            position: 'absolute',
-                                            top: -8,
-                                            right: -10,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: 9,
-                                            fontWeight: 700,
-                                            lineHeight: 1,
-                                            padding: pendingCount > 9 ? '0 4px' : 0,
-                                        }}>
-                                            {pendingCount > 99 ? '99+' : pendingCount}
-                                        </span>
-                                    )}
-                                </span>
-                                {!isSidebarCollapsed && <span style={{ flex: 1 }}>{label}</span>}
-                                {showBadge && (
-                                    !isSidebarCollapsed && (
-                                        <span style={{
-                                            background: '#EF4444',
-                                            color: '#FFFFFF',
-                                            borderRadius: pendingCount > 9 ? 10 : '50%',
-                                            minWidth: 20,
-                                            height: 20,
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            fontSize: 11,
-                                            fontWeight: 700,
-                                            lineHeight: 1,
-                                            padding: pendingCount > 9 ? '0 5px' : 0,
-                                            flexShrink: 0,
-                                        }}>
-                                            {pendingCount > 99 ? '99+' : pendingCount}
-                                        </span>
-                                    )
-                                )}
-                            </Link>
-                        );
-                    })}
-                </nav>
+                                <PanelLeftClose size={16} />
+                            </button>
+                        </>
+                    ) : (
+                        <div className="flex flex-col items-center gap-2 w-full">
+                            <button
+                                type="button"
+                                onClick={() => handleSidebarChange(true)}
+                                title="Expand sidebar"
+                                aria-label="Expand sidebar"
+                                className="size-10 rounded-[10px] border border-sidebar-border bg-sidebar-accent text-sidebar-foreground inline-flex items-center justify-center cursor-pointer shrink-0 shadow-lg hover:brightness-125 transition-[filter]"
+                            >
+                                <PanelLeftOpen size={18} />
+                            </button>
+                        </div>
+                    )}
+                </SidebarHeader>
 
-                {/* Logout */}
-                <div style={{ padding: '12px 20px 24px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                {/* ── Navigation ── */}
+                <SidebarContent className="px-3 py-4">
+                    <SidebarMenu className="gap-1">
+                        {navItems.map(({ label, href, icon: Icon }) => {
+                            const active = currentPath === href;
+                            const showBadge = label === 'Pesanan Aktif' && pendingCount > 0;
+                            return (
+                                <SidebarMenuItem key={href}>
+                                    <Link
+                                        href={href}
+                                        prefetch
+                                        cacheFor="1m"
+                                        className={cn(
+                                            'flex items-center gap-3 h-11 rounded-lg text-sm font-medium transition-colors no-underline select-none',
+                                            'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:size-[52px] group-data-[collapsible=icon]:p-0',
+                                            sidebarOpen ? 'px-4' : 'px-0',
+                                            active
+                                                ? 'bg-primary text-primary-foreground'
+                                                : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                                        )}
+                                    >
+                                        {/* Icon + collapsed badge */}
+                                        <span className="relative inline-flex shrink-0">
+                                            <Icon size={20} />
+                                            {!sidebarOpen && showBadge && (
+                                                <span
+                                                    className={cn(
+                                                        'absolute -top-2 -right-2.5 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold leading-none',
+                                                        pendingCount > 9 ? 'min-w-4 h-4 px-1' : 'size-4',
+                                                    )}
+                                                >
+                                                    {pendingCount > 99 ? '99+' : pendingCount}
+                                                </span>
+                                            )}
+                                        </span>
+                                        {/* Label */}
+                                        {sidebarOpen && (
+                                            <span className="flex-1 truncate group-data-[collapsible=icon]:hidden">{label}</span>
+                                        )}
+                                        {/* Expanded badge */}
+                                        {sidebarOpen && showBadge && (
+                                            <span
+                                                className={cn(
+                                                    'shrink-0 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold leading-none',
+                                                    pendingCount > 9 ? 'min-w-5 h-5 px-[5px]' : 'size-5',
+                                                )}
+                                            >
+                                                {pendingCount > 99 ? '99+' : pendingCount}
+                                            </span>
+                                        )}
+                                    </Link>
+                                </SidebarMenuItem>
+                            );
+                        })}
+                    </SidebarMenu>
+                </SidebarContent>
+
+                {/* ── Logout Footer ── */}
+                <SidebarFooter className="p-3 border-t border-sidebar-border">
                     <button
+                        type="button"
                         onClick={() => router.post('/logout')}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: isSidebarCollapsed ? 0 : 12,
-                            height: 44,
-                            padding: isSidebarCollapsed ? '0 12px' : '0 16px',
-                            borderRadius: 8,
-                            width: '100%',
-                            background: 'transparent',
-                            border: 'none',
-                            color: '#DC2626',
-                            fontSize: 14,
-                            fontWeight: 500,
-                            cursor: 'pointer',
-                            transition: 'background 0.15s',
-                            justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
-                        }}
-                        onMouseEnter={e => e.currentTarget.style.background = 'rgba(220,38,38,0.08)'}
-                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                        className={cn(
+                            'flex items-center gap-3 h-11 w-full rounded-lg text-sm font-medium transition-colors cursor-pointer border-none bg-transparent',
+                            'text-destructive hover:bg-destructive/10',
+                            'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0',
+                            sidebarOpen ? 'px-4' : 'px-0',
+                        )}
                     >
-                        <LogOut size={20} />
-                        {!isSidebarCollapsed && 'Keluar'}
+                        <LogOut size={20} className="shrink-0" />
+                        {sidebarOpen && (
+                            <span className="group-data-[collapsible=icon]:hidden">Keluar</span>
+                        )}
                     </button>
-                </div>
-            </aside>
+                </SidebarFooter>
 
-            {/* ── MAIN CONTENT ── */}
+                <SidebarRail />
+            </Sidebar>
+
+            {/* ── Main Content ── */}
             {fullscreen ? (
-                <main style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden', height: '100vh' }}>
+                <main className="relative flex flex-1 flex-col overflow-hidden h-svh">
+                    <SidebarTrigger className="absolute top-3 left-3 z-30 md:hidden" />
                     {children}
                 </main>
             ) : (
-                <main style={{ flex: 1, background: '#F8FAFC', padding: 32, minHeight: '100vh' }}>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+                <main className="flex flex-1 flex-col bg-muted p-4 sm:p-8 min-h-svh">
+                    <div className="flex items-center justify-between mb-4">
+                        <SidebarTrigger className="md:hidden" />
+                        <div className="flex-1" />
                         <ThemeToggle />
                     </div>
-                    <div style={{
-                        background: 'white',
-                        borderRadius: 12,
-                        padding: 24,
-                        minHeight: 'calc(100vh - 64px)',
-                        border: '1px solid #E2E8F0',
-                        boxShadow: '0 2px 8px rgba(15,23,42,0.03)',
-                    }}>
+                    <div className="flex-1 bg-card rounded-xl p-6 border shadow-sm">
                         {children}
                     </div>
                 </main>
             )}
 
-            {/* ── TOAST ── */}
+            {/* ── Toast ── */}
             {toast && (
-                <div style={{
-                    position: 'fixed',
-                    top: 24,
-                    right: 24,
-                    zIndex: 9999,
-                    background: toast.type === 'success' ? '#F0FDF4' : '#FEF2F2',
-                    border: `1px solid ${toast.type === 'success' ? '#86EFAC' : '#FCA5A5'}`,
-                    borderRadius: 10,
-                    padding: '12px 16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    fontSize: 14,
-                    color: toast.type === 'success' ? '#15803D' : '#DC2626',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
-                    minWidth: 280,
-                    maxWidth: 380,
-                }}>
+                <div
+                    className={cn(
+                        'fixed top-6 right-6 z-[9999] rounded-[10px] px-4 py-3 flex items-center gap-2.5 text-sm shadow-floating min-w-[280px] max-w-[380px]',
+                        toast.type === 'success'
+                            ? 'bg-green-50 border border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
+                            : 'bg-red-50 border border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200',
+                    )}
+                >
                     {toast.type === 'success'
-                        ? <CheckCircle size={18} style={{ flexShrink: 0 }} />
-                        : <XCircle size={18} style={{ flexShrink: 0 }} />}
+                        ? <CheckCircle size={18} className="shrink-0" />
+                        : <XCircle size={18} className="shrink-0" />}
                     {toast.message}
                 </div>
             )}
-        </div>
+        </SidebarProvider>
     );
 }

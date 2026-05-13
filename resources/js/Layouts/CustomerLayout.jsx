@@ -7,7 +7,6 @@ export default function CustomerLayout({ children, activeTab = 'menu', showBotto
     const { flash } = usePage().props;
     const [info, setInfo] = useState(null);
 
-    /* ── Flash info toast ── */
     useEffect(() => {
         if (flash?.info) {
             setInfo(flash.info);
@@ -17,42 +16,27 @@ export default function CustomerLayout({ children, activeTab = 'menu', showBotto
     }, [flash]);
 
     return (
-        <div data-interface="customer" style={{
-            maxWidth: 430,
-            margin: '0 auto',
-            minHeight: '100vh',
-            background: '#FAF8F5',
-            position: 'relative',
-            paddingBottom: showBottomNav ? 92 : 0,
-        }}>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '8px 16px' }}>
+        <div
+            data-interface="customer"
+            className="min-h-screen bg-background text-foreground antialiased"
+        >
+            <header className="sticky top-0 z-40 flex items-center justify-between px-4 py-2 bg-background/80 backdrop-blur-sm border-b border-border">
+                <div className="text-sm font-semibold text-primary tracking-wide">
+                    W9 Cafe
+                </div>
                 <ThemeToggle />
-            </div>
-            {children}
+            </header>
+
             {showBottomNav && <BottomNav activeTab={activeTab} />}
 
-            {/* ── Info toast (verifikasi pending) ── */}
+            <main className="pb-16 sm:pb-0">
+                {children}
+            </main>
+
             {info && (
-                <div style={{
-                    position: 'fixed',
-                    bottom: 80,
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    width: 'calc(100% - 32px)',
-                    maxWidth: 398,
-                    background: '#FEF3EC',
-                    border: '1px solid #F0C4A0',
-                    borderRadius: 14,
-                    padding: '12px 16px',
-                    fontSize: 13,
-                    color: '#C05A1A',
-                    fontFamily: 'Outfit, system-ui, sans-serif',
-                    boxShadow: '0 4px 16px rgba(45,32,22,0.12)',
-                    zIndex: 9999,
-                    textAlign: 'center',
-                    lineHeight: 1.5,
-                }}>
-                    ⏳ {info}
+                <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-[9999] w-[calc(100%-2rem)] max-w-md rounded-xl border border-primary/20 bg-accent px-4 py-3 text-sm text-accent-foreground text-center leading-relaxed shadow-floating">
+                    <span className="mr-1.5 opacity-70">⏳</span>
+                    {info}
                 </div>
             )}
         </div>
