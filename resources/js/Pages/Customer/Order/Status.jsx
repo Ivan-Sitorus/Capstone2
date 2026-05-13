@@ -14,15 +14,7 @@ const STEPS = [
     { key: 'completed',  icon: '✅',  label: 'Selesai' },
 ];
 
-const s = {
-    cancelledCard: {
-        background: '#FDEDEC',
-        border: '1px solid rgba(192,84,74,0.19)',
-        borderRadius: 20,
-        padding: '20px 24px',
-        textAlign: 'center',
-    },
-};
+const cancelledCardClass = 'bg-red-50 border border-red-200/30 rounded-[20px] px-6 py-5 text-center';
 
 export default function OrderStatus({ order }) {
     const currentIdx = ORDER_FLOW.indexOf(order.status);
@@ -48,9 +40,9 @@ export default function OrderStatus({ order }) {
             <div className="flex flex-col gap-4 p-6 pb-24">
 
                 {order.status === 'cancelled' && (
-                    <div style={s.cancelledCard}>
+                    <div className={cancelledCardClass}>
                         <div className="text-3xl mb-2">✕</div>
-                        <div className="text-base font-semibold text-[#C0544A]">
+                        <div className="text-base font-semibold text-red-600">
                             Pesanan Dibatalkan
                         </div>
                         <div className="text-xs mt-1 text-muted-foreground">

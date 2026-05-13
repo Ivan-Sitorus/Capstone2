@@ -66,7 +66,7 @@ export default function Profil({ user }) {
                             <Button
                                 onClick={handleLogout}
                                 variant="destructive"
-                                className="w-full h-11 flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(220,38,38,0.25)] hover:bg-[#B91C1C]"
+                                className="w-full h-11 flex items-center justify-center gap-2 shadow-[0_2px_8px_rgba(220,38,38,0.25)] hover:bg-red-700"
                             >
                                 <LogOut size={16} />
                                 Keluar dari Akun

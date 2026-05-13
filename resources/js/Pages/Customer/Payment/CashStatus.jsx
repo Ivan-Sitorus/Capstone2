@@ -57,14 +57,10 @@ export default function CashStatus({ order }) {
                         const active = step.active && order.status === 'menunggu_bayar_cash';
                         return (
                             <div key={i} className="flex items-center gap-3 mb-3">
-                                <div className="w-[26px] h-[26px] rounded-full shrink-0 flex items-center justify-center text-[13px] font-bold text-white"
-                                     style={{ background: done ? '#28A745' : active ? 'var(--primary)' : '#EDE8E2' }}>
+                                <div className={`w-[26px] h-[26px] rounded-full shrink-0 flex items-center justify-center text-[13px] font-bold text-white ${done ? 'bg-green-500' : active ? 'bg-primary' : 'bg-stone-100'}`}>
                                     {done ? '✓' : active ? '◐' : ''}
                                 </div>
-                                <span className="text-[13px]" style={{
-                                    color: done ? '#28A745' : active ? 'var(--primary)' : '#9AA3AF',
-                                    fontWeight: active || done ? 600 : 400,
-                                }}>
+                                <span className={`text-[13px] ${done ? 'text-green-600 font-semibold' : active ? 'text-primary font-semibold' : 'text-gray-400 font-normal'}`}>
                                     {step.label}
                                 </span>
                             </div>

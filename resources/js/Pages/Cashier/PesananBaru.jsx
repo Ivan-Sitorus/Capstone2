@@ -294,7 +294,7 @@ export default function PesananBaru({ categories, promotions }) {
                                                     {promo.name}
                                                 </span>
                                                 {promo.is_student_only && (
-                                                    <span className="text-[10px] ml-1.5 rounded-full px-1.5 py-px bg-[#FFF0E8] text-[#E8763A]">
+                                                    <span className="text-[10px] ml-1.5 rounded-full px-1.5 py-px bg-orange-50 text-orange-600">
                                                         Mahasiswa
                                                     </span>
                                                 )}

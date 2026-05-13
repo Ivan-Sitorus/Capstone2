@@ -118,7 +118,7 @@ export default function CustomerMenu({ categories, table }) {
 
             <div className="bg-card px-5 pt-5 pb-4">
                 <div className="flex items-center gap-3.5 mb-3.5">
-                    <div className="w-[52px] h-[52px] rounded-[14px] overflow-hidden shrink-0 flex items-center justify-center bg-[#1B3A4B] shadow-[0_4px_14px_rgba(0,0,0,0.18)]">
+                    <div className="w-[52px] h-[52px] rounded-[14px] overflow-hidden shrink-0 flex items-center justify-center bg-cyan-900 shadow-[0_4px_14px_rgba(0,0,0,0.18)]">
                         {logoError ? (
                             <span className="text-white text-lg italic font-bold">w9</span>
                         ) : (
@@ -208,7 +208,7 @@ export default function CustomerMenu({ categories, table }) {
             </div>
 
             {count > 0 && (
-                <div className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-[#1A1814] px-4 py-3 flex items-center justify-between z-50 shadow-[0_-4px_24px_rgba(0,0,0,0.22)]">
+                <div className="fixed bottom-16 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-stone-900 px-4 py-3 flex items-center justify-between z-50 shadow-[0_-4px_24px_rgba(0,0,0,0.22)]">
                     <div className="flex items-center gap-3">
                         <div className="relative shrink-0">
                             <ShoppingBag size={22} className="text-white" />

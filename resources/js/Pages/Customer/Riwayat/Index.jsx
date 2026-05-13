@@ -244,7 +244,7 @@ export default function CustomerRiwayat({ orders = [] }) {
           className="flex max-h-[85vh] max-w-[340px] flex-col gap-0 overflow-y-auto rounded-[24px] p-0"
           showCloseButton={false}
         >
-          <div className="h-[3px] shrink-0 bg-gradient-to-r from-[#E8763A] to-[#FB923C]" />
+          <div className="h-[3px] shrink-0 bg-gradient-to-r from-orange-500 to-orange-400" />
 
           <div className="flex justify-end px-4 pt-3">
             <DialogClose
@@ -266,7 +266,7 @@ export default function CustomerRiwayat({ orders = [] }) {
               style={{ boxShadow: '0 4px 14px rgba(0,0,0,0.15)' }}
             >
               {logoError ? (
-                <span className="text-lg font-bold italic text-white" style={{ color: '#fff' }}>
+                <span className="text-lg font-bold italic text-white">
                   w9
                 </span>
               ) : (

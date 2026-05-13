@@ -49,11 +49,10 @@ export default function QrisStatus({ order }) {
                                 { label: 'Pesanan Sedang Diproses', done: true },
                             ].map((s, i) => (
                                 <div key={i} className="flex items-center gap-3 mb-3">
-                                    <div className="w-[26px] h-[26px] rounded-full flex items-center justify-center text-[13px] font-bold shrink-0 text-white"
-                                         style={{ background: s.done ? '#28A745' : '#EDE8E2' }}>
+                                    <div className={`w-[26px] h-[26px] rounded-full flex items-center justify-center text-[13px] font-bold shrink-0 text-white ${s.done ? 'bg-green-500' : 'bg-stone-100'}`}>
                                         {s.done ? '✓' : ''}
                                     </div>
-                                    <span className="text-[13px]" style={{ color: s.done ? '#28A745' : '#9AA3AF', fontWeight: s.done ? 600 : 400 }}>
+                                    <span className={`text-[13px] ${s.done ? 'text-green-600 font-semibold' : 'text-gray-400 font-normal'}`}>
                                         {s.label}
                                     </span>
                                 </div>
