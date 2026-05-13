@@ -3,7 +3,8 @@ import { router, Head } from '@inertiajs/react';
 import axios from 'axios';
 import { X, QrCode } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CashierLayout from '@/Layouts/CashierLayout';
 import OrderCard from '@/Components/Cashier/OrderCard';
 import StatusBadge from '@/Components/Common/StatusBadge';
@@ -51,10 +52,10 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
     }, []);
 
     const tabs = [
-        { key: 'all',         label: `Semua (${counts.all})`,                  className: 'bg-muted text-foreground border-border/50' },
-        { key: 'pending',     label: `Pending (${counts.pending})`,             className: 'bg-amber-50 text-amber-600 border-amber-300' },
-        { key: 'diproses',    label: `Diproses (${counts.diproses})`,           className: 'bg-blue-50 text-blue-600 border-blue-300' },
-        { key: 'belum_bayar', label: `Belum Bayar (${counts.belum_bayar ?? 0})`, className: 'bg-red-50 text-red-500 border-red-300' },
+        { key: 'all',         label: `Semua (${counts.all})` },
+        { key: 'pending',     label: `Pending (${counts.pending})` },
+        { key: 'diproses',    label: `Diproses (${counts.diproses})` },
+        { key: 'belum_bayar', label: `Belum Bayar (${counts.belum_bayar ?? 0})` },
     ];
 
     const filteredOrders = (() => {
@@ -160,31 +161,29 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                 </p>
             </div>
 
-            <div className="flex gap-2 mb-6 flex-wrap">
-                {tabs.map(tab => {
-                    const active = activeTab === tab.key;
-                    return (
-                        <button
+            {/* ── Shadcn Tabs — pill variant ── */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+                <TabsList className="h-auto rounded-full p-1 bg-muted">
+                    {tabs.map(tab => (
+                        <TabsTrigger
                             key={tab.key}
-                            onClick={() => setActiveTab(tab.key)}
-                            className={`h-9 px-4 rounded-full text-sm cursor-pointer shrink-0 transition-all duration-150 font-semibold border ${
-                                active
-                                    ? tab.className + ' opacity-100'
-                                    : 'bg-transparent text-muted-foreground border-transparent opacity-65'
-                            }`}
+                            value={tab.key}
+                            className="rounded-full px-4 py-1.5 text-sm font-semibold
+                                       data-active:bg-background data-active:text-foreground
+                                       data-active:shadow-sm"
                         >
                             {tab.label}
-                        </button>
-                    );
-                })}
-            </div>
+                        </TabsTrigger>
+                    ))}
+                </TabsList>
+            </Tabs>
 
             {filteredOrders.length === 0 ? (
                 <div className="text-center pt-16 text-sm text-muted-foreground">
                     Tidak ada pesanan aktif
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-[18px] items-start">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-start">
                     {filteredOrders.map(order => (
                         <OrderCard
                             key={order.id}
@@ -198,11 +197,10 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                 </div>
             )}
 
+            {/* ── QRIS Modal ── */}
             {qrisOrder && (
-                <div className="fixed inset-0 z-200 flex items-center justify-center p-4 bg-black/40">
-                    <div className="bg-card rounded-2xl w-full max-w-2xl flex flex-col overflow-hidden shadow-[0_12px_40px_rgba(15,23,42,0.125),0_2px_6px_rgba(15,23,42,0.031)]"
-                        style={{ maxHeight: 'calc(100vh - 32px)' }}
-                    >
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+                    <div className="bg-card rounded-2xl w-full max-w-2xl flex flex-col overflow-hidden shadow-modal max-h-[calc(100vh-32px)]">
                         <div className="flex justify-between items-center px-5 py-3.5 border-b border-border shrink-0">
                             <div className="flex flex-col gap-0.5">
                                 <span className="text-base font-bold text-foreground">
@@ -302,8 +300,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                             <Button
                                 onClick={handleConfirmQris}
                                 disabled={processing}
-                                className="flex-[2] shadow-[0_3px_10px_rgba(22,163,74,0.145)]"
-                                style={{ background: processing ? '#8EC4A0' : undefined }}
+                                className="flex-[2]"
                             >
                                 Konfirmasi Pembayaran
                             </Button>

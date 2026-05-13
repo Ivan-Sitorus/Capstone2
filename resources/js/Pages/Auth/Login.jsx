@@ -1,5 +1,9 @@
 import { useForm } from '@inertiajs/react';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import ThemeToggle from '@/Components/Common/ThemeToggle';
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
@@ -13,184 +17,82 @@ export default function Login() {
     }
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'Inter', system-ui, sans-serif" }}>
-
-            {/* ── KIRI — Navy Panel ── */}
-            <div style={{
-                width: '50%',
-                background: '#0F172A',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: 14,
-            }}>
-                {/* Logo */}
+        <div data-interface="cashier" className="flex min-h-screen">
+            <div className="w-1/2 bg-sidebar flex flex-col items-center justify-center gap-3.5">
                 <img
                     src="/images/logo.jpg"
                     alt="W9 Cafe"
-                    style={{
-                        width: 120,
-                        height: 120,
-                        borderRadius: 24,
-                        objectFit: 'cover',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.30)',
-                    }}
+                    className="w-[120px] h-[120px] rounded-3xl object-cover shadow-[0_4px_20px_rgba(0,0,0,0.30)]"
                 />
-
-                <h1 style={{
-                    color: 'white',
-                    fontSize: 32,
-                    fontWeight: 700,
-                    margin: '4px 0 0',
-                    letterSpacing: '-0.5px',
-                }}>W9 Cafe</h1>
-
-                <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 15, margin: 0 }}>
+                <h1 className="text-sidebar-foreground text-[32px] font-bold tracking-tight">
+                    W9 Cafe
+                </h1>
+                <p className="text-sidebar-foreground/50 text-[15px]">
                     Sistem Point of Sale
                 </p>
             </div>
 
-            {/* ── KANAN — Form Panel ── */}
-            <div style={{
-                width: '50%',
-                background: '#FFFFFF',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '0 56px',
-            }}>
-                <form
-                    onSubmit={handleSubmit}
-                    style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', gap: 24 }}
-                >
-                    {/* Heading */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        <h2 style={{
-                            fontSize: 26,
-                            fontWeight: 700,
-                            color: '#0F172A',
-                            margin: 0,
-                            letterSpacing: '-0.5px',
-                        }}>Masuk ke Akun Anda</h2>
-                        <p style={{ fontSize: 14, color: '#64748B', margin: 0 }}>
+            <div className="w-1/2 bg-background flex items-center justify-center px-14 relative">
+                <div className="absolute top-4 right-4">
+                    <ThemeToggle />
+                </div>
+
+                <Card className="w-full max-w-[400px]">
+                    <CardHeader>
+                        <CardTitle>Masuk ke Akun Anda</CardTitle>
+                        <CardDescription>
                             Masukkan email dan kata sandi untuk melanjutkan
-                        </p>
-                    </div>
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-col gap-4">
+                        {errors.email && (
+                            <div className="flex items-center gap-2 rounded-xl border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+                                <AlertCircle className="size-4 shrink-0" />
+                                <span>{errors.email}</span>
+                            </div>
+                        )}
 
-                    {/* Error Box */}
-                    {errors.email && (
-                        <div style={{
-                            background: '#FEF2F2',
-                            border: '1px solid #FCA5A5',
-                            borderRadius: 12,
-                            padding: '12px 14px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 8,
-                            fontSize: 13,
-                            color: '#DC2626',
-                        }}>
-                            <AlertCircle size={16} style={{ flexShrink: 0 }} />
-                            {errors.email}
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-sm font-medium text-foreground">Email</label>
+                            <div className="relative">
+                                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-muted-foreground" />
+                                <Input
+                                    type="email"
+                                    value={data.email}
+                                    onChange={e => setData('email', e.target.value)}
+                                    placeholder="kasir@kafenusantara.com"
+                                    autoComplete="email"
+                                    className="pl-11"
+                                />
+                            </div>
                         </div>
-                    )}
 
-                    {/* Email */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        <label style={{ fontSize: 13, fontWeight: 500, color: '#0F172A' }}>Email</label>
-                        <div style={{ position: 'relative' }}>
-                            <Mail size={18} style={{
-                                position: 'absolute',
-                                left: 14,
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                color: '#94A3B8',
-                                pointerEvents: 'none',
-                            }} />
-                            <input
-                                type="email"
-                                value={data.email}
-                                onChange={e => setData('email', e.target.value)}
-                                placeholder="kasir@kafenusantara.com"
-                                autoComplete="email"
-                                style={{
-                                    width: '100%',
-                                    height: 44,
-                                    border: '1px solid #E2E8F0',
-                                    borderRadius: 8,
-                                    padding: '0 14px 0 44px',
-                                    fontSize: 14,
-                                    color: '#0F172A',
-                                    outline: 'none',
-                                    boxSizing: 'border-box',
-                                    boxShadow: '0 2px 8px rgba(15,23,42,0.03)',
-                                    transition: 'border-color 0.15s',
-                                }}
-                                onFocus={e => e.target.style.borderColor = '#3B6FD4'}
-                                onBlur={e => e.target.style.borderColor = '#E2E8F0'}
-                            />
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-sm font-medium text-foreground">Kata Sandi</label>
+                            <div className="relative">
+                                <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-muted-foreground" />
+                                <Input
+                                    type="password"
+                                    value={data.password}
+                                    onChange={e => setData('password', e.target.value)}
+                                    placeholder="Masukkan kata sandi..."
+                                    autoComplete="current-password"
+                                    className="pl-11"
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Password */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                        <label style={{ fontSize: 13, fontWeight: 500, color: '#0F172A' }}>Kata Sandi</label>
-                        <div style={{ position: 'relative' }}>
-                            <Lock size={18} style={{
-                                position: 'absolute',
-                                left: 14,
-                                top: '50%',
-                                transform: 'translateY(-50%)',
-                                color: '#94A3B8',
-                                pointerEvents: 'none',
-                            }} />
-                            <input
-                                type="password"
-                                value={data.password}
-                                onChange={e => setData('password', e.target.value)}
-                                placeholder="Masukkan kata sandi..."
-                                autoComplete="current-password"
-                                style={{
-                                    width: '100%',
-                                    height: 44,
-                                    border: '1px solid #E2E8F0',
-                                    borderRadius: 8,
-                                    padding: '0 14px 0 44px',
-                                    fontSize: 14,
-                                    color: '#0F172A',
-                                    outline: 'none',
-                                    boxSizing: 'border-box',
-                                    boxShadow: '0 2px 8px rgba(15,23,42,0.03)',
-                                    transition: 'border-color 0.15s',
-                                }}
-                                onFocus={e => e.target.style.borderColor = '#3B6FD4'}
-                                onBlur={e => e.target.style.borderColor = '#E2E8F0'}
-                            />
-                        </div>
-                    </div>
-
-                    {/* Submit */}
-                    <button
-                        type="submit"
-                        disabled={processing}
-                        style={{
-                            width: '100%',
-                            height: 44,
-                            background: processing ? '#93AEDF' : '#3B6FD4',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: 8,
-                            fontSize: 14,
-                            fontWeight: 600,
-                            cursor: processing ? 'not-allowed' : 'pointer',
-                            boxShadow: '0 4px 16px rgba(59,111,212,0.30)',
-                            transition: 'background 0.15s',
-                        }}
-                    >
-                        {processing ? 'Memuat...' : 'Masuk'}
-                    </button>
-                </form>
+                        <Button
+                            type="submit"
+                            disabled={processing}
+                            variant="default"
+                            size="lg"
+                            className="w-full"
+                        >
+                            {processing ? 'Memuat...' : 'Masuk'}
+                        </Button>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );
