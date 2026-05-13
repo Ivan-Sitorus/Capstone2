@@ -41,8 +41,12 @@ Route::prefix('cashier')->middleware(['auth', 'role:cashier,admin'])->group(func
     Route::get('/verifikasi', [CashierVerifikasiController::class, 'index'])->name('cashier.verifikasi');
 });
 
+// Kitchen auth
+Route::get('/kitchen/login', [AuthController::class, 'showKitchenLogin'])->name('kitchen.login');
+Route::post('/kitchen/login', [AuthController::class, 'login'])->name('kitchen.login.attempt');
+
 // Kitchen
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'role:kitchen,cashier,admin'])->group(function () {
     Route::get('/kitchen', [KitchenController::class, 'index'])->name('kitchen.index');
 });
 

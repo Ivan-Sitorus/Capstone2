@@ -16,6 +16,11 @@ class AuthController extends Controller
         return Inertia::render('Auth/Login');
     }
 
+    public function showKitchenLogin()
+    {
+        return Inertia::render('Kitchen/Login');
+    }
+
     public function login(Request $request)
     {
         $request->validate([
@@ -44,6 +49,10 @@ class AuthController extends Controller
 
         if (in_array($role, ['cashier', 'admin'])) {
             return Inertia::location(route('cashier.dashboard'));
+        }
+
+        if ($role === 'kitchen') {
+            return Inertia::location(route('kitchen.index'));
         }
 
         return Inertia::location(route('customer.menu'));
