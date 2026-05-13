@@ -1,12 +1,8 @@
 import { useForm } from '@inertiajs/react';
-import { Mail, Lock, AlertCircle } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { buttonVariants } from '@/components/ui/button';
+import { ShoppingBag, Lock } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import ThemeToggle from '@/Components/Common/ThemeToggle';
-import { cn } from '@/lib/utils';
 
-export default function Login() {
+export default function CashierLogin() {
     const { data, setData, post, processing, errors } = useForm({
         email: '',
         password: '',
@@ -14,88 +10,63 @@ export default function Login() {
 
     function handleSubmit(e) {
         e?.preventDefault?.();
-        post('/login');
+        post('/cashier/login');
     }
 
     return (
-        <div data-interface="cashier" className="flex min-h-screen">
-            <div className="w-1/2 bg-sidebar flex flex-col items-center justify-center gap-3.5">
-                <img
-                    src="/images/logo.jpg"
-                    alt="W9 Cafe"
-                    className="w-[120px] h-[120px] rounded-3xl object-cover shadow-[0_4px_20px_rgba(0,0,0,0.30)]"
-                />
-                <h1 className="text-sidebar-foreground text-[32px] font-bold tracking-tight">
-                    W9 Cafe
-                </h1>
-                <p className="text-sidebar-foreground/50 text-[15px]">
-                    Sistem Point of Sale
-                </p>
-            </div>
-
-            <div className="w-1/2 bg-background flex items-center justify-center px-14 relative">
-                <div className="absolute top-4 right-4">
-                    <ThemeToggle />
-                </div>
-
-                <form onSubmit={handleSubmit} className="w-full max-w-[400px]">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Masuk ke Akun Anda</CardTitle>
+        <div data-interface="cashier" className="min-h-screen bg-background flex items-center justify-center p-6">
+            <form onSubmit={handleSubmit} className="w-full max-w-[380px]">
+                <Card className="bg-card shadow-none">
+                    <CardHeader className="text-center pb-2">
+                        <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary/10">
+                            <ShoppingBag className="size-7 text-primary" />
+                        </div>
+                        <CardTitle className="text-xl">W9 Cafe POS</CardTitle>
                         <CardDescription>
-                            Masukkan email dan kata sandi untuk melanjutkan
+                            Masuk ke sistem Point of Sale
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-col gap-4">
                         {errors.email && (
-                            <div className="flex items-center gap-2 rounded-xl border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
-                                <AlertCircle className="size-4 shrink-0" />
-                                <span>{errors.email}</span>
+                            <div className="rounded-xl border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">
+                                {errors.email}
                             </div>
                         )}
 
                         <div className="flex flex-col gap-1.5">
                             <label className="text-sm font-medium text-foreground">Email</label>
-                            <div className="relative">
-                                <Mail className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-muted-foreground" />
-                                <Input
-                                    type="email"
-                                    value={data.email}
-                                    onChange={e => setData('email', e.target.value)}
-                                    placeholder="kasir@kafenusantara.com"
-                                    autoComplete="email"
-                                    className="pl-11"
-                                />
-                            </div>
+                            <input
+                                type="email"
+                                value={data.email}
+                                onChange={e => setData('email', e.target.value)}
+                                placeholder="kasir@w9cafe.com"
+                                autoComplete="email"
+                                className="h-11 w-full rounded-lg border border-input bg-background px-3.5 text-sm text-foreground outline-none transition-colors focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                            />
                         </div>
 
                         <div className="flex flex-col gap-1.5">
                             <label className="text-sm font-medium text-foreground">Kata Sandi</label>
-                            <div className="relative">
-                                <Lock className="pointer-events-none absolute left-3.5 top-1/2 size-[18px] -translate-y-1/2 text-muted-foreground" />
-                                <Input
-                                    type="password"
-                                    value={data.password}
-                                    onChange={e => setData('password', e.target.value)}
-                                    placeholder="Masukkan kata sandi..."
-                                    autoComplete="current-password"
-                                    className="pl-11"
-                                />
-                            </div>
+                            <input
+                                type="password"
+                                value={data.password}
+                                onChange={e => setData('password', e.target.value)}
+                                placeholder="Masukkan kata sandi..."
+                                autoComplete="current-password"
+                                className="h-11 w-full rounded-lg border border-input bg-background px-3.5 text-sm text-foreground outline-none transition-colors focus:border-primary/50 focus:ring-2 focus:ring-primary/20"
+                            />
                         </div>
 
                         <button
                             type="submit"
                             disabled={processing}
-                            className={cn(buttonVariants({ variant: 'default', size: 'lg' }), 'w-full')}
-                            onClick={handleSubmit}
+                            className="inline-flex h-11 w-full items-center justify-center rounded-lg bg-primary text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
                         >
-                            {processing ? 'Memuat...' : 'Masuk'}
+                            {processing ? 'Memproses...' : 'Masuk'}
                         </button>
                     </CardContent>
                 </Card>
-                </form>
-            </div>
+            </form>
         </div>
     );
 }

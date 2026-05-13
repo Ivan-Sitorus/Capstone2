@@ -18,9 +18,13 @@ use Inertia\Inertia;
 
 Route::get('/', fn() => redirect()->route('login'));
 
-// Kasir auth
-Route::get('/login',  [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
+// Cashier auth
+Route::get('/cashier/login',  [AuthController::class, 'showLogin'])->name('cashier.login');
+Route::post('/cashier/login', [AuthController::class, 'login'])->name('cashier.login.attempt');
+// Legacy redirect
+Route::get('/login',  fn() => redirect()->route('cashier.login'));
+Route::post('/login', fn() => redirect()->route('cashier.login'));
+
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Kasir pages

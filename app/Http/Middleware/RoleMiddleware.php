@@ -11,7 +11,7 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, string ...$roles): mixed
     {
         if (!Auth::check()) {
-            return redirect()->route('login');
+            return redirect()->route('cashier.login');
         }
 
         if (!in_array(Auth::user()->role, $roles)) {
