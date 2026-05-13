@@ -1,9 +1,10 @@
 import { useForm } from '@inertiajs/react';
 import { Mail, Lock, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { buttonVariants } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import ThemeToggle from '@/Components/Common/ThemeToggle';
+import { cn } from '@/lib/utils';
 
 export default function Login() {
     const { data, setData, post, processing, errors } = useForm({
@@ -12,7 +13,7 @@ export default function Login() {
     });
 
     function handleSubmit(e) {
-        e.preventDefault();
+        e?.preventDefault?.();
         post('/login');
     }
 
@@ -83,15 +84,14 @@ export default function Login() {
                             </div>
                         </div>
 
-                        <Button
+                        <button
                             type="submit"
                             disabled={processing}
-                            variant="default"
-                            size="lg"
-                            className="w-full"
+                            className={cn(buttonVariants({ variant: 'default', size: 'lg' }), 'w-full')}
+                            onClick={handleSubmit}
                         >
                             {processing ? 'Memuat...' : 'Masuk'}
-                        </Button>
+                        </button>
                     </CardContent>
                 </Card>
                 </form>
