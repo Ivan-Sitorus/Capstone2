@@ -9,6 +9,9 @@ use App\Http\Controllers\Cashier\CashierOrderController;
 use App\Http\Controllers\Cashier\CashierPesananAktifController;
 use App\Http\Controllers\Cashier\CashierPesananBaruController;
 use App\Http\Controllers\Cashier\CashierRiwayatController;
+use App\Http\Controllers\Cashier\CashierVerifikasiController;
+use App\Http\Controllers\Kitchen\KitchenController;
+use App\Http\Controllers\ReceiptController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -35,6 +38,12 @@ Route::prefix('cashier')->middleware(['auth', 'role:cashier,admin'])->group(func
     Route::patch('/order/{order}/reject-qris',  [CashierOrderController::class, 'rejectQris'])->name('cashier.order.reject-qris');
     Route::get('/profil', fn() => Inertia::render('Cashier/Profil', ['user' => Auth::user()]))->name('cashier.profil');
     Route::get('/pending-count', \App\Http\Controllers\Cashier\CashierPendingCountController::class)->name('cashier.pending-count');
+    Route::get('/verifikasi', [CashierVerifikasiController::class, 'index'])->name('cashier.verifikasi');
+});
+
+// Kitchen
+Route::middleware('auth')->group(function () {
+    Route::get('/kitchen', [KitchenController::class, 'index'])->name('kitchen.index');
 });
 
 // Customer — entry point via QR scan
@@ -53,3 +62,6 @@ Route::prefix('customer')->group(function () {
     Route::get('/payment/{orderCode}/qris',        [CustomerPaymentController::class, 'showQrisUpload'])->name('customer.payment.qris-upload');
     Route::get('/payment/{orderCode}/qris-status', [CustomerPaymentController::class, 'showQrisStatus'])->name('customer.payment.qris-status');
 });
+
+// Receipt (public — no auth required)
+Route::get('/receipt/{order:code}', [ReceiptController::class, 'show'])->name('receipt.show');
