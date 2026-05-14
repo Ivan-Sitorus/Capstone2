@@ -6,6 +6,8 @@ use App\Models\MenuIngredient;
 use App\Observers\MenuIngredientObserver;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,5 +24,11 @@ class AppServiceProvider extends ServiceProvider
         FilamentAsset::register([
             Css::make('financial-table', __DIR__ . '/../../resources/css/filament/financial-table.css'),
         ]);
+
+        Authenticate::redirectUsing(function (Request $request) {
+            return $request->is('kitchen/*')
+                ? route('kitchen.login')
+                : route('cashier.login');
+        });
     }
 }

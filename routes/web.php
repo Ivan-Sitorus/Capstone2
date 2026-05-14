@@ -45,7 +45,7 @@ Route::get('/kitchen/login', [AuthController::class, 'showKitchenLogin'])->name(
 Route::post('/kitchen/login', [AuthController::class, 'login'])->name('kitchen.login.attempt');
 
 // Kitchen
-Route::middleware(['auth', 'role:kitchen,cashier,admin'])->group(function () {
+Route::middleware(['auth', 'role:kitchen,admin'])->group(function () {
     Route::get('/kitchen', [KitchenController::class, 'index'])->name('kitchen.index');
     Route::get('/kitchen/riwayat', [KitchenController::class, 'riwayat'])->name('kitchen.riwayat');
     Route::patch('/kitchen/order/{order}/bump', [KitchenController::class, 'bump'])->name('kitchen.bump');

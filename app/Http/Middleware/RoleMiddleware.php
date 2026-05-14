@@ -11,6 +11,9 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, string ...$roles): mixed
     {
         if (!Auth::check()) {
+            if ($request->is('kitchen/*')) {
+                return redirect()->route('kitchen.login');
+            }
             return redirect()->route('cashier.login');
         }
 
