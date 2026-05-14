@@ -1,65 +1,34 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import {
-    LayoutDashboard,
     ShoppingCart,
     ClipboardList,
     History,
     User,
     LogOut,
-    CheckCircle,
-    XCircle,
-    PanelLeftClose,
-    PanelLeftOpen,
 } from 'lucide-react';
-import ThemeToggle from '@/Components/Common/ThemeToggle';
+import FlashToast from '@/Components/Shared/FlashToast';
 import { cn } from '@/lib/utils';
+import { buttonVariants } from '@/components/ui/button';
+import { formatDate } from '@/helpers';
 import {
-    Sidebar,
-    SidebarContent,
-    SidebarFooter,
-    SidebarHeader,
-    SidebarMenu,
-    SidebarMenuItem,
-    SidebarProvider,
-    SidebarRail,
-    SidebarTrigger,
-} from '@/components/ui/sidebar';
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 
-const navItems = [
-    { label: 'Dashboard',       href: '/cashier/dashboard',     icon: LayoutDashboard },
-    { label: 'Pesanan Baru',    href: '/cashier/pesanan-baru',  icon: ShoppingCart },
+const tabs = [
+    { label: 'Pesanan Baru',    href: '/cashier/pesanan-baru', icon: ShoppingCart },
     { label: 'Pesanan Aktif',   href: '/cashier/pesanan-aktif', icon: ClipboardList },
     { label: 'Riwayat Pesanan', href: '/cashier/riwayat',       icon: History },
-    { label: 'Profil',          href: '/cashier/profil',        icon: User },
 ];
 
-const SIDEBAR_STORAGE_KEY = 'cashier-sidebar-collapsed';
-const SIDEBAR_EXPANDED_W = 260;
-const SIDEBAR_COLLAPSED_W = 84;
-
-export default function CashierLayout({ children, fullscreen = false }) {
-    const { flash, pendingOrderCount: initialCount } = usePage().props;
+export default function CashierLayout({ children }) {
+    const { flash, auth, pendingOrderCount: initialCount } = usePage().props;
     const [pendingCount, setPendingCount] = useState(initialCount ?? 0);
     const [toast, setToast] = useState(null);
-
-    // ── Sidebar state: persisted in localStorage, initiates from there ──
-    const [sidebarOpen, setSidebarOpen] = useState(() => {
-        if (typeof window === 'undefined') return true;
-        return window.localStorage.getItem(SIDEBAR_STORAGE_KEY) !== 'true';
-    });
-
-    // ── onOpenChange: sync localStorage + dispatch custom event ──
-    const handleSidebarChange = useCallback((open) => {
-        setSidebarOpen(open);
-        if (typeof window === 'undefined') return;
-        const collapsed = !open;
-        const width = open ? SIDEBAR_EXPANDED_W : SIDEBAR_COLLAPSED_W;
-        window.localStorage.setItem(SIDEBAR_STORAGE_KEY, String(collapsed));
-        window.dispatchEvent(new CustomEvent('cashier-sidebar-toggle', {
-            detail: { collapsed, width },
-        }));
-    }, []);
 
     // ── Flash toast ──
     useEffect(() => {
@@ -95,169 +64,97 @@ export default function CashierLayout({ children, fullscreen = false }) {
     const currentPath = usePage().url;
 
     return (
-        <SidebarProvider
-            data-interface="cashier"
-            open={sidebarOpen}
-            onOpenChange={handleSidebarChange}
-            style={{
-                '--sidebar-width': `${SIDEBAR_EXPANDED_W / 16}rem`,
-                '--sidebar-width-icon': `${SIDEBAR_COLLAPSED_W / 16}rem`,
-            }}
-            className="font-sans"
-        >
-            <Sidebar collapsible="icon" className="border-r border-sidebar-border">
-                {/* ── Brand Header ── */}
-                <SidebarHeader className="flex-row items-center gap-3 p-4 border-b border-sidebar-border">
-                    {sidebarOpen ? (
-                        <>
-                            <img
-                                src="/images/logo.jpg"
-                                alt="W9 Cafe"
-                                className="size-10 rounded-[10px] object-cover shrink-0 shadow-lg"
-                            />
-                            <span className="text-sidebar-foreground font-bold text-base whitespace-nowrap select-none">
-                                W9 Cafe
-                            </span>
-                            <ThemeToggle />
-                            <button
-                                type="button"
-                                onClick={() => handleSidebarChange(false)}
-                                title="Collapse sidebar"
-                                aria-label="Collapse sidebar"
-                                className="ml-auto size-8 rounded-lg border border-sidebar-border bg-sidebar-accent text-sidebar-foreground inline-flex items-center justify-center cursor-pointer shrink-0 hover:brightness-125 transition-[filter]"
-                            >
-                                <PanelLeftClose size={16} />
-                            </button>
-                        </>
-                    ) : (
-                        <div className="flex flex-col items-center gap-2 w-full">
-                            <button
-                                type="button"
-                                onClick={() => handleSidebarChange(true)}
-                                title="Expand sidebar"
-                                aria-label="Expand sidebar"
-                                className="size-10 rounded-[10px] border border-sidebar-border bg-sidebar-accent text-sidebar-foreground inline-flex items-center justify-center cursor-pointer shrink-0 shadow-lg hover:brightness-125 transition-[filter]"
-                            >
-                                <PanelLeftOpen size={18} />
-                            </button>
-                        </div>
-                    )}
-                </SidebarHeader>
+        <div data-interface="cashier" className="min-h-screen flex flex-col bg-muted">
+            {/* ── Header Bar ── */}
+            <header className="sticky top-0 z-50 bg-card border-b border-border px-4 lg:px-6 h-14 flex items-center gap-2">
+                <div className="flex items-center gap-2.5 mr-3 shrink-0">
+                    <img
+                        src="/images/logo.jpg"
+                        alt="W9 Cafe"
+                        className="size-8 rounded-[8px] object-cover shrink-0"
+                    />
+                    <span className="font-bold text-base text-foreground whitespace-nowrap select-none hidden sm:inline">
+                        W9 Cafe
+                    </span>
+                </div>
 
-                {/* ── Navigation ── */}
-                <SidebarContent className="px-3 py-4">
-                    <SidebarMenu className="gap-1">
-                        {navItems.map(({ label, href, icon: Icon }) => {
-                            const active = currentPath === href;
-                            const showBadge = label === 'Pesanan Aktif' && pendingCount > 0;
-                            return (
-                                <SidebarMenuItem key={href}>
-                                    <Link
-                                        href={href}
-                                        prefetch
-                                        cacheFor="1m"
+                {/* Tab Navigation */}
+                <nav className="flex items-center gap-1 flex-1 min-w-0">
+                    {tabs.map(({ label, href, icon: Icon }) => {
+                        const isActive = currentPath === href;
+                        const showBadge = label === 'Pesanan Aktif' && pendingCount > 0;
+                        return (
+                            <Link
+                                key={href}
+                                href={href}
+                                prefetch
+                                cacheFor="1m"
+                                className={cn(
+                                    'relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors no-underline whitespace-nowrap',
+                                    isActive
+                                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                                )}
+                            >
+                                <Icon size={16} className="shrink-0" />
+                                <span className="hidden sm:inline">{label}</span>
+                                {showBadge && (
+                                    <span
                                         className={cn(
-                                            'flex items-center gap-3 h-11 rounded-lg text-sm font-medium transition-colors no-underline select-none',
-                                            'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:size-[52px] group-data-[collapsible=icon]:p-0',
-                                            sidebarOpen ? 'px-4' : 'px-0',
-                                            active
-                                                ? 'bg-primary text-primary-foreground'
-                                                : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                                            'inline-flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold leading-none ml-0.5',
+                                            pendingCount > 9 ? 'min-w-4 h-4 px-1' : 'size-4',
                                         )}
                                     >
-                                        {/* Icon + collapsed badge */}
-                                        <span className="relative inline-flex shrink-0">
-                                            <Icon size={20} />
-                                            {!sidebarOpen && showBadge && (
-                                                <span
-                                                    className={cn(
-                                                        'absolute -top-2 -right-2.5 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[9px] font-bold leading-none',
-                                                        pendingCount > 9 ? 'min-w-4 h-4 px-1' : 'size-4',
-                                                    )}
-                                                >
-                                                    {pendingCount > 99 ? '99+' : pendingCount}
-                                                </span>
-                                            )}
-                                        </span>
-                                        {/* Label */}
-                                        {sidebarOpen && (
-                                            <span className="flex-1 truncate group-data-[collapsible=icon]:hidden">{label}</span>
-                                        )}
-                                        {/* Expanded badge */}
-                                        {sidebarOpen && showBadge && (
-                                            <span
-                                                className={cn(
-                                                    'shrink-0 flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[11px] font-bold leading-none',
-                                                    pendingCount > 9 ? 'min-w-5 h-5 px-[5px]' : 'size-5',
-                                                )}
-                                            >
-                                                {pendingCount > 99 ? '99+' : pendingCount}
-                                            </span>
-                                        )}
-                                    </Link>
-                                </SidebarMenuItem>
-                            );
-                        })}
-                    </SidebarMenu>
-                </SidebarContent>
+                                        {pendingCount > 99 ? '99+' : pendingCount}
+                                    </span>
+                                )}
+                            </Link>
+                        );
+                    })}
+                </nav>
 
-                {/* ── Logout Footer ── */}
-                <SidebarFooter className="p-3 border-t border-sidebar-border">
-                    <button
-                        type="button"
-                        onClick={() => router.post('/logout')}
-                        className={cn(
-                            'flex items-center gap-3 h-11 w-full rounded-lg text-sm font-medium transition-colors cursor-pointer border-none bg-transparent',
-                            'text-destructive hover:bg-destructive/10',
-                            'group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0',
-                            sidebarOpen ? 'px-4' : 'px-0',
-                        )}
-                    >
-                        <LogOut size={20} className="shrink-0" />
-                        {sidebarOpen && (
-                            <span className="group-data-[collapsible=icon]:hidden">Keluar</span>
-                        )}
-                    </button>
-                </SidebarFooter>
+                {/* Right side: Theme Toggle + Avatar Dropdown */}
+                    <div className="flex items-center gap-1 shrink-0">
 
-                <SidebarRail />
-            </Sidebar>
+                    <DropdownMenu>
+                        <DropdownMenuTrigger>
+                            <button
+                                type="button"
+                                className={buttonVariants({ variant: 'outline', size: 'icon' })}
+                                aria-label="Menu akun"
+                            >
+                                <User size={20} />
+                            </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" sideOffset={8} className="min-w-[200px] p-0">
+                            <div className="px-3.5 py-3">
+                                <p className="text-sm font-semibold text-foreground">
+                                    {auth?.user?.name ?? 'Kasir'}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                    {auth?.user?.email}
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                    Terdaftar sejak {auth?.user?.created_at ? formatDate(auth.user.created_at) : '-'}
+                                </p>
+                            </div>
+                            <div className="h-px bg-border" />
+                            <DropdownMenuItem onClick={() => router.post('/logout')} variant="destructive" className="rounded-none px-3.5 py-2.5">
+                                <LogOut size={16} />
+                                Keluar
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                </div>
+            </header>
 
             {/* ── Main Content ── */}
-            {fullscreen ? (
-                <main className="relative flex flex-1 flex-col overflow-hidden h-svh">
-                    <SidebarTrigger className="absolute top-3 left-3 z-30 md:hidden" />
-                    {children}
-                </main>
-            ) : (
-                <main className="flex flex-1 flex-col bg-muted p-4 sm:p-8 min-h-svh">
-                    <div className="flex items-center justify-between mb-4">
-                        <SidebarTrigger className="md:hidden" />
-                        <div className="flex-1" />
-                        <ThemeToggle />
-                    </div>
-                    <div className="flex-1 bg-card rounded-xl p-6 border shadow-sm">
-                        {children}
-                    </div>
-                </main>
-            )}
+            <main className="flex-1 flex flex-col overflow-hidden min-h-0">
+                {children}
+            </main>
 
             {/* ── Toast ── */}
-            {toast && (
-                <div
-                    className={cn(
-                        'fixed top-6 right-6 z-[9999] rounded-[10px] px-4 py-3 flex items-center gap-2.5 text-sm shadow-floating min-w-[280px] max-w-[380px]',
-                        toast.type === 'success'
-                            ? 'bg-green-50 border border-green-200 text-green-800 dark:bg-green-950 dark:border-green-800 dark:text-green-200'
-                            : 'bg-red-50 border border-red-200 text-red-800 dark:bg-red-950 dark:border-red-800 dark:text-red-200',
-                    )}
-                >
-                    {toast.type === 'success'
-                        ? <CheckCircle size={18} className="shrink-0" />
-                        : <XCircle size={18} className="shrink-0" />}
-                    {toast.message}
-                </div>
-            )}
-        </SidebarProvider>
+            <FlashToast toast={toast} onDismiss={() => setToast(null)} />
+        </div>
     );
 }
