@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { Link, usePage, router } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 import {
     ShoppingCart,
     ClipboardList,
     History,
 } from 'lucide-react';
+import HeaderBar from '@/Components/Shared/HeaderBar';
 import FlashToast from '@/Components/Shared/FlashToast';
-import ProfileDropdown from '@/Components/Shared/ProfileDropdown';
-import { cn } from '@/lib/utils';
 
 const tabs = [
     { label: 'Pesanan Baru',    href: '/cashier/pesanan-baru', icon: ShoppingCart },
@@ -50,65 +49,9 @@ export default function CashierLayout({ children }) {
         };
     }, []);
 
-    // ── Active route detection ──
-    const currentPath = usePage().url;
-
     return (
         <div data-interface="cashier" className="min-h-screen flex flex-col bg-muted">
-            {/* ── Header Bar ── */}
-            <header className="sticky top-0 z-50 bg-card border-b border-border px-4 lg:px-6 h-14 flex items-center gap-2">
-                <div className="flex items-center gap-2.5 mr-3 shrink-0">
-                    <img
-                        src="/images/logo.jpg"
-                        alt="W9 Cafe"
-                        className="size-8 rounded-[8px] object-cover shrink-0"
-                    />
-                    <span className="font-bold text-base text-foreground whitespace-nowrap select-none hidden sm:inline">
-                        W9 Cafe
-                    </span>
-                </div>
-
-                {/* Tab Navigation */}
-                <nav className="flex items-center gap-1 flex-1 min-w-0">
-                    {tabs.map(({ label, href, icon: Icon }) => {
-                        const isActive = currentPath === href;
-                        const showBadge = label === 'Pesanan Aktif' && pendingCount > 0;
-                        return (
-                            <Link
-                                key={href}
-                                href={href}
-                                prefetch
-                                cacheFor="1m"
-                                className={cn(
-                                    'relative inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors no-underline whitespace-nowrap',
-                                    isActive
-                                        ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
-                                )}
-                            >
-                                <Icon size={16} className="shrink-0" />
-                                <span className="hidden sm:inline">{label}</span>
-                                {showBadge && (
-                                    <span
-                                        className={cn(
-                                            'inline-flex items-center justify-center rounded-full bg-destructive text-destructive-foreground text-[10px] font-bold leading-none ml-0.5',
-                                            pendingCount > 9 ? 'min-w-4 h-4 px-1' : 'size-4',
-                                        )}
-                                    >
-                                        {pendingCount > 99 ? '99+' : pendingCount}
-                                    </span>
-                                )}
-                            </Link>
-                        );
-                    })}
-                </nav>
-
-                {/* Right side: Theme Toggle + Avatar Dropdown */}
-                    <div className="flex items-center gap-1 shrink-0">
-
-                    <ProfileDropdown user={auth?.user} />
-                </div>
-            </header>
+            <HeaderBar tabs={tabs} user={auth?.user} pendingCount={pendingCount} />
 
             {/* ── Main Content ── */}
             <main className="flex-1 flex flex-col overflow-hidden min-h-0">
