@@ -4,20 +4,10 @@ import {
     ShoppingCart,
     ClipboardList,
     History,
-    User,
-    LogOut,
 } from 'lucide-react';
 import FlashToast from '@/Components/Shared/FlashToast';
+import ProfileDropdown from '@/Components/Shared/ProfileDropdown';
 import { cn } from '@/lib/utils';
-import { buttonVariants } from '@/components/ui/button';
-import { formatDate } from '@/helpers';
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-} from '@/components/ui/dropdown-menu';
 
 const tabs = [
     { label: 'Pesanan Baru',    href: '/cashier/pesanan-baru', icon: ShoppingCart },
@@ -116,35 +106,7 @@ export default function CashierLayout({ children }) {
                 {/* Right side: Theme Toggle + Avatar Dropdown */}
                     <div className="flex items-center gap-1 shrink-0">
 
-                    <DropdownMenu>
-                        <DropdownMenuTrigger>
-                            <button
-                                type="button"
-                                className={buttonVariants({ variant: 'outline', size: 'icon' })}
-                                aria-label="Menu akun"
-                            >
-                                <User size={20} />
-                            </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" sideOffset={8} className="min-w-[200px] p-0">
-                            <div className="px-3.5 py-3">
-                                <p className="text-sm font-semibold text-foreground">
-                                    {auth?.user?.name ?? 'Kasir'}
-                                </p>
-                                <p className="text-xs text-muted-foreground mt-0.5">
-                                    {auth?.user?.email}
-                                </p>
-                                <p className="text-xs text-muted-foreground mt-0.5">
-                                    Terdaftar sejak {auth?.user?.created_at ? formatDate(auth.user.created_at) : '-'}
-                                </p>
-                            </div>
-                            <div className="h-px bg-border" />
-                            <DropdownMenuItem onClick={() => router.post('/logout')} variant="destructive" className="rounded-none px-3.5 py-2.5">
-                                <LogOut size={16} />
-                                Keluar
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <ProfileDropdown user={auth?.user} />
                 </div>
             </header>
 
