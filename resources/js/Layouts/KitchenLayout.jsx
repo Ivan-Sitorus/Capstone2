@@ -1,11 +1,19 @@
 import { useState, useEffect } from 'react';
 import { usePage } from '@inertiajs/react';
+import { ClipboardList, History } from 'lucide-react';
+import HeaderBar from '@/Components/Shared/HeaderBar';
 import FlashToast from '@/Components/Shared/FlashToast';
 
-export default function KitchenLayout({ children, title = 'Dapur' }) {
-    const { flash } = usePage().props;
+const kitchenTabs = [
+    { label: 'Pesanan', href: '/kitchen', icon: ClipboardList },
+    { label: 'Riwayat', href: '#riwayat', icon: History },
+];
+
+export default function KitchenLayout({ children, activeTab, onTabChange }) {
+    const { flash, auth } = usePage().props;
     const [toast, setToast] = useState(null);
 
+    // ── Flash toast ──
     useEffect(() => {
         if (flash?.success) {
             setToast({ type: 'success', message: flash.success });
@@ -20,15 +28,15 @@ export default function KitchenLayout({ children, title = 'Dapur' }) {
     }, [flash]);
 
     return (
-        <div
-            data-interface="kitchen"
-            className="min-h-screen w-full bg-background text-foreground font-sans text-lg flex flex-col"
-        >
-        
-            <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 p-4 min-h-0">
-                {children}
-            </div>
+        <div data-interface="kitchen" className="min-h-screen flex flex-col bg-muted">
+            <HeaderBar tabs={kitchenTabs} user={auth?.user} />
 
+            {/* ── Main Content ── */}
+            <main className="flex-1 overflow-hidden min-h-0 p-4 lg:p-6">
+                <div className="bg-card rounded-xl border border-border shadow-sm h-full flex flex-col min-h-0">
+                    {children}
+                </div>
+            </main>
 
             {/* ── Toast ── */}
             <FlashToast toast={toast} onDismiss={() => setToast(null)} />
