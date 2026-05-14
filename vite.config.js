@@ -6,7 +6,11 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/js/app.jsx', 'resources/css/filament/admin/theme.css'],
+            input: [
+                'resources/js/app.jsx',
+                'resources/js/report-grid.jsx',
+                'resources/css/filament/admin/theme.css',
+            ],
             refresh: [
                 ...refreshPaths,
                 'app/Filament/**',

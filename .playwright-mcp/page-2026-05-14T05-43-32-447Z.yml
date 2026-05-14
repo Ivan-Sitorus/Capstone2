@@ -1,0 +1,13 @@
+- generic [ref=e5]:
+  - generic [ref=e6]:
+    - img [ref=e8]
+    - generic [ref=e11]: Dapur W9 Cafe
+    - generic [ref=e12]: Masuk ke Kitchen Display System
+  - generic [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]: Email
+      - textbox "kasir@w9cafe.com" [ref=e16]
+    - generic [ref=e17]:
+      - generic [ref=e18]: Kata Sandi
+      - textbox "Masukkan kata sandi..." [ref=e19]
+    - button "Masuk" [ref=e20]

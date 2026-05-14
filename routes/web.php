@@ -51,7 +51,7 @@ Route::get('/pesan', [CustomerMenuController::class, 'showIdentitas'])->name('pe
 // Customer pages
 Route::prefix('pelanggan')->group(function () {
     Route::get('/menu',    [CustomerMenuController::class, 'index'])->name('pelanggan.menu');
-    Route::get('/keranjang',    fn() => Inertia::render('Customer/Cart/Index', []))->name('pelanggan.keranjang');
+    Route::get('/keranjang',    fn() => Inertia::render('Pelanggan/Cart/Index', []))->name('pelanggan.keranjang');
     Route::get('/pesanan/{code}/status', [CustomerOrderController::class, 'status'])->name('pelanggan.pesanan.status');
 
     // Payment flow

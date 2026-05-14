@@ -1,0 +1,195 @@
+- generic [ref=e3]:
+  - complementary [ref=e4]:
+    - generic [ref=e5]:
+      - img "W9 Cafe" [ref=e6]
+      - generic [ref=e7]: W9 Cafe
+      - button "Collapse sidebar" [ref=e8] [cursor=pointer]:
+        - img [ref=e9]
+    - button "T Tidak dikenal Kasir" [ref=e14] [cursor=pointer]:
+      - generic [ref=e15]: T
+      - generic [ref=e16]:
+        - generic [ref=e17]: Tidak dikenal
+        - generic [ref=e18]: Kasir
+      - img [ref=e19]
+    - navigation [ref=e21]:
+      - link "Dasbor" [ref=e22] [cursor=pointer]:
+        - /url: /cashier/dashboard
+        - img [ref=e24]
+        - generic [ref=e29]: Dasbor
+      - link "Pesanan Baru" [ref=e30] [cursor=pointer]:
+        - /url: /cashier/pesanan-baru
+        - img [ref=e32]
+        - generic [ref=e36]: Pesanan Baru
+      - link "Pesanan Aktif" [ref=e37] [cursor=pointer]:
+        - /url: /cashier/pesanan-aktif
+        - img [ref=e39]
+        - generic [ref=e42]: Pesanan Aktif
+      - link "Riwayat Pesanan" [ref=e43] [cursor=pointer]:
+        - /url: /cashier/riwayat
+        - img [ref=e45]
+        - generic [ref=e49]: Riwayat Pesanan
+      - link "Verifikasi Akun" [ref=e50] [cursor=pointer]:
+        - /url: /cashier/verifikasi
+        - img [ref=e52]
+        - generic [ref=e55]: Verifikasi Akun
+      - link "Profil" [ref=e56] [cursor=pointer]:
+        - /url: /cashier/profil
+        - img [ref=e58]
+        - generic [ref=e61]: Profil
+    - button "Keluar" [ref=e63] [cursor=pointer]:
+      - img [ref=e64]
+      - text: Keluar
+  - main [ref=e67]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - img
+          - textbox "Cari menu..." [ref=e71]
+        - generic [ref=e72]:
+          - button "Semua" [ref=e73] [cursor=pointer]
+          - button "Ayam Geprek" [ref=e74] [cursor=pointer]
+          - button "Chocolatos Base" [ref=e75] [cursor=pointer]
+          - button "Coffee Base" [ref=e76] [cursor=pointer]
+          - button "Data Mining Seed" [ref=e77] [cursor=pointer]
+          - button "Indomie Base" [ref=e78] [cursor=pointer]
+          - button "Lime Base" [ref=e79] [cursor=pointer]
+          - button "Nasi Goreng" [ref=e80] [cursor=pointer]
+          - button "Nasi Telur" [ref=e81] [cursor=pointer]
+          - button "Snack" [ref=e82] [cursor=pointer]
+          - button "Tea Base" [ref=e83] [cursor=pointer]
+        - generic [ref=e84]:
+          - generic [ref=e85] [cursor=pointer]:
+            - generic [ref=e86]: Ayam Geprek
+            - generic [ref=e87]: Nasi Ayam Geprek
+            - generic [ref=e88]: Rp14.000
+          - generic [ref=e89] [cursor=pointer]:
+            - generic [ref=e90]: Ayam Geprek
+            - generic [ref=e91]: Test Menu E2E
+            - generic [ref=e92]: Rp5.000
+          - generic [ref=e93] [cursor=pointer]:
+            - generic [ref=e94]: Chocolatos Base
+            - generic [ref=e95]: Creamy Chocolatey
+            - generic [ref=e96]: Rp8.000
+          - generic [ref=e97] [cursor=pointer]:
+            - generic [ref=e98]: Chocolatos Base
+            - generic [ref=e99]: Full Chocolate
+            - generic [ref=e100]: Rp8.000
+          - generic [ref=e101] [cursor=pointer]:
+            - generic [ref=e102]: Chocolatos Base
+            - generic [ref=e103]: Matcha
+            - generic [ref=e104]: Rp8.000
+          - generic [ref=e105] [cursor=pointer]:
+            - generic [ref=e106]: Chocolatos Base
+            - generic [ref=e107]: Vanilla Latte
+            - generic [ref=e108]: Rp8.000
+          - generic [ref=e109] [cursor=pointer]:
+            - generic [ref=e110]: Coffee Base
+            - generic [ref=e111]: Americano Panas
+            - generic [ref=e112]: Rp10.000
+          - generic [ref=e113] [cursor=pointer]:
+            - generic [ref=e114]: Coffee Base
+            - generic [ref=e115]: Es Americano
+            - generic [ref=e116]: Rp12.000
+          - generic [ref=e117] [cursor=pointer]:
+            - generic [ref=e118]: Coffee Base
+            - generic [ref=e119]: Espresso
+            - generic [ref=e120]: Rp10.000
+          - generic [ref=e121] [cursor=pointer]:
+            - generic [ref=e122]: Coffee Base
+            - generic [ref=e123]: Kopi Susu
+            - generic [ref=e124]: Rp14.000
+          - generic [ref=e125] [cursor=pointer]:
+            - generic [ref=e126]: Data Mining Seed
+            - generic [ref=e127]: Cappucino
+            - generic [ref=e128]: Rp22.000
+          - generic [ref=e129] [cursor=pointer]:
+            - generic [ref=e130]: Data Mining Seed
+            - generic [ref=e131]: Cheesecake
+            - generic [ref=e132]: Rp27.000
+          - generic [ref=e133] [cursor=pointer]:
+            - generic [ref=e134]: Data Mining Seed
+            - generic [ref=e135]: French Fries
+            - generic [ref=e136]: Rp20.000
+          - generic [ref=e137] [cursor=pointer]:
+            - generic [ref=e138]: Data Mining Seed
+            - generic [ref=e139]: Mie Goreng
+            - generic [ref=e140]: Rp28.000
+          - generic [ref=e141] [cursor=pointer]:
+            - generic [ref=e142]: Data Mining Seed
+            - generic [ref=e143]: Nasi Goreng
+            - generic [ref=e144]: Rp30.000
+          - generic [ref=e145] [cursor=pointer]:
+            - generic [ref=e146]: Indomie Base
+            - generic [ref=e147]: Mie Goreng Telur
+            - generic [ref=e148]: Rp10.000
+          - generic [ref=e149] [cursor=pointer]:
+            - generic [ref=e150]: Indomie Base
+            - generic [ref=e151]: Mie Rebus Telur
+            - generic [ref=e152]: Rp10.000
+          - generic [ref=e153] [cursor=pointer]:
+            - generic [ref=e154]: Lime Base
+            - generic [ref=e155]: Jeruk Nipis
+            - generic [ref=e156]: Rp5.000
+          - generic [ref=e157] [cursor=pointer]:
+            - generic [ref=e158]: Lime Base
+            - generic [ref=e159]: Teh Jeruk (Lime Tea)
+            - generic [ref=e160]: Rp6.000
+          - generic [ref=e161] [cursor=pointer]:
+            - generic [ref=e162]: Nasi Goreng
+            - generic [ref=e163]: Nasgor Ayam/Udang
+            - generic [ref=e164]: Rp17.000
+          - generic [ref=e165] [cursor=pointer]:
+            - generic [ref=e166]: Nasi Goreng
+            - generic [ref=e167]: Nasgor Telur
+            - generic [ref=e168]: Rp12.000
+          - generic [ref=e169] [cursor=pointer]:
+            - generic [ref=e170]: Nasi Telur
+            - generic [ref=e171]: Nasi Telur Kecap
+            - generic [ref=e172]: Rp8.000
+          - generic [ref=e173] [cursor=pointer]:
+            - generic [ref=e174]: Nasi Telur
+            - generic [ref=e175]: Nasi Telur Saus
+            - generic [ref=e176]: Rp9.000
+          - generic [ref=e177] [cursor=pointer]:
+            - generic [ref=e178]: Snack
+            - generic [ref=e179]: Kentang (French Fries)
+            - generic [ref=e180]: Rp12.000
+          - generic [ref=e181] [cursor=pointer]:
+            - generic [ref=e182]: Snack
+            - generic [ref=e183]: Pisang Coklat Keju
+            - generic [ref=e184]: Rp10.000
+          - generic [ref=e185] [cursor=pointer]:
+            - generic [ref=e186]: Snack
+            - generic [ref=e187]: Tempe Mendoan
+            - generic [ref=e188]: Rp8.000
+          - generic [ref=e189] [cursor=pointer]:
+            - generic [ref=e190]: Tea Base
+            - generic [ref=e191]: Teh Manis
+            - generic [ref=e192]: Rp4.000
+          - generic [ref=e193] [cursor=pointer]:
+            - generic [ref=e194]: Tea Base
+            - generic [ref=e195]: Teh Susu
+            - generic [ref=e196]: Rp7.000
+          - generic [ref=e197] [cursor=pointer]:
+            - generic [ref=e198]: Tea Base
+            - generic [ref=e199]: Teh Tawar
+            - generic [ref=e200]: Rp3.000
+      - generic [ref=e201]:
+        - generic [ref=e202]:
+          - generic [ref=e203]: Keranjang Pesanan
+          - generic [ref=e204]:
+            - generic [ref=e205]: "0"
+            - button "Collapse keranjang" [ref=e206] [cursor=pointer]:
+              - img [ref=e207]
+        - paragraph [ref=e211]: Keranjang kosong
+        - generic [ref=e212]:
+          - generic [ref=e215] [cursor=pointer]: Mahasiswa STIE Totalwin Semarang
+          - generic [ref=e216]:
+            - generic [ref=e217]: Subtotal
+            - generic [ref=e218]: Rp0
+          - generic [ref=e219]:
+            - generic [ref=e220]: Total
+            - generic [ref=e221]: Rp0
+          - button "BAYAR Rp0" [disabled] [ref=e222]:
+            - generic [ref=e223]: BAYAR
+            - generic [ref=e224]: Rp0

@@ -8,15 +8,21 @@ use Livewire\Attributes\On;
 class CashFlow extends Page
 {
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
-    protected static string|\UnitEnum|null $navigationGroup = 'Finance Details';
-    protected static ?string $navigationLabel = 'Cash Flow';
-    protected static ?string $title = 'Cash Flow';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Detail Keuangan';
+
+    protected static ?string $navigationLabel = 'Arus Kas';
+
+    protected static ?string $title = 'Arus Kas';
+
     protected static ?int $navigationSort = 0;
 
     protected string $view = 'filament.pages.cash-flow';
 
     public string $period = 'day';
+
     public ?string $date_start = null;
+
     public ?string $date_end = null;
 
     public function mount(): void
@@ -43,7 +49,7 @@ class CashFlow extends Page
 
     public function getTitle(): string
     {
-        return 'Cash Flow';
+        return 'Arus Kas';
     }
 
     protected function getHeaderActions(): array

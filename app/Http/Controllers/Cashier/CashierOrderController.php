@@ -18,7 +18,7 @@ class CashierOrderController extends Controller
     {
         $order->load(['items.menu', 'cafeTable', 'cashier']);
 
-        return Inertia::render('Cashier/Order/Show', [
+        return Inertia::render('Kasir/Order/Show', [
             'order' => [
                 'id'             => $order->id,
                 'order_code'     => $order->order_code,

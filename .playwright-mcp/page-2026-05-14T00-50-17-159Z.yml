@@ -1,0 +1,233 @@
+- generic [ref=e3]:
+  - 'button "Tema: system" [ref=e5] [cursor=pointer]':
+    - img [ref=e6]
+  - generic [ref=e8]:
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]: W9
+        - generic [ref=e12]:
+          - heading "Dapur" [level=1] [ref=e13]
+          - text: Kitchen Display System
+      - button "Layar Penuh" [ref=e15] [cursor=pointer]:
+        - img [ref=e16]
+    - tablist [ref=e23]:
+      - tab "Pesanan" [selected] [ref=e24]
+      - tab "Riwayat" [ref=e25]
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - generic [ref=e28]: Menunggu
+        - generic [ref=e29]: "3"
+      - generic [ref=e30]:
+        - generic [ref=e32]:
+          - generic [ref=e33]:
+            - generic [ref=e34]:
+              - generic [ref=e35]: "#ORD-20260514-0006"
+              - generic [ref=e36]: Meja 1
+            - generic [ref=e37]: Pending
+          - generic [ref=e40]:
+            - generic [ref=e41]:
+              - generic [ref=e42]:
+                - generic [ref=e43]: 4x
+                - text: Nasi Ayam Geprek
+              - generic [ref=e44]: Ayam Geprek
+            - generic [ref=e45]:
+              - generic [ref=e46]:
+                - generic [ref=e47]: 1x
+                - text: Creamy Chocolatey
+              - generic [ref=e48]: Chocolatos Base
+            - generic [ref=e49]:
+              - generic [ref=e50]:
+                - generic [ref=e51]: 1x
+                - text: Full Chocolate
+              - generic [ref=e52]: Chocolatos Base
+            - generic [ref=e53]:
+              - generic [ref=e54]:
+                - generic [ref=e55]: 1x
+                - text: Matcha
+              - generic [ref=e56]: Chocolatos Base
+            - generic [ref=e57]:
+              - generic [ref=e58]:
+                - generic [ref=e59]: 1x
+                - text: Espresso
+              - generic [ref=e60]: Coffee Base
+            - generic [ref=e61]:
+              - generic [ref=e62]:
+                - generic [ref=e63]: 1x
+                - text: Es Americano
+              - generic [ref=e64]: Coffee Base
+            - generic [ref=e65]:
+              - generic [ref=e66]:
+                - generic [ref=e67]: 1x
+                - text: Americano Panas
+              - generic [ref=e68]: Coffee Base
+            - generic [ref=e69]:
+              - generic [ref=e70]:
+                - generic [ref=e71]: 1x
+                - text: Vanilla Latte
+              - generic [ref=e72]: Chocolatos Base
+            - generic [ref=e73]:
+              - generic [ref=e74]:
+                - generic [ref=e75]: 1x
+                - text: Kopi Susu
+              - generic [ref=e76]: Coffee Base
+            - generic [ref=e77]:
+              - generic [ref=e78]:
+                - generic [ref=e79]: 1x
+                - text: Cappucino
+              - generic [ref=e80]: Data Mining Seed
+            - generic [ref=e81]:
+              - generic [ref=e82]:
+                - generic [ref=e83]: 1x
+                - text: Cheesecake
+              - generic [ref=e84]: Data Mining Seed
+            - generic [ref=e85]:
+              - generic [ref=e86]:
+                - generic [ref=e87]: 1x
+                - text: French Fries
+              - generic [ref=e88]: Data Mining Seed
+            - generic [ref=e89]:
+              - generic [ref=e90]:
+                - generic [ref=e91]: 1x
+                - text: Mie Rebus Telur
+              - generic [ref=e92]: Indomie Base
+            - generic [ref=e93]:
+              - generic [ref=e94]:
+                - generic [ref=e95]: 1x
+                - text: Mie Goreng Telur
+              - generic [ref=e96]: Indomie Base
+            - generic [ref=e97]:
+              - generic [ref=e98]:
+                - generic [ref=e99]: 1x
+                - text: Nasi Goreng
+              - generic [ref=e100]: Data Mining Seed
+            - generic [ref=e101]:
+              - generic [ref=e102]:
+                - generic [ref=e103]: 1x
+                - text: Mie Goreng
+              - generic [ref=e104]: Data Mining Seed
+            - generic [ref=e105]:
+              - generic [ref=e106]:
+                - generic [ref=e107]: 1x
+                - text: Jeruk Nipis
+              - generic [ref=e108]: Lime Base
+            - generic [ref=e109]:
+              - generic [ref=e110]:
+                - generic [ref=e111]: 1x
+                - text: Teh Jeruk (Lime Tea)
+              - generic [ref=e112]: Lime Base
+            - generic [ref=e113]:
+              - generic [ref=e114]:
+                - generic [ref=e115]: 1x
+                - text: Nasgor Ayam/Udang
+              - generic [ref=e116]: Nasi Goreng
+            - generic [ref=e117]:
+              - generic [ref=e118]:
+                - generic [ref=e119]: 1x
+                - text: Nasgor Telur
+              - generic [ref=e120]: Nasi Goreng
+            - generic [ref=e121]:
+              - generic [ref=e122]:
+                - generic [ref=e123]: 1x
+                - text: Pisang Coklat Keju
+              - generic [ref=e124]: Snack
+            - generic [ref=e125]:
+              - generic [ref=e126]:
+                - generic [ref=e127]: 1x
+                - text: Kentang (French Fries)
+              - generic [ref=e128]: Snack
+            - generic [ref=e129]:
+              - generic [ref=e130]:
+                - generic [ref=e131]: 1x
+                - text: Nasi Telur Saus
+              - generic [ref=e132]: Nasi Telur
+            - generic [ref=e133]:
+              - generic [ref=e134]:
+                - generic [ref=e135]: 1x
+                - text: Nasi Telur Kecap
+              - generic [ref=e136]: Nasi Telur
+            - generic [ref=e137]:
+              - generic [ref=e138]:
+                - generic [ref=e139]: 1x
+                - text: Tempe Mendoan
+              - generic [ref=e140]: Snack
+            - generic [ref=e141]:
+              - generic [ref=e142]:
+                - generic [ref=e143]: 1x
+                - text: Teh Manis
+              - generic [ref=e144]: Tea Base
+            - generic [ref=e145]:
+              - generic [ref=e146]:
+                - generic [ref=e147]: 1x
+                - text: Teh Susu
+              - generic [ref=e148]: Tea Base
+            - generic [ref=e149]:
+              - generic [ref=e150]:
+                - generic [ref=e151]: 1x
+                - text: Teh Tawar
+              - generic [ref=e152]: Tea Base
+          - generic [ref=e153]:
+            - generic [ref=e154]: Rp 338.000
+            - button "→ Ambil" [ref=e156]
+        - generic [ref=e158]:
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - generic [ref=e161]: "#ORD-20260514-0004"
+              - generic [ref=e162]: Meja 2
+            - generic [ref=e163]: Pending
+          - generic [ref=e167]:
+            - generic [ref=e168]:
+              - generic [ref=e169]: 5x
+              - text: Creamy Chocolatey
+            - generic [ref=e170]: Chocolatos Base
+          - generic [ref=e171]:
+            - generic [ref=e172]: Rp 30.000
+            - button "→ Ambil" [ref=e174]
+        - generic [ref=e176]:
+          - generic [ref=e177]:
+            - generic [ref=e178]:
+              - generic [ref=e179]: "#ORD-20260514-0003"
+              - generic [ref=e180]: Meja 2
+            - generic [ref=e181]: Pending
+          - generic [ref=e185]:
+            - generic [ref=e186]:
+              - generic [ref=e187]: 5x
+              - text: Creamy Chocolatey
+            - generic [ref=e188]: Chocolatos Base
+          - generic [ref=e189]:
+            - generic [ref=e190]: Rp 30.000
+            - button "→ Ambil" [ref=e192]
+    - generic [ref=e193]:
+      - generic [ref=e194]:
+        - generic [ref=e195]: Diproses
+        - generic [ref=e196]: "2"
+      - generic [ref=e197]:
+        - generic [ref=e199]:
+          - generic [ref=e200]:
+            - generic [ref=e202]: "#ORD-20260514-0005"
+            - generic [ref=e203]: Diproses
+          - generic [ref=e207]:
+            - generic [ref=e208]:
+              - generic [ref=e209]: 1x
+              - text: Vanilla Latte
+            - generic [ref=e210]: Chocolatos Base
+          - generic [ref=e211]:
+            - generic [ref=e212]: Rp 6.000
+            - button "✔ Selesai" [ref=e214]
+        - generic [ref=e216]:
+          - generic [ref=e217]:
+            - generic [ref=e219]: "#ORD-20260514-0001"
+            - generic [ref=e220]: Diproses
+          - generic [ref=e223]:
+            - generic [ref=e224]:
+              - generic [ref=e225]:
+                - generic [ref=e226]: 4x
+                - text: Creamy Chocolatey
+              - generic [ref=e227]: Chocolatos Base
+            - generic [ref=e228]:
+              - generic [ref=e229]:
+                - generic [ref=e230]: 5x
+                - text: Kopi Susu
+              - generic [ref=e231]: Coffee Base
+          - generic [ref=e232]:
+            - generic [ref=e233]: Rp 102.000
+            - button "✔ Selesai" [ref=e235]

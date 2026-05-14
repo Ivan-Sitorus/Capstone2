@@ -3,6 +3,8 @@
 namespace App\Filament\Clusters\Financial\Pages;
 
 use App\Filament\Clusters\Financial\FinancialCluster;
+use App\Filament\Pages\ViewReport;
+use App\Models\GeneratedReport;
 use App\Models\ReportTemplate;
 use App\Services\FinancialReportService;
 use Filament\Actions\Action;
@@ -25,9 +27,9 @@ class SavedTemplates extends Page implements HasTable
 
     protected static ?string $cluster = FinancialCluster::class;
 
-    protected static ?string $navigationLabel = 'Saved Templates';
+    protected static ?string $navigationLabel = 'Template Tersimpan';
 
-    protected static ?string $title = 'Saved Templates';
+    protected static ?string $title = 'Template Tersimpan';
 
     protected static ?string $slug = 'templates';
 
@@ -44,11 +46,11 @@ class SavedTemplates extends Page implements HasTable
             ->query(ReportTemplate::where('user_id', Auth::id())->latest())
             ->columns([
                 TextColumn::make('name')
-                    ->label('Name')
+                    ->label('Nama')
                     ->searchable()
                     ->weight('medium'),
                 TextColumn::make('type')
-                    ->label('Type')
+                    ->label('Tipe')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'simple' => 'gray',
@@ -58,7 +60,7 @@ class SavedTemplates extends Page implements HasTable
                     })
                     ->formatStateUsing(fn (string $state): string => ucfirst($state)),
                 TextColumn::make('created_at')
-                    ->label('Created')
+                    ->label('Dibuat')
                     ->date('d M Y')
                     ->sortable(),
             ])
@@ -78,7 +80,7 @@ class SavedTemplates extends Page implements HasTable
                                     'categories' => $config['categories'] ?? [],
                                 ]
                             );
-                            $report = \App\Models\GeneratedReport::create([
+                            $report = GeneratedReport::create([
                                 'user_id' => Auth::id(),
                                 'name' => ($record->name.' — '.now()->format('Y-m-d H:i')),
                                 'type' => $config['report_type'] ?? 'simple',
@@ -89,27 +91,27 @@ class SavedTemplates extends Page implements HasTable
                                 'result' => $reportData->toArray(),
                             ]);
                             Notification::make()
-                                ->title('Generated from Template')
+                                ->title('Terbuat dari Template')
                                 ->success()
                                 ->send();
-                            $this->redirect(\App\Filament\Pages\ViewReport::getUrl(['id' => $report->id]));
+                            $this->redirect(ViewReport::getUrl(['id' => $report->id]));
                         } catch (\Exception $e) {
                             Notification::make()
-                                ->title('Failed')
+                                ->title('Gagal')
                                 ->body($e->getMessage())
                                 ->danger()
                                 ->send();
                         }
                     }),
                 Action::make('delete')
-                    ->label('Delete')
+                    ->label('Hapus')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
                     ->requiresConfirmation()
                     ->action(function (ReportTemplate $record): void {
                         $record->delete();
                         Notification::make()
-                            ->title('Template Deleted')
+                            ->title('Template Dihapus')
                             ->success()
                             ->send();
                     }),
@@ -121,19 +123,19 @@ class SavedTemplates extends Page implements HasTable
     {
         return [
             Action::make('save_template')
-                ->label('Save as Template')
+                ->label('Simpan sebagai Template')
                 ->icon('heroicon-o-bookmark')
                 ->color('primary')
                 ->modal()
-                ->modalHeading('Save Report as Template')
-                ->modalDescription('Enter report details to save as a reusable template.')
+                ->modalHeading('Simpan Laporan sebagai Template')
+                ->modalDescription('Masukkan detail laporan untuk disimpan sebagai template.')
                 ->form([
                     TextInput::make('name')
-                        ->label('Template Name')
+                        ->label('Nama Template')
                         ->required()
                         ->maxLength(255),
                     Select::make('report_type')
-                        ->label('Report Type')
+                        ->label('Tipe Laporan')
                         ->options([
                             'simple' => 'Simple (Ringkasan)',
                             'rigid' => 'Rigid (Laba Rugi + Arus Kas)',
@@ -142,16 +144,16 @@ class SavedTemplates extends Page implements HasTable
                         ->required()
                         ->default('simple'),
                     DatePicker::make('date_start')
-                        ->label('Start Date')
+                        ->label('Tanggal Awal')
                         ->required()
                         ->default(now()->subMonth()),
                     DatePicker::make('date_end')
-                        ->label('End Date')
+                        ->label('Tanggal Akhir')
                         ->required()
                         ->default(now()),
                 ])
                 ->action(function (array $data): void {
-                    \App\Models\ReportTemplate::create([
+                    ReportTemplate::create([
                         'name' => $data['name'],
                         'user_id' => Auth::id(),
                         'type' => $data['report_type'],
@@ -164,7 +166,7 @@ class SavedTemplates extends Page implements HasTable
                         ],
                     ]);
                     Notification::make()
-                        ->title('Template Saved')
+                        ->title('Template Disimpan')
                         ->success()
                         ->send();
                 }),

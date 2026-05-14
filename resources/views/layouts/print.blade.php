@@ -11,7 +11,7 @@
 
         @page {
             size: A4 landscape;
-            margin: 15mm;
+            margin: 20mm 25mm;
         }
 
         * {

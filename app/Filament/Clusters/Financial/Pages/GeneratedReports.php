@@ -3,6 +3,7 @@
 namespace App\Filament\Clusters\Financial\Pages;
 
 use App\Filament\Clusters\Financial\FinancialCluster;
+use App\Filament\Pages\ViewReport;
 use App\Models\GeneratedReport;
 use App\Services\FinancialReportService;
 use Filament\Actions\Action;
@@ -24,9 +25,9 @@ class GeneratedReports extends Page implements HasTable
 
     protected static ?string $cluster = FinancialCluster::class;
 
-    protected static ?string $navigationLabel = 'Generated Reports';
+    protected static ?string $navigationLabel = 'Laporan Hasil';
 
-    protected static ?string $title = 'Generated Reports';
+    protected static ?string $title = 'Laporan Hasil';
 
     protected static ?string $slug = '';
 
@@ -43,11 +44,11 @@ class GeneratedReports extends Page implements HasTable
             ->query(GeneratedReport::with('user')->latest())
             ->columns([
                 TextColumn::make('name')
-                    ->label('Name')
+                    ->label('Nama')
                     ->searchable()
                     ->weight('medium'),
                 TextColumn::make('type')
-                    ->label('Type')
+                    ->label('Tipe')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'simple' => 'gray',
@@ -57,21 +58,21 @@ class GeneratedReports extends Page implements HasTable
                     })
                     ->formatStateUsing(fn (string $state): string => ucfirst($state)),
                 TextColumn::make('date_start')
-                    ->label('Period')
+                    ->label('Periode')
                     ->formatStateUsing(fn ($record): string => $record->date_start->format('d M').' → '.$record->date_end->format('d M Y')),
                 TextColumn::make('aggregation')
                     ->label('Aggregation')
                     ->formatStateUsing(fn (?string $state): string => ucfirst($state ?? '—')),
                 TextColumn::make('created_at')
-                    ->label('Created')
+                    ->label('Dibuat')
                     ->dateTime('d M Y, H:i')
                     ->sortable(),
             ])
             ->recordActions([
                 Action::make('view')
-                    ->label('View')
+                    ->label('Lihat')
                     ->icon('heroicon-o-eye')
-                    ->url(fn (GeneratedReport $record): string => \App\Filament\Pages\ViewReport::getUrl(['id' => $record->id])),
+                    ->url(fn (GeneratedReport $record): string => ViewReport::getUrl(['id' => $record->id])),
                 Action::make('pdf')
                     ->label('PDF')
                     ->icon('heroicon-o-document-arrow-down')
@@ -85,21 +86,21 @@ class GeneratedReports extends Page implements HasTable
     {
         $labels = ['simple' => 'Simple', 'rigid' => 'Rigid', 'custom' => 'Custom'];
 
-        return ($labels[$data['report_type']] ?? $data['report_type'])." — {$data['date_start']} to {$data['date_end']}";
+        return ($labels[$data['report_type']] ?? $data['report_type'])." — {$data['date_start']} s/d {$data['date_end']}";
     }
 
     protected function getHeaderActions(): array
     {
         return [
             Action::make('generate_report')
-                ->label('Generate Report')
+                ->label('Generate Laporan')
                 ->icon('heroicon-o-plus-circle')
                 ->color('primary')
                 ->modal()
-                ->modalHeading('Generate New Report')
+                ->modalHeading('Generate Laporan Baru')
                 ->form([
                     Select::make('report_type')
-                        ->label('Report Type')
+                        ->label('Tipe Laporan')
                         ->options([
                             'simple' => 'Simple (Ringkasan)',
                             'rigid' => 'Rigid (Laba Rugi + Arus Kas)',
@@ -108,18 +109,18 @@ class GeneratedReports extends Page implements HasTable
                         ->required()
                         ->default('simple'),
                     DatePicker::make('date_start')
-                        ->label('Start Date')
+                        ->label('Tanggal Awal')
                         ->required()
                         ->default(now()->subMonth()),
                     DatePicker::make('date_end')
-                        ->label('End Date')
+                        ->label('Tanggal Akhir')
                         ->required()
                         ->default(now()),
                     Select::make('aggregation')
-                        ->label('Aggregation')
+                        ->label('Agregasi')
                         ->options([
-                            'daily' => 'Daily',
-                            'monthly' => 'Monthly',
+                            'daily' => 'Harian',
+                            'monthly' => 'Bulanan',
                         ])
                         ->default('monthly')
                         ->visible(fn ($get): bool => $get('report_type') === 'custom'),
@@ -144,10 +145,10 @@ class GeneratedReports extends Page implements HasTable
                         'result' => $reportData->toArray(),
                     ]);
                     Notification::make()
-                        ->title('Report Generated')
+                        ->title('Laporan Terbuat')
                         ->success()
                         ->send();
-                    $this->redirect(\App\Filament\Pages\ViewReport::getUrl(['id' => $report->id]));
+                    $this->redirect(ViewReport::getUrl(['id' => $report->id]));
                 }),
         ];
     }

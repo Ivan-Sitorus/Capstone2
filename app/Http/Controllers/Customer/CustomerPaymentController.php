@@ -24,7 +24,7 @@ class CustomerPaymentController extends Controller
             return Inertia::location('/customer/riwayat');
         }
 
-        return Inertia::render('Customer/Payment/Choose', [
+        return Inertia::render('Pelanggan/Payment/Choose', [
             'order'        => $order->only(['id', 'order_code', 'total_amount', 'customer_name']),
             'items'        => $order->items->map(fn($i) => [
                 'name'     => $i->menu->name,
@@ -68,7 +68,7 @@ class CustomerPaymentController extends Controller
         $order = Order::where('order_code', $orderCode)->firstOrFail();
 
         if (in_array($order->status, [Order::STATUS_DIPROSES, Order::STATUS_SELESAI])) {
-            return Inertia::render('Customer/Payment/QrisStatus', ['order' => $this->orderData($order)]);
+return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderData($order)]);
         }
 
         // rejection_note is set when cashier rejects and clears proof, allowing re-upload
@@ -76,7 +76,7 @@ class CustomerPaymentController extends Controller
             ? $order->rejection_note
             : null;
 
-        return Inertia::render('Customer/Payment/QrisUpload', [
+        return Inertia::render('Pelanggan/Payment/QrisUpload', [
             'order'           => $order->only(['id', 'order_code', 'total_amount']),
             'qrisImage'       => asset('storage/' . Setting::get('qris_image', 'qris/qris-w9cafe.png')),
             'qrisName'        => Setting::get('qris_name', 'W9 Cafe'),
@@ -113,7 +113,7 @@ class CustomerPaymentController extends Controller
     public function showQrisStatus(string $orderCode): InertiaResponse
     {
         $order = Order::where('order_code', $orderCode)->firstOrFail();
-        return Inertia::render('Customer/Payment/QrisStatus', ['order' => $this->orderData($order)]);
+        return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderData($order)]);
     }
 
     private function orderData(Order $order): array

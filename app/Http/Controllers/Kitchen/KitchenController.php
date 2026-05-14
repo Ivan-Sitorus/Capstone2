@@ -34,7 +34,7 @@ class KitchenController extends Controller
             ]),
         ]);
 
-        return Inertia::render('Kitchen/Index', [
+        return Inertia::render('Dapur/Index', [
             'orders' => $ordersData,
         ]);
     }
@@ -64,7 +64,7 @@ class KitchenController extends Controller
                 ]),
             ]);
 
-        return Inertia::render('Kitchen/Riwayat', ['riwayatOrders' => $riwayatOrders]);
+        return Inertia::render('Dapur/Riwayat', ['riwayatOrders' => $riwayatOrders]);
     }
 
     public function bump(Order $order)

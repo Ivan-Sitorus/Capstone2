@@ -31,7 +31,7 @@ class CashierRiwayatController extends Controller
                 'status'         => $o->status,
             ]);
 
-        return Inertia::render('Cashier/RiwayatPesanan', [
+        return Inertia::render('Kasir/RiwayatPesanan', [
             'orders'  => $orders,
             'filters' => $request->only(['search', 'date', 'method']),
         ]);

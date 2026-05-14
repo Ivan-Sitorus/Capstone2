@@ -1,0 +1,24 @@
+- generic [ref=e3]:
+  - generic [ref=e4]:
+    - img "W9 Cafe" [ref=e5]
+    - heading "W9 Cafe" [level=1] [ref=e6]
+    - paragraph [ref=e7]: Sistem Point of Sale
+  - generic [ref=e8]:
+    - 'button "Tema: light" [ref=e10] [cursor=pointer]':
+      - img [ref=e11]
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - generic [ref=e20]: Masuk ke Akun Anda
+        - generic [ref=e21]: Masukkan email dan kata sandi untuk melanjutkan
+      - generic [ref=e22]:
+        - generic [ref=e23]:
+          - generic [ref=e24]: Email
+          - generic [ref=e25]:
+            - img
+            - textbox "kasir@kafenusantara.com" [ref=e26]: kasir@w9cafe.com
+        - generic [ref=e27]:
+          - generic [ref=e28]: Kata Sandi
+          - generic [ref=e29]:
+            - img
+            - textbox "Masukkan kata sandi..." [active] [ref=e30]: password
+        - button "Masuk" [ref=e31]

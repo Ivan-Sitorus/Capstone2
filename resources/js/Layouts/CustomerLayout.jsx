@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
-import BottomNav from '@/Components/Customer/BottomNav';
-import ThemeToggle from '@/Components/Common/ThemeToggle';
+import BottomNav from '@/Components/Pelanggan/BottomNav';
 
 export default function CustomerLayout({ children, activeTab = 'menu', showBottomNav = true }) {
     const { flash } = usePage().props;
@@ -24,7 +23,6 @@ export default function CustomerLayout({ children, activeTab = 'menu', showBotto
                 <div className="text-sm font-semibold text-primary tracking-wide">
                     W9 Cafe
                 </div>
-                <ThemeToggle />
             </header>
 
             {showBottomNav && <BottomNav activeTab={activeTab} />}

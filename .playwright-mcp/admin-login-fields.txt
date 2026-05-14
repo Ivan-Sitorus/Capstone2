@@ -1,0 +1,28 @@
+- generic [ref=e1] [box=0,0,1280,720]:
+  - main [ref=e4] [box=384,138,512,444]:
+    - generic [ref=e6] [box=432,186,416,348]:
+      - generic [ref=e7] [box=432,186,416,68]:
+        - generic [ref=e8] [box=544,186,192,20]: W9 Cafe — Admin
+        - heading "Sign in" [level=1] [ref=e9] [box=595,222,89,32]
+      - generic [ref=e13] [box=432,278,416,256]:
+        - generic [ref=e17] [box=432,278,416,196]:
+          - generic [ref=e20] [box=432,278,416,64]:
+            - generic [ref=e24] [box=432,278,104,20]:
+              - text: Email address
+              - superscript [ref=e25] [box=530,278,5,12]: "*"
+            - textbox "Email address*" [active] [ref=e29] [box=432,306,416,36]
+          - generic [ref=e32] [box=432,366,416,64]:
+            - generic [ref=e36] [box=432,366,71,20]:
+              - text: Password
+              - superscript [ref=e37] [box=497,366,5,12]: "*"
+            - generic [ref=e39] [box=432,394,416,36]:
+              - textbox "Password*" [ref=e41] [box=432,394,371,36]
+              - button "Show password" [ref=e44] [cursor=pointer] [box=810,396,32,32]:
+                - img [ref=e45] [box=816,402,20,20]
+          - generic [ref=e53] [box=432,454,132,20]:
+            - checkbox "Remember me" [ref=e54] [box=432,456,16,16]
+            - generic [ref=e55] [box=460,454,104,20]: Remember me
+        - button "Sign in" [ref=e61] [cursor=pointer] [box=432,498,416,36]:
+          - generic [ref=e62] [box=616,506,48,20]: Sign in
+  - generic [box=0,720,1280,0]:
+    - status [box=16,16,1248,688]

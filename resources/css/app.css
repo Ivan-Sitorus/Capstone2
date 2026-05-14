@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./themes.css";
 
 @theme {
   --font-sans: 'Plus Jakarta Sans', system-ui, sans-serif;
@@ -50,26 +49,26 @@
     --green-success:  #28A745;
     --red-danger:     #DC3545;
 
-    /* Shadcn semantic tokens — warm earth tone default */
-    --background: oklch(0.985 0.005 85);
-    --foreground: oklch(0.15 0.01 80);
-    --card: oklch(1.00 0.002 85);
-    --card-foreground: oklch(0.15 0.01 80);
-    --popover: oklch(1.00 0.002 85);
-    --popover-foreground: oklch(0.15 0.01 80);
-    --primary: oklch(0.55 0.12 35);
+    /* Shadcn semantic tokens — blue accent */
+    --background: oklch(0.985 0.005 255);
+    --foreground: oklch(0.15 0.02 260);
+    --card: oklch(1.00 0.002 255);
+    --card-foreground: oklch(0.15 0.02 260);
+    --popover: oklch(1.00 0.002 255);
+    --popover-foreground: oklch(0.15 0.02 260);
+    --primary: oklch(0.48 0.18 255);
     --primary-foreground: oklch(1.00 0 0);
-    --secondary: oklch(0.95 0.01 45);
-    --secondary-foreground: oklch(0.55 0.12 35);
-    --muted: oklch(0.96 0.005 85);
-    --muted-foreground: oklch(0.55 0.01 85);
-    --accent: oklch(0.95 0.01 45);
-    --accent-foreground: oklch(0.55 0.12 35);
+    --secondary: oklch(0.96 0.02 255);
+    --secondary-foreground: oklch(0.48 0.18 255);
+    --muted: oklch(0.96 0.005 255);
+    --muted-foreground: oklch(0.55 0.01 260);
+    --accent: oklch(0.96 0.02 255);
+    --accent-foreground: oklch(0.48 0.18 255);
     --destructive: oklch(0.53 0.20 25);
     --destructive-foreground: oklch(1.00 0 0);
-    --border: oklch(0.90 0.01 85);
-    --input: oklch(0.90 0.01 85);
-    --ring: oklch(0.55 0.12 35);
+    --border: oklch(0.90 0.01 260);
+    --input: oklch(0.90 0.01 260);
+    --ring: oklch(0.48 0.18 255);
     --radius: 0.5rem;
 }
 

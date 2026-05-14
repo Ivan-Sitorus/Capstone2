@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <title>{{ $report->name }}</title>
     <style>
+        @page { size: A4 landscape; margin: 20mm 25mm; }
         body { font-family: sans-serif; font-size: 12px; color: #333; }
         .header { text-align: center; margin-bottom: 20px; }
         .header h1 { font-size: 20px; margin-bottom: 4px; color: #1a1a2e; }

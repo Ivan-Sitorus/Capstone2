@@ -1,0 +1,21 @@
+- generic [ref=e4]:
+  - generic [ref=e7]: Keranjang
+  - generic [ref=e8]:
+    - img [ref=e10]
+    - generic [ref=e13]:
+      - paragraph [ref=e14]: Keranjang Kosong
+      - paragraph [ref=e15]: Tambahkan menu favoritmu dari halaman menu
+    - button "Kembali ke Menu" [ref=e16] [cursor=pointer]
+  - navigation [ref=e18]:
+    - link "Menu" [ref=e19] [cursor=pointer]:
+      - /url: /customer/menu
+      - img [ref=e21]
+      - generic [ref=e23]: Menu
+    - link "Keranjang" [ref=e24] [cursor=pointer]:
+      - /url: /customer/cart
+      - img [ref=e26]
+      - generic [ref=e30]: Keranjang
+    - link "Riwayat" [ref=e31] [cursor=pointer]:
+      - /url: /customer/riwayat
+      - img [ref=e33]
+      - generic [ref=e36]: Riwayat

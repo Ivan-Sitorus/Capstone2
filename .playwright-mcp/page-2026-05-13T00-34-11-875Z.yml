@@ -1,0 +1,45 @@
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]: W9
+      - generic [ref=e8]:
+        - heading "Dapur" [level=1] [ref=e9]
+        - text: Kitchen Display System
+    - generic [ref=e10]:
+      - generic [ref=e11]: "07.34"
+      - generic [ref=e12]:
+        - img [ref=e13]
+        - text: "1"
+      - button "Nonaktifkan suara" [ref=e16] [cursor=pointer]:
+        - img [ref=e17]
+      - button "Fullscreen" [ref=e21] [cursor=pointer]:
+        - img [ref=e22]
+  - generic [ref=e27]:
+    - button "Semua" [ref=e28] [cursor=pointer]
+    - button "Minuman" [ref=e29] [cursor=pointer]
+    - button "Makanan" [ref=e30] [cursor=pointer]
+  - generic [ref=e31]:
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - generic [ref=e34]: Pending
+        - generic [ref=e35]: "0"
+      - generic [ref=e37]: Tidak ada pesanan
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]: Preparing
+        - generic [ref=e41]: "1"
+      - generic [ref=e43]:
+        - generic [ref=e45]: "#ORD-20260513-0002"
+        - generic [ref=e47]: 00:53
+        - generic [ref=e49]:
+          - generic [ref=e50]:
+            - generic [ref=e51]: 2x
+            - text: Nasi Ayam Geprek
+          - generic [ref=e52]: Ayam Geprek
+        - generic [ref=e53]: 2x Nasi Ayam Geprek
+        - button "✔ Selesai" [ref=e54] [cursor=pointer]
+    - generic [ref=e55]:
+      - generic [ref=e56]:
+        - generic [ref=e57]: Ready
+        - generic [ref=e58]: "0"
+      - generic [ref=e60]: Tidak ada pesanan

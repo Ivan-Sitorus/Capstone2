@@ -1,0 +1,39 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - img "W9 Cafe" [ref=e6]
+      - generic [ref=e7]: W9 Cafe
+    - navigation [ref=e8]:
+      - link "Pesanan" [ref=e9] [cursor=pointer]:
+        - /url: /kitchen
+        - img [ref=e10]
+        - generic [ref=e13]: Pesanan
+      - link "Riwayat" [ref=e14] [cursor=pointer]:
+        - /url: "#riwayat"
+        - img [ref=e15]
+        - generic [ref=e19]: Riwayat
+    - button "Menu akun" [ref=e21]:
+      - button "Menu akun" [ref=e22]:
+        - img
+  - main [ref=e23]:
+    - generic [ref=e25]:
+      - generic [ref=e27]:
+        - generic [ref=e28]:
+          - generic [ref=e29]: Menunggu
+          - generic [ref=e30]: "0"
+        - generic [ref=e32]: Tidak ada pesanan
+      - generic [ref=e34]:
+        - generic [ref=e35]:
+          - generic [ref=e36]: Diproses
+          - generic [ref=e37]: "1"
+        - generic [ref=e40]:
+          - generic [ref=e41]: "#ORD-20260514-0007"
+          - generic [ref=e42]: 123:30
+          - generic [ref=e44]:
+            - generic [ref=e45]: 1x Creamy Chocolatey
+            - generic [ref=e46]: 1x Nasi Ayam Geprek
+            - generic [ref=e47]: 1x Matcha
+            - generic [ref=e48]: 1x Espresso
+            - generic [ref=e49]: 1x Americano Panas
+            - generic [ref=e50]: 1x Full Chocolate
+          - button "Selesai" [ref=e51]

@@ -1,0 +1,20 @@
+- generic [ref=e3]:
+  - 'button "Tema: system" [ref=e5] [cursor=pointer]':
+    - img [ref=e6]
+  - generic [ref=e8]:
+    - generic [ref=e9]:
+      - generic [ref=e10]:
+        - generic [ref=e11]: W9
+        - generic [ref=e12]:
+          - heading "Dapur" [level=1] [ref=e13]
+          - text: Kitchen Display System
+      - button "Layar Penuh" [ref=e15] [cursor=pointer]:
+        - img [ref=e16]
+    - tablist [ref=e23]:
+      - tab "Pesanan" [ref=e24]
+      - tab "Riwayat" [selected] [ref=e25]
+    - generic [ref=e236]:
+      - generic [ref=e237]:
+        - generic [ref=e238]: Riwayat Pesanan
+        - generic [ref=e239]: "0"
+      - generic [ref=e241]: Belum ada pesanan selesai hari ini

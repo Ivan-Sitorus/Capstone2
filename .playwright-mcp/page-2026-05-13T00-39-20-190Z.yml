@@ -1,0 +1,36 @@
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]:
+      - generic [ref=e7]: W9
+      - generic [ref=e8]:
+        - heading "Dapur" [level=1] [ref=e9]
+        - text: Kitchen Display System
+    - generic [ref=e10]:
+      - generic [ref=e11]: "07.39"
+      - generic [ref=e12]:
+        - img [ref=e13]
+        - text: "0"
+      - button "Nonaktifkan suara" [ref=e16] [cursor=pointer]:
+        - img [ref=e17]
+      - button "Fullscreen" [ref=e21] [cursor=pointer]:
+        - img [ref=e22]
+  - generic [ref=e27]:
+    - button "Semua" [ref=e28] [cursor=pointer]
+    - button "Minuman" [ref=e29] [cursor=pointer]
+    - button "Makanan" [ref=e30] [cursor=pointer]
+  - generic [ref=e31]:
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - generic [ref=e34]: Pending
+        - generic [ref=e35]: "0"
+      - generic [ref=e37]: Tidak ada pesanan
+    - generic [ref=e38]:
+      - generic [ref=e39]:
+        - generic [ref=e40]: Preparing
+        - generic [ref=e41]: "0"
+      - generic [ref=e43]: Tidak ada pesanan
+    - generic [ref=e44]:
+      - generic [ref=e45]:
+        - generic [ref=e46]: Ready
+        - generic [ref=e47]: "0"
+      - generic [ref=e49]: Tidak ada pesanan

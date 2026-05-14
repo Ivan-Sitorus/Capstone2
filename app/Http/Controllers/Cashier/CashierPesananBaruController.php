@@ -29,7 +29,7 @@ class CashierPesananBaruController extends Controller
                 ->get()
         );
 
-        return Inertia::render('Cashier/PesananBaru', compact('categories'));
+        return Inertia::render('Kasir/PesananBaru', compact('categories'));
     }
 
     public function store(

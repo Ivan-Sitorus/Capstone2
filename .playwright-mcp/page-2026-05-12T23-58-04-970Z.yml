@@ -1,0 +1,634 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - button "Collapse sidebar" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - link "W9 Cafe — Admin" [ref=e9] [cursor=pointer]:
+        - /url: http://localhost:8080/admin
+        - generic [ref=e10]: W9 Cafe — Admin
+    - button "User menu" [ref=e14] [cursor=pointer]:
+      - img "Avatar of Admin W9" [ref=e15]
+  - generic [ref=e16]:
+    - complementary [ref=e18]:
+      - navigation [ref=e19]:
+        - list [ref=e20]:
+          - listitem [ref=e21]:
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "Dashboard" [ref=e24] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin
+                  - img [ref=e25]
+                  - generic [ref=e27]: Dashboard
+          - listitem [ref=e28]:
+            - generic [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: Finance Details
+              - button "Finance Details" [expanded] [ref=e31]:
+                - img [ref=e32]
+            - list [ref=e34]:
+              - listitem [ref=e35]:
+                - link "Cash Flow" [ref=e36] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/cash-flow
+                  - img [ref=e37]
+                  - generic [ref=e39]: Cash Flow
+              - listitem [ref=e40]:
+                - link "Pemasukan" [ref=e41] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/incomes
+                  - img [ref=e42]
+                  - generic [ref=e44]: Pemasukan
+              - listitem [ref=e45]:
+                - link "Receivables" [ref=e46] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/receivables
+                  - img [ref=e47]
+                  - generic [ref=e49]: Receivables
+              - listitem [ref=e50]:
+                - link "Financial Reports" [ref=e51] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/financial
+                  - img [ref=e52]
+                  - generic [ref=e54]: Financial Reports
+              - listitem [ref=e55]:
+                - link "Transaksi Keuangan" [ref=e56] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/transaksi-keuangans
+                  - img [ref=e57]
+                  - generic [ref=e59]: Transaksi Keuangan
+              - listitem [ref=e60]:
+                - link "Template Header Laporan" [ref=e61] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/report-header-templates
+                  - img [ref=e62]
+                  - generic [ref=e64]: Template Header Laporan
+          - listitem [ref=e65]:
+            - generic [ref=e66] [cursor=pointer]:
+              - generic [ref=e67]: Inventory
+              - button "Inventory" [expanded] [ref=e68]:
+                - img [ref=e69]
+            - list [ref=e71]:
+              - listitem [ref=e72]:
+                - link "Ingredients" [ref=e73] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/ingredients
+                  - img [ref=e74]
+                  - generic [ref=e76]: Ingredients
+              - listitem [ref=e77]:
+                - link "Stock Adjustments" [ref=e78] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/stock-adjustments
+                  - img [ref=e79]
+                  - generic [ref=e81]: Stock Adjustments
+              - listitem [ref=e82]:
+                - link "Pemakaian Bahan Harian" [ref=e83] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/daily-ingredient-usages
+                  - img [ref=e84]
+                  - generic [ref=e86]: Pemakaian Bahan Harian
+          - listitem [ref=e87]:
+            - generic [ref=e88] [cursor=pointer]:
+              - generic [ref=e89]: Data Master
+              - button "Data Master" [expanded] [ref=e90]:
+                - img [ref=e91]
+            - list [ref=e93]:
+              - listitem [ref=e94]:
+                - link "Menu" [ref=e95] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/menus
+                  - img [ref=e96]
+                  - generic [ref=e98]: Menu
+              - listitem [ref=e99]:
+                - link "Kategori" [ref=e100] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/categories
+                  - img [ref=e101]
+                  - generic [ref=e104]: Kategori
+              - listitem [ref=e105]:
+                - link "Meja Cafe" [ref=e106] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/cafe-tables
+                  - img [ref=e107]
+                  - generic [ref=e109]: Meja Cafe
+          - listitem [ref=e110]:
+            - generic [ref=e111] [cursor=pointer]:
+              - generic [ref=e112]: Transaksi
+              - button "Transaksi" [expanded] [ref=e113]:
+                - img [ref=e114]
+            - list [ref=e116]:
+              - listitem [ref=e117]:
+                - link "Pesanan" [ref=e118] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/orders
+                  - img [ref=e119]
+                  - generic [ref=e121]: Pesanan
+              - listitem [ref=e122]:
+                - link "Cashier Sessions" [ref=e123] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/cashier-sessions
+                  - img [ref=e124]
+                  - generic [ref=e126]: Cashier Sessions
+              - listitem [ref=e127]:
+                - link "Promotions" [ref=e128] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/promotions
+                  - img [ref=e129]
+                  - generic [ref=e131]: Promotions
+              - listitem [ref=e132]:
+                - link "Sesi Kerja" [ref=e133] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/work-sessions
+                  - img [ref=e134]
+                  - generic [ref=e136]: Sesi Kerja
+          - listitem [ref=e137]:
+            - generic [ref=e138] [cursor=pointer]:
+              - generic [ref=e139]: Pengguna
+              - button "Pengguna" [expanded] [ref=e140]:
+                - img [ref=e141]
+            - list [ref=e143]:
+              - listitem [ref=e144]:
+                - link "Pengguna" [ref=e145] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/users
+                  - img [ref=e146]
+                  - generic [ref=e148]: Pengguna
+          - listitem [ref=e149]:
+            - generic [ref=e150] [cursor=pointer]:
+              - generic [ref=e151]: Analitik
+              - button "Analitik" [expanded] [ref=e152]:
+                - img [ref=e153]
+            - list [ref=e155]:
+              - listitem [ref=e156]:
+                - link "Klasterisasi Menu Penjualan" [ref=e157] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/klasterisasi-menu
+                  - img [ref=e158]
+                  - generic [ref=e160]: Klasterisasi Menu Penjualan
+              - listitem [ref=e161]:
+                - link "Prediksi Menu" [ref=e162] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/prediksi-menu
+                  - img [ref=e163]
+                  - generic [ref=e165]: Prediksi Menu
+              - listitem [ref=e166]:
+                - link "Asosiatif Menu" [ref=e167] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/asosiatif-menu
+                  - img [ref=e168]
+                  - generic [ref=e170]: Asosiatif Menu
+              - listitem [ref=e171]:
+                - link "Klasterisasi Bahan Baku" [ref=e172] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/klasterisasi-bahan-baku
+                  - img [ref=e173]
+                  - generic [ref=e175]: Klasterisasi Bahan Baku
+              - listitem [ref=e176]:
+                - link "Prediksi Bahan Baku" [ref=e177] [cursor=pointer]:
+                  - /url: http://localhost:8080/admin/prediksi-bahan-baku
+                  - img [ref=e178]
+                  - generic [ref=e180]: Prediksi Bahan Baku
+    - main [ref=e182]:
+      - generic [ref=e184]:
+        - generic [ref=e185]:
+          - generic [ref=e186]:
+            - navigation [ref=e187]:
+              - list [ref=e188]:
+                - listitem [ref=e189]:
+                  - link "Menus" [ref=e190] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus
+                - listitem [ref=e191]:
+                  - img [ref=e192]
+                  - generic [ref=e194]: List
+            - heading "Menus" [level=1] [ref=e195]
+          - button "New menu" [ref=e198] [cursor=pointer]
+        - generic [ref=e206]:
+          - generic [ref=e209]:
+            - generic [ref=e210]:
+              - generic [ref=e211]: Search
+              - generic [ref=e212]:
+                - img [ref=e214]
+                - searchbox "Search" [ref=e217]
+            - button "Filter" [ref=e220] [cursor=pointer]:
+              - img [ref=e221]
+              - generic [ref=e224]: "0"
+          - table [ref=e226]:
+            - rowgroup [ref=e227]:
+              - row "Select/deselect all items for bulk actions. Nama Menu Kategori Harga Cashback Tersedia Diskon Mhs Resep Actions" [ref=e228]:
+                - columnheader "Select/deselect all items for bulk actions." [ref=e229]:
+                  - checkbox "Select/deselect all items for bulk actions." [ref=e230]
+                - columnheader "Nama Menu" [ref=e231]:
+                  - button "Nama Menu" [ref=e232] [cursor=pointer]:
+                    - text: Nama Menu
+                    - img [ref=e233]
+                - columnheader "Kategori" [ref=e235]:
+                  - button "Kategori" [ref=e236] [cursor=pointer]:
+                    - text: Kategori
+                    - img [ref=e237]
+                - columnheader "Harga" [ref=e239]:
+                  - button "Harga" [ref=e240] [cursor=pointer]:
+                    - text: Harga
+                    - img [ref=e241]
+                - columnheader "Cashback" [ref=e243]:
+                  - button "Cashback" [ref=e244] [cursor=pointer]:
+                    - text: Cashback
+                    - img [ref=e245]
+                - columnheader "Tersedia" [ref=e247]:
+                  - button "Tersedia" [ref=e248] [cursor=pointer]:
+                    - text: Tersedia
+                    - img [ref=e249]
+                - columnheader "Diskon Mhs" [ref=e251]
+                - columnheader "Resep" [ref=e252]
+                - columnheader "Actions" [ref=e253]
+            - rowgroup [ref=e254]:
+              - row "Select/deselect item 1 for bulk actions. Espresso Coffee Base IDR 10,000.00 IDR 2,000.00 Tanpa Resep Edit Delete" [ref=e255]:
+                - cell "Select/deselect item 1 for bulk actions." [ref=e256]:
+                  - checkbox "Select/deselect item 1 for bulk actions." [ref=e257]
+                - cell "Espresso" [ref=e258]:
+                  - link "Espresso" [ref=e259] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/1/edit
+                    - generic [ref=e260]: Espresso
+                - cell "Coffee Base" [ref=e261]:
+                  - link "Coffee Base" [ref=e262] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/1/edit
+                    - generic [ref=e263]: Coffee Base
+                - cell "IDR 10,000.00" [ref=e264]:
+                  - link "IDR 10,000.00" [ref=e265] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/1/edit
+                    - generic [ref=e266]: IDR 10,000.00
+                - cell "IDR 2,000.00" [ref=e267]:
+                  - link "IDR 2,000.00" [ref=e268] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/1/edit
+                    - generic [ref=e269]: IDR 2,000.00
+                - cell [ref=e270]:
+                  - link [ref=e271] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/1/edit
+                    - img [ref=e273]
+                - cell [ref=e275]:
+                  - link [ref=e276] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/1/edit
+                    - img [ref=e278]
+                - cell "Tanpa Resep" [ref=e280]:
+                  - link "Tanpa Resep" [ref=e281] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/1/edit
+                    - generic [ref=e283]: Tanpa Resep
+                - cell "Edit Delete" [ref=e284]:
+                  - generic [ref=e285]:
+                    - button "Edit" [ref=e286] [cursor=pointer]:
+                      - img [ref=e287]
+                      - text: Edit
+                    - button "Delete" [ref=e290] [cursor=pointer]:
+                      - img [ref=e291]
+                      - text: Delete
+              - row "Select/deselect item 2 for bulk actions. Americano Panas Coffee Base IDR 10,000.00 IDR 2,000.00 Tanpa Resep Edit Delete" [ref=e293]:
+                - cell "Select/deselect item 2 for bulk actions." [ref=e294]:
+                  - checkbox "Select/deselect item 2 for bulk actions." [ref=e295]
+                - cell "Americano Panas" [ref=e296]:
+                  - link "Americano Panas" [ref=e297] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/2/edit
+                    - generic [ref=e298]: Americano Panas
+                - cell "Coffee Base" [ref=e299]:
+                  - link "Coffee Base" [ref=e300] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/2/edit
+                    - generic [ref=e301]: Coffee Base
+                - cell "IDR 10,000.00" [ref=e302]:
+                  - link "IDR 10,000.00" [ref=e303] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/2/edit
+                    - generic [ref=e304]: IDR 10,000.00
+                - cell "IDR 2,000.00" [ref=e305]:
+                  - link "IDR 2,000.00" [ref=e306] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/2/edit
+                    - generic [ref=e307]: IDR 2,000.00
+                - cell [ref=e308]:
+                  - link [ref=e309] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/2/edit
+                    - img [ref=e311]
+                - cell [ref=e313]:
+                  - link [ref=e314] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/2/edit
+                    - img [ref=e316]
+                - cell "Tanpa Resep" [ref=e318]:
+                  - link "Tanpa Resep" [ref=e319] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/2/edit
+                    - generic [ref=e321]: Tanpa Resep
+                - cell "Edit Delete" [ref=e322]:
+                  - generic [ref=e323]:
+                    - button "Edit" [ref=e324] [cursor=pointer]:
+                      - img [ref=e325]
+                      - text: Edit
+                    - button "Delete" [ref=e328] [cursor=pointer]:
+                      - img [ref=e329]
+                      - text: Delete
+              - row "Select/deselect item 3 for bulk actions. Es Americano Coffee Base IDR 12,000.00 IDR 2,000.00 Tanpa Resep Edit Delete" [ref=e331]:
+                - cell "Select/deselect item 3 for bulk actions." [ref=e332]:
+                  - checkbox "Select/deselect item 3 for bulk actions." [ref=e333]
+                - cell "Es Americano" [ref=e334]:
+                  - link "Es Americano" [ref=e335] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/3/edit
+                    - generic [ref=e336]: Es Americano
+                - cell "Coffee Base" [ref=e337]:
+                  - link "Coffee Base" [ref=e338] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/3/edit
+                    - generic [ref=e339]: Coffee Base
+                - cell "IDR 12,000.00" [ref=e340]:
+                  - link "IDR 12,000.00" [ref=e341] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/3/edit
+                    - generic [ref=e342]: IDR 12,000.00
+                - cell "IDR 2,000.00" [ref=e343]:
+                  - link "IDR 2,000.00" [ref=e344] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/3/edit
+                    - generic [ref=e345]: IDR 2,000.00
+                - cell [ref=e346]:
+                  - link [ref=e347] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/3/edit
+                    - img [ref=e349]
+                - cell [ref=e351]:
+                  - link [ref=e352] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/3/edit
+                    - img [ref=e354]
+                - cell "Tanpa Resep" [ref=e356]:
+                  - link "Tanpa Resep" [ref=e357] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/3/edit
+                    - generic [ref=e359]: Tanpa Resep
+                - cell "Edit Delete" [ref=e360]:
+                  - generic [ref=e361]:
+                    - button "Edit" [ref=e362] [cursor=pointer]:
+                      - img [ref=e363]
+                      - text: Edit
+                    - button "Delete" [ref=e366] [cursor=pointer]:
+                      - img [ref=e367]
+                      - text: Delete
+              - row "Select/deselect item 4 for bulk actions. Kopi Susu Coffee Base IDR 14,000.00 IDR 2,000.00 Tanpa Resep Edit Delete" [ref=e369]:
+                - cell "Select/deselect item 4 for bulk actions." [ref=e370]:
+                  - checkbox "Select/deselect item 4 for bulk actions." [ref=e371]
+                - cell "Kopi Susu" [ref=e372]:
+                  - link "Kopi Susu" [ref=e373] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/4/edit
+                    - generic [ref=e374]: Kopi Susu
+                - cell "Coffee Base" [ref=e375]:
+                  - link "Coffee Base" [ref=e376] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/4/edit
+                    - generic [ref=e377]: Coffee Base
+                - cell "IDR 14,000.00" [ref=e378]:
+                  - link "IDR 14,000.00" [ref=e379] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/4/edit
+                    - generic [ref=e380]: IDR 14,000.00
+                - cell "IDR 2,000.00" [ref=e381]:
+                  - link "IDR 2,000.00" [ref=e382] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/4/edit
+                    - generic [ref=e383]: IDR 2,000.00
+                - cell [ref=e384]:
+                  - link [ref=e385] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/4/edit
+                    - img [ref=e387]
+                - cell [ref=e389]:
+                  - link [ref=e390] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/4/edit
+                    - img [ref=e392]
+                - cell "Tanpa Resep" [ref=e394]:
+                  - link "Tanpa Resep" [ref=e395] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/4/edit
+                    - generic [ref=e397]: Tanpa Resep
+                - cell "Edit Delete" [ref=e398]:
+                  - generic [ref=e399]:
+                    - button "Edit" [ref=e400] [cursor=pointer]:
+                      - img [ref=e401]
+                      - text: Edit
+                    - button "Delete" [ref=e404] [cursor=pointer]:
+                      - img [ref=e405]
+                      - text: Delete
+              - row "Select/deselect item 5 for bulk actions. Teh Tawar Tea Base IDR 3,000.00 IDR 1,000.00 Tanpa Resep Edit Delete" [ref=e407]:
+                - cell "Select/deselect item 5 for bulk actions." [ref=e408]:
+                  - checkbox "Select/deselect item 5 for bulk actions." [ref=e409]
+                - cell "Teh Tawar" [ref=e410]:
+                  - link "Teh Tawar" [ref=e411] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/5/edit
+                    - generic [ref=e412]: Teh Tawar
+                - cell "Tea Base" [ref=e413]:
+                  - link "Tea Base" [ref=e414] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/5/edit
+                    - generic [ref=e415]: Tea Base
+                - cell "IDR 3,000.00" [ref=e416]:
+                  - link "IDR 3,000.00" [ref=e417] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/5/edit
+                    - generic [ref=e418]: IDR 3,000.00
+                - cell "IDR 1,000.00" [ref=e419]:
+                  - link "IDR 1,000.00" [ref=e420] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/5/edit
+                    - generic [ref=e421]: IDR 1,000.00
+                - cell [ref=e422]:
+                  - link [ref=e423] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/5/edit
+                    - img [ref=e425]
+                - cell [ref=e427]:
+                  - link [ref=e428] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/5/edit
+                    - img [ref=e430]
+                - cell "Tanpa Resep" [ref=e432]:
+                  - link "Tanpa Resep" [ref=e433] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/5/edit
+                    - generic [ref=e435]: Tanpa Resep
+                - cell "Edit Delete" [ref=e436]:
+                  - generic [ref=e437]:
+                    - button "Edit" [ref=e438] [cursor=pointer]:
+                      - img [ref=e439]
+                      - text: Edit
+                    - button "Delete" [ref=e442] [cursor=pointer]:
+                      - img [ref=e443]
+                      - text: Delete
+              - row "Select/deselect item 6 for bulk actions. Teh Manis Tea Base IDR 4,000.00 IDR 1,000.00 Tanpa Resep Edit Delete" [ref=e445]:
+                - cell "Select/deselect item 6 for bulk actions." [ref=e446]:
+                  - checkbox "Select/deselect item 6 for bulk actions." [ref=e447]
+                - cell "Teh Manis" [ref=e448]:
+                  - link "Teh Manis" [ref=e449] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/6/edit
+                    - generic [ref=e450]: Teh Manis
+                - cell "Tea Base" [ref=e451]:
+                  - link "Tea Base" [ref=e452] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/6/edit
+                    - generic [ref=e453]: Tea Base
+                - cell "IDR 4,000.00" [ref=e454]:
+                  - link "IDR 4,000.00" [ref=e455] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/6/edit
+                    - generic [ref=e456]: IDR 4,000.00
+                - cell "IDR 1,000.00" [ref=e457]:
+                  - link "IDR 1,000.00" [ref=e458] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/6/edit
+                    - generic [ref=e459]: IDR 1,000.00
+                - cell [ref=e460]:
+                  - link [ref=e461] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/6/edit
+                    - img [ref=e463]
+                - cell [ref=e465]:
+                  - link [ref=e466] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/6/edit
+                    - img [ref=e468]
+                - cell "Tanpa Resep" [ref=e470]:
+                  - link "Tanpa Resep" [ref=e471] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/6/edit
+                    - generic [ref=e473]: Tanpa Resep
+                - cell "Edit Delete" [ref=e474]:
+                  - generic [ref=e475]:
+                    - button "Edit" [ref=e476] [cursor=pointer]:
+                      - img [ref=e477]
+                      - text: Edit
+                    - button "Delete" [ref=e480] [cursor=pointer]:
+                      - img [ref=e481]
+                      - text: Delete
+              - row "Select/deselect item 7 for bulk actions. Teh Susu Tea Base IDR 7,000.00 IDR 2,000.00 Tanpa Resep Edit Delete" [ref=e483]:
+                - cell "Select/deselect item 7 for bulk actions." [ref=e484]:
+                  - checkbox "Select/deselect item 7 for bulk actions." [ref=e485]
+                - cell "Teh Susu" [ref=e486]:
+                  - link "Teh Susu" [ref=e487] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/7/edit
+                    - generic [ref=e488]: Teh Susu
+                - cell "Tea Base" [ref=e489]:
+                  - link "Tea Base" [ref=e490] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/7/edit
+                    - generic [ref=e491]: Tea Base
+                - cell "IDR 7,000.00" [ref=e492]:
+                  - link "IDR 7,000.00" [ref=e493] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/7/edit
+                    - generic [ref=e494]: IDR 7,000.00
+                - cell "IDR 2,000.00" [ref=e495]:
+                  - link "IDR 2,000.00" [ref=e496] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/7/edit
+                    - generic [ref=e497]: IDR 2,000.00
+                - cell [ref=e498]:
+                  - link [ref=e499] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/7/edit
+                    - img [ref=e501]
+                - cell [ref=e503]:
+                  - link [ref=e504] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/7/edit
+                    - img [ref=e506]
+                - cell "Tanpa Resep" [ref=e508]:
+                  - link "Tanpa Resep" [ref=e509] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/7/edit
+                    - generic [ref=e511]: Tanpa Resep
+                - cell "Edit Delete" [ref=e512]:
+                  - generic [ref=e513]:
+                    - button "Edit" [ref=e514] [cursor=pointer]:
+                      - img [ref=e515]
+                      - text: Edit
+                    - button "Delete" [ref=e518] [cursor=pointer]:
+                      - img [ref=e519]
+                      - text: Delete
+              - row "Select/deselect item 8 for bulk actions. Jeruk Nipis Lime Base IDR 5,000.00 IDR 1,000.00 Tanpa Resep Edit Delete" [ref=e521]:
+                - cell "Select/deselect item 8 for bulk actions." [ref=e522]:
+                  - checkbox "Select/deselect item 8 for bulk actions." [ref=e523]
+                - cell "Jeruk Nipis" [ref=e524]:
+                  - link "Jeruk Nipis" [ref=e525] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/8/edit
+                    - generic [ref=e526]: Jeruk Nipis
+                - cell "Lime Base" [ref=e527]:
+                  - link "Lime Base" [ref=e528] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/8/edit
+                    - generic [ref=e529]: Lime Base
+                - cell "IDR 5,000.00" [ref=e530]:
+                  - link "IDR 5,000.00" [ref=e531] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/8/edit
+                    - generic [ref=e532]: IDR 5,000.00
+                - cell "IDR 1,000.00" [ref=e533]:
+                  - link "IDR 1,000.00" [ref=e534] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/8/edit
+                    - generic [ref=e535]: IDR 1,000.00
+                - cell [ref=e536]:
+                  - link [ref=e537] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/8/edit
+                    - img [ref=e539]
+                - cell [ref=e541]:
+                  - link [ref=e542] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/8/edit
+                    - img [ref=e544]
+                - cell "Tanpa Resep" [ref=e546]:
+                  - link "Tanpa Resep" [ref=e547] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/8/edit
+                    - generic [ref=e549]: Tanpa Resep
+                - cell "Edit Delete" [ref=e550]:
+                  - generic [ref=e551]:
+                    - button "Edit" [ref=e552] [cursor=pointer]:
+                      - img [ref=e553]
+                      - text: Edit
+                    - button "Delete" [ref=e556] [cursor=pointer]:
+                      - img [ref=e557]
+                      - text: Delete
+              - row "Select/deselect item 9 for bulk actions. Teh Jeruk (Lime Tea) Lime Base IDR 6,000.00 IDR 1,000.00 Tanpa Resep Edit Delete" [ref=e559]:
+                - cell "Select/deselect item 9 for bulk actions." [ref=e560]:
+                  - checkbox "Select/deselect item 9 for bulk actions." [ref=e561]
+                - cell "Teh Jeruk (Lime Tea)" [ref=e562]:
+                  - link "Teh Jeruk (Lime Tea)" [ref=e563] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/9/edit
+                    - generic [ref=e564]: Teh Jeruk (Lime Tea)
+                - cell "Lime Base" [ref=e565]:
+                  - link "Lime Base" [ref=e566] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/9/edit
+                    - generic [ref=e567]: Lime Base
+                - cell "IDR 6,000.00" [ref=e568]:
+                  - link "IDR 6,000.00" [ref=e569] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/9/edit
+                    - generic [ref=e570]: IDR 6,000.00
+                - cell "IDR 1,000.00" [ref=e571]:
+                  - link "IDR 1,000.00" [ref=e572] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/9/edit
+                    - generic [ref=e573]: IDR 1,000.00
+                - cell [ref=e574]:
+                  - link [ref=e575] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/9/edit
+                    - img [ref=e577]
+                - cell [ref=e579]:
+                  - link [ref=e580] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/9/edit
+                    - img [ref=e582]
+                - cell "Tanpa Resep" [ref=e584]:
+                  - link "Tanpa Resep" [ref=e585] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/9/edit
+                    - generic [ref=e587]: Tanpa Resep
+                - cell "Edit Delete" [ref=e588]:
+                  - generic [ref=e589]:
+                    - button "Edit" [ref=e590] [cursor=pointer]:
+                      - img [ref=e591]
+                      - text: Edit
+                    - button "Delete" [ref=e594] [cursor=pointer]:
+                      - img [ref=e595]
+                      - text: Delete
+              - row "Select/deselect item 10 for bulk actions. Full Chocolate Chocolatos Base IDR 8,000.00 IDR 2,000.00 Tanpa Resep Edit Delete" [ref=e597]:
+                - cell "Select/deselect item 10 for bulk actions." [ref=e598]:
+                  - checkbox "Select/deselect item 10 for bulk actions." [ref=e599]
+                - cell "Full Chocolate" [ref=e600]:
+                  - link "Full Chocolate" [ref=e601] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/10/edit
+                    - generic [ref=e602]: Full Chocolate
+                - cell "Chocolatos Base" [ref=e603]:
+                  - link "Chocolatos Base" [ref=e604] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/10/edit
+                    - generic [ref=e605]: Chocolatos Base
+                - cell "IDR 8,000.00" [ref=e606]:
+                  - link "IDR 8,000.00" [ref=e607] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/10/edit
+                    - generic [ref=e608]: IDR 8,000.00
+                - cell "IDR 2,000.00" [ref=e609]:
+                  - link "IDR 2,000.00" [ref=e610] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/10/edit
+                    - generic [ref=e611]: IDR 2,000.00
+                - cell [ref=e612]:
+                  - link [ref=e613] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/10/edit
+                    - img [ref=e615]
+                - cell [ref=e617]:
+                  - link [ref=e618] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/10/edit
+                    - img [ref=e620]
+                - cell "Tanpa Resep" [ref=e622]:
+                  - link "Tanpa Resep" [ref=e623] [cursor=pointer]:
+                    - /url: http://localhost:8080/admin/menus/10/edit
+                    - generic [ref=e625]: Tanpa Resep
+                - cell "Edit Delete" [ref=e626]:
+                  - generic [ref=e627]:
+                    - button "Edit" [ref=e628] [cursor=pointer]:
+                      - img [ref=e629]
+                      - text: Edit
+                    - button "Delete" [ref=e632] [cursor=pointer]:
+                      - img [ref=e633]
+                      - text: Delete
+          - navigation "Pagination navigation" [ref=e635]:
+            - generic [ref=e636]: Showing 1 to 10 of 28 results
+            - generic [ref=e639]:
+              - generic [ref=e641]: Per page
+              - combobox "Per page" [ref=e643]:
+                - option "5"
+                - option "10" [selected]
+                - option "25"
+                - option "50"
+            - list [ref=e644]:
+              - listitem [ref=e645]:
+                - button "Go to page 1" [ref=e646] [cursor=pointer]:
+                  - generic [ref=e647]: "1"
+              - listitem [ref=e648]:
+                - button "Go to page 2" [ref=e649] [cursor=pointer]:
+                  - generic [ref=e650]: "2"
+              - listitem [ref=e651]:
+                - button "Go to page 3" [ref=e652] [cursor=pointer]:
+                  - generic [ref=e653]: "3"
+              - listitem [ref=e654]:
+                - button "Next" [ref=e655] [cursor=pointer]:
+                  - img [ref=e656]
+  - generic:
+    - status

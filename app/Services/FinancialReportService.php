@@ -17,24 +17,33 @@ class FinancialReportService
     /**
      * Generate a financial report.
      *
-     * @param  string  $type   'simple', 'rigid', or 'custom'
-     * @param  array   $params [
-     *     'date_start'  => string|null,
-     *     'date_end'    => string|null,
-     *     'categories'  => array|null,
-     *     'aggregation' => 'daily'|'monthly',
-     * ]
-     * @return ReportData
+     * @param  string  $type  'simple', 'rigid', or 'custom'
+     * @param  array  $params  [
+     *                         'date_start'  => string|null,
+     *                         'date_end'    => string|null,
+     *                         'categories'  => array|null,
+     *                         'aggregation' => 'daily'|'monthly',
+     *                         ]
      *
      * @throws \InvalidArgumentException for unknown report types
      */
     public function generate(string $type, array $params = []): ReportData
     {
+        // Validate date ordering before dispatching to report type
+        if (isset($params['date_start']) && isset($params['date_end'])) {
+            $dateStart = Carbon::parse($params['date_start']);
+            $dateEnd = Carbon::parse($params['date_end']);
+
+            if ($dateStart->greaterThan($dateEnd)) {
+                throw new \InvalidArgumentException('date_start cannot be after date_end');
+            }
+        }
+
         return match ($type) {
             'simple' => $this->generateSimple($params),
-            'rigid'  => $this->generateRigid($params),
+            'rigid' => $this->generateRigid($params),
             'custom' => $this->generateCustom($params),
-            default  => throw new \InvalidArgumentException("Unknown report type: {$type}"),
+            default => throw new \InvalidArgumentException("Unknown report type: {$type}"),
         };
     }
 
@@ -56,22 +65,22 @@ class FinancialReportService
             : Carbon::now()->endOfDay();
 
         $dateStart = $start->toDateString();
-        $dateEnd   = $end->toDateString();
+        $dateEnd = $end->toDateString();
 
-        $totalIncome  = $this->calcTotalIncome($start, $end);
+        $totalIncome = $this->calcTotalIncome($start, $end);
         $totalExpense = $this->calcTotalExpense($start, $end);
-        $net          = $totalIncome - $totalExpense;
+        $net = $totalIncome - $totalExpense;
 
         $data = [
-            'total_income'           => $totalIncome,
-            'total_expense'          => $totalExpense,
-            'net'                    => $net,
-            'income_breakdown'       => $this->calcIncomeBreakdown($start, $end),
-            'expense_breakdown'      => $this->calcExpenseBreakdown($start, $end),
+            'total_income' => $totalIncome,
+            'total_expense' => $totalExpense,
+            'net' => $net,
+            'income_breakdown' => $this->calcIncomeBreakdown($start, $end),
+            'expense_breakdown' => $this->calcExpenseBreakdown($start, $end),
             'receivables_outstanding' => $this->calcReceivablesOutstanding($start, $end),
             'date_range' => [
                 'start' => $dateStart,
-                'end'   => $dateEnd,
+                'end' => $dateEnd,
             ],
         ];
 
@@ -116,8 +125,8 @@ class FinancialReportService
             ->get()
             ->map(fn ($item) => [
                 'source' => $item->payment_method ?? 'unknown',
-                'total'  => (float) $item->total,
-                'count'  => (int) $item->count,
+                'total' => (float) $item->total,
+                'count' => (int) $item->count,
             ])
             ->toArray();
 
@@ -128,8 +137,8 @@ class FinancialReportService
         return array_merge($ordersByPayment, [
             [
                 'source' => 'unexpected_income',
-                'total'  => $unexpectedIncome,
-                'count'  => UnexpectedTransaction::where('jenis', 'pemasukan')
+                'total' => $unexpectedIncome,
+                'count' => UnexpectedTransaction::where('jenis', 'pemasukan')
                     ->whereBetween('created_at', [$start, $end])
                     ->count(),
             ],
@@ -158,21 +167,21 @@ class FinancialReportService
             ->get()
             ->map(fn ($item) => [
                 'source' => $item->category ?? 'uncategorized',
-                'total'  => (float) $item->total,
-                'count'  => (int) $item->count,
+                'total' => (float) $item->total,
+                'count' => (int) $item->count,
             ])
             ->toArray();
 
         return array_merge($expenses, [
             [
                 'source' => 'ingredient_purchase',
-                'total'  => $ingredientCosts,
-                'count'  => $ingredientCount,
+                'total' => $ingredientCosts,
+                'count' => $ingredientCount,
             ],
             [
                 'source' => 'unexpected_expense',
-                'total'  => $unexpectedExpense,
-                'count'  => $unexpectedCount,
+                'total' => $unexpectedExpense,
+                'count' => $unexpectedCount,
             ],
         ]);
     }
@@ -197,7 +206,7 @@ class FinancialReportService
     private function generateRigid(array $params): ReportData
     {
         $dateStart = $params['date_start'] ?? Carbon::now()->startOfMonth()->toDateString();
-        $dateEnd   = $params['date_end']   ?? Carbon::now()->toDateString();
+        $dateEnd = $params['date_end'] ?? Carbon::now()->toDateString();
 
         $s = Carbon::parse($dateStart)->startOfDay();
         $e = Carbon::parse($dateEnd)->endOfDay();
@@ -227,44 +236,44 @@ class FinancialReportService
         $labaRugiBersih = $labaKotor - $bebanOperasional - $bebanTakTerduga;
 
         $receivablePayments = (float) Receivable::whereIn('status', [
-                Receivable::STATUS_PAID,
-                Receivable::STATUS_PARTIAL,
-            ])
+            Receivable::STATUS_PAID,
+            Receivable::STATUS_PARTIAL,
+        ])
             ->whereBetween('updated_at', [$s, $e])
             ->sum('paid_amount');
 
-        $arusKasMasuk  = $pendapatan + $receivablePayments;
+        $arusKasMasuk = $pendapatan + $receivablePayments;
         $arusKasKeluar = $bebanOperasional + $hpp + $bebanTakTerduga;
         $arusKasBersih = $arusKasMasuk - $arusKasKeluar;
 
         $data = [
             'meta' => [
-                'date_start'   => $dateStart,
-                'date_end'     => $dateEnd,
+                'date_start' => $dateStart,
+                'date_end' => $dateEnd,
                 'generated_at' => now()->toDateTimeString(),
-                'type'         => 'rigid',
+                'type' => 'rigid',
             ],
             'income_statement' => [
-                'pendapatan'            => $pendapatan,
-                'pendapatan_orders'     => $pendapatanOrders,
+                'pendapatan' => $pendapatan,
+                'pendapatan_orders' => $pendapatanOrders,
                 'pendapatan_unexpected' => $pendapatanUnexpected,
-                'hpp'                   => $hpp,
-                'laba_kotor'            => $labaKotor,
-                'beban_operasional'     => $bebanOperasional,
-                'beban_tak_terduga'     => $bebanTakTerduga,
-                'laba_rugi_bersih'      => $labaRugiBersih,
+                'hpp' => $hpp,
+                'laba_kotor' => $labaKotor,
+                'beban_operasional' => $bebanOperasional,
+                'beban_tak_terduga' => $bebanTakTerduga,
+                'laba_rugi_bersih' => $labaRugiBersih,
             ],
             'cash_flow' => [
-                'arus_kas_masuk'      => $arusKasMasuk,
-                'pendapatan'          => $pendapatan,
+                'arus_kas_masuk' => $arusKasMasuk,
+                'pendapatan' => $pendapatan,
                 'receivable_payments' => $receivablePayments,
-                'arus_kas_keluar'     => $arusKasKeluar,
-                'beban_operasional'   => $bebanOperasional,
-                'hpp'                 => $hpp,
-                'beban_tak_terduga'   => $bebanTakTerduga,
-                'arus_kas_bersih'     => $arusKasBersih,
-                'saldo_awal'          => 0,
-                'saldo_akhir'         => $arusKasBersih,
+                'arus_kas_keluar' => $arusKasKeluar,
+                'beban_operasional' => $bebanOperasional,
+                'hpp' => $hpp,
+                'beban_tak_terduga' => $bebanTakTerduga,
+                'arus_kas_bersih' => $arusKasBersih,
+                'saldo_awal' => 0,
+                'saldo_akhir' => $arusKasBersih,
             ],
         ];
 
@@ -286,30 +295,30 @@ class FinancialReportService
      */
     private function generateCustom(array $params): ReportData
     {
-        $dateStart   = $params['date_start'] ?? Carbon::now()->startOfYear()->toDateString();
-        $dateEnd     = $params['date_end']   ?? Carbon::now()->toDateString();
+        $dateStart = $params['date_start'] ?? Carbon::now()->startOfYear()->toDateString();
+        $dateEnd = $params['date_end'] ?? Carbon::now()->toDateString();
         $aggregation = $params['aggregation'] ?? 'monthly';
         $categoryFilters = $params['categories'] ?? [];
 
         $config = [
-            'date_start'  => $dateStart,
-            'date_end'    => $dateEnd,
-            'categories'  => $categoryFilters,
+            'date_start' => $dateStart,
+            'date_end' => $dateEnd,
+            'categories' => $categoryFilters,
             'aggregation' => $aggregation,
         ];
 
         $from = Carbon::parse($dateStart)->startOfDay();
-        $to   = Carbon::parse($dateEnd)->endOfDay();
+        $to = Carbon::parse($dateEnd)->endOfDay();
 
         [$menuCatIds, $includeUncInc, $includeBb, $includeUncExp]
             = $this->parseCategoryFilters($categoryFilters);
 
         $dateExpr = $aggregation === 'daily'
-            ? "DATE(%s)"
+            ? 'DATE(%s)'
             : "DATE_TRUNC('month', %s)::date";
 
         $unionParts = [];
-        $bindings   = [];
+        $bindings = [];
 
         if ($menuCatIds !== null) {
             $unionParts[] = $this->incomeMenuSql($from, $to, $dateExpr, $menuCatIds, $bindings);
@@ -332,8 +341,8 @@ class FinancialReportService
         } else {
             $unionSql = implode("\nUNION ALL\n", $unionParts);
             $sql = "SELECT bucket_date, category, type, CAST(amount AS NUMERIC(15,2)) AS amount\n"
-                  . "FROM ({$unionSql}) combined\n"
-                  . "ORDER BY bucket_date, type DESC, category";
+                  ."FROM ({$unionSql}) combined\n"
+                  .'ORDER BY bucket_date, type DESC, category';
 
             $rows = DB::select($sql, $bindings);
         }
@@ -358,7 +367,7 @@ class FinancialReportService
         }
         unset($row);
 
-        $totalIncome  = 0;
+        $totalIncome = 0;
         $totalExpense = 0;
         foreach ($allRows as $row) {
             if ($row['type'] === 'Income') {
@@ -369,12 +378,12 @@ class FinancialReportService
         }
 
         $data = [
-            'config'  => $config,
-            'rows'    => $allRows,
+            'config' => $config,
+            'rows' => $allRows,
             'summary' => [
-                'total_income'  => round($totalIncome, 2),
+                'total_income' => round($totalIncome, 2),
                 'total_expense' => round($totalExpense, 2),
-                'net'           => round($totalIncome - $totalExpense, 2),
+                'net' => round($totalIncome - $totalExpense, 2),
             ],
         ];
 
@@ -392,9 +401,9 @@ class FinancialReportService
     {
         $includeAll = empty($categoryFilters);
 
-        $menuCatIds    = null;
+        $menuCatIds = null;
         $includeUncInc = true;
-        $includeBb     = true;
+        $includeBb = true;
         $includeUncExp = true;
 
         if ($includeAll) {
@@ -402,9 +411,9 @@ class FinancialReportService
         }
 
         $menuIds = [];
-        $uncInc  = false;
-        $bb      = false;
-        $uncExp  = false;
+        $uncInc = false;
+        $bb = false;
+        $uncExp = false;
 
         foreach ($categoryFilters as $ident) {
             if ($ident === 'unexpected_income') {
@@ -436,7 +445,7 @@ class FinancialReportService
     {
         $dateCol = sprintf($dateExpr, 'o.created_at');
 
-        $where = "o.is_paid = true AND o.created_at BETWEEN ? AND ?";
+        $where = 'o.is_paid = true AND o.created_at BETWEEN ? AND ?';
         $bindings[] = $from;
         $bindings[] = $to;
 
@@ -514,17 +523,17 @@ class FinancialReportService
      * so empty categories are not hidden.
      */
     private function fillMissingCombos(
-        array   $rows,
-        Carbon  $from,
-        Carbon  $to,
-        string  $aggregation,
-        ?array  $menuCatIds,
-        bool    $includeUncInc,
-        bool    $includeBb,
-        bool    $includeUncExp,
+        array $rows,
+        Carbon $from,
+        Carbon $to,
+        string $aggregation,
+        ?array $menuCatIds,
+        bool $includeUncInc,
+        bool $includeBb,
+        bool $includeUncExp,
     ): array {
         $buckets = [];
-        $cur     = $from->copy();
+        $cur = $from->copy();
         if ($aggregation === 'daily') {
             while ($cur->lte($to)) {
                 $buckets[] = $cur->format('Y-m-d');
@@ -607,6 +616,7 @@ class FinancialReportService
             if ($typeCmp !== 0) {
                 return $typeCmp;
             }
+
             return strcmp($a['category'], $b['category']);
         });
     }
@@ -619,10 +629,10 @@ class FinancialReportService
     private function makeRow(string $date, string $category, string $type, float $amount): array
     {
         return [
-            'date'          => $date,
-            'category'      => $category,
-            'type'          => $type,
-            'amount'        => round($amount, 2),
+            'date' => $date,
+            'category' => $category,
+            'type' => $type,
+            'amount' => round($amount, 2),
             'running_total' => 0,
         ];
     }
@@ -630,10 +640,10 @@ class FinancialReportService
     private function toArray(\stdClass $obj): array
     {
         return [
-            'date'          => $obj->bucket_date,
-            'category'      => $obj->category,
-            'type'          => $obj->type,
-            'amount'        => (float) $obj->amount,
+            'date' => $obj->bucket_date,
+            'category' => $obj->category,
+            'type' => $obj->type,
+            'amount' => (float) $obj->amount,
             'running_total' => 0,
         ];
     }

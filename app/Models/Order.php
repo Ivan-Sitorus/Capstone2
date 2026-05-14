@@ -54,6 +54,7 @@ class Order extends Model
         'is_paid',
         'total_amount',
         'notes',
+        'processed_by',
     ];
 
     protected function casts(): array
@@ -87,6 +88,11 @@ class Order extends Model
     public function receivable()
     {
         return $this->hasOne(Receivable::class);
+    }
+
+    public function processedBy()
+    {
+        return $this->belongsTo(User::class, 'processed_by');
     }
 
     public function isCashPending(): bool

@@ -19,8 +19,8 @@ class CustomerOrderController extends Controller
     public function store(Request $request, OrderPromotionService $orderPromotionService): JsonResponse
     {
         $request->validate([
-            'customer_name'     => 'required|string|min:2|max:255',
-            'customer_phone'    => ['required', 'string', 'regex:/^[0-9]{10,15}$/'],
+            'customer_name'     => 'nullable|string|min:2|max:255',
+            'customer_phone'    => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
             'table_id'          => 'required|integer|exists:cafe_tables,id',
             'is_mahasiswa'      => 'boolean',
             'promotion_ids'     => 'nullable|array',
@@ -29,7 +29,6 @@ class CustomerOrderController extends Controller
             'items.*.menu_id'   => 'required|integer|exists:menus,id',
             'items.*.quantity'  => 'required|integer|min:1|max:20',
         ], [
-            'customer_name.required' => 'Nama wajib diisi.',
             'customer_phone.regex'   => 'Nomor telepon tidak valid.',
             'items.required'         => 'Pesanan tidak boleh kosong.',
             'items.min'              => 'Minimal 1 item dalam pesanan.',
@@ -108,61 +107,13 @@ class CustomerOrderController extends Controller
         });
     }
 
-    public function riwayat(Request $request)
-    {
-        // Riwayat berdasarkan nomor telepon di sessionStorage (dikirim via query param)
-        $phone = $request->query('phone');
-
-        $orders = $phone
-            ? Order::with([
-                'items' => fn($q) => $q->select(['id', 'order_id', 'menu_id', 'quantity', 'subtotal']),
-                'items.menu' => fn($q) => $q->select(['id', 'name']),
-            ])
-                ->select(['id', 'order_code', 'status', 'total_amount', 'created_at', 'payment_method', 'customer_name', 'customer_phone', 'payment_proof'])
-                ->where('customer_phone', $phone)
-                ->where(function ($q) {
-                    $q->where('payment_method', 'cash')
-                      ->orWhere(function ($q2) {
-                          $q2->where('payment_method', 'qris')
-                             ->where(function ($q3) {
-                                 // Tampil saat bukti dikirim (pending) ATAU sudah dikonfirmasi kasir (proof dihapus)
-                                 $q3->whereNotNull('payment_proof')
-                                    ->orWhereIn('status', [Order::STATUS_DIPROSES, Order::STATUS_SELESAI]);
-                             });
-                      });
-                })
-                ->latest()
-                ->limit(50)
-                ->get()
-                ->map(fn($o) => [
-                    'id'             => $o->id,
-                    'order_code'     => $o->order_code,
-                    'status'         => $o->status,
-                    'total_amount'   => $o->total_amount,
-                    'created_at'     => $o->created_at->toISOString(),
-                    'payment_method' => $o->payment_method,
-                    'customer_name'  => $o->customer_name,
-                    'items_summary'  => $o->items
-                        ->map(fn($i) => "{$i->quantity}x {$i->menu->name}")
-                        ->join(', '),
-                    'items' => $o->items->map(fn($i) => [
-                        'name'     => $i->menu->name,
-                        'quantity' => $i->quantity,
-                        'subtotal' => (float) $i->subtotal,
-                    ])->values()->toArray(),
-                ])
-            : collect();
-
-        return Inertia::render('Customer/Riwayat/Index', compact('orders'));
-    }
-
     public function status(string $code)
     {
         $order = Order::select(['id', 'order_code', 'status', 'total_amount', 'payment_method', 'created_at'])
             ->where('order_code', $code)
             ->firstOrFail();
 
-        return Inertia::render('Customer/Order/Status', [
+        return Inertia::render('Pelanggan/Order/Status', [
             'order' => [
                 'id'             => $order->id,
                 'order_code'     => $order->order_code,

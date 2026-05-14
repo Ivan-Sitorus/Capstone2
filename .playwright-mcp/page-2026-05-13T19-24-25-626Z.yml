@@ -1,0 +1,84 @@
+- generic [ref=e3]:
+  - generic [ref=e6]:
+    - generic [ref=e7]:
+      - img "W9 Cafe" [ref=e8]
+      - generic [ref=e9]: W9 Cafe
+      - 'button "Tema: system" [ref=e10] [cursor=pointer]':
+        - img [ref=e11]
+      - button "Collapse sidebar" [ref=e13] [cursor=pointer]:
+        - img [ref=e14]
+    - list [ref=e18]:
+      - listitem [ref=e19]:
+        - link "Dashboard" [ref=e20] [cursor=pointer]:
+          - /url: /cashier/dashboard
+          - img [ref=e22]
+          - generic [ref=e27]: Dashboard
+      - listitem [ref=e28]:
+        - link "Pesanan Baru" [ref=e29] [cursor=pointer]:
+          - /url: /cashier/pesanan-baru
+          - img [ref=e31]
+          - generic [ref=e35]: Pesanan Baru
+      - listitem [ref=e36]:
+        - link "Pesanan Aktif" [ref=e37] [cursor=pointer]:
+          - /url: /cashier/pesanan-aktif
+          - img [ref=e39]
+          - generic [ref=e42]: Pesanan Aktif
+      - listitem [ref=e43]:
+        - link "Riwayat Pesanan" [ref=e44] [cursor=pointer]:
+          - /url: /cashier/riwayat
+          - img [ref=e46]
+          - generic [ref=e50]: Riwayat Pesanan
+      - listitem [ref=e51]:
+        - link "Profil" [ref=e52] [cursor=pointer]:
+          - /url: /cashier/profil
+          - img [ref=e54]
+          - generic [ref=e57]: Profil
+    - button "Keluar" [ref=e59] [cursor=pointer]:
+      - img [ref=e60]
+      - generic [ref=e63]: Keluar
+    - button "Toggle Sidebar" [ref=e64]
+  - main [ref=e65]:
+    - generic [ref=e68]:
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - heading "Dasbor" [level=1] [ref=e71]
+          - paragraph [ref=e72]: Selamat datang, Kasir! Berikut ringkasan hari ini.
+        - generic [ref=e73]:
+          - img [ref=e74]
+          - text: 14 Mei 2026, 02.24
+      - generic [ref=e76]:
+        - generic [ref=e78]:
+          - generic [ref=e79]: Rp 0
+          - generic [ref=e80]: Total Penjualan Hari Ini
+        - generic [ref=e82]:
+          - generic [ref=e83]: "0"
+          - generic [ref=e84]: Jumlah Transaksi
+        - generic [ref=e86]:
+          - generic [ref=e87]: "0"
+          - generic [ref=e88]: Pesanan Aktif
+      - generic [ref=e89]:
+        - button "Pesanan Baru" [ref=e90]:
+          - img
+          - text: Pesanan Baru
+        - button "Lihat Pesanan" [ref=e91]:
+          - img
+          - text: Lihat Pesanan
+        - button "Riwayat" [ref=e92]:
+          - img
+          - text: Riwayat
+      - generic [ref=e93]:
+        - generic [ref=e94]:
+          - heading "Transaksi Terbaru" [level=2] [ref=e95]
+          - link "Lihat Semua →" [ref=e96] [cursor=pointer]:
+            - /url: /cashier/riwayat
+        - table [ref=e99]:
+          - rowgroup [ref=e100]:
+            - row "ID Pesanan Item Total Pembayaran Status" [ref=e101]:
+              - columnheader "ID Pesanan" [ref=e102]
+              - columnheader "Item" [ref=e103]
+              - columnheader "Total" [ref=e104]
+              - columnheader "Pembayaran" [ref=e105]
+              - columnheader "Status" [ref=e106]
+          - rowgroup [ref=e107]:
+            - row "Belum ada transaksi hari ini" [ref=e108]:
+              - cell "Belum ada transaksi hari ini" [ref=e109]

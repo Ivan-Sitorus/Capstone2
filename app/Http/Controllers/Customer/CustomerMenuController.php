@@ -44,6 +44,6 @@ class CustomerMenuController extends Controller
             abort(404);
         }
 
-        return Inertia::render('Customer/Menu/Index', compact('categories', 'table'));
+        return Inertia::render('Pelanggan/Menu/Index', compact('categories', 'table'));
     }
 }

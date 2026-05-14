@@ -27,7 +27,7 @@ class AuthController extends Controller
 
     public function showKitchenLogin()
     {
-        return Inertia::render('Kitchen/Login');
+        return Inertia::render('Dapur/Login');
     }
 
     public function login(Request $request)

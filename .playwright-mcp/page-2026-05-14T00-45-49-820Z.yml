@@ -1,0 +1,18 @@
+- generic [ref=e6]:
+  - generic [ref=e7]:
+    - img [ref=e9]
+    - heading "Dapur W9 Cafe" [level=1] [ref=e12]
+    - paragraph [ref=e13]: Masuk ke Kitchen Display System
+  - generic [ref=e14]:
+    - generic [ref=e15]: Email
+    - generic [ref=e16]:
+      - img
+      - textbox "Email" [ref=e17]:
+        - /placeholder: kitchen@w9cafe.com
+  - generic [ref=e18]:
+    - generic [ref=e19]: Kata Sandi
+    - generic [ref=e20]:
+      - img
+      - textbox "Kata Sandi" [ref=e21]:
+        - /placeholder: Masukkan kata sandi...
+  - button "Masuk" [ref=e22]

@@ -64,13 +64,11 @@
             </x-filament::section>
         @endif
 
-        {{-- Detail Table --}}
-        @if(!empty($reportData->rows))
-            <x-filament::section>
-                <x-slot name="heading">Data Detail</x-slot>
-                {{ $this->table }}
-            </x-filament::section>
-        @endif
+        {{-- AG Grid React (interactive table) --}}
+        <div id="ag-grid-report-container"
+             data-report-props='@json($this->getReportData()->toArray())'
+             class="ag-grid-react-wrapper rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden"
+        ></div>
 
         {{-- Raw JSON (collapsible) --}}
         <div x-data="{ open: false }" class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
@@ -88,4 +86,6 @@
             </div>
         </div>
     </div>
+
+    @vite(['resources/js/report-grid.jsx'])
 </x-filament-panels::page>

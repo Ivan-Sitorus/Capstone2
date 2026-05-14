@@ -8,31 +8,27 @@ use App\Models\ReportTemplate;
 use App\Renderers\CsvRenderer;
 use App\Renderers\DomPdfRenderer;
 use App\Renderers\ExcelRenderer;
-use App\Renderers\FilamentTableRenderer;
 use Filament\Actions\Action;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Pages\PageConfiguration;
 use Filament\Panel;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
-use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class ViewReport extends Page implements HasTable
+class ViewReport extends Page
 {
-    use InteractsWithTable;
-
     protected static string|\BackedEnum|null $navigationIcon = null;
 
     protected static bool $shouldRegisterNavigation = false;
 
     protected static ?string $slug = 'view-report/{id}';
 
-    protected static ?string $title = 'View Report';
+    protected static ?string $title = 'Lihat Laporan';
 
     protected string $view = 'filament.pages.view-report';
 
@@ -55,21 +51,21 @@ class ViewReport extends Page implements HasTable
         })
             ->middleware(static::getRouteMiddleware($panel))
             ->withoutMiddleware(static::getWithoutRouteMiddleware($panel))
-            ->name(static::getRelativeRouteName($panel) . '.pdf');
+            ->name(static::getRelativeRouteName($panel).'.pdf');
 
         Route::get('/view-report/{id}/download-excel', function ($id) {
             return app(static::class)->downloadExcel($id);
         })
             ->middleware(static::getRouteMiddleware($panel))
             ->withoutMiddleware(static::getWithoutRouteMiddleware($panel))
-            ->name(static::getRelativeRouteName($panel) . '.excel');
+            ->name(static::getRelativeRouteName($panel).'.excel');
 
         Route::get('/view-report/{id}/download-csv', function ($id) {
             return app(static::class)->downloadCsv($id);
         })
             ->middleware(static::getRouteMiddleware($panel))
             ->withoutMiddleware(static::getWithoutRouteMiddleware($panel))
-            ->name(static::getRelativeRouteName($panel) . '.csv');
+            ->name(static::getRelativeRouteName($panel).'.csv');
     }
 
     public function mount($id): void
@@ -82,45 +78,40 @@ class ViewReport extends Page implements HasTable
         return $this->report->toReportData();
     }
 
-    public function table(Table $table): Table
-    {
-        return FilamentTableRenderer::configure($table, $this->getReportData());
-    }
-
     protected function getHeaderActions(): array
     {
         return [
             Action::make('download_pdf')
-                ->label('Download PDF')
+                ->label('Unduh PDF')
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('danger')
                 ->url(fn () => url("/admin/view-report/{$this->report->id}/download-pdf"))
                 ->openUrlInNewTab(),
 
             Action::make('download_excel')
-                ->label('Download Excel')
+                ->label('Unduh Excel')
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('success')
                 ->url(fn () => url("/admin/view-report/{$this->report->id}/download-excel"))
                 ->openUrlInNewTab(),
 
             Action::make('download_csv')
-                ->label('Download CSV')
+                ->label('Unduh CSV')
                 ->icon('heroicon-o-document-arrow-down')
                 ->color('gray')
                 ->url(fn () => url("/admin/view-report/{$this->report->id}/download-csv"))
                 ->openUrlInNewTab(),
 
             Action::make('save_template')
-                ->label('Save as Template')
+                ->label('Simpan sebagai Template')
                 ->icon('heroicon-o-bookmark')
                 ->color('gray')
                 ->modal()
-                ->modalHeading('Save Report as Template')
-                ->modalDescription('Save this report configuration for future use.')
+                ->modalHeading('Simpan Laporan sebagai Template')
+                ->modalDescription('Simpan konfigurasi laporan ini untuk digunakan kembali.')
                 ->schema([
                     TextInput::make('template_name')
-                        ->label('Template Name')
+                        ->label('Nama Template')
                         ->required()
                         ->maxLength(255)
                         ->default($this->report->name),
@@ -145,8 +136,8 @@ class ViewReport extends Page implements HasTable
                         ]);
 
                         Notification::make()
-                            ->title('Template Updated')
-                            ->body("Template \"{$templateName}\" has been updated.")
+                            ->title('Template Diperbarui')
+                            ->body("Template \"{$templateName}\" telah diperbarui.")
                             ->success()
                             ->send();
                     } else {
@@ -164,8 +155,8 @@ class ViewReport extends Page implements HasTable
                         ]);
 
                         Notification::make()
-                            ->title('Template Saved')
-                            ->body("Template \"{$templateName}\" has been saved.")
+                            ->title('Template Disimpan')
+                            ->body("Template \"{$templateName}\" telah disimpan.")
                             ->success()
                             ->send();
                     }
@@ -173,7 +164,7 @@ class ViewReport extends Page implements HasTable
         ];
     }
 
-    public function downloadPdf($id): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function downloadPdf($id): StreamedResponse
     {
         $report = GeneratedReport::findOrFail($id);
 
@@ -183,7 +174,7 @@ class ViewReport extends Page implements HasTable
         ]);
     }
 
-    public function downloadExcel($id): \Symfony\Component\HttpFoundation\BinaryFileResponse
+    public function downloadExcel($id): BinaryFileResponse
     {
         $report = GeneratedReport::findOrFail($id);
 
@@ -193,7 +184,7 @@ class ViewReport extends Page implements HasTable
         );
     }
 
-    public function downloadCsv($id): \Symfony\Component\HttpFoundation\StreamedResponse
+    public function downloadCsv($id): StreamedResponse
     {
         $report = GeneratedReport::findOrFail($id);
 
@@ -202,7 +193,7 @@ class ViewReport extends Page implements HasTable
 
     public function getTitle(): string
     {
-        return "View Report — {$this->report->name}";
+        return "Lihat Laporan — {$this->report->name}";
     }
 
     public function getTypeLabel(): string

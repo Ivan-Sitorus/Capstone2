@@ -9,13 +9,13 @@ class FinancialCluster extends Cluster
 {
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-chart-bar';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Finance Details';
+    protected static \UnitEnum|string|null $navigationGroup = 'Detail Keuangan';
 
-    protected static ?string $navigationLabel = 'Financial Reports';
+    protected static ?string $navigationLabel = 'Laporan Keuangan';
 
     protected static ?int $navigationSort = 4;
 
-    protected static ?string $title = 'Financial Reports';
+    protected static ?string $title = 'Laporan Keuangan';
 
     protected static ?SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 }

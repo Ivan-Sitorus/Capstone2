@@ -1,0 +1,264 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]: W9 Cafe
+    - 'button "Tema: system" [ref=e6] [cursor=pointer]':
+      - img [ref=e7]
+  - navigation [ref=e10]:
+    - link "Menu" [ref=e11] [cursor=pointer]:
+      - /url: /customer/menu
+      - generic [ref=e12]:
+        - img
+      - generic [ref=e13]: Menu
+    - link "Keranjang" [ref=e14] [cursor=pointer]:
+      - /url: /customer/cart
+      - generic [ref=e15]:
+        - img
+      - generic [ref=e16]: Keranjang
+  - main [ref=e17]:
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - img "W9 Cafe" [ref=e21]
+        - generic [ref=e22]:
+          - generic [ref=e23]: Selamat datang,
+          - generic [ref=e24]: Pelanggan
+          - generic [ref=e25]: Meja 1
+      - generic [ref=e26]:
+        - img
+        - textbox "Cari menu favoritmu..." [ref=e27]
+    - generic [ref=e29]:
+      - button "Semua" [ref=e30] [cursor=pointer]
+      - button "Ayam Geprek" [ref=e31] [cursor=pointer]
+      - button "Chocolatos Base" [ref=e32] [cursor=pointer]
+      - button "Coffee Base" [ref=e33] [cursor=pointer]
+      - button "Data Mining Seed" [ref=e34] [cursor=pointer]
+      - button "Indomie Base" [ref=e35] [cursor=pointer]
+      - button "Lime Base" [ref=e36] [cursor=pointer]
+      - button "Nasi Goreng" [ref=e37] [cursor=pointer]
+      - button "Nasi Telur" [ref=e38] [cursor=pointer]
+      - button "Snack" [ref=e39] [cursor=pointer]
+      - button "Tea Base" [ref=e40] [cursor=pointer]
+    - generic [ref=e42]:
+      - generic [ref=e43] [cursor=pointer]:
+        - generic [ref=e45]: ☕
+        - generic [ref=e46]:
+          - generic [ref=e47]: Nasi Ayam Geprek
+          - generic [ref=e48]: Rp 14.000
+          - button "Tambah" [ref=e49]:
+            - img
+            - text: Tambah
+      - generic [ref=e50] [cursor=pointer]:
+        - generic [ref=e52]: ☕
+        - generic [ref=e53]:
+          - generic [ref=e54]: Creamy Chocolatey
+          - generic [ref=e55]: Rp 8.000
+          - button "Tambah" [ref=e56]:
+            - img
+            - text: Tambah
+      - generic [ref=e57] [cursor=pointer]:
+        - generic [ref=e59]: ☕
+        - generic [ref=e60]:
+          - generic [ref=e61]: Full Chocolate
+          - generic [ref=e62]: Rp 8.000
+          - button "Tambah" [ref=e63]:
+            - img
+            - text: Tambah
+      - generic [ref=e64] [cursor=pointer]:
+        - generic [ref=e66]: ☕
+        - generic [ref=e67]:
+          - generic [ref=e68]: Matcha
+          - generic [ref=e69]: Rp 8.000
+          - button "Tambah" [ref=e70]:
+            - img
+            - text: Tambah
+      - generic [ref=e71] [cursor=pointer]:
+        - generic [ref=e73]: ☕
+        - generic [ref=e74]:
+          - generic [ref=e75]: Vanilla Latte
+          - generic [ref=e76]: Rp 8.000
+          - button "Tambah" [ref=e77]:
+            - img
+            - text: Tambah
+      - generic [ref=e78] [cursor=pointer]:
+        - generic [ref=e80]: ☕
+        - generic [ref=e81]:
+          - generic [ref=e82]: Americano Panas
+          - generic [ref=e83]: Rp 10.000
+          - button "Tambah" [ref=e84]:
+            - img
+            - text: Tambah
+      - generic [ref=e85] [cursor=pointer]:
+        - generic [ref=e87]: ☕
+        - generic [ref=e88]:
+          - generic [ref=e89]: Es Americano
+          - generic [ref=e90]: Rp 12.000
+          - button "Tambah" [ref=e91]:
+            - img
+            - text: Tambah
+      - generic [ref=e92] [cursor=pointer]:
+        - generic [ref=e94]: ☕
+        - generic [ref=e95]:
+          - generic [ref=e96]: Espresso
+          - generic [ref=e97]: Rp 10.000
+          - button "Tambah" [ref=e98]:
+            - img
+            - text: Tambah
+      - generic [ref=e99] [cursor=pointer]:
+        - generic [ref=e101]: ☕
+        - generic [ref=e102]:
+          - generic [ref=e103]: Kopi Susu
+          - generic [ref=e104]: Rp 14.000
+          - button "Tambah" [ref=e105]:
+            - img
+            - text: Tambah
+      - generic [ref=e106] [cursor=pointer]:
+        - generic [ref=e108]: ☕
+        - generic [ref=e109]:
+          - generic [ref=e110]: Cappucino
+          - generic [ref=e111]: Rp 22.000
+          - button "Tambah" [ref=e112]:
+            - img
+            - text: Tambah
+      - generic [ref=e113] [cursor=pointer]:
+        - generic [ref=e115]: ☕
+        - generic [ref=e116]:
+          - generic [ref=e117]: Cheesecake
+          - generic [ref=e118]: Rp 27.000
+          - button "Tambah" [ref=e119]:
+            - img
+            - text: Tambah
+      - generic [ref=e120] [cursor=pointer]:
+        - generic [ref=e122]: ☕
+        - generic [ref=e123]:
+          - generic [ref=e124]: French Fries
+          - generic [ref=e125]: Rp 20.000
+          - button "Tambah" [ref=e126]:
+            - img
+            - text: Tambah
+      - generic [ref=e127] [cursor=pointer]:
+        - generic [ref=e129]: ☕
+        - generic [ref=e130]:
+          - generic [ref=e131]: Mie Goreng
+          - generic [ref=e132]: Rp 28.000
+          - button "Tambah" [ref=e133]:
+            - img
+            - text: Tambah
+      - generic [ref=e134] [cursor=pointer]:
+        - generic [ref=e136]: ☕
+        - generic [ref=e137]:
+          - generic [ref=e138]: Nasi Goreng
+          - generic [ref=e139]: Rp 30.000
+          - button "Tambah" [ref=e140]:
+            - img
+            - text: Tambah
+      - generic [ref=e141] [cursor=pointer]:
+        - generic [ref=e143]: ☕
+        - generic [ref=e144]:
+          - generic [ref=e145]: Mie Goreng Telur
+          - generic [ref=e146]: Rp 10.000
+          - button "Tambah" [ref=e147]:
+            - img
+            - text: Tambah
+      - generic [ref=e148] [cursor=pointer]:
+        - generic [ref=e150]: ☕
+        - generic [ref=e151]:
+          - generic [ref=e152]: Mie Rebus Telur
+          - generic [ref=e153]: Rp 10.000
+          - button "Tambah" [ref=e154]:
+            - img
+            - text: Tambah
+      - generic [ref=e155] [cursor=pointer]:
+        - generic [ref=e157]: ☕
+        - generic [ref=e158]:
+          - generic [ref=e159]: Jeruk Nipis
+          - generic [ref=e160]: Rp 5.000
+          - button "Tambah" [ref=e161]:
+            - img
+            - text: Tambah
+      - generic [ref=e162] [cursor=pointer]:
+        - generic [ref=e164]: ☕
+        - generic [ref=e165]:
+          - generic [ref=e166]: Teh Jeruk (Lime Tea)
+          - generic [ref=e167]: Rp 6.000
+          - button "Tambah" [ref=e168]:
+            - img
+            - text: Tambah
+      - generic [ref=e169] [cursor=pointer]:
+        - generic [ref=e171]: ☕
+        - generic [ref=e172]:
+          - generic [ref=e173]: Nasgor Ayam/Udang
+          - generic [ref=e174]: Rp 17.000
+          - button "Tambah" [ref=e175]:
+            - img
+            - text: Tambah
+      - generic [ref=e176] [cursor=pointer]:
+        - generic [ref=e178]: ☕
+        - generic [ref=e179]:
+          - generic [ref=e180]: Nasgor Telur
+          - generic [ref=e181]: Rp 12.000
+          - button "Tambah" [ref=e182]:
+            - img
+            - text: Tambah
+      - generic [ref=e183] [cursor=pointer]:
+        - generic [ref=e185]: ☕
+        - generic [ref=e186]:
+          - generic [ref=e187]: Nasi Telur Kecap
+          - generic [ref=e188]: Rp 8.000
+          - button "Tambah" [ref=e189]:
+            - img
+            - text: Tambah
+      - generic [ref=e190] [cursor=pointer]:
+        - generic [ref=e192]: ☕
+        - generic [ref=e193]:
+          - generic [ref=e194]: Nasi Telur Saus
+          - generic [ref=e195]: Rp 9.000
+          - button "Tambah" [ref=e196]:
+            - img
+            - text: Tambah
+      - generic [ref=e197] [cursor=pointer]:
+        - generic [ref=e199]: ☕
+        - generic [ref=e200]:
+          - generic [ref=e201]: Kentang (French Fries)
+          - generic [ref=e202]: Rp 12.000
+          - button "Tambah" [ref=e203]:
+            - img
+            - text: Tambah
+      - generic [ref=e204] [cursor=pointer]:
+        - generic [ref=e206]: ☕
+        - generic [ref=e207]:
+          - generic [ref=e208]: Pisang Coklat Keju
+          - generic [ref=e209]: Rp 10.000
+          - button "Tambah" [ref=e210]:
+            - img
+            - text: Tambah
+      - generic [ref=e211] [cursor=pointer]:
+        - generic [ref=e213]: ☕
+        - generic [ref=e214]:
+          - generic [ref=e215]: Tempe Mendoan
+          - generic [ref=e216]: Rp 8.000
+          - button "Tambah" [ref=e217]:
+            - img
+            - text: Tambah
+      - generic [ref=e218] [cursor=pointer]:
+        - generic [ref=e220]: ☕
+        - generic [ref=e221]:
+          - generic [ref=e222]: Teh Manis
+          - generic [ref=e223]: Rp 4.000
+          - button "Tambah" [ref=e224]:
+            - img
+            - text: Tambah
+      - generic [ref=e225] [cursor=pointer]:
+        - generic [ref=e227]: ☕
+        - generic [ref=e228]:
+          - generic [ref=e229]: Teh Susu
+          - generic [ref=e230]: Rp 7.000
+          - button "Tambah" [ref=e231]:
+            - img
+            - text: Tambah
+      - generic [ref=e232] [cursor=pointer]:
+        - generic [ref=e234]: ☕
+        - generic [ref=e235]:
+          - generic [ref=e236]: Teh Tawar
+          - generic [ref=e237]: Rp 3.000
+          - button "Tambah" [ref=e238]:
+            - img
+            - text: Tambah

@@ -1,0 +1,24 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]: W9 Cafe
+    - 'button "Tema: system" [ref=e6] [cursor=pointer]':
+      - img [ref=e7]
+  - navigation [ref=e10]:
+    - link "Menu" [ref=e11] [cursor=pointer]:
+      - /url: /customer/menu
+      - generic [ref=e12]:
+        - img
+      - generic [ref=e13]: Menu
+    - link "Keranjang" [ref=e14] [cursor=pointer]:
+      - /url: /customer/cart
+      - generic [ref=e15]:
+        - img
+      - generic [ref=e16]: Keranjang
+  - main [ref=e17]:
+    - generic [ref=e20]: Keranjang
+    - generic [ref=e21]:
+      - img [ref=e23]
+      - generic [ref=e26]:
+        - paragraph [ref=e27]: Keranjang Kosong
+        - paragraph [ref=e28]: Tambahkan menu favoritmu dari halaman menu
+      - button "Kembali ke Menu" [ref=e29]

@@ -16,7 +16,6 @@ class AdminCurrentResourcesSmokeTest extends TestCase
             'filament.admin.resources.ingredients.index',
             'filament.admin.resources.waste-records.index',
             'filament.admin.resources.stock-adjustments.index',
-            'filament.admin.resources.cashier-sessions.index',
             'filament.admin.resources.promotions.index',
             'filament.admin.resources.expenses.index',
             'filament.admin.resources.receivables.index',
