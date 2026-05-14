@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 export default function KanbanColumn({ title, count, colorClass, badgeClass, children, className }) {
     return (
         <div className={cn('flex flex-col min-h-0 min-w-0 flex-1', className)}>
-            <div className={`flex items-center justify-between mb-3 pb-2.5 ${colorClass}`}>
+            <div className={`flex items-center justify-between mb-2 pb-2 px-3 ${colorClass}`}>
                 <span className="text-base font-bold text-foreground">
                     {title}
                 </span>
