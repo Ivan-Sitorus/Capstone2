@@ -17,6 +17,7 @@ class CustomerMenuController extends Controller
 
         if (!$tableId) {
             return redirect()->route('pelanggan.menu');
+        }
 
         return redirect()->route('pelanggan.menu', ['table' => $tableId]);
     }

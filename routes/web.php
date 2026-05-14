@@ -16,10 +16,6 @@ use Inertia\Inertia;
 // Cashier auth
 Route::get('/kasir/login',  [AuthController::class, 'showLogin'])->name('kasir.login');
 Route::post('/kasir/login', [AuthController::class, 'login'])->name('kasir.login.attempt');
-// Legacy redirect + named route for auth middleware fallback
-Route::get('/login',  fn() => redirect()->route('kasir.login'))->name('login');
-Route::post('/login', fn() => redirect()->route('kasir.login'));
-
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Kasir pages
