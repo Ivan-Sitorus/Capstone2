@@ -13,6 +13,15 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
+        if (Auth::check()) {
+            $user = Auth::user();
+            return match ($user->role) {
+                'admin' => redirect()->to('/admin'),
+                'kitchen' => redirect()->route('kitchen.index'),
+                default => Inertia::location(route('cashier.pesanan-baru')),
+            };
+        }
+
         return Inertia::render('Auth/Login');
     }
 
@@ -45,6 +54,16 @@ class AuthController extends Controller
         RateLimiter::clear($key);
         $request->session()->regenerate();
 
+        $user = Auth::user();
+
+        if ($user->role === 'admin') {
+            return redirect()->to('/admin');
+        }
+
+        if ($user->role === 'kitchen') {
+            return Inertia::location(route('kitchen.index'));
+        }
+
         if ($request->is('kitchen/*')) {
             return Inertia::location(route('kitchen.index'));
         }
@@ -54,9 +73,15 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+        $role = Auth::user()->role ?? 'cashier';
+
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
+        if ($role === 'kitchen') {
+            return redirect()->route('kitchen.login');
+        }
 
         return redirect()->route('cashier.login');
     }
