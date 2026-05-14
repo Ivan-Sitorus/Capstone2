@@ -40,7 +40,7 @@ export default function RiwayatTable({
   filters: initialFilters,
   showFilters = true,
   showPagination = true,
-  baseRoute = '/cashier/riwayat',
+  baseRoute,
 }) {
   const rows     = orders?.data ?? [];
   const prevUrl  = orders?.prev_page_url ?? null;
@@ -157,7 +157,7 @@ export default function RiwayatTable({
                       <Button
                         variant="ghost"
                         size="sm"
-                        render={<Link href={`/cashier/order/${order.id}`} />}
+                        render={<Link href={route('kasir.pesanan.detail', {order: order.id})} />}
                       >
                         Detail
                       </Button>

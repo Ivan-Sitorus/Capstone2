@@ -43,7 +43,7 @@ export default function KitchenIndex({ orders: initialOrders }) {
         setBumpingIds(prev => new Set(prev).add(order.id));
 
         try {
-            await axios.patch(`/kitchen/order/${order.id}/bump`);
+            await axios.patch(route('dapur.proses', {order: order.id}));
             const nextStatus = order.status === 'pending' ? 'diproses' : 'selesai';
             setOrders(prev =>
                 nextStatus === 'selesai'
@@ -87,7 +87,7 @@ export default function KitchenIndex({ orders: initialOrders }) {
             <KitchenLayout>
                 <div className="flex flex-1 min-h-0">
                     <div className="flex flex-col flex-1 min-w-0">
-                        <div className="flex items-center justify-center gap-2 mb-2 pb-2 mx-3 border-b-2 border-b-primary">
+                        <div className="flex items-center justify-center gap-2 mt-2 pt-2 mb-2 pb-2 mx-3 border-b-2 border-b-primary">
                             <span className="text-base font-bold text-foreground">Menunggu</span>
                             <span className="rounded-full px-2.5 py-0.5 text-xs font-bold bg-primary text-primary-foreground">
                                 {pendingOrders.length}
@@ -107,7 +107,7 @@ export default function KitchenIndex({ orders: initialOrders }) {
                     <div className="border-l border-border" />
 
                     <div className="flex flex-col flex-1 min-w-0">
-                        <div className="flex items-center justify-center gap-2 mb-2 pb-2 mx-3 border-b-2 border-b-amber-500">
+                        <div className="flex items-center justify-center gap-2 mt-2 pt-2 mb-2 pb-2 mx-3 border-b-2 border-b-amber-500">
                             <span className="text-base font-bold text-foreground">Diproses</span>
                             <span className="rounded-full px-2.5 py-0.5 text-xs font-bold bg-amber-500 text-white">
                                 {processingOrders.length}

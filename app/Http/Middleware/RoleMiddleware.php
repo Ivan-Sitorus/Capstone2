@@ -11,10 +11,10 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, string ...$roles): mixed
     {
         if (!Auth::check()) {
-            if ($request->is('kitchen/*')) {
-                return redirect()->route('kitchen.login');
+            if ($request->is('dapur/*')) {
+                return redirect()->route('dapur.login');
             }
-            return redirect()->route('cashier.login');
+            return redirect()->route('kasir.login');
         }
 
         if (!in_array(Auth::user()->role, $roles)) {

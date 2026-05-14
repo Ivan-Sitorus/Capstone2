@@ -5,8 +5,8 @@ import HeaderBar from '@/Components/Shared/HeaderBar';
 import FlashToast from '@/Components/Shared/FlashToast';
 
 const kitchenTabs = [
-    { label: 'Pesanan', href: '/kitchen', icon: ClipboardList },
-    { label: 'Riwayat', href: '/kitchen/riwayat', icon: History },
+    { label: 'Pesanan', href: route('dapur.beranda'), icon: ClipboardList },
+    { label: 'Riwayat', href: route('dapur.riwayat'), icon: History },
 ];
 
 export default function KitchenLayout({ children }) {

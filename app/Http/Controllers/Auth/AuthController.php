@@ -17,8 +17,8 @@ class AuthController extends Controller
             $user = Auth::user();
             return match ($user->role) {
                 'admin' => redirect()->to('/admin'),
-                'kitchen' => redirect()->route('kitchen.index'),
-                default => Inertia::location(route('cashier.pesanan-baru')),
+                'kitchen' => redirect()->route('dapur.beranda'),
+                default => Inertia::location(route('kasir.pesanan-baru')),
             };
         }
 
@@ -61,14 +61,14 @@ class AuthController extends Controller
         }
 
         if ($user->role === 'kitchen') {
-            return Inertia::location(route('kitchen.index'));
+            return Inertia::location(route('dapur.beranda'));
         }
 
-        if ($request->is('kitchen/*')) {
-            return Inertia::location(route('kitchen.index'));
+        if ($request->is('dapur/*')) {
+            return Inertia::location(route('dapur.beranda'));
         }
 
-        return Inertia::location(route('cashier.pesanan-baru'));
+        return Inertia::location(route('kasir.pesanan-baru'));
     }
 
     public function logout(Request $request)
@@ -80,9 +80,9 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         if ($role === 'kitchen') {
-            return redirect()->route('kitchen.login');
+            return redirect()->route('dapur.login');
         }
 
-        return redirect()->route('cashier.login');
+        return redirect()->route('kasir.login');
     }
 }

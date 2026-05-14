@@ -79,7 +79,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         setQrisOrder(null);
 
         try {
-            await axios.patch(`/cashier/order/${orderId}/confirm-qris`);
+            await axios.patch(route('kasir.pesanan.konfirmasi-qris', {order: orderId}));
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => pendingStatusRef.current.delete(orderId),
@@ -96,7 +96,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         if (processing || !qrisOrder) return;
         setProcessing(true);
         try {
-            await axios.patch(`/cashier/order/${qrisOrder.id}/reject-qris`, { note: rejectNote });
+            await axios.patch(route('kasir.pesanan.tolak-qris', {order: qrisOrder.id}), { note: rejectNote });
             setQrisOrder(null);
             setRejectNote('');
             router.reload({ only: ['orders', 'counts'] });
@@ -118,7 +118,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         }
 
         try {
-            await axios.patch(`/cashier/order/${orderId}/status`, { status: targetStatus });
+            await axios.patch(route('kasir.pesanan.status', {order: orderId}), { status: targetStatus });
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => {
@@ -139,7 +139,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         if (processing) return;
         setProcessing(true);
         try {
-            await axios.patch(`/cashier/order/${orderId}/confirm-payment`, { payment_method: paymentMethod });
+            await axios.patch(route('kasir.pesanan.konfirmasi-bayar', {order: orderId}), { payment_method: paymentMethod });
             router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);
@@ -188,7 +188,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                         <OrderCard
                             key={order.id}
                             order={order}
-                            onDetail={id => router.visit(`/cashier/order/${id}`)}
+                            onDetail={id => router.visit(route('kasir.pesanan.detail', {order: id}))}
                             onOpenQrisModal={o => { setQrisOrder(o); setRejectNote(''); }}
                             onMarkDone={handleMarkDone}
                             onConfirmPayment={handleConfirmPayment}

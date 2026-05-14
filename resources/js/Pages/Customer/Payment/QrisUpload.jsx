@@ -194,7 +194,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             Lihat Struk Digital
                         </button>
                         <button
-                            onClick={() => router.visit('/customer/riwayat')}
+                            onClick={() => router.visit(route('pelanggan.pesanan.status', {code: order.order_code}))}
                             className="w-full h-[46px] bg-transparent border border-muted-foreground/30 rounded-[18px] text-[14px] font-semibold cursor-pointer text-muted-foreground"
                         >
                             Cek Status Pesanan

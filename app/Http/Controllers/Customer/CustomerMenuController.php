@@ -14,15 +14,11 @@ class CustomerMenuController extends Controller
     public function showIdentitas(Request $request)
     {
         $tableId = $request->query('table');
-        $table   = $tableId
-            ? CafeTable::select(['id', 'table_number'])->find($tableId)
-            : null;
 
-        if ($table && $table->table_number > 10) {
-            abort(404);
-        }
+        if (!$tableId) {
+            return redirect()->route('pelanggan.menu');
 
-        return Inertia::render('Customer/Identitas', ['table' => $table]);
+        return redirect()->route('pelanggan.menu', ['table' => $tableId]);
     }
 
     public function index(Request $request)

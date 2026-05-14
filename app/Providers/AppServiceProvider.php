@@ -26,9 +26,9 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Authenticate::redirectUsing(function (Request $request) {
-            return $request->is('kitchen/*')
-                ? route('kitchen.login')
-                : route('cashier.login');
+            return $request->is('dapur/*')
+                ? route('dapur.login')
+                : route('kasir.login');
         });
     }
 }

@@ -9,9 +9,9 @@ import HeaderBar from '@/Components/Shared/HeaderBar';
 import FlashToast from '@/Components/Shared/FlashToast';
 
 const tabs = [
-    { label: 'Pesanan Baru',    href: '/cashier/pesanan-baru', icon: ShoppingCart },
-    { label: 'Pesanan Aktif',   href: '/cashier/pesanan-aktif', icon: ClipboardList },
-    { label: 'Riwayat Pesanan', href: '/cashier/riwayat',       icon: History },
+    { label: 'Pesanan Baru',    href: route('kasir.pesanan-baru'), icon: ShoppingCart },
+    { label: 'Pesanan Aktif',   href: route('kasir.pesanan-aktif'), icon: ClipboardList },
+    { label: 'Riwayat Pesanan', href: route('kasir.riwayat'),       icon: History },
 ];
 
 export default function CashierLayout({ children }) {

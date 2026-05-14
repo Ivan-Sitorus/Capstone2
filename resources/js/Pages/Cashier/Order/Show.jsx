@@ -38,10 +38,10 @@ export default function OrderShow({ order }) {
         }
     }
 
-    function handleAdvance() { handleAction(`/cashier/order/${order.id}/status`, { status: 'selesai' }); }
-    function handleConfirmCash() { handleAction(`/cashier/order/${order.id}/confirm-cash`); }
-    function handleConfirmQris() { handleAction(`/cashier/order/${order.id}/confirm-qris`); setShowRejectModal(false); }
-    function handleRejectQris() { handleAction(`/cashier/order/${order.id}/reject-qris`, { note: rejectNote }); setShowRejectModal(false); setRejectNote(''); }
+    function handleAdvance() { handleAction(route('kasir.pesanan.status', {order: order.id}), { status: 'selesai' }); }
+    function handleConfirmCash() { handleAction(route('kasir.pesanan.konfirmasi-tunai', {order: order.id})); }
+    function handleConfirmQris() { handleAction(route('kasir.pesanan.konfirmasi-qris', {order: order.id})); setShowRejectModal(false); }
+    function handleRejectQris() { handleAction(route('kasir.pesanan.tolak-qris', {order: order.id}), { note: rejectNote }); setShowRejectModal(false); setRejectNote(''); }
 
     return (
         <CashierLayout title={`Detail Pesanan ${order.order_code}`} fullscreen>
@@ -53,7 +53,7 @@ export default function OrderShow({ order }) {
                         <div className="flex items-center justify-between mb-7">
                             <div className="flex items-center gap-3.5">
                                 <Link
-                                    href="/cashier/pesanan-aktif"
+                                    href={route('kasir.pesanan-aktif')}
                                     className="w-9 h-9 rounded-lg bg-card border border-border shrink-0 flex items-center justify-center no-underline shadow-sm text-foreground"
                                 >
                                     <ArrowLeft size={18} />

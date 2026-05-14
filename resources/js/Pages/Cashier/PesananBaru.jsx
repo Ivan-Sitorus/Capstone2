@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
-import { Search, X, Banknote, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen, Printer, Percent } from 'lucide-react';
+import { Search, X, Banknote, Lock, User, CircleCheck, Clock, Printer, Percent } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,9 +9,17 @@ import SharedMenuItem from '@/Components/Shared/SharedMenuItem';
 import SharedCartItem from '@/Components/Shared/SharedCartItem';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 import { cn } from '@/lib/utils';
+import useCartStore from '@/Store/cartStore';
 
 export default function PesananBaru({ categories, promotions }) {
-    const [cartItems, setCartItems] = useState([]);
+    // ── Zustand cashier cart ──────────────────────────────────────────────
+    const cartItems = useCartStore(s => s.cashierItems);
+    const cashierAddItem = useCartStore(s => s.cashierAddItem);
+    const cashierRemoveItem = useCartStore(s => s.cashierRemoveItem);
+    const cashierIncrement = useCartStore(s => s.cashierIncrement);
+    const cashierDecrement = useCartStore(s => s.cashierDecrement);
+    const cashierClearCart = useCartStore(s => s.cashierClearCart);
+
     const [activeCategory, setActiveCategory] = useState('Semua');
     const [search, setSearch] = useState('');
     const [showPayModal, setShowPayModal] = useState(false);
@@ -22,7 +30,6 @@ export default function PesananBaru({ categories, promotions }) {
     const [showSuccess, setShowSuccess] = useState(false);
     const [successTotal, setSuccessTotal] = useState(0);
     const [successOrderCode, setSuccessOrderCode] = useState('');
-    const [isCartCollapsed, setIsCartCollapsed] = useState(false);
     const [isPortrait, setIsPortrait] = useState(() => {
         if (typeof window === 'undefined') return false;
         return window.innerHeight > window.innerWidth;
@@ -33,10 +40,6 @@ export default function PesananBaru({ categories, promotions }) {
         window.addEventListener('resize', onResize);
         return () => window.removeEventListener('resize', onResize);
     }, []);
-
-    useEffect(() => {
-        if (isPortrait) setIsCartCollapsed(true);
-    }, [isPortrait]);
 
     const allMenus = useMemo(
         () => categories.flatMap(c => c.menus.map(m => ({ ...m, category: { name: c.name } }))),
@@ -63,19 +66,7 @@ export default function PesananBaru({ categories, promotions }) {
 
     const menuGridColumns = isPortrait
         ? 'repeat(auto-fill, minmax(170px, 1fr))'
-        : isCartCollapsed
-            ? 'repeat(auto-fill, minmax(185px, 1fr))'
-            : 'repeat(auto-fill, minmax(210px, 1fr))';
-
-    function addToCart(menu) {
-        setCartItems(prev => {
-            const existing = prev.find(i => i.menuId === menu.id);
-            if (existing) return prev.map(i => i.menuId === menu.id ? { ...i, quantity: i.quantity + 1 } : i);
-            return [...prev, { menuId: menu.id, name: menu.name, price: Number(menu.price), cashback: Number(menu.cashback ?? 0), quantity: 1 }];
-        });
-    }
-    const increment = (menuId) => setCartItems(prev => prev.map(i => i.menuId === menuId ? { ...i, quantity: i.quantity + 1 } : i));
-    const decrement = (menuId) => setCartItems(prev => prev.map(i => i.menuId === menuId ? { ...i, quantity: i.quantity - 1 } : i).filter(i => i.quantity > 0));
+        : 'repeat(auto-fill, minmax(210px, 1fr))';
 
     function openModal() {
         setPayMethod('cash');
@@ -101,7 +92,7 @@ export default function PesananBaru({ categories, promotions }) {
         const orderTotal = grandTotal;
         setProcessing(true);
         router.post(
-            '/cashier/pesanan-baru',
+            route('kasir.pesanan-baru.simpan'),
             { items: cartItems.map(i => ({ menu_id: i.menuId, quantity: i.quantity })), payment_method: method, customer_name: customerName.trim() || null, is_mahasiswa: isMahasiswa },
             {
                 onSuccess: (page) => {
@@ -119,10 +110,10 @@ export default function PesananBaru({ categories, promotions }) {
 
     function handleSuccessOk() {
         setShowSuccess(false);
-        setCartItems([]);
+        cashierClearCart();
         setCustomerName('');
         setPayMethod('cash');
-        router.visit('/cashier/pesanan-aktif');
+        router.visit(route('kasir.pesanan-aktif'));
     }
 
     const methods = [
@@ -149,7 +140,7 @@ export default function PesananBaru({ categories, promotions }) {
     return (
         <><Head title="Pesanan Baru | W9 Cafe" /><CashierLayout title="Pesanan Baru" fullscreen>
             <div className={cn(
-                'flex flex-1 overflow-hidden',
+                'flex flex-1 overflow-hidden min-h-0',
                 isPortrait ? 'flex-col' : 'flex-row',
             )}>
 
@@ -208,7 +199,7 @@ export default function PesananBaru({ categories, promotions }) {
                             style={{ gridTemplateColumns: menuGridColumns }}
                         >
                             {filteredMenus.map(menu => (
-                                <SharedMenuItem key={menu.id} menu={menu} onAdd={addToCart} variant="cashier" />
+                                <SharedMenuItem key={menu.id} menu={menu} onAdd={cashierAddItem} variant="cashier" />
                             ))}
                         </div>
                     )}
@@ -216,155 +207,108 @@ export default function PesananBaru({ categories, promotions }) {
 
                 {/* ══ CART PANEL ══ */}
                 <div className={cn(
-                    'flex flex-col shrink-0 overflow-y-auto overflow-x-hidden bg-card transition-all duration-200',
+                    'flex flex-col bg-card min-h-0',
                     isPortrait
                         ? 'w-full border-t border-border'
-                        : 'border-l border-border',
-                    isPortrait && isCartCollapsed && 'h-16 overflow-hidden',
-                    isPortrait && !isCartCollapsed && 'max-h-[44vh]',
-                    !isPortrait && isCartCollapsed && 'w-20',
-                    !isPortrait && !isCartCollapsed && 'w-[280px]',
+                        : 'w-[280px] shrink-0 border-l border-border',
                 )}>
-                    {/* Cart header */}
-                    <div className={cn(
-                        'flex items-center gap-2.5 shrink-0',
-                        isCartCollapsed ? 'justify-center p-2' : 'justify-between pt-6 px-6 pb-0',
-                    )}>
-                        {!isCartCollapsed && (
-                            <span className="text-base font-bold tracking-tight text-foreground">
-                                Keranjang Pesanan
-                            </span>
-                        )}
-                        <div className="flex items-center gap-2">
-                            <span className="rounded-full flex items-center justify-center text-xs font-bold bg-primary text-primary-foreground w-7 h-7">
-                                {totalQty}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="icon-sm"
-                                onClick={() => setIsCartCollapsed(prev => !prev)}
-                                title={isCartCollapsed ? 'Expand keranjang' : 'Collapse keranjang'}
-                            >
-                                {isCartCollapsed ? <PanelRightOpen size={16} /> : <PanelRightClose size={16} />}
-                            </Button>
-                        </div>
+                    <div className={cn('flex items-center justify-between pt-4 pb-3 shrink-0', isPortrait ? 'px-4' : 'px-6')}>
+                        <span className="text-base font-bold tracking-tight text-foreground">
+                            Keranjang Pesanan
+                        </span>
+                        <span className="rounded-full flex items-center justify-center text-xs font-bold bg-primary text-primary-foreground w-7 h-7">
+                            {totalQty}
+                        </span>
                     </div>
 
-                    {!isCartCollapsed && (
-                        <>
-                            {/* Items list */}
-                            <div className={cn('flex-1 overflow-y-auto', isPortrait ? 'px-4' : 'px-6')}>
-                                {cartItems.length === 0 ? (
-                                    <p className="text-center mt-10 text-sm text-muted-foreground/70">
-                                        Keranjang kosong
-                                    </p>
-                                ) : (
-                                    cartItems.map(item => (
-                                        <SharedCartItem
-                                            key={item.menuId}
-                                            item={item}
-                                            onUpdate={(id, qty) => {
-                                                const curr = cartItems.find(i => i.menuId === id);
-                                                if (!curr) return;
-                                                qty > curr.quantity ? increment(id) : decrement(id);
-                                            }}
-                                            onRemove={(id) => decrement(id)}
-                                            variant="cashier"
-                                        />
-                                    ))
-                                )}
-                            </div>
-
-                            {/* Active Promotions */}
-                            {promotions && promotions.length > 0 && cartItems.length > 0 && (
-                                <div className={cn('py-3 border-t border-border', isPortrait ? 'px-4' : 'px-6')}>
-                                    <div className="flex items-center gap-1.5 mb-2">
-                                        <Percent size={14} className="text-primary" />
-                                        <span className="text-xs font-semibold uppercase tracking-wide text-primary">
-                                            Promo Aktif
-                                        </span>
-                                        <span className="text-[10px] rounded-full px-1.5 py-px font-semibold bg-primary/10 text-primary">
-                                            {promotions.length}
-                                        </span>
-                                    </div>
-                                    {promotions.map(promo => (
-                                        <div key={promo.id} className="flex items-start justify-between py-1 gap-2 border-b border-border">
-                                            <div className="min-w-0 flex-1">
-                                                <span className="text-xs font-semibold text-foreground">
-                                                    {promo.name}
-                                                </span>
-                                                {promo.is_student_only && (
-                                                    <span className="text-[10px] ml-1.5 rounded-full px-1.5 py-px bg-orange-50 text-orange-600">
-                                                        Mahasiswa
-                                                    </span>
-                                                )}
-                                                <span className="block text-[11px] truncate text-muted-foreground">
-                                                    {promo.type === 'percentage'
-                                                        ? `Diskon ${Number(promo.discount_value)}%`
-                                                        : promo.type === 'fixed_amount'
-                                                            ? `Potongan ${formatRupiah(Number(promo.discount_value))}`
-                                                            : promo.description}
-                                                    {promo.min_purchase > 0 && ` (min. ${formatRupiah(Number(promo.min_purchase))})`}
-                                                </span>
-                                            </div>
-                                            <span className="text-[11px] font-semibold shrink-0 mt-0.5 text-green-600">
-                                                Aktif
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-
-                            {/* Footer: Toggle + Totals + BAYAR */}
+                    <div className={cn('shrink-0 px-4 border-t border-border bg-card', !isPortrait && 'px-6')}>
+                        <div
+                            onClick={() => setIsMahasiswa(p => !p)}
+                            className="flex items-center gap-2 py-3 cursor-pointer select-none"
+                        >
                             <div className={cn(
-                                'pt-4 mt-auto border-t border-border',
-                                isPortrait ? 'px-4 pb-4' : 'px-6 pb-6',
+                                'flex items-center justify-center shrink-0 w-4 h-4 rounded border transition-colors duration-150',
+                                isMahasiswa ? 'bg-primary border-primary' : 'bg-card border-border',
                             )}>
-                                {/* Mahasiswa toggle */}
-                                <div
-                                    onClick={() => setIsMahasiswa(p => !p)}
-                                    className="flex items-center gap-2 mb-3 cursor-pointer select-none"
-                                >
-                                    <div className={cn(
-                                        'flex items-center justify-center shrink-0 w-4 h-4 rounded border transition-colors duration-150',
-                                        isMahasiswa
-                                            ? 'bg-primary border-primary'
-                                            : 'bg-card border-border',
-                                    )}>
-                                        {isMahasiswa && <span className="text-primary-foreground text-[11px] leading-none">✓</span>}
-                                    </div>
-                                    <span className="text-sm text-muted-foreground">Mahasiswa STIE Totalwin Semarang</span>
-                                </div>
-
-                                <div className="flex justify-between mb-2">
-                                    <span className="text-sm text-muted-foreground">Subtotal</span>
-                                    <span className="text-sm font-medium text-foreground">{formatRupiah(total)}</span>
-                                </div>
-                                {isMahasiswa && totalCashback > 0 && (
-                                    <div className="flex justify-between mb-2">
-                                        <span className="text-sm text-green-600">Cashback Mahasiswa</span>
-                                        <span className="text-sm font-semibold text-green-600">- {formatRupiah(totalCashback)}</span>
-                                    </div>
-                                )}
-                                <div className="flex justify-between py-3 mb-4 border-t border-border">
-                                    <span className="text-base font-bold text-foreground">Total</span>
-                                    <span className="text-base font-bold text-foreground">{formatRupiah(grandTotal)}</span>
-                                </div>
-                                <Button
-                                    size="lg"
-                                    disabled={cartItems.length === 0}
-                                    onClick={openModal}
-                                    className={cn(
-                                        'w-full h-12 text-base font-bold flex items-center justify-between px-5 shadow-[0_4px_16px_rgba(59,111,212,0.30)]',
-                                        cartItems.length === 0 && 'opacity-50 cursor-not-allowed shadow-none',
-                                    )}
-                                >
-                                    <span>BAYAR</span>
-                                    <span className="text-lg">{formatRupiah(grandTotal)}</span>
-                                </Button>
+                                {isMahasiswa && <span className="text-primary-foreground text-[11px] leading-none">✓</span>}
                             </div>
-                        </>
-                    )}
+                            <span className="text-sm text-muted-foreground">Mahasiswa STIE Totalwin Semarang</span>
+                        </div>
+                        <div className="flex justify-between mb-1">
+                            <span className="text-sm text-muted-foreground">Subtotal</span>
+                            <span className="text-sm font-medium text-foreground">{formatRupiah(total)}</span>
+                        </div>
+                        {isMahasiswa && totalCashback > 0 && (
+                            <div className="flex justify-between mb-1">
+                                <span className="text-sm text-green-600">Cashback Mahasiswa</span>
+                                <span className="text-sm font-semibold text-green-600">- {formatRupiah(totalCashback)}</span>
+                            </div>
+                        )}
+                        <div className="flex justify-between py-2.5 mb-3 border-t border-border">
+                            <span className="text-base font-bold text-foreground">Total</span>
+                            <span className="text-base font-bold text-foreground">{formatRupiah(grandTotal)}</span>
+                        </div>
+                        <Button
+                            size="lg"
+                            disabled={cartItems.length === 0}
+                            onClick={openModal}
+                            className={cn(
+                                'w-full h-12 text-base font-bold flex items-center justify-between px-5 shadow-[0_4px_16px_rgba(59,111,212,0.30)] mb-3',
+                                cartItems.length === 0 && 'opacity-50 cursor-not-allowed shadow-none',
+                            )}
+                        >
+                            <span>BAYAR</span>
+                            <span className="text-lg">{formatRupiah(grandTotal)}</span>
+                        </Button>
+                    </div>
+
+                    <div className={cn('border-t border-border shrink-0', isPortrait ? 'mx-4' : 'mx-6')} />
+
+                    <div className={cn('flex flex-col flex-1 min-h-0 overflow-y-auto', isPortrait ? 'px-4' : 'px-6')}>
+                        {cartItems.length === 0 ? (
+                            <p className="text-center mt-8 text-sm text-muted-foreground/70">
+                                Keranjang kosong
+                            </p>
+                        ) : (
+                            cartItems.map(item => (
+                                <SharedCartItem
+                                    key={item.menuId}
+                                    item={item}
+                                    onUpdate={(id, qty) => {
+                                        const curr = cartItems.find(i => i.menuId === id);
+                                        if (!curr) return;
+                                        qty > curr.quantity ? cashierIncrement(id) : cashierDecrement(id);
+                                    }}
+                                    onRemove={(id) => cashierRemoveItem(id)}
+                                    variant="cashier"
+                                />
+                            ))
+                        )}
+
+                        {promotions && promotions.length > 0 && cartItems.length > 0 && (
+                            <div className="py-3 border-t border-border mt-2">
+                                <div className="flex items-center gap-1.5 mb-2">
+                                    <Percent size={14} className="text-primary" />
+                                    <span className="text-xs font-semibold uppercase tracking-wide text-primary">
+                                        Promo Aktif
+                                    </span>
+                                    <span className="text-[10px] rounded-full px-1.5 py-px font-semibold bg-primary/10 text-primary">
+                                        {promotions.length}
+                                    </span>
+                                </div>
+                                {promotions.map(promo => (
+                                    <div key={promo.id} className="flex items-center justify-between text-xs text-muted-foreground">
+                                        <span className="truncate">{promo.name}</span>
+                                        <span className="text-[11px] font-semibold shrink-0 mt-0.5 text-green-600">
+                                            Aktif
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="h-32 shrink-0" />
+                    </div>
                 </div>
             </div>
 
