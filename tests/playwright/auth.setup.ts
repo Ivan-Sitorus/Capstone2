@@ -8,13 +8,13 @@ const CREDENTIALS = {
     email: 'admin@w9cafe.com',
     password: 'password',
     storageState: path.join(AUTH_DIR, 'admin.json'),
-    expectedUrl: /\/cashier\/dashboard/,
+    expectedUrl: /\/cashier\/pesanan-baru/,
   },
   cashier: {
     email: 'kasir@w9cafe.com',
     password: 'password',
     storageState: path.join(AUTH_DIR, 'cashier.json'),
-    expectedUrl: /\/cashier\/dashboard/,
+    expectedUrl: /\/cashier\/pesanan-baru/,
   },
   customer: {
     storageState: path.join(AUTH_DIR, 'customer.json'),

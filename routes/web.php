@@ -4,32 +4,28 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Customer\CustomerMenuController;
 use App\Http\Controllers\Customer\CustomerOrderController;
 use App\Http\Controllers\Customer\CustomerPaymentController;
-use App\Http\Controllers\Cashier\CashierDashboardController;
 use App\Http\Controllers\Cashier\CashierOrderController;
 use App\Http\Controllers\Cashier\CashierPesananAktifController;
 use App\Http\Controllers\Cashier\CashierPesananBaruController;
 use App\Http\Controllers\Cashier\CashierRiwayatController;
-use App\Http\Controllers\Cashier\CashierVerifikasiController;
 use App\Http\Controllers\Kitchen\KitchenController;
 use App\Http\Controllers\ReceiptController;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::get('/', fn() => redirect()->route('login'));
+Route::get('/', fn() => redirect()->route('cashier.login'));
 
 // Cashier auth
 Route::get('/cashier/login',  [AuthController::class, 'showLogin'])->name('cashier.login');
 Route::post('/cashier/login', [AuthController::class, 'login'])->name('cashier.login.attempt');
-// Legacy redirect
-Route::get('/login',  fn() => redirect()->route('cashier.login'));
+// Legacy redirect + named route for auth middleware fallback
+Route::get('/login',  fn() => redirect()->route('cashier.login'))->name('login');
 Route::post('/login', fn() => redirect()->route('cashier.login'));
 
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Kasir pages
 Route::prefix('cashier')->middleware(['auth', 'role:cashier,admin'])->group(function () {
-    Route::get('/dashboard',     [CashierDashboardController::class, 'index'])->name('cashier.dashboard');
     Route::get('/pesanan-baru',  [CashierPesananBaruController::class, 'index'])->name('cashier.pesanan-baru');
     Route::post('/pesanan-baru', [CashierPesananBaruController::class, 'store'])->name('cashier.pesanan-baru.store');
     Route::get('/pesanan-aktif', [CashierPesananAktifController::class, 'index'])->name('cashier.pesanan-aktif');
@@ -40,9 +36,8 @@ Route::prefix('cashier')->middleware(['auth', 'role:cashier,admin'])->group(func
     Route::patch('/order/{order}/confirm-payment', [CashierOrderController::class, 'confirmPayment'])->name('cashier.order.confirm-payment');
     Route::patch('/order/{order}/confirm-qris', [CashierOrderController::class, 'confirmQris'])->name('cashier.order.confirm-qris');
     Route::patch('/order/{order}/reject-qris',  [CashierOrderController::class, 'rejectQris'])->name('cashier.order.reject-qris');
-    Route::get('/profil', fn() => Inertia::render('Cashier/Profil', ['user' => Auth::user()]))->name('cashier.profil');
+
     Route::get('/pending-count', \App\Http\Controllers\Cashier\CashierPendingCountController::class)->name('cashier.pending-count');
-    Route::get('/verifikasi', [CashierVerifikasiController::class, 'index'])->name('cashier.verifikasi');
 });
 
 // Kitchen auth
@@ -52,6 +47,7 @@ Route::post('/kitchen/login', [AuthController::class, 'login'])->name('kitchen.l
 // Kitchen
 Route::middleware(['auth', 'role:kitchen,cashier,admin'])->group(function () {
     Route::get('/kitchen', [KitchenController::class, 'index'])->name('kitchen.index');
+    Route::patch('/kitchen/order/{order}/bump', [KitchenController::class, 'bump'])->name('kitchen.bump');
 });
 
 // Customer — entry point via QR scan
@@ -61,7 +57,6 @@ Route::get('/order', [CustomerMenuController::class, 'showIdentitas'])->name('cu
 Route::prefix('customer')->group(function () {
     Route::get('/menu',    [CustomerMenuController::class, 'index'])->name('customer.menu');
     Route::get('/cart',    fn() => Inertia::render('Customer/Cart/Index', []))->name('customer.cart');
-    Route::get('/riwayat', [CustomerOrderController::class, 'riwayat'])->name('customer.riwayat');
     Route::get('/order/{code}/status', [CustomerOrderController::class, 'status'])->name('customer.order.status');
 
     // Payment flow

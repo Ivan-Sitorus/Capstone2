@@ -61,5 +61,14 @@ export default defineConfig({
         storageState: 'tests/playwright/auth/customer.json',
       },
     },
+    {
+      name: 'kitchen',
+      testMatch: /kitchen\/.*\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 800 },
+        storageState: 'tests/playwright/auth/cashier.json',
+      },
+    },
   ],
 });
