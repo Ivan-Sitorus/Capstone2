@@ -72,78 +72,57 @@ export default function KitchenIndex({ orders: initialOrders }) {
     const processingCol1 = processingOrders.slice(0, halfProcessing);
     const processingCol2 = processingOrders.slice(halfProcessing);
 
+    const renderCards = (items) => items.map(order => (
+        <OrderKanbanCard
+            key={order.id}
+            order={order}
+            onBump={handleBump}
+            isBumping={bumpingIds.has(order.id)}
+        />
+    ));
+
     return (
         <>
             <Head title="Dapur | W9 Cafe" />
             <KitchenLayout>
-                <div className="flex flex-1 min-h-0 gap-0 divide-x divide-border">
-                    {/* ── Menunggu col 1 ── */}
-                    <KanbanColumn
-                        title="Menunggu"
-                        count={pendingCol1.length}
-                        colorClass="border-b-2 border-b-primary"
-                        badgeClass="bg-primary text-primary-foreground"
-                    >
-                        {pendingCol1.map(order => (
-                            <OrderKanbanCard
-                                key={order.id}
-                                order={order}
-                                onBump={handleBump}
-                                isBumping={bumpingIds.has(order.id)}
-                            />
-                        ))}
-                    </KanbanColumn>
+                <div className="flex flex-1 min-h-0">
+                    <div className="flex flex-col flex-1 min-w-0">
+                        <div className="flex items-center justify-center gap-2 mb-2 pb-2 mx-3 border-b-2 border-b-primary">
+                            <span className="text-base font-bold text-foreground">Menunggu</span>
+                            <span className="rounded-full px-2.5 py-0.5 text-xs font-bold bg-primary text-primary-foreground">
+                                {pendingOrders.length}
+                            </span>
+                        </div>
 
-                    {/* ── Menunggu col 2 ── */}
-                    <KanbanColumn
-                        title="Menunggu"
-                        count={pendingCol2.length}
-                        colorClass="border-b-2 border-b-primary"
-                        badgeClass="bg-primary text-primary-foreground"
-                    >
-                        {pendingCol2.map(order => (
-                            <OrderKanbanCard
-                                key={order.id}
-                                order={order}
-                                onBump={handleBump}
-                                isBumping={bumpingIds.has(order.id)}
-                            />
-                        ))}
-                    </KanbanColumn>
+                        <div className="flex flex-1 min-h-0 gap-3 px-3">
+                            <KanbanColumn hideHeader>
+                                {renderCards(pendingCol1)}
+                            </KanbanColumn>
+                            <KanbanColumn hideHeader>
+                                {renderCards(pendingCol2)}
+                            </KanbanColumn>
+                        </div>
+                    </div>
 
-                    {/* ── Diproses col 1 ── */}
-                    <KanbanColumn
-                        title="Diproses"
-                        count={processingCol1.length}
-                        colorClass="border-b-2 border-b-amber-500"
-                        badgeClass="bg-amber-500 text-white"
-                    >
-                        {processingCol1.map(order => (
-                            <OrderKanbanCard
-                                key={order.id}
-                                order={order}
-                                onBump={handleBump}
-                                isBumping={bumpingIds.has(order.id)}
-                            />
-                        ))}
-                    </KanbanColumn>
+                    <div className="border-l border-border" />
 
-                    {/* ── Diproses col 2 ── */}
-                    <KanbanColumn
-                        title="Diproses"
-                        count={processingCol2.length}
-                        colorClass="border-b-2 border-b-amber-500"
-                        badgeClass="bg-amber-500 text-white"
-                    >
-                        {processingCol2.map(order => (
-                            <OrderKanbanCard
-                                key={order.id}
-                                order={order}
-                                onBump={handleBump}
-                                isBumping={bumpingIds.has(order.id)}
-                            />
-                        ))}
-                    </KanbanColumn>
+                    <div className="flex flex-col flex-1 min-w-0">
+                        <div className="flex items-center justify-center gap-2 mb-2 pb-2 mx-3 border-b-2 border-b-amber-500">
+                            <span className="text-base font-bold text-foreground">Diproses</span>
+                            <span className="rounded-full px-2.5 py-0.5 text-xs font-bold bg-amber-500 text-white">
+                                {processingOrders.length}
+                            </span>
+                        </div>
+
+                        <div className="flex flex-1 min-h-0 gap-3 px-3">
+                            <KanbanColumn hideHeader>
+                                {renderCards(processingCol1)}
+                            </KanbanColumn>
+                            <KanbanColumn hideHeader>
+                                {renderCards(processingCol2)}
+                            </KanbanColumn>
+                        </div>
+                    </div>
                 </div>
             </KitchenLayout>
         </>
