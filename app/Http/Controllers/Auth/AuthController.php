@@ -45,17 +45,11 @@ class AuthController extends Controller
         RateLimiter::clear($key);
         $request->session()->regenerate();
 
-        $role = Auth::user()->role;
-
-        if (in_array($role, ['cashier', 'admin'])) {
-            return Inertia::location(route('cashier.dashboard'));
-        }
-
-        if ($role === 'kitchen') {
+        if ($request->is('kitchen/*')) {
             return Inertia::location(route('kitchen.index'));
         }
 
-        return Inertia::location(route('customer.menu'));
+        return Inertia::location(route('cashier.pesanan-baru'));
     }
 
     public function logout(Request $request)

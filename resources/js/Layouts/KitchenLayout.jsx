@@ -6,10 +6,10 @@ import FlashToast from '@/Components/Shared/FlashToast';
 
 const kitchenTabs = [
     { label: 'Pesanan', href: '/kitchen', icon: ClipboardList },
-    { label: 'Riwayat', href: '#riwayat', icon: History },
+    { label: 'Riwayat', href: '/kitchen/riwayat', icon: History },
 ];
 
-export default function KitchenLayout({ children, activeTab, onTabChange }) {
+export default function KitchenLayout({ children }) {
     const { flash, auth } = usePage().props;
     const [toast, setToast] = useState(null);
 
