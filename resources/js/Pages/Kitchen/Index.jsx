@@ -4,6 +4,7 @@ import axios from 'axios';
 import KitchenLayout from '@/Layouts/KitchenLayout';
 import KanbanColumn from '@/Components/Kitchen/KanbanColumn';
 import OrderKanbanCard from '@/Components/Kitchen/OrderKanbanCard';
+import RiwayatTable from '@/Components/Shared/RiwayatTable';
 
 export default function KitchenIndex({ orders: initialOrders, riwayatOrders: initialRiwayat }) {
     const [orders, setOrders] = useState(initialOrders ?? []);
@@ -112,9 +113,12 @@ export default function KitchenIndex({ orders: initialOrders, riwayatOrders: ini
                         </div>
                     </div>
                 ) : (
-                    <div className="flex-1 min-h-0">
-                        {/* T11 will add RiwayatTable */}
-                    </div>
+                    <RiwayatTable
+                        orders={{ data: riwayatOrders, current_page: 1, last_page: 1 }}
+                        showFilters={false}
+                        showPagination={false}
+                        baseRoute="/kitchen"
+                    />
                 )}
             </KitchenLayout>
         </>
