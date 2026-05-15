@@ -163,12 +163,28 @@ class InventoryService
     {
         $ingredient = Ingredient::findOrFail($ingredientId);
 
-        $batches = IngredientBatch::where('ingredient_id', $ingredientId)
-            ->where('quantity', '>', 0)
-            ->orderByRaw('CASE WHEN expiry_date IS NULL THEN 1 ELSE 0 END')
-            ->orderBy('expiry_date', 'asc')
-            ->orderBy('received_at', 'asc')
-            ->get();
+        $query = IngredientBatch::where('ingredient_id', $ingredientId)
+            ->where('quantity', '>', 0);
+
+        match ($ingredient->batch_mode) {
+            Ingredient::BATCH_MODE_FIFO => $query
+                ->orderByRaw('CASE WHEN received_at IS NULL THEN 1 ELSE 0 END')
+                ->orderBy('received_at', 'asc')
+                ->orderBy('expiry_date', 'asc')
+                ->orderBy('id', 'asc'),
+            Ingredient::BATCH_MODE_CUSTOM => $query
+                ->orderByRaw('CASE WHEN custom_order IS NULL THEN 1 ELSE 0 END')
+                ->orderBy('custom_order', 'asc')
+                ->orderBy('received_at', 'asc')
+                ->orderBy('id', 'asc'),
+            default => $query  // FEFO (default & null fallback)
+                ->orderByRaw('CASE WHEN expiry_date IS NULL THEN 1 ELSE 0 END')
+                ->orderBy('expiry_date', 'asc')
+                ->orderBy('received_at', 'asc')
+                ->orderBy('id', 'asc'),
+        };
+
+        $batches = $query->get();
 
         $totalAvailable = (float) $batches->sum('quantity');
 
