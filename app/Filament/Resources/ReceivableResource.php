@@ -2,33 +2,30 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Forms\Components\TextInput;
+use App\Filament\Helpers\NumberInputHelper;
+use App\Filament\Helpers\TextInputHelper;
+use App\Filament\Resources\ReceivableResource\Pages\EditReceivable;
+use App\Filament\Resources\ReceivableResource\Pages\ListReceivables;
+use App\Filament\Resources\ReceivableResource\Pages\ViewReceivable;
+use App\Models\Order;
+use App\Models\Receivable;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Schemas\Components\Utilities\Set;
+use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\ReceivableResource\Pages\ListReceivables;
-use App\Filament\Resources\ReceivableResource\Pages\EditReceivable;
-use App\Filament\Resources\ReceivableResource\Pages\ViewReceivable;
-use App\Filament\Resources\ReceivableResource\Pages;
-use App\Models\Receivable;
-use App\Models\Order;
-use App\Filament\Helpers\NumberInputHelper;
-use App\Filament\Helpers\TextInputHelper;
-use Filament\Forms;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -36,9 +33,9 @@ class ReceivableResource extends Resource
 {
     protected static ?string $model = Receivable::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-banknotes';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Finance Details';
+    protected static string|\UnitEnum|null $navigationGroup = 'Finance Details';
 
     protected static ?string $navigationLabel = 'Receivables';
 
@@ -161,8 +158,8 @@ class ReceivableResource extends Resource
                 ->schema([
                     TextEntry::make('order.order_code')
                         ->label('Order Code')
-                        ->url(fn (Receivable $record): ?string => $record->order 
-                            ? route('filament.admin.resources.orders.view', $record->order) 
+                        ->url(fn (Receivable $record): ?string => $record->order
+                            ? route('filament.admin.resources.orders.view', $record->order)
                             : null)
                         ->openUrlInNewTab(),
                     TextEntry::make('order.status')
@@ -208,8 +205,8 @@ class ReceivableResource extends Resource
                 TextColumn::make('order.order_code')
                     ->label('Order')
                     ->searchable()
-                    ->url(fn (Receivable $record): ?string => $record->order 
-                        ? route('filament.admin.resources.orders.view', $record->order) 
+                    ->url(fn (Receivable $record): ?string => $record->order
+                        ? route('filament.admin.resources.orders.view', $record->order)
                         : null)
                     ->openUrlInNewTab(),
                 TextColumn::make('customer_name')

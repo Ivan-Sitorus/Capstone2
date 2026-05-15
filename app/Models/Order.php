@@ -2,20 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    const STATUS_PENDING  = 'pending';
+    use HasFactory;
+
+    const STATUS_PENDING = 'pending';
+
     const STATUS_DIPROSES = 'diproses';
-    const STATUS_SELESAI  = 'selesai';
+
+    const STATUS_SELESAI = 'selesai';
 
     protected static function boot(): void
     {
         parent::boot();
 
         static::creating(function ($order) {
-            $order->order_code ??= 'ORD-' . date('Ymd') . '-' .
+            $order->order_code ??= 'ORD-'.date('Ymd').'-'.
                 str_pad(Order::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
         });
     }
@@ -27,13 +32,13 @@ class Order extends Model
                 if (! $order->receivable()->exists()) {
                     Receivable::create([
                         'customer_name' => $order->customer_name ?? 'Event Customer',
-                        'amount'        => $order->total_amount,
-                        'invoice_date'  => $order->created_at,
-                        'due_date'      => $order->created_at->copy()->addDays(30),
-                        'status'        => Receivable::STATUS_PENDING,
-                        'paid_amount'   => 0,
-                        'order_id'      => $order->id,
-                        'notes'         => "Auto-generated from Order #{$order->order_code}",
+                        'amount' => $order->total_amount,
+                        'invoice_date' => $order->created_at,
+                        'due_date' => $order->created_at->copy()->addDays(30),
+                        'status' => Receivable::STATUS_PENDING,
+                        'paid_amount' => 0,
+                        'order_id' => $order->id,
+                        'notes' => "Auto-generated from Order #{$order->order_code}",
                     ]);
                 }
             }
@@ -61,7 +66,7 @@ class Order extends Model
     {
         return [
             'total_amount' => 'integer',
-            'is_paid'      => 'boolean',
+            'is_paid' => 'boolean',
         ];
     }
 

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\MenuIngredient;
 use App\Observers\MenuIngredientObserver;
+use App\Services\MenuImageService;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -14,7 +15,7 @@ class AppServiceProvider extends ServiceProvider
 {
     public function register(): void
     {
-        $this->app->singleton(\App\Services\MenuImageService::class);
+        $this->app->singleton(MenuImageService::class);
     }
 
     public function boot(): void
@@ -22,11 +23,11 @@ class AppServiceProvider extends ServiceProvider
         MenuIngredient::observe(MenuIngredientObserver::class);
 
         FilamentAsset::register([
-            Css::make('financial-table', __DIR__ . '/../../resources/css/filament/financial-table.css'),
+            Css::make('financial-table', __DIR__.'/../../resources/css/filament/financial-table.css'),
         ]);
 
         Authenticate::redirectUsing(function (Request $request) {
-            return $request->is('dapur/*')
+            return $request->is('dapur') || $request->is('dapur/*')
                 ? route('dapur.login')
                 : route('kasir.login');
         });

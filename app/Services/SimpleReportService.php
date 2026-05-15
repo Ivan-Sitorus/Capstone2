@@ -17,8 +17,8 @@ class SimpleReportService
     /**
      * Generate a simple financial report for the given date range.
      *
-     * @param string|null $dateStart Start date (inclusive)
-     * @param string|null $dateEnd End date (inclusive)
+     * @param  string|null  $dateStart  Start date (inclusive)
+     * @param  string|null  $dateEnd  End date (inclusive)
      * @return array Financial report data
      */
     public function generate(?string $dateStart = null, ?string $dateEnd = null): array

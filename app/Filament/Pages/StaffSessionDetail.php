@@ -2,9 +2,8 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\CashierSession;
-use App\Models\KitchenSession;
 use App\Models\Order;
+use App\Models\StaffSession;
 use App\Models\User;
 use App\Services\StaffSessionService;
 use BackedEnum;
@@ -31,7 +30,7 @@ class StaffSessionDetail extends Page implements HasTable
 
     protected static ?string $title = 'Detail Sesi Staff';
 
-    public CashierSession|KitchenSession $session;
+    public StaffSession $sessionRecord;
 
     public User $staff;
 
@@ -46,12 +45,9 @@ class StaffSessionDetail extends Page implements HasTable
         }
 
         $this->type = $type;
-        $this->session = match ($type) {
-            'cashier' => CashierSession::with('user')->findOrFail($session),
-            'kitchen' => KitchenSession::with('user')->findOrFail($session),
-        };
-        $this->staff = $this->session->user;
-        $this->orderCount = app(StaffSessionService::class)->getOrderCount($this->session);
+        $this->sessionRecord = StaffSession::with('user')->findOrFail($session);
+        $this->staff = $this->sessionRecord->user;
+        $this->orderCount = app(StaffSessionService::class)->getOrderCount($this->sessionRecord);
     }
 
     public function getTitle(): string
@@ -83,10 +79,10 @@ class StaffSessionDetail extends Page implements HasTable
                         ->state($this->getTypeLabel()),
                     TextEntry::make('masuk')
                         ->label('Waktu Masuk')
-                        ->state($this->session->started_at->format('d M Y, H:i')),
+                        ->state($this->sessionRecord->started_at->format('d M Y, H:i')),
                     TextEntry::make('keluar')
                         ->label('Waktu Keluar')
-                        ->state($this->session->ended_at?->format('d M Y, H:i') ?? 'Masih Aktif'),
+                        ->state($this->sessionRecord->ended_at?->format('d M Y, H:i') ?? 'Masih Aktif'),
                     TextEntry::make('pesanan')
                         ->label('Jumlah Pesanan')
                         ->state($this->orderCount),
@@ -98,11 +94,10 @@ class StaffSessionDetail extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        $session = $this->session;
-        $type = $this->type;
+        $session = $this->sessionRecord;
         $endedAt = $session->ended_at ?? now();
 
-        $baseQuery = match ($type) {
+        $baseQuery = match ($session->type) {
             'cashier' => Order::with('cafeTable')
                 ->where('cashier_id', $session->user_id)
                 ->whereBetween('created_at', [$session->started_at, $endedAt]),

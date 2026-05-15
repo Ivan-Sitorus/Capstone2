@@ -12,15 +12,15 @@ class MenuSeeder extends Seeder
     {
         Menu::truncate();
 
-        $coffee   = Category::where('slug', 'coffee-base')->value('id');
-        $tea      = Category::where('slug', 'tea-base')->value('id');
-        $lime     = Category::where('slug', 'lime-base')->value('id');
-        $choco    = Category::where('slug', 'chocolatos-base')->value('id');
-        $snack    = Category::where('slug', 'snack')->value('id');
-        $indomie  = Category::where('slug', 'indomie-base')->value('id');
-        $nasgor   = Category::where('slug', 'nasi-goreng')->value('id');
-        $nastel   = Category::where('slug', 'nasi-telur')->value('id');
-        $geprek   = Category::where('slug', 'ayam-geprek')->value('id');
+        $coffee = Category::where('slug', 'coffee-base')->value('id');
+        $tea = Category::where('slug', 'tea-base')->value('id');
+        $lime = Category::where('slug', 'lime-base')->value('id');
+        $choco = Category::where('slug', 'chocolatos-base')->value('id');
+        $snack = Category::where('slug', 'snack')->value('id');
+        $indomie = Category::where('slug', 'indomie-base')->value('id');
+        $nasgor = Category::where('slug', 'nasi-goreng')->value('id');
+        $nastel = Category::where('slug', 'nasi-telur')->value('id');
+        $geprek = Category::where('slug', 'ayam-geprek')->value('id');
 
         // [category_id, name, slug, price, cashback]
         $menus = [
@@ -48,11 +48,11 @@ class MenuSeeder extends Seeder
             // ── SNACK ─────────────────────────────────────────
             [$snack,  'Pisang Coklat Keju',   'pisang-coklat-keju',   10000, 2000],
             [$snack,  'Tempe Mendoan',        'tempe-mendoan',         8000, 2000],
-            [$snack,  'Kentang (French Fries)','kentang-french-fries', 12000, 2000],
+            [$snack,  'Kentang (French Fries)', 'kentang-french-fries', 12000, 2000],
 
             // ── INDOMIE BASE ──────────────────────────────────
-            [$indomie,'Mie Goreng Telur',     'mie-goreng-telur',     10000, 1000],
-            [$indomie,'Mie Rebus Telur',      'mie-rebus-telur',      10000, 1000],
+            [$indomie, 'Mie Goreng Telur',     'mie-goreng-telur',     10000, 1000],
+            [$indomie, 'Mie Rebus Telur',      'mie-rebus-telur',      10000, 1000],
 
             // ── NASI GORENG ───────────────────────────────────
             [$nasgor, 'Nasgor Telur',         'nasgor-telur',         12000, 2000],
@@ -68,15 +68,15 @@ class MenuSeeder extends Seeder
 
         foreach ($menus as [$catId, $name, $slug, $price, $cashback]) {
             Menu::create([
-                'category_id'         => $catId,
-                'name'                => $name,
-                'slug'                => $slug,
-                'price'               => $price,
-                'cashback'            => $cashback,
-                'image'               => null,
-                'is_available'        => true,
+                'category_id' => $catId,
+                'name' => $name,
+                'slug' => $slug,
+                'price' => $price,
+                'cashback' => $cashback,
+                'image' => null,
+                'is_available' => true,
                 'is_student_discount' => true,
-                'student_price'       => $price - $cashback,
+                'student_price' => $price - $cashback,
             ]);
         }
     }

@@ -14,7 +14,7 @@ class CompressResponse
 
         if (
             str_contains($request->header('Accept-Encoding', ''), 'gzip') &&
-            !$response->headers->has('Content-Encoding') &&
+            ! $response->headers->has('Content-Encoding') &&
             str_contains($response->headers->get('Content-Type', ''), 'text/html')
         ) {
             $compressed = gzencode($response->getContent(), 6);

@@ -14,14 +14,22 @@ use Livewire\Attributes\On;
 class CashFlowStatsWidget extends StatsOverviewWidget
 {
     public string $period = 'day';
+
     public string $dateStart = '';
+
     public string $dateEnd = '';
 
     protected ?string $pollingInterval = null;
 
-    public static function isLazy(): bool { return false; }
+    public static function isLazy(): bool
+    {
+        return false;
+    }
 
-    protected function getColumns(): int { return 4; }
+    protected function getColumns(): int
+    {
+        return 4;
+    }
 
     #[On('cashflow-period-changed')]
     public function onPeriodChanged(string $period): void
@@ -46,19 +54,22 @@ class CashFlowStatsWidget extends StatsOverviewWidget
         }
 
         return match ($this->period) {
-            'day'      => [Carbon::today(),              Carbon::today()->endOfDay()],
-            'year'     => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()],
+            'day' => [Carbon::today(),              Carbon::today()->endOfDay()],
+            'year' => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()],
             'all_time' => [Carbon::createFromDate(2000, 1, 1), Carbon::now()->endOfDay()],
-            default    => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
+            default => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
         };
     }
 
     private function prevRange(): array
     {
         [$s, $e] = $this->dateRange();
-        if ($this->period === 'all_time') return [$s, $e];
-        $days    = $s->diffInDays($e) + 1;
+        if ($this->period === 'all_time') {
+            return [$s, $e];
+        }
+        $days = $s->diffInDays($e) + 1;
         $prevEnd = $s->copy()->subDay();
+
         return [$prevEnd->copy()->subDays($days - 1), $prevEnd];
     }
 
@@ -73,6 +84,7 @@ class CashFlowStatsWidget extends StatsOverviewWidget
             ->whereBetween('created_at', [$s, $e])->sum('total_amount');
         $fromUnexpected = (float) UnexpectedTransaction::where('jenis', 'pemasukan')
             ->whereBetween('created_at', [$s, $e])->sum('nominal');
+
         return $fromOrders + $fromUnexpected;
     }
 
@@ -82,6 +94,7 @@ class CashFlowStatsWidget extends StatsOverviewWidget
             ->selectRaw('SUM(quantity * cost_per_unit) as total')->value('total') ?? 0;
         $fromUnexpected = (float) UnexpectedTransaction::where('jenis', 'pengeluaran')
             ->whereBetween('created_at', [$s, $e])->sum('nominal');
+
         return $fromBatches + $fromUnexpected;
     }
 
@@ -89,11 +102,12 @@ class CashFlowStatsWidget extends StatsOverviewWidget
     {
         $data = [];
         for ($i = 6; $i >= 0; $i--) {
-            $day   = now()->subDays($i)->toDateString();
-            $s     = Carbon::parse($day)->startOfDay();
-            $e     = Carbon::parse($day)->endOfDay();
+            $day = now()->subDays($i)->toDateString();
+            $s = Carbon::parse($day)->startOfDay();
+            $e = Carbon::parse($day)->endOfDay();
             $data[] = $this->totalIncome($s, $e);
         }
+
         return $data;
     }
 
@@ -101,39 +115,40 @@ class CashFlowStatsWidget extends StatsOverviewWidget
     {
         $data = [];
         for ($i = 6; $i >= 0; $i--) {
-            $day   = now()->subDays($i)->toDateString();
-            $s     = Carbon::parse($day)->startOfDay();
-            $e     = Carbon::parse($day)->endOfDay();
+            $day = now()->subDays($i)->toDateString();
+            $s = Carbon::parse($day)->startOfDay();
+            $e = Carbon::parse($day)->endOfDay();
             $data[] = $this->totalExpense($s, $e);
         }
+
         return $data;
     }
 
     private function fmtK(float $n): string
     {
-        return 'Rp ' . number_format($n, 0, ',', '.') . ',-';
+        return 'Rp '.number_format($n, 0, ',', '.').',-';
     }
 
     protected function getStats(): array
     {
-        $cacheKey = 'cashflow_stats_' . md5($this->period . $this->dateStart . $this->dateEnd);
+        $cacheKey = 'cashflow_stats_'.md5($this->period.$this->dateStart.$this->dateEnd);
 
         return Cache::remember($cacheKey, 300, function () {
-            [$s, $e]   = $this->dateRange();
+            [$s, $e] = $this->dateRange();
             [$ps, $pe] = $this->prevRange();
 
-            $income  = $this->totalIncome($s, $e);
+            $income = $this->totalIncome($s, $e);
             $expense = $this->totalExpense($s, $e);
-            $net     = $income - $expense;
-            $margin  = $income > 0 ? ($net / $income) * 100 : 0;
+            $net = $income - $expense;
+            $margin = $income > 0 ? ($net / $income) * 100 : 0;
 
             $txnCnt = Order::where('is_paid', true)->whereBetween('created_at', [$s, $e])->count()
                     + IngredientBatch::whereBetween('received_at', [$s, $e])->count()
                     + UnexpectedTransaction::whereBetween('created_at', [$s, $e])->count();
 
-            $pIncome  = $this->totalIncome($ps, $pe);
+            $pIncome = $this->totalIncome($ps, $pe);
             $pExpense = $this->totalExpense($ps, $pe);
-            $pNet     = $pIncome - $pExpense;
+            $pNet = $pIncome - $pExpense;
 
             $icPct = $this->pct($income, $pIncome);
             $ecPct = $this->pct($expense, $pExpense);
@@ -142,7 +157,7 @@ class CashFlowStatsWidget extends StatsOverviewWidget
             return [
                 Stat::make('Total Pemasukan', $this->fmtK($income))
                     ->description($icPct !== null
-                        ? ($icPct >= 0 ? '↑ ' : '↓ ') . number_format(abs($icPct), 1) . '% dari periode lalu'
+                        ? ($icPct >= 0 ? '↑ ' : '↓ ').number_format(abs($icPct), 1).'% dari periode lalu'
                         : 'Periode pertama')
                     ->descriptionIcon($icPct === null || $icPct >= 0
                         ? 'heroicon-m-arrow-trending-up'
@@ -152,7 +167,7 @@ class CashFlowStatsWidget extends StatsOverviewWidget
 
                 Stat::make('Total Pengeluaran', $this->fmtK($expense))
                     ->description($ecPct !== null
-                        ? ($ecPct >= 0 ? '↑ ' : '↓ ') . number_format(abs($ecPct), 1) . '% dari periode lalu'
+                        ? ($ecPct >= 0 ? '↑ ' : '↓ ').number_format(abs($ecPct), 1).'% dari periode lalu'
                         : 'Periode pertama')
                     ->descriptionIcon($ecPct === null || $ecPct <= 0
                         ? 'heroicon-m-arrow-trending-down'
@@ -160,15 +175,15 @@ class CashFlowStatsWidget extends StatsOverviewWidget
                     ->color($ecPct === null || $ecPct <= 0 ? 'success' : 'danger')
                     ->chart($this->sparklineExpense()),
 
-                Stat::make('Net Cash Flow', ($net >= 0 ? '+' : '−') . $this->fmtK(abs($net)))
+                Stat::make('Net Cash Flow', ($net >= 0 ? '+' : '−').$this->fmtK(abs($net)))
                     ->description($ncPct !== null
-                        ? ($ncPct >= 0 ? '↑ ' : '↓ ') . number_format(abs($ncPct), 1) . '% dari periode lalu'
+                        ? ($ncPct >= 0 ? '↑ ' : '↓ ').number_format(abs($ncPct), 1).'% dari periode lalu'
                         : 'Periode pertama')
                     ->descriptionIcon('heroicon-m-banknotes')
                     ->color($net >= 0 ? 'success' : 'danger'),
 
-                Stat::make('Net Margin', number_format($margin, 1) . '%')
-                    ->description($txnCnt . ' total transaksi')
+                Stat::make('Net Margin', number_format($margin, 1).'%')
+                    ->description($txnCnt.' total transaksi')
                     ->descriptionIcon('heroicon-m-chart-pie')
                     ->color($margin >= 30 ? 'success' : ($margin >= 10 ? 'warning' : 'danger')),
             ];

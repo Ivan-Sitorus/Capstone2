@@ -2,6 +2,9 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\FreqItemChart;
+use App\Filament\Widgets\SupConfChart;
+use App\Filament\Widgets\TopRulesChart;
 use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -40,13 +43,13 @@ class AsosiatifMenuView extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\TopRulesChart::make(['recordId' => $this->record->id]),
-            \App\Filament\Widgets\SupConfChart::make(['recordId' => $this->record->id]),
-            \App\Filament\Widgets\FreqItemChart::make(['recordId' => $this->record->id]),
+            TopRulesChart::make(['recordId' => $this->record->id]),
+            SupConfChart::make(['recordId' => $this->record->id]),
+            FreqItemChart::make(['recordId' => $this->record->id]),
         ];
     }
 
-    public function getHeaderWidgetsColumns(): int | array
+    public function getHeaderWidgetsColumns(): int|array
     {
         return 2;
     }
@@ -73,10 +76,10 @@ class AsosiatifMenuView extends Page
                                         ->state($r['total_transactions'] ?? 0),
                                     TextEntry::make('min_support')
                                         ->label('Min Support')
-                                        ->state(fn (): string => isset($r['min_support']) ? number_format($r['min_support'] * 100, 1) . '%' : '-'),
+                                        ->state(fn (): string => isset($r['min_support']) ? number_format($r['min_support'] * 100, 1).'%' : '-'),
                                     TextEntry::make('min_confidence')
                                         ->label('Min Confidence')
-                                        ->state(fn (): string => isset($r['min_confidence']) ? number_format($r['min_confidence'] * 100, 1) . '%' : '-'),
+                                        ->state(fn (): string => isset($r['min_confidence']) ? number_format($r['min_confidence'] * 100, 1).'%' : '-'),
                                 ]),
                             Section::make('Aturan Asosiasi')
                                 ->description('Aturan asosiasi yang dihasilkan dari algoritma Apriori')
@@ -90,10 +93,10 @@ class AsosiatifMenuView extends Page
                                             TextEntry::make('menu_kedua')->label('Menu Kedua'),
                                             TextEntry::make('support')
                                                 ->label('Support')
-                                                ->formatStateUsing(fn ($state) => number_format(($state ?? 0) * 100, 2) . '%'),
+                                                ->formatStateUsing(fn ($state) => number_format(($state ?? 0) * 100, 2).'%'),
                                             TextEntry::make('confidence')
                                                 ->label('Confidence')
-                                                ->formatStateUsing(fn ($state) => number_format(($state ?? 0) * 100, 2) . '%'),
+                                                ->formatStateUsing(fn ($state) => number_format(($state ?? 0) * 100, 2).'%'),
                                             TextEntry::make('lift')
                                                 ->label('Lift')
                                                 ->numeric(decimalPlaces: 2),
@@ -110,7 +113,7 @@ class AsosiatifMenuView extends Page
                                             TextEntry::make('items')->label('Itemset'),
                                             TextEntry::make('support')
                                                 ->label('Support')
-                                                ->formatStateUsing(fn ($state) => number_format(($state ?? 0) * 100, 2) . '%'),
+                                                ->formatStateUsing(fn ($state) => number_format(($state ?? 0) * 100, 2).'%'),
                                         ])
                                         ->columns(2),
                                 ]),
@@ -128,10 +131,10 @@ class AsosiatifMenuView extends Page
                                     TextEntry::make('date_range_end')->label('Data Sampai')->state($this->record->date_range_end?->format('d M Y')),
                                     TextEntry::make('min_support_param')
                                         ->label('Min Support')
-                                        ->state(fn (): string => isset($r['min_support']) ? number_format($r['min_support'] * 100, 1) . '%' : '-'),
+                                        ->state(fn (): string => isset($r['min_support']) ? number_format($r['min_support'] * 100, 1).'%' : '-'),
                                     TextEntry::make('min_confidence_param')
                                         ->label('Min Confidence')
-                                        ->state(fn (): string => isset($r['min_confidence']) ? number_format($r['min_confidence'] * 100, 1) . '%' : '-'),
+                                        ->state(fn (): string => isset($r['min_confidence']) ? number_format($r['min_confidence'] * 100, 1).'%' : '-'),
                                 ]),
                             Section::make('Preprocessing Logs')
                                 ->collapsible()

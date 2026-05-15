@@ -6,6 +6,7 @@ use App\DTO\ReportData;
 use App\DTO\ReportRow;
 use App\DTO\SummaryItem;
 use App\Renderers\CsvRenderer;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use Tests\TestCase;
 
 class CsvRendererTest extends TestCase
@@ -17,10 +18,10 @@ class CsvRendererTest extends TestCase
         parent::setUp();
 
         $this->reportData = new ReportData(
-            type:        ReportData::TYPE_SIMPLE,
-            title:       'Test Report',
-            dateStart:   '2026-05-01',
-            dateEnd:     '2026-05-31',
+            type: ReportData::TYPE_SIMPLE,
+            title: 'Test Report',
+            dateStart: '2026-05-01',
+            dateEnd: '2026-05-31',
             aggregation: 'daily',
             summary: [
                 new SummaryItem('Total Pendapatan', 'Rp 150.000', 150000),
@@ -40,7 +41,7 @@ class CsvRendererTest extends TestCase
     {
         $response = CsvRenderer::download($this->reportData, 'laporan.csv');
 
-        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
+        $this->assertInstanceOf(StreamedResponse::class, $response);
         $this->assertSame(200, $response->getStatusCode());
         $this->assertSame('text/csv; charset=utf-8', $response->headers->get('Content-Type'));
         $this->assertSame('attachment; filename="laporan.csv"', $response->headers->get('Content-Disposition'));
@@ -104,12 +105,12 @@ class CsvRendererTest extends TestCase
     public function test_csv_empty_rows_still_has_header(): void
     {
         $emptyData = new ReportData(
-            type:        ReportData::TYPE_SIMPLE,
-            title:       'Empty Report',
-            dateStart:   '2026-05-01',
-            dateEnd:     '2026-05-31',
+            type: ReportData::TYPE_SIMPLE,
+            title: 'Empty Report',
+            dateStart: '2026-05-01',
+            dateEnd: '2026-05-31',
             aggregation: 'daily',
-            rows:       [],
+            rows: [],
         );
 
         $content = CsvRenderer::toCsvString($emptyData);

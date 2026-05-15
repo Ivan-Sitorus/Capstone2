@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\FeatureImportanceChart;
+use App\Filament\Widgets\ForecastAllChart;
 use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -15,23 +17,40 @@ use Filament\Support\Icons\Heroicon;
 class PrediksiMenuView extends Page
 {
     protected static string|\BackedEnum|null $navigationIcon = null;
+
     protected static bool $shouldRegisterNavigation = false;
+
     protected static ?string $slug = 'menu-prediction/{id}';
+
     public DataMiningRun $record;
 
     public function mount(string $id): void
     {
         $this->record = DataMiningRun::findOrFail($id);
     }
-    public function getView(): string { return 'filament.pages.prediksi-menu-view'; }
-    public function getTitle(): string { return 'Detail Prediksi Menu'; }
-    protected function getHeaderWidgets(): array {
+
+    public function getView(): string
+    {
+        return 'filament.pages.prediksi-menu-view';
+    }
+
+    public function getTitle(): string
+    {
+        return 'Detail Prediksi Menu';
+    }
+
+    protected function getHeaderWidgets(): array
+    {
         return [
-            \App\Filament\Widgets\ForecastAllChart::make(['recordId' => $this->record->id]),
-            \App\Filament\Widgets\FeatureImportanceChart::make(['recordId' => $this->record->id]),
+            ForecastAllChart::make(['recordId' => $this->record->id]),
+            FeatureImportanceChart::make(['recordId' => $this->record->id]),
         ];
     }
-    public function getHeaderWidgetsColumns(): int | array { return 2; }
+
+    public function getHeaderWidgetsColumns(): int|array
+    {
+        return 2;
+    }
 
     // COMBO-4: ALL sections, minimal closures
     public function content(Schema $schema): Schema
@@ -48,7 +67,8 @@ class PrediksiMenuView extends Page
                         TextEntry::make('total_forecast')->label('Total (unit)')->state(array_sum(array_column($predictions, 'total_forecast'))),
                         TextEntry::make('avg_mape')->label('MAPE')->state(function () use ($r) {
                             $m = array_column($r['predictions'] ?? [], 'mape');
-                            return count($m) > 0 ? round(array_sum($m) / count($m), 1) . '%' : 'N/A';
+
+                            return count($m) > 0 ? round(array_sum($m) / count($m), 1).'%' : 'N/A';
                         }),
                     ]),
                     // Ranking
@@ -68,7 +88,7 @@ class PrediksiMenuView extends Page
                                 $nama = $pred['nama_menu'] ?? "Menu {$i}";
                                 $forecastDays = $pred['forecast'] ?? [];
                                 $entries[] = Section::make($nama)->schema([
-                                    TextEntry::make("pt_{$i}")->label('Total')->state(($pred['total_forecast'] ?? 0) . ' unit'),
+                                    TextEntry::make("pt_{$i}")->label('Total')->state(($pred['total_forecast'] ?? 0).' unit'),
                                     RepeatableEntry::make("pd_{$i}")->label('Harian')
                                         ->state(fn (): array => $forecastDays)
                                         ->schema([
@@ -81,6 +101,7 @@ class PrediksiMenuView extends Page
                                         ])->columns(6),
                                 ]);
                             }
+
                             return $entries;
                         }),
                 ]),
@@ -89,8 +110,8 @@ class PrediksiMenuView extends Page
                         TextEntry::make('type')->state($this->record->analysis_type),
                         TextEntry::make('status')->state($this->record->status),
                         TextEntry::make('run_at')->state($this->record->run_at?->format('d M Y, H:i')),
-                        TextEntry::make('dr')->state(($r['date_range']['from']??'?').' - '.($r['date_range']['to']??'?')),
-                        TextEntry::make('fr')->label('Prediksi')->state(($r['forecast_range']['from']??'?').' - '.($r['forecast_range']['to']??'?')),
+                        TextEntry::make('dr')->state(($r['date_range']['from'] ?? '?').' - '.($r['date_range']['to'] ?? '?')),
+                        TextEntry::make('fr')->label('Prediksi')->state(($r['forecast_range']['from'] ?? '?').' - '.($r['forecast_range']['to'] ?? '?')),
                     ]),
                     Section::make('Evaluasi Model')->collapsed()->schema([
                         RepeatableEntry::make('eval')->hiddenLabel()
@@ -117,6 +138,7 @@ class PrediksiMenuView extends Page
                                     ->label($log['tahap'] ?? "Step {$i}")
                                     ->state($log['detail'] ?? '');
                             }
+
                             return $entries;
                         }),
                 ]),

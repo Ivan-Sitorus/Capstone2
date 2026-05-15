@@ -11,11 +11,13 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Tests\TestCase;
 
 class ExcelRendererTest extends TestCase
 {
     private ReportData $rigidReportData;
+
     private ReportData $simpleReportData;
 
     protected function setUp(): void
@@ -350,7 +352,7 @@ class ExcelRendererTest extends TestCase
         $sheet = IOFactory::load(storage_path("app/{$path}"))->getActiveSheet();
 
         $evenFill = $sheet->getStyle('A6:E6')->getFill()->getStartColor()->getRGB();
-        $oddFill  = $sheet->getStyle('A7:E7')->getFill()->getStartColor()->getRGB();
+        $oddFill = $sheet->getStyle('A7:E7')->getFill()->getStartColor()->getRGB();
 
         $this->assertNotEquals(
             $evenFill,
@@ -366,13 +368,13 @@ class ExcelRendererTest extends TestCase
     public function test_empty_report_does_not_throw(): void
     {
         $data = new ReportData(
-            type:        ReportData::TYPE_SIMPLE,
-            title:       'Empty Report',
-            dateStart:   '2026-01-01',
-            dateEnd:     '2026-01-31',
+            type: ReportData::TYPE_SIMPLE,
+            title: 'Empty Report',
+            dateStart: '2026-01-01',
+            dateEnd: '2026-01-31',
             aggregation: 'daily',
-            summary:     [],
-            rows:        [],
+            summary: [],
+            rows: [],
         );
 
         $path = 'test_empty.xlsx';
@@ -389,25 +391,25 @@ class ExcelRendererTest extends TestCase
     public function test_indentation_is_applied_to_category(): void
     {
         $data = new ReportData(
-            type:        ReportData::TYPE_CUSTOM,
-            title:       'Indent Test',
-            dateStart:   '2026-03-01',
-            dateEnd:     '2026-03-31',
+            type: ReportData::TYPE_CUSTOM,
+            title: 'Indent Test',
+            dateStart: '2026-03-01',
+            dateEnd: '2026-03-31',
             aggregation: 'monthly',
-            summary:     [],
+            summary: [],
             rows: [
                 new ReportRow(
-                    date:        '',
-                    category:    'Parent Item',
-                    type:        ReportRow::TYPE_INCOME,
-                    amount:      100000,
+                    date: '',
+                    category: 'Parent Item',
+                    type: ReportRow::TYPE_INCOME,
+                    amount: 100000,
                     indentLevel: 0,
                 ),
                 new ReportRow(
-                    date:        '',
-                    category:    'Child Item',
-                    type:        ReportRow::TYPE_INCOME,
-                    amount:      50000,
+                    date: '',
+                    category: 'Child Item',
+                    type: ReportRow::TYPE_INCOME,
+                    amount: 50000,
                     indentLevel: 1,
                 ),
             ],
@@ -430,22 +432,22 @@ class ExcelRendererTest extends TestCase
     {
         return ReportData::fromRigidReport([
             'income_statement' => [
-                'pendapatan'             => 5000000,
-                'pendapatan_orders'      => 4500000,
-                'pendapatan_unexpected'  => 500000,
-                'hpp'                    => 2000000,
-                'laba_kotor'             => 3000000,
-                'beban_operasional'      => 1500000,
-                'beban_tak_terduga'      => 200000,
-                'laba_rugi_bersih'       => 1300000,
+                'pendapatan' => 5000000,
+                'pendapatan_orders' => 4500000,
+                'pendapatan_unexpected' => 500000,
+                'hpp' => 2000000,
+                'laba_kotor' => 3000000,
+                'beban_operasional' => 1500000,
+                'beban_tak_terduga' => 200000,
+                'laba_rugi_bersih' => 1300000,
             ],
             'cash_flow' => [
-                'arus_kas_masuk'      => 5000000,
-                'arus_kas_keluar'     => 3700000,
-                'arus_kas_bersih'     => 1300000,
-                'receivable_payments'  => 500000,
-                'saldo_awal'          => 2000000,
-                'saldo_akhir'         => 3300000,
+                'arus_kas_masuk' => 5000000,
+                'arus_kas_keluar' => 3700000,
+                'arus_kas_bersih' => 1300000,
+                'receivable_payments' => 500000,
+                'saldo_awal' => 2000000,
+                'saldo_akhir' => 3300000,
             ],
             'meta' => [],
         ], '2026-05-01', '2026-05-07');
@@ -462,27 +464,27 @@ class ExcelRendererTest extends TestCase
                 ['source' => 'Bahan Baku', 'total' => 1200000],
                 ['source' => 'Operasional', 'total' => 500000],
             ],
-            'total_income'  => 4500000,
+            'total_income' => 4500000,
             'total_expense' => 1700000,
-            'net'           => 2800000,
+            'net' => 2800000,
         ], '2026-05-01', '2026-05-07');
     }
 
     private function makeSimpleIncomeOnlyReport(): ReportData
     {
         return new ReportData(
-            type:        ReportData::TYPE_SIMPLE,
-            title:       'Income Only',
-            dateStart:   '2026-05-01',
-            dateEnd:     '2026-05-07',
+            type: ReportData::TYPE_SIMPLE,
+            title: 'Income Only',
+            dateStart: '2026-05-01',
+            dateEnd: '2026-05-07',
             aggregation: 'daily',
-            summary:     [],
+            summary: [],
             rows: [
                 new ReportRow(
-                    date:     '2026-05-01',
+                    date: '2026-05-01',
                     category: 'Pesanan QRIS',
-                    type:     ReportRow::TYPE_INCOME,
-                    amount:   5000000,
+                    type: ReportRow::TYPE_INCOME,
+                    amount: 5000000,
                 ),
             ],
         );
@@ -493,51 +495,54 @@ class ExcelRendererTest extends TestCase
         $rows = [];
         for ($i = 0; $i < $count; $i++) {
             $rows[] = new ReportRow(
-                date:     '2026-05-0' . ($i + 1),
+                date: '2026-05-0'.($i + 1),
                 category: "Item {$i}",
-                type:     ReportRow::TYPE_INCOME,
-                amount:   100000 * ($i + 1),
+                type: ReportRow::TYPE_INCOME,
+                amount: 100000 * ($i + 1),
             );
         }
 
         return new ReportData(
-            type:        ReportData::TYPE_SIMPLE,
-            title:       'Alternating Test',
-            dateStart:   '2026-05-01',
-            dateEnd:     '2026-05-07',
+            type: ReportData::TYPE_SIMPLE,
+            title: 'Alternating Test',
+            dateStart: '2026-05-01',
+            dateEnd: '2026-05-07',
             aggregation: 'daily',
-            summary:     [],
-            rows:        $rows,
+            summary: [],
+            rows: $rows,
         );
     }
 
-    private function findSectionRow(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet): ?int
+    private function findSectionRow(Worksheet $sheet): ?int
     {
         for ($row = 6; $row <= $sheet->getHighestRow(); $row++) {
             if ($sheet->getCell("C{$row}")->getValue() === 'Bagian') {
                 return $row;
             }
         }
+
         return null;
     }
 
-    private function findTotalRow(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet): ?int
+    private function findTotalRow(Worksheet $sheet): ?int
     {
         for ($row = 6; $row <= $sheet->getHighestRow(); $row++) {
             if ($sheet->getCell("C{$row}")->getValue() === 'Subtotal') {
                 return $row;
             }
         }
+
         return null;
     }
 
-    private function findGrandTotalRow(\PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet): ?int
+    private function findGrandTotalRow(Worksheet $sheet): ?int
     {
         for ($row = 6; $row <= $sheet->getHighestRow(); $row++) {
             if ($sheet->getCell("C{$row}")->getValue() === 'Total') {
                 return $row;
             }
         }
+
         return null;
     }
 }

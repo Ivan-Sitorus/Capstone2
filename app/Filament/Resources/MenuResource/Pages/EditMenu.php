@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\MenuResource\Pages;
 
-use Filament\Actions\DeleteAction;
 use App\Filament\Resources\MenuResource;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 use Illuminate\Support\Facades\Cache;
 

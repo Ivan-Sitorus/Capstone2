@@ -2,33 +2,32 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\CategoryResource\Pages\ListCategories;
-use App\Filament\Resources\CategoryResource\Pages\EditCategory;
-use App\Filament\Resources\CategoryResource\Pages;
-use App\Models\Category;
 use App\Filament\Helpers\TextInputHelper;
+use App\Filament\Resources\CategoryResource\Pages\EditCategory;
+use App\Filament\Resources\CategoryResource\Pages\ListCategories;
+use App\Models\Category;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Components\Utilities\Set;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-tag';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Data Master';
+    protected static string|\UnitEnum|null $navigationGroup = 'Data Master';
 
     protected static ?string $navigationLabel = 'Kategori';
 
@@ -43,7 +42,7 @@ class CategoryResource extends Resource
                 ->unique(ignoreRecord: true)
                 ->maxLength(100)
                 ->live(onBlur: true)
-                ->afterStateUpdated(fn ($state, Set $set) => $set('slug', \Illuminate\Support\Str::slug($state)))
+                ->afterStateUpdated(fn ($state, Set $set) => $set('slug', Str::slug($state)))
                 ->extraInputAttributes(TextInputHelper::string(100)),
             TextInput::make('slug')
                 ->label('Slug')
@@ -100,8 +99,8 @@ class CategoryResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListCategories::route('/'),
-            'edit'   => EditCategory::route('/{record}/edit'),
+            'index' => ListCategories::route('/'),
+            'edit' => EditCategory::route('/{record}/edit'),
         ];
     }
 }

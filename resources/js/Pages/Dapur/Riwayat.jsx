@@ -11,7 +11,7 @@ export default function KitchenRiwayat({ riwayatOrders }) {
                     orders={{ data: riwayatOrders, current_page: 1, last_page: 1 }}
                     showFilters={false}
                     showPagination={false}
-                    baseRoute={route('dapur.riwayat')}
+                    baseRoute={route('dapur.riwayat-pesanan')}
                 />
             </KitchenLayout>
         </>

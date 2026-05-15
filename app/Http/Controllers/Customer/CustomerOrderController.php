@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Customer;
 
-use Exception;
 use App\Http\Controllers\Controller;
 use App\Jobs\BroadcastPendingCount;
+use App\Models\CafeTable;
 use App\Models\Menu;
 use App\Models\Order;
-use App\Models\CafeTable;
+use App\Models\OrderItem;
 use App\Services\OrderPromotionService;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -19,19 +20,19 @@ class CustomerOrderController extends Controller
     public function store(Request $request, OrderPromotionService $orderPromotionService): JsonResponse
     {
         $request->validate([
-            'customer_name'     => 'nullable|string|min:2|max:255',
-            'customer_phone'    => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
-            'table_id'          => 'required|integer|exists:cafe_tables,id',
-            'is_mahasiswa'      => 'boolean',
-            'promotion_ids'     => 'nullable|array',
-            'promotion_ids.*'   => 'integer|exists:promotions,id',
-            'items'             => 'required|array|min:1',
-            'items.*.menu_id'   => 'required|integer|exists:menus,id',
-            'items.*.quantity'  => 'required|integer|min:1|max:20',
+            'customer_name' => 'nullable|string|min:2|max:255',
+            'customer_phone' => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
+            'table_id' => 'required|integer|exists:cafe_tables,id',
+            'is_mahasiswa' => 'boolean',
+            'promotion_ids' => 'nullable|array',
+            'promotion_ids.*' => 'integer|exists:promotions,id',
+            'items' => 'required|array|min:1',
+            'items.*.menu_id' => 'required|integer|exists:menus,id',
+            'items.*.quantity' => 'required|integer|min:1|max:20',
         ], [
-            'customer_phone.regex'   => 'Nomor telepon tidak valid.',
-            'items.required'         => 'Pesanan tidak boleh kosong.',
-            'items.min'              => 'Minimal 1 item dalam pesanan.',
+            'customer_phone.regex' => 'Nomor telepon tidak valid.',
+            'items.required' => 'Pesanan tidak boleh kosong.',
+            'items.min' => 'Minimal 1 item dalam pesanan.',
         ]);
 
         return DB::transaction(function () use ($request, $orderPromotionService) {
@@ -41,13 +42,13 @@ class CustomerOrderController extends Controller
             $selectedPromotionIds = $request->input('promotion_ids', []);
 
             $order = Order::create([
-                'customer_name'  => $request->customer_name,
+                'customer_name' => $request->customer_name,
                 'customer_phone' => $request->customer_phone,
-                'table_id'       => $request->table_id,
-                'cashier_id'     => null,
-                'order_type'     => 'qr',
-                'status'         => Order::STATUS_PENDING,
-                'total_amount'   => 0,
+                'table_id' => $request->table_id,
+                'cashier_id' => null,
+                'order_type' => 'qr',
+                'status' => Order::STATUS_PENDING,
+                'total_amount' => 0,
             ]);
 
             $total = 0;
@@ -56,13 +57,13 @@ class CustomerOrderController extends Controller
 
             // Bulk-fetch semua menu sekaligus — hindari N+1 query
             $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
-            $menus   = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
+            $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
             foreach ($request->items as $item) {
                 $menu = $menus->get($item['menu_id']);
 
-                if (!$menu || !$menu->is_available) {
-                    throw new Exception("Menu " . ($menu?->name ?? "#{$item['menu_id']}") . " tidak tersedia.");
+                if (! $menu || ! $menu->is_available) {
+                    throw new Exception('Menu '.($menu?->name ?? "#{$item['menu_id']}").' tidak tersedia.');
                 }
 
                 $lineCalculation = $orderPromotionService->calculateLine(
@@ -73,11 +74,11 @@ class CustomerOrderController extends Controller
                 );
 
                 $orderItemsToInsert[] = [
-                    'order_id'   => $order->id,
-                    'menu_id'    => $menu->id,
-                    'quantity'   => $item['quantity'],
+                    'order_id' => $order->id,
+                    'menu_id' => $menu->id,
+                    'quantity' => $item['quantity'],
                     'unit_price' => $lineCalculation['unit_price'],
-                    'subtotal'   => $lineCalculation['subtotal'],
+                    'subtotal' => $lineCalculation['subtotal'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];
@@ -90,7 +91,7 @@ class CustomerOrderController extends Controller
             }
 
             // Bulk insert semua order items sekaligus
-            \App\Models\OrderItem::insert($orderItemsToInsert);
+            OrderItem::insert($orderItemsToInsert);
 
             $order->update(['total_amount' => $total]);
 
@@ -100,9 +101,9 @@ class CustomerOrderController extends Controller
             BroadcastPendingCount::dispatch()->afterCommit();
 
             return response()->json([
-                'order_code'   => $order->order_code,
+                'order_code' => $order->order_code,
                 'total_amount' => $order->total_amount,
-                'order_id'     => $order->id,
+                'order_id' => $order->id,
             ], 201);
         });
     }
@@ -115,12 +116,12 @@ class CustomerOrderController extends Controller
 
         return Inertia::render('Pelanggan/Order/Status', [
             'order' => [
-                'id'             => $order->id,
-                'order_code'     => $order->order_code,
-                'status'         => $order->status,
-                'total_amount'   => $order->total_amount,
+                'id' => $order->id,
+                'order_code' => $order->order_code,
+                'status' => $order->status,
+                'total_amount' => $order->total_amount,
                 'payment_method' => $order->payment_method,
-                'created_at'     => $order->created_at->toISOString(),
+                'created_at' => $order->created_at->toISOString(),
             ],
         ]);
     }

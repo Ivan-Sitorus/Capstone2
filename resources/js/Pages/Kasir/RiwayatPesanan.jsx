@@ -26,7 +26,7 @@ export default function RiwayatPesanan({ orders, filters }) {
                 filters={filters}
                 showFilters={true}
                 showPagination={true}
-                baseRoute={route('kasir.riwayat')}
+                baseRoute={route('kasir.riwayat-pesanan')}
               />
             </CardContent>
           </Card>

@@ -5,11 +5,22 @@ namespace App\Renderers;
 use App\DTO\ReportData;
 use App\DTO\ReportRow;
 use App\Helpers\AccountingFormatter;
+use Filament\Actions\Action;
+use Filament\Schemas\Schema;
+use Filament\Support\Contracts\TranslatableContentDriver;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\FontFamily;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\Indicator;
+use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Pagination\CursorPaginator;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\LazyCollection;
 
 class FilamentTableRenderer
 {
@@ -35,9 +46,8 @@ class FilamentTableRenderer
      * implements HasTable + InteractsWithTable. The $table parameter is the
      * Livewire-managed table instance.
      *
-     * @param  Table       $table  Livewire-managed table instance
-     * @param  ReportData  $data   The report data to render
-     * @return Table
+     * @param  Table  $table  Livewire-managed table instance
+     * @param  ReportData  $data  The report data to render
      */
     public static function configure(Table $table, ReportData $data): Table
     {
@@ -48,7 +58,7 @@ class FilamentTableRenderer
         $rows = array_map(fn (ReportRow $row): array => $row->toArray(), $data->rows);
 
         return $table
-            ->records(fn (): \Illuminate\Support\Collection => collect($rows))
+            ->records(fn (): Collection => collect($rows))
             ->paginated(false)
             ->searchable(false)
             ->columns([
@@ -58,12 +68,13 @@ class FilamentTableRenderer
                     ->extraAttributes(function (array $record): array {
                         $indent = $record['indent_level'] ?? 0;
                         $isBold = $record['is_bold'] ?? false;
-                        $type   = $record['type'] ?? '';
+                        $type = $record['type'] ?? '';
+
                         return [
                             'class' => 'text-sm'
-                                . ($indent > 0 ? ' indent-' . $indent : '')
-                                . ($isBold ? ' font-bold' : '')
-                                . ($type === ReportRow::TYPE_SECTION ? ' font-semibold' : ''),
+                                .($indent > 0 ? ' indent-'.$indent : '')
+                                .($isBold ? ' font-bold' : '')
+                                .($type === ReportRow::TYPE_SECTION ? ' font-semibold' : ''),
                         ];
                     }),
 
@@ -74,7 +85,7 @@ class FilamentTableRenderer
                     ->fontFamily(FontFamily::Mono)
                     ->extraAttributes(function (array $record): array {
                         return [
-                            'class' => 'text-sm' . (($record['is_bold'] ?? false) ? ' font-bold' : ''),
+                            'class' => 'text-sm'.(($record['is_bold'] ?? false) ? ' font-bold' : ''),
                         ];
                     }),
             ])
@@ -94,6 +105,7 @@ class FilamentTableRenderer
                 if ($type === ReportRow::TYPE_SECTION) {
                     return 'bg-primary-50 dark:bg-primary-900/20 font-semibold';
                 }
+
                 return 'hover:bg-gray-50 dark:hover:bg-white/5';
             });
     }
@@ -106,8 +118,6 @@ class FilamentTableRenderer
      * for every method in the interface. The table is configured solely via ->records()
      * (custom dataSource, no database query), so most of these methods return null/empty
      * defaults and are never called during configuration.
-     *
-     * @return HasTable
      */
     private static function makeLivewireStub(): HasTable
     {
@@ -158,12 +168,12 @@ class FilamentTableRenderer
                 return null;
             }
 
-            public function getSelectedTableRecords(bool $shouldFetchSelectedRecords = true, ?int $chunkSize = null): \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|\Illuminate\Support\LazyCollection
+            public function getSelectedTableRecords(bool $shouldFetchSelectedRecords = true, ?int $chunkSize = null): \Illuminate\Database\Eloquent\Collection|Collection|LazyCollection
             {
                 return collect();
             }
 
-            public function getSelectedTableRecordsQuery(bool $shouldFetchSelectedRecords = true, ?int $chunkSize = null): \Illuminate\Database\Eloquent\Builder
+            public function getSelectedTableRecordsQuery(bool $shouldFetchSelectedRecords = true, ?int $chunkSize = null): Builder
             {
                 throw new \LogicException('Not implemented: stub does not support database queries.');
             }
@@ -173,42 +183,42 @@ class FilamentTableRenderer
                 return $name;
             }
 
-            public function getTableGrouping(): ?\Filament\Tables\Grouping\Group
+            public function getTableGrouping(): ?Group
             {
                 return null;
             }
 
-            public function getMountedTableAction(): ?\Filament\Actions\Action
+            public function getMountedTableAction(): ?Action
             {
                 return null;
             }
 
-            public function getMountedTableActionForm(): ?\Filament\Schemas\Schema
+            public function getMountedTableActionForm(): ?Schema
             {
                 return null;
             }
 
-            public function getMountedTableActionRecord(): ?\Illuminate\Database\Eloquent\Model
+            public function getMountedTableActionRecord(): ?Model
             {
                 return null;
             }
 
-            public function getMountedTableBulkAction(): ?\Filament\Actions\Action
+            public function getMountedTableBulkAction(): ?Action
             {
                 return null;
             }
 
-            public function getMountedTableBulkActionForm(): ?\Filament\Schemas\Schema
+            public function getMountedTableBulkActionForm(): ?Schema
             {
                 return null;
             }
 
-            public function getTableFiltersForm(): \Filament\Schemas\Schema
+            public function getTableFiltersForm(): Schema
             {
                 throw new \LogicException('Not implemented: stub does not support filters.');
             }
 
-            public function getTableRecords(): \Illuminate\Support\Collection|\Illuminate\Contracts\Pagination\Paginator|\Illuminate\Contracts\Pagination\CursorPaginator
+            public function getTableRecords(): Collection|Paginator|CursorPaginator
             {
                 return collect();
             }
@@ -233,12 +243,12 @@ class FilamentTableRenderer
                 return null;
             }
 
-            public function getAllTableSummaryQuery(): ?\Illuminate\Database\Eloquent\Builder
+            public function getAllTableSummaryQuery(): ?Builder
             {
                 return null;
             }
 
-            public function getPageTableSummaryQuery(): ?\Illuminate\Database\Eloquent\Builder
+            public function getPageTableSummaryQuery(): ?Builder
             {
                 return null;
             }
@@ -248,14 +258,14 @@ class FilamentTableRenderer
                 return false;
             }
 
-            /** @return \Illuminate\Database\Eloquent\Model|array<string, mixed>|null */
-            public function getTableRecord(?string $key): \Illuminate\Database\Eloquent\Model|array|null
+            /** @return Model|array<string, mixed>|null */
+            public function getTableRecord(?string $key): Model|array|null
             {
                 return null;
             }
 
-            /** @param \Illuminate\Database\Eloquent\Model|array<string, mixed> $record */
-            public function getTableRecordKey(\Illuminate\Database\Eloquent\Model|array $record): string
+            /** @param Model|array<string, mixed> $record */
+            public function getTableRecordKey(Model|array $record): string
             {
                 return '';
             }
@@ -281,33 +291,33 @@ class FilamentTableRenderer
 
             public function resetTableColumnSearch(string $column): void {}
 
-            public function getTableSearchIndicator(): \Filament\Tables\Filters\Indicator
+            public function getTableSearchIndicator(): Indicator
             {
                 throw new \LogicException('Not implemented.');
             }
 
-            /** @return array<\Filament\Tables\Filters\Indicator> */
+            /** @return array<Indicator> */
             public function getTableColumnSearchIndicators(): array
             {
                 return [];
             }
 
-            public function getFilteredTableQuery(): ?\Illuminate\Database\Eloquent\Builder
+            public function getFilteredTableQuery(): ?Builder
             {
                 return null;
             }
 
-            public function getFilteredSortedTableQuery(): ?\Illuminate\Database\Eloquent\Builder
+            public function getFilteredSortedTableQuery(): ?Builder
             {
                 return null;
             }
 
-            public function getTableQueryForExport(): \Illuminate\Database\Eloquent\Builder
+            public function getTableQueryForExport(): Builder
             {
                 throw new \LogicException('Not implemented: stub does not support exports.');
             }
 
-            public function makeFilamentTranslatableContentDriver(): ?\Filament\Support\Contracts\TranslatableContentDriver
+            public function makeFilamentTranslatableContentDriver(): ?TranslatableContentDriver
             {
                 return null;
             }

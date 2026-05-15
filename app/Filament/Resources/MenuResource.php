@@ -2,39 +2,42 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\MenuResource\RelationManagers\IngredientsRelationManager;
-use App\Filament\Resources\MenuResource\Pages\ListMenus;
-use App\Filament\Resources\MenuResource\Pages\EditMenu;
-use App\Models\Menu;
 use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Helpers\TextInputHelper;
+use App\Filament\Resources\MenuResource\Pages\EditMenu;
+use App\Filament\Resources\MenuResource\Pages\ListMenus;
+use App\Filament\Resources\MenuResource\RelationManagers\IngredientsRelationManager;
+use App\Models\Ingredient;
+use App\Models\Menu;
+use App\Services\MenuImageService;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Repeater;
+use Filament\Resources\Resource;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
-use Filament\Resources\Resource;
-use App\Services\MenuImageService;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Str;
 
 class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Data Master';
+    protected static string|\UnitEnum|null $navigationGroup = 'Data Master';
 
     protected static ?string $navigationLabel = 'Menu';
 
@@ -48,7 +51,7 @@ class MenuResource extends Resource
                 ->required()
                 ->maxLength(255)
                 ->live(onBlur: true)
-                ->afterStateUpdated(fn ($state, Set $set) => $set('slug', \Illuminate\Support\Str::slug($state)))
+                ->afterStateUpdated(fn ($state, Set $set) => $set('slug', Str::slug($state)))
                 ->extraInputAttributes(TextInputHelper::string()),
             TextInput::make('slug')
                 ->label('Slug')
@@ -67,13 +70,13 @@ class MenuResource extends Resource
                         ->label('Nama Kategori')
                         ->required()
                         ->live(onBlur: true)
-                        ->afterStateUpdated(fn ($state, Set $set) => $set('slug', \Illuminate\Support\Str::slug($state))),
+                        ->afterStateUpdated(fn ($state, Set $set) => $set('slug', Str::slug($state))),
                     TextInput::make('slug')
                         ->label('Slug')
                         ->required()
                         ->unique(ignoreRecord: true),
                 ])
-                ->createOptionAction(fn (\Filament\Actions\Action $action) => $action->label('+ Kategori Baru')),
+                ->createOptionAction(fn (Action $action) => $action->label('+ Kategori Baru')),
             FileUpload::make('image')
                 ->label('Gambar Menu')
                 ->directory('menus/')
@@ -131,8 +134,9 @@ class MenuResource extends Resource
                     if (! $name) {
                         return 'Bahan Baru';
                     }
-                    $ingredient = \App\Models\Ingredient::find($name);
-                    return $ingredient ? $ingredient->name . ' (' . $ingredient->unit . ')' : 'Bahan Baru';
+                    $ingredient = Ingredient::find($name);
+
+                    return $ingredient ? $ingredient->name.' ('.$ingredient->unit.')' : 'Bahan Baru';
                 })
                 ->schema([
                     Select::make('ingredient_id')
@@ -142,7 +146,7 @@ class MenuResource extends Resource
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name . ' (' . $record->unit . ')'),
+                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name.' ('.$record->unit.')'),
                     TextInput::make('quantity_used')
                         ->label('Jumlah per Porsi')
                         ->required()
@@ -153,9 +157,11 @@ class MenuResource extends Resource
                         ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                         ->suffix(function ($record) {
                             if ($record && $record->ingredient_id) {
-                                $ingredient = \App\Models\Ingredient::find($record->ingredient_id);
-                                return $ingredient ? ' ' . $ingredient->unit : '';
+                                $ingredient = Ingredient::find($record->ingredient_id);
+
+                                return $ingredient ? ' '.$ingredient->unit : '';
                             }
+
                             return '';
                         }),
                 ]),
@@ -231,8 +237,8 @@ class MenuResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListMenus::route('/'),
-            'edit'   => EditMenu::route('/{record}/edit'),
+            'index' => ListMenus::route('/'),
+            'edit' => EditMenu::route('/{record}/edit'),
         ];
     }
 }

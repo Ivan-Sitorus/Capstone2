@@ -3,9 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Menu;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 /**
  * Seeder data histori transaksi untuk keperluan Data Mining (Association Rule / FP-Growth).
@@ -95,39 +95,39 @@ class AssociationHistorySeeder extends Seeder
 
         // ── Generate orders ────────────────────────────────────────────
         $startDate = Carbon::create(2025, 1, 1);
-        $endDate   = Carbon::create(2025, 4, 10);
+        $endDate = Carbon::create(2025, 4, 10);
         $totalDays = $startDate->diffInDays($endDate) + 1; // 100 hari
 
-        $orderNum   = 2000;
-        $orders     = [];
+        $orderNum = 2000;
+        $orders = [];
         $orderItems = [];
 
         foreach ($templates as [$menuNames, $count]) {
             for ($i = 0; $i < $count; $i++) {
                 $dayOffset = ($orderNum - 2000) % $totalDays;
-                $hour      = mt_rand(8, 20);
-                $minute    = mt_rand(0, 59);
+                $hour = mt_rand(8, 20);
+                $minute = mt_rand(0, 59);
                 $orderDate = $startDate->copy()->addDays($dayOffset)->setTime($hour, $minute, 0);
-                $orderCode = 'ORD' . $orderNum++;
+                $orderCode = 'ORD'.$orderNum++;
 
                 $totalAmount = 0;
-                $items       = [];
+                $items = [];
 
                 foreach ($menuNames as $menuName) {
-                    $menuId    = $menuIds[$menuName] ?? null;
+                    $menuId = $menuIds[$menuName] ?? null;
                     $unitPrice = (float) ($menuPrices[$menuName] ?? 0);
                     if (! $menuId) {
                         continue;
                     }
-                    $qty      = mt_rand(1, 3);
+                    $qty = mt_rand(1, 3);
                     $subtotal = $qty * $unitPrice;
                     $totalAmount += $subtotal;
                     $items[] = [
-                        'menu_id'    => $menuId,
-                        'quantity'   => $qty,
+                        'menu_id' => $menuId,
+                        'quantity' => $qty,
                         'unit_price' => $unitPrice,
-                        'subtotal'   => $subtotal,
-                        'notes'      => null,
+                        'subtotal' => $subtotal,
+                        'notes' => null,
                         'created_at' => $orderDate->toDateTimeString(),
                         'updated_at' => $orderDate->toDateTimeString(),
                     ];
@@ -138,17 +138,17 @@ class AssociationHistorySeeder extends Seeder
                 }
 
                 $orders[] = [
-                    'order_code'     => $orderCode,
-                    'table_id'       => null,
-                    'cashier_id'     => null,
-                    'status'         => 'selesai',
-                    'order_type'     => 'cashier',
+                    'order_code' => $orderCode,
+                    'table_id' => null,
+                    'cashier_id' => null,
+                    'status' => 'selesai',
+                    'order_type' => 'cashier',
                     'payment_method' => 'cash',
-                    'total_amount'   => $totalAmount,
-                    'notes'          => null,
-                    'is_paid'        => true,
-                    'created_at'     => $orderDate->toDateTimeString(),
-                    'updated_at'     => $orderDate->toDateTimeString(),
+                    'total_amount' => $totalAmount,
+                    'notes' => null,
+                    'is_paid' => true,
+                    'created_at' => $orderDate->toDateTimeString(),
+                    'updated_at' => $orderDate->toDateTimeString(),
                 ];
                 $orderItems[$orderCode] = $items;
             }
@@ -159,7 +159,7 @@ class AssociationHistorySeeder extends Seeder
             DB::table('orders')->insert($chunk);
         }
 
-        $codes       = array_column($orders, 'order_code');
+        $codes = array_column($orders, 'order_code');
         $insertedIds = DB::table('orders')
             ->whereIn('order_code', $codes)
             ->pluck('id', 'order_code');
@@ -173,7 +173,7 @@ class AssociationHistorySeeder extends Seeder
             }
             foreach ($items as $item) {
                 $item['order_id'] = $orderId;
-                $itemRows[]       = $item;
+                $itemRows[] = $item;
             }
         }
 
@@ -182,9 +182,9 @@ class AssociationHistorySeeder extends Seeder
         }
 
         $this->command->info(
-            'AssociationHistorySeeder: ' . count($orders) . ' orders, ' .
-            count($itemRows) . ' order_items ' .
-            '(ORD2000–ORD' . ($orderNum - 1) . ', 2025-01-01 s/d 2025-04-10).'
+            'AssociationHistorySeeder: '.count($orders).' orders, '.
+            count($itemRows).' order_items '.
+            '(ORD2000–ORD'.($orderNum - 1).', 2025-01-01 s/d 2025-04-10).'
         );
     }
 }

@@ -10,7 +10,8 @@ class BroadcastPendingCount implements ShouldQueue
 {
     use Queueable;
 
-    public int $tries   = 1;
+    public int $tries = 1;
+
     public int $timeout = 10;
 
     public function handle(): void

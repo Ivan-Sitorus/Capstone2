@@ -4,8 +4,8 @@ namespace Tests\Feature\Order;
 
 use App\Models\CafeTable;
 use App\Models\Category;
-use App\Models\Order;
 use App\Models\Menu;
+use App\Models\Order;
 use App\Models\Promotion;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

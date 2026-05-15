@@ -223,9 +223,9 @@ class FinanceModuleTest extends TestCase
         $start = now()->subDay()->startOfDay()->toDateString();
         $end = now()->addDay()->endOfDay()->toDateString();
 
-        $report = (new FinancialReportService())->generate('simple', [
+        $report = (new FinancialReportService)->generate('simple', [
             'date_start' => $start,
-            'date_end'   => $end,
+            'date_end' => $end,
         ]);
 
         $rawOrderIncome = (float) DB::table('orders')

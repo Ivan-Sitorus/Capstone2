@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class KitchenSession extends Model
+class StaffSession extends Model
 {
     protected $fillable = [
         'user_id',
+        'type',
         'session_id',
         'started_at',
         'ended_at',
@@ -35,5 +36,20 @@ class KitchenSession extends Model
     public function scopeForUser($query, $userId)
     {
         return $query->where('user_id', $userId);
+    }
+
+    public function scopeType($query, string $type)
+    {
+        return $query->where('type', $type);
+    }
+
+    public function scopeCashier($query)
+    {
+        return $query->where('type', 'cashier');
+    }
+
+    public function scopeKitchen($query)
+    {
+        return $query->where('type', 'kitchen');
     }
 }

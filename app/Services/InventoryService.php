@@ -64,13 +64,13 @@ class InventoryService
 
             // Pre-load all menus in one query to avoid N+1
             $menuIds = array_unique(array_column($items, 'menu_id'));
-            $menus   = Menu::with('menuIngredients.ingredient')
+            $menus = Menu::with('menuIngredients.ingredient')
                 ->whereIn('id', $menuIds)
                 ->get()
                 ->keyBy('id');
 
             foreach ($items as $item) {
-                $menu     = $menus->get($item['menu_id']) ?? Menu::with('menuIngredients.ingredient')->findOrFail($item['menu_id']);
+                $menu = $menus->get($item['menu_id']) ?? Menu::with('menuIngredients.ingredient')->findOrFail($item['menu_id']);
                 $quantity = (int) ($item['quantity'] ?? 0);
 
                 if ($quantity <= 0 || $menu->menuIngredients->isEmpty()) {
@@ -174,8 +174,8 @@ class InventoryService
 
         if ($totalAvailable < $requiredQuantity) {
             throw new Exception(
-                "Stok tidak mencukupi untuk bahan '{$ingredient->name}'. " .
-                "Dibutuhkan: {$requiredQuantity} {$ingredient->unit}, " .
+                "Stok tidak mencukupi untuk bahan '{$ingredient->name}'. ".
+                "Dibutuhkan: {$requiredQuantity} {$ingredient->unit}, ".
                 "Tersedia: {$totalAvailable} {$ingredient->unit}"
             );
         }

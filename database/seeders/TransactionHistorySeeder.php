@@ -4,9 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\Category;
 use App\Models\Menu;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
 
 /**
  * Seeder data histori transaksi untuk keperluan Data Mining (Prediksi Menu).
@@ -33,6 +33,7 @@ class TransactionHistorySeeder extends Seeder
         for ($i = 0; $i < $count; $i++) {
             $quantities[] = mt_rand(1, 5);
         }
+
         return $quantities;
     }
 
@@ -42,8 +43,8 @@ class TransactionHistorySeeder extends Seeder
         $category = Category::firstOrCreate(
             ['slug' => 'data-mining-seed'],
             [
-                'name'      => 'Data Mining Seed',
-                'slug'      => 'data-mining-seed',
+                'name' => 'Data Mining Seed',
+                'slug' => 'data-mining-seed',
                 'is_active' => true,
             ]
         );
@@ -62,16 +63,16 @@ class TransactionHistorySeeder extends Seeder
             $menus[$m['name']] = Menu::firstOrCreate(
                 ['slug' => $m['slug']],
                 [
-                    'category_id'         => $category->id,
-                    'name'                => $m['name'],
-                    'slug'                => $m['slug'],
-                    'description'         => null,
-                    'price'               => $m['price'],
-                    'cashback'            => 0,
-                    'image'               => null,
-                    'is_available'        => true,
+                    'category_id' => $category->id,
+                    'name' => $m['name'],
+                    'slug' => $m['slug'],
+                    'description' => null,
+                    'price' => $m['price'],
+                    'cashback' => 0,
+                    'image' => null,
+                    'is_available' => true,
                     'is_student_discount' => false,
-                    'student_price'       => null,
+                    'student_price' => null,
                 ]
             );
         }
@@ -90,11 +91,11 @@ class TransactionHistorySeeder extends Seeder
         // ── 4. Generate 500 transaksi ────────────────────────────────────
         // Seed berbeda per menu agar distribusi kuantitas bervariasi
         $menuSeeds = [
-            'Cheesecake'   => 1001,
-            'Mie Goreng'   => 2002,
-            'Nasi Goreng'  => 3003,
+            'Cheesecake' => 1001,
+            'Mie Goreng' => 2002,
+            'Nasi Goreng' => 3003,
             'French Fries' => 4004,
-            'Cappucino'    => 5005,
+            'Cappucino' => 5005,
         ];
 
         // Tanggal mulai: 2025-01-01, jumlah hari: 100
@@ -104,35 +105,35 @@ class TransactionHistorySeeder extends Seeder
         // Nomor order global: ORD1000–ORD1499
         $orderNum = 1000;
 
-        $ordersToInsert    = [];
+        $ordersToInsert = [];
         $orderItemsToInsert = [];
 
         foreach ($menuData as $menuIndex => $m) {
-            $menuName   = $m['name'];
-            $menuId     = $menus[$menuName]->id;
-            $unitPrice  = $m['price'];
+            $menuName = $m['name'];
+            $menuId = $menus[$menuName]->id;
+            $unitPrice = $m['price'];
             $quantities = $this->generateQuantities($menuSeeds[$menuName], $totalDays);
 
             for ($day = 0; $day < $totalDays; $day++) {
-                $date     = $startDate->copy()->addDays($day);
-                $qty      = $quantities[$day];
+                $date = $startDate->copy()->addDays($day);
+                $qty = $quantities[$day];
                 $subtotal = $qty * $unitPrice;
-                $code     = 'ORD' . ($orderNum++);
+                $code = 'ORD'.($orderNum++);
 
                 $ordersToInsert[] = [
-                    'order_code'     => $code,
-                    'table_id'       => null,
-                    'customer_name'  => 'Data Mining',
+                    'order_code' => $code,
+                    'table_id' => null,
+                    'customer_name' => 'Data Mining',
                     'customer_phone' => null,
-                    'cashier_id'     => null,
-                    'status'         => 'selesai',
-                    'order_type'     => 'cashier',
-                    'total_amount'   => $subtotal,
+                    'cashier_id' => null,
+                    'status' => 'selesai',
+                    'order_type' => 'cashier',
+                    'total_amount' => $subtotal,
                     'payment_method' => 'cash',
-                    'notes'          => null,
-                    'is_paid'        => true,
-                    'created_at'     => $date->copy()->setTime(10, 0, 0)->toDateTimeString(),
-                    'updated_at'     => $date->copy()->setTime(10, 0, 0)->toDateTimeString(),
+                    'notes' => null,
+                    'is_paid' => true,
+                    'created_at' => $date->copy()->setTime(10, 0, 0)->toDateTimeString(),
+                    'updated_at' => $date->copy()->setTime(10, 0, 0)->toDateTimeString(),
                 ];
             }
         }
@@ -143,7 +144,7 @@ class TransactionHistorySeeder extends Seeder
         }
 
         // Ambil order ID yang baru saja diinsert berdasarkan order_code
-        $codes      = array_column($ordersToInsert, 'order_code');
+        $codes = array_column($ordersToInsert, 'order_code');
         $insertedOrders = DB::table('orders')
             ->whereIn('order_code', $codes)
             ->pluck('id', 'order_code');
@@ -151,30 +152,30 @@ class TransactionHistorySeeder extends Seeder
         // Susun order_items
         $menuIndex = 0;
         foreach ($menuData as $m) {
-            $menuName   = $m['name'];
-            $menuId     = $menus[$menuName]->id;
-            $unitPrice  = $m['price'];
+            $menuName = $m['name'];
+            $menuId = $menus[$menuName]->id;
+            $unitPrice = $m['price'];
             $quantities = $this->generateQuantities($menuSeeds[$menuName], $totalDays);
 
             for ($day = 0; $day < $totalDays; $day++) {
                 $orderNum2 = 1000 + ($menuIndex * $totalDays) + $day;
-                $code      = 'ORD' . $orderNum2;
-                $orderId   = $insertedOrders[$code] ?? null;
+                $code = 'ORD'.$orderNum2;
+                $orderId = $insertedOrders[$code] ?? null;
 
                 if (! $orderId) {
                     continue;
                 }
 
-                $qty      = $quantities[$day];
+                $qty = $quantities[$day];
                 $subtotal = $qty * $unitPrice;
 
                 $orderItemsToInsert[] = [
-                    'order_id'   => $orderId,
-                    'menu_id'    => $menuId,
-                    'quantity'   => $qty,
+                    'order_id' => $orderId,
+                    'menu_id' => $menuId,
+                    'quantity' => $qty,
                     'unit_price' => $unitPrice,
-                    'subtotal'   => $subtotal,
-                    'notes'      => null,
+                    'subtotal' => $subtotal,
+                    'notes' => null,
                     'created_at' => $startDate->copy()->addDays($day)->setTime(10, 0, 0)->toDateTimeString(),
                     'updated_at' => $startDate->copy()->addDays($day)->setTime(10, 0, 0)->toDateTimeString(),
                 ];
@@ -188,8 +189,8 @@ class TransactionHistorySeeder extends Seeder
 
         $total = count($orderItemsToInsert);
         $this->command->info(
-            "TransactionHistorySeeder: berhasil insert {$total} order_items " .
-            "(5 menu × 100 hari, 2025-01-01 s/d 2025-04-10)."
+            "TransactionHistorySeeder: berhasil insert {$total} order_items ".
+            '(5 menu × 100 hari, 2025-01-01 s/d 2025-04-10).'
         );
     }
 }

@@ -12,8 +12,7 @@ class StockReconciliationService
 {
     public function __construct(
         protected InventoryService $inventoryService,
-    ) {
-    }
+    ) {}
 
     public function createManualAdjustment(
         int $ingredientId,

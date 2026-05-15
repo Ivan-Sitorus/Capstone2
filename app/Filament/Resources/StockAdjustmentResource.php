@@ -2,20 +2,20 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Forms\Components\Textarea;
+use App\Filament\Helpers\NumberInputHelper;
+use App\Filament\Resources\StockAdjustmentResource\Pages\ListStockAdjustments;
+use App\Filament\Resources\StockAdjustmentResource\RelationManagers\MovementsRelationManager;
+use App\Models\StockAdjustment;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Resource;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Actions\EditAction;
-use App\Filament\Helpers\NumberInputHelper;
-use App\Filament\Resources\StockAdjustmentResource\RelationManagers\MovementsRelationManager;
-use App\Filament\Resources\StockAdjustmentResource\Pages\ListStockAdjustments;
-use App\Models\StockAdjustment;
-use Filament\Resources\Resource;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 
@@ -23,9 +23,9 @@ class StockAdjustmentResource extends Resource
 {
     protected static ?string $model = StockAdjustment::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?string $navigationLabel = 'Stock Adjustments';
 
@@ -41,7 +41,7 @@ class StockAdjustmentResource extends Resource
                 ->searchable()
                 ->preload()
                 ->disabledOn('edit')
-                ->getOptionLabelFromRecordUsing(fn ($record) => $record->name . ' (' . $record->unit . ')'),
+                ->getOptionLabelFromRecordUsing(fn ($record) => $record->name.' ('.$record->unit.')'),
             Select::make('adjustment_type')
                 ->label('Tipe Penyesuaian')
                 ->options([
@@ -100,7 +100,7 @@ class StockAdjustmentResource extends Resource
                 TextColumn::make('quantity')
                     ->label('Jumlah')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(fn (StockAdjustment $record) => ' ' . ($record->ingredient?->unit ?? ''))
+                    ->suffix(fn (StockAdjustment $record) => ' '.($record->ingredient?->unit ?? ''))
                     ->sortable(),
                 TextColumn::make('quantity_before')
                     ->label('Sebelum')

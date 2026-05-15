@@ -2,40 +2,38 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Actions\Action;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\IngredientResource\Pages\ListIngredients;
-use App\Filament\Resources\IngredientResource\Pages\EditIngredient;
-use App\Filament\Resources\IngredientResource\Pages\ManageBatches;
-use App\Models\Ingredient;
 use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Helpers\TextInputHelper;
-use Filament\Forms;
+use App\Filament\Resources\IngredientResource\Pages\EditIngredient;
+use App\Filament\Resources\IngredientResource\Pages\ListIngredients;
+use App\Filament\Resources\IngredientResource\Pages\ManageBatches;
+use App\Models\Ingredient;
+use Filament\Actions\Action;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
 class IngredientResource extends Resource
 {
     protected static ?string $model = Ingredient::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-cube';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cube';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?string $navigationLabel = 'Ingredients';
 
@@ -65,7 +63,7 @@ class IngredientResource extends Resource
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
                 ->stripCharacters('.')
                 ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                ->suffix(fn ($get) => $get('unit') ? ' ' . $get('unit') : ''),
+                ->suffix(fn ($get) => $get('unit') ? ' '.$get('unit') : ''),
             Toggle::make('is_active')
                 ->label('Active')
                 ->default(true)
@@ -87,7 +85,7 @@ class IngredientResource extends Resource
                         ->stripCharacters('.')
                         ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                         ->extraInputAttributes(NumberInputHelper::decimal())
-                        ->suffix(fn ($get) => $get('../../unit') ? ' ' . $get('../../unit') : ''),
+                        ->suffix(fn ($get) => $get('../../unit') ? ' '.$get('../../unit') : ''),
                     DatePicker::make('expiry_date')
                         ->label('Tanggal Kadaluarsa')
                         ->nullable()
@@ -105,7 +103,7 @@ class IngredientResource extends Resource
                         ->type('text')
                         ->stripCharacters('.')
                         ->extraInputAttributes(NumberInputHelper::integer())
-                        ->prefix(fn ($get) => $get('../../unit') ? 'Rp/' . $get('../../unit') : 'Rp'),
+                        ->prefix(fn ($get) => $get('../../unit') ? 'Rp/'.$get('../../unit') : 'Rp'),
                 ])
                 ->defaultItems(0)
                 ->collapsible(),
@@ -126,16 +124,16 @@ class IngredientResource extends Resource
                 TextColumn::make('low_stock_threshold')
                     ->label('Low Stock Threshold')
                     ->numeric(decimalPlaces: 2, decimalSeparator: ',', thousandsSeparator: '.')
-                    ->suffix(fn (Ingredient $record) => ' ' . $record->unit)
+                    ->suffix(fn (Ingredient $record) => ' '.$record->unit)
                     ->sortable(),
                 TextColumn::make('total_stock')
                     ->label('Total Stock')
                     ->getStateUsing(fn (Ingredient $record) => $record->getTotalStock() + 0)
-                    ->suffix(fn (Ingredient $record) => ' ' . $record->unit)
+                    ->suffix(fn (Ingredient $record) => ' '.$record->unit)
                     ->badge()
                     ->color(fn (Ingredient $record) => $record->getTotalStock() < (float) $record->low_stock_threshold ? 'danger' : 'success')
                     ->sortable(query: function ($query, string $direction): void {
-                        $query->orderByRaw('(SELECT COALESCE(SUM(quantity), 0) FROM ingredient_batches WHERE ingredient_batches.ingredient_id = ingredients.id) ' . $direction);
+                        $query->orderByRaw('(SELECT COALESCE(SUM(quantity), 0) FROM ingredient_batches WHERE ingredient_batches.ingredient_id = ingredients.id) '.$direction);
                     }),
                 IconColumn::make('is_active')
                     ->label('Active')

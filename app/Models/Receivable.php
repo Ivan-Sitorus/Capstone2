@@ -59,9 +59,9 @@ class Receivable extends Model
      * Record a payment for this receivable.
      * Automatically updates status based on paid_amount.
      *
-     * @param float $amount Payment amount to add
+     * @param  float  $amount  Payment amount to add
+     *
      * @throws \InvalidArgumentException If receivable is already paid
-     * @return void
      */
     public function recordPayment(float $amount): void
     {

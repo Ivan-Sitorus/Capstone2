@@ -2,9 +2,8 @@
 
 namespace App\Filament\Resources\ReceivableResource\Pages;
 
-use Filament\Actions\DeleteAction;
 use App\Filament\Resources\ReceivableResource;
-use Filament\Actions;
+use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
 class EditReceivable extends EditRecord

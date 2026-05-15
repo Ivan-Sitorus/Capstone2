@@ -11,7 +11,7 @@ import FlashToast from '@/Components/Shared/FlashToast';
 const tabs = [
     { label: 'Pesanan Baru',    href: route('kasir.pesanan-baru'), icon: ShoppingCart },
     { label: 'Pesanan Aktif',   href: route('kasir.pesanan-aktif'), icon: ClipboardList },
-    { label: 'Riwayat Pesanan', href: route('kasir.riwayat'),       icon: History },
+    { label: 'Riwayat Pesanan', href: route('kasir.riwayat-pesanan'),       icon: History },
 ];
 
 export default function CashierLayout({ children }) {

@@ -16,27 +16,19 @@ use Maatwebsite\Excel\Concerns\WithTitle;
 use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\PageSetup;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class ExcelRenderer implements
-    FromArray,
-    WithHeadings,
-    WithStyles,
-    WithColumnWidths,
-    WithColumnFormatting,
-    WithEvents,
-    ShouldAutoSize,
-    WithTitle
+class ExcelRenderer implements FromArray, ShouldAutoSize, WithColumnFormatting, WithColumnWidths, WithEvents, WithHeadings, WithStyles, WithTitle
 {
     /**
      * @param  ReportData  $reportData  The DTO containing report rows and metadata.
      */
     public function __construct(
         private readonly ReportData $reportData,
-    ) {
-    }
+    ) {}
 
     // ─── Maatwebsite Excel Concerns ──────────────────────────────────────
 
@@ -117,9 +109,9 @@ class ExcelRenderer implements
     {
         $typeLabel = match ($this->reportData->type) {
             ReportData::TYPE_SIMPLE => 'Simple',
-            ReportData::TYPE_RIGID  => 'Rigid',
+            ReportData::TYPE_RIGID => 'Rigid',
             ReportData::TYPE_CUSTOM => 'Custom',
-            default                 => 'Report',
+            default => 'Report',
         };
 
         return "{$typeLabel} Report";
@@ -144,7 +136,7 @@ class ExcelRenderer implements
 
     private function afterSheet(AfterSheet $event): void
     {
-        $sheet   = $event->sheet->getDelegate();
+        $sheet = $event->sheet->getDelegate();
         $lastCol = 'E';
 
         // ── 1. Insert 4 title rows at top, shifting headers+data down ──
@@ -154,7 +146,7 @@ class ExcelRenderer implements
         $sheet->setCellValue('A1', 'W9 Cafe');
         $sheet->mergeCells("A1:{$lastCol}1");
         $sheet->getStyle('A1')->applyFromArray([
-            'font'      => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '1F4E79']],
+            'font' => ['bold' => true, 'size' => 14, 'color' => ['rgb' => '1F4E79']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
         ]);
         $sheet->getRowDimension(1)->setRowHeight(24);
@@ -163,7 +155,7 @@ class ExcelRenderer implements
         $sheet->setCellValue('A2', $this->reportData->title);
         $sheet->mergeCells("A2:{$lastCol}2");
         $sheet->getStyle('A2')->applyFromArray([
-            'font'      => ['bold' => true, 'size' => 13],
+            'font' => ['bold' => true, 'size' => 13],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
         ]);
 
@@ -172,7 +164,7 @@ class ExcelRenderer implements
         $sheet->setCellValue('A3', $periodLabel);
         $sheet->mergeCells("A3:{$lastCol}3");
         $sheet->getStyle('A3')->applyFromArray([
-            'font'      => ['italic' => true, 'size' => 10, 'color' => ['rgb' => '808080']],
+            'font' => ['italic' => true, 'size' => 10, 'color' => ['rgb' => '808080']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
         ]);
 
@@ -183,8 +175,8 @@ class ExcelRenderer implements
         $headerRow = 5;
         $headerRange = "A{$headerRow}:{$lastCol}{$headerRow}";
         $sheet->getStyle($headerRange)->applyFromArray([
-            'font'      => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
-            'fill'      => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '1F4E79']],
+            'font' => ['bold' => true, 'size' => 11, 'color' => ['rgb' => 'FFFFFF']],
+            'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => '1F4E79']],
             'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER, 'vertical' => Alignment::VERTICAL_CENTER],
         ]);
         $sheet->getRowDimension($headerRow)->setRowHeight(20);
@@ -195,8 +187,8 @@ class ExcelRenderer implements
         $count = count($rows);
 
         for ($i = 0; $i < $count; $i++) {
-            $excelRow  = $dataStartRow + $i;
-            $row       = $rows[$i];
+            $excelRow = $dataStartRow + $i;
+            $row = $rows[$i];
             $cellRange = "A{$excelRow}:{$lastCol}{$excelRow}";
 
             $isAlternating = ($i % 2 === 0);
@@ -210,21 +202,21 @@ class ExcelRenderer implements
             } elseif ($row->isGrandTotal()) {
                 // Grand total rows
                 $sheet->getStyle($cellRange)->applyFromArray([
-                    'font'    => ['bold' => true, 'size' => 11],
+                    'font' => ['bold' => true, 'size' => 11],
                     'borders' => ['top' => ['borderStyle' => Border::BORDER_DOUBLE, 'color' => ['rgb' => '1F4E79']]],
-                    'fill'    => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2EFDA']],
+                    'fill' => ['fillType' => Fill::FILL_SOLID, 'startColor' => ['rgb' => 'E2EFDA']],
                 ]);
             } elseif ($row->isTotal()) {
                 // Sub-total rows
                 $sheet->getStyle($cellRange)->applyFromArray([
-                    'font'    => ['bold' => true, 'size' => 11],
+                    'font' => ['bold' => true, 'size' => 11],
                     'borders' => ['top' => ['borderStyle' => Border::BORDER_MEDIUM, 'color' => ['rgb' => '1F4E79']]],
                 ]);
 
                 if ($isAlternating) {
                     $sheet->getStyle($cellRange)->getFill()
                         ->setFillType(Fill::FILL_SOLID)
-                        ->setStartColor(new \PhpOffice\PhpSpreadsheet\Style\Color('F5F7FA'));
+                        ->setStartColor(new Color('F5F7FA'));
                 }
             } elseif ($row->isBold) {
                 // Rows marked as bold only
@@ -233,7 +225,7 @@ class ExcelRenderer implements
                 if ($isAlternating) {
                     $sheet->getStyle($cellRange)->getFill()
                         ->setFillType(Fill::FILL_SOLID)
-                        ->setStartColor(new \PhpOffice\PhpSpreadsheet\Style\Color('F5F7FA'));
+                        ->setStartColor(new Color('F5F7FA'));
                 }
             } elseif ($isAlternating) {
                 // Alternating clean rows
@@ -291,7 +283,7 @@ class ExcelRenderer implements
     {
         $indent = str_repeat('  ', max(0, $row->indentLevel));
 
-        return $indent . $row->category;
+        return $indent.$row->category;
     }
 
     /**
@@ -300,12 +292,12 @@ class ExcelRenderer implements
     private function translateType(string $type): string
     {
         return match ($type) {
-            ReportRow::TYPE_INCOME      => 'Pemasukan',
-            ReportRow::TYPE_EXPENSE     => 'Pengeluaran',
-            ReportRow::TYPE_SECTION     => 'Bagian',
-            ReportRow::TYPE_TOTAL       => 'Subtotal',
+            ReportRow::TYPE_INCOME => 'Pemasukan',
+            ReportRow::TYPE_EXPENSE => 'Pengeluaran',
+            ReportRow::TYPE_SECTION => 'Bagian',
+            ReportRow::TYPE_TOTAL => 'Subtotal',
             ReportRow::TYPE_GRAND_TOTAL => 'Total',
-            default                     => $type,
+            default => $type,
         };
     }
 
@@ -316,13 +308,13 @@ class ExcelRenderer implements
     {
         if ($this->reportData->dateStart && $this->reportData->dateEnd) {
             $start = AccountingFormatter::dateIndo($this->reportData->dateStart);
-            $end   = AccountingFormatter::dateIndo($this->reportData->dateEnd);
+            $end = AccountingFormatter::dateIndo($this->reportData->dateEnd);
 
             return "Periode: {$start} — {$end}";
         }
 
         if ($this->reportData->dateStart) {
-            return 'Periode: ' . AccountingFormatter::dateIndo($this->reportData->dateStart);
+            return 'Periode: '.AccountingFormatter::dateIndo($this->reportData->dateStart);
         }
 
         return 'Periode: —';

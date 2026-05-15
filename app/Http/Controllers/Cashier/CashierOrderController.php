@@ -20,24 +20,24 @@ class CashierOrderController extends Controller
 
         return Inertia::render('Kasir/Order/Show', [
             'order' => [
-                'id'             => $order->id,
-                'order_code'     => $order->order_code,
-                'status'         => $order->status,
-                'total_amount'   => $order->total_amount,
-                'customer_name'  => $order->customer_name,
+                'id' => $order->id,
+                'order_code' => $order->order_code,
+                'status' => $order->status,
+                'total_amount' => $order->total_amount,
+                'customer_name' => $order->customer_name,
                 'customer_phone' => $order->customer_phone,
                 'payment_method' => $order->payment_method,
-                'payment_proof'  => $order->payment_proof,
+                'payment_proof' => $order->payment_proof,
                 'rejection_note' => $order->rejection_note,
-                'created_at'     => $order->created_at->toISOString(),
-                'cashier_name'   => $order->cashier?->name,
-                'table_number'   => $order->cafeTable?->table_number,
-                'items'          => $order->items->map(fn($i) => [
-                    'id'         => $i->id,
-                    'name'       => $i->menu->name,
+                'created_at' => $order->created_at->toISOString(),
+                'cashier_name' => $order->cashier?->name,
+                'table_number' => $order->cafeTable?->table_number,
+                'items' => $order->items->map(fn ($i) => [
+                    'id' => $i->id,
+                    'name' => $i->menu->name,
                     'unit_price' => $i->unit_price,
-                    'quantity'   => $i->quantity,
-                    'subtotal'   => $i->subtotal,
+                    'quantity' => $i->quantity,
+                    'subtotal' => $i->subtotal,
                 ]),
             ],
         ]);
@@ -48,17 +48,17 @@ class CashierOrderController extends Controller
         $request->validate(['status' => 'required|string|in:diproses,selesai']);
 
         $validTransitions = [
-            Order::STATUS_PENDING  => Order::STATUS_DIPROSES,
+            Order::STATUS_PENDING => Order::STATUS_DIPROSES,
             Order::STATUS_DIPROSES => Order::STATUS_SELESAI,
         ];
 
         $allowed = $validTransitions[$order->status] ?? null;
-        if (!$allowed || $allowed !== $request->status) {
+        if (! $allowed || $allowed !== $request->status) {
             return response()->json(['message' => 'Transisi status tidak valid.'], 409);
         }
 
         // Blok selesai jika belum bayar
-        if ($request->status === Order::STATUS_SELESAI && !$order->is_paid) {
+        if ($request->status === Order::STATUS_SELESAI && ! $order->is_paid) {
             return response()->json(['message' => 'Pesanan belum lunas. Konfirmasi pembayaran terlebih dahulu.'], 409);
         }
 
@@ -83,11 +83,12 @@ class CashierOrderController extends Controller
         $request->validate(['payment_method' => 'required|in:cash,qris']);
 
         $order->update([
-            'is_paid'        => true,
+            'is_paid' => true,
             'payment_method' => $request->payment_method,
-            'cashier_id'     => Auth::id(),
+            'cashier_id' => Auth::id(),
         ]);
         BroadcastPendingCount::dispatch();
+
         return response()->json(['message' => 'Pembayaran dikonfirmasi.']);
     }
 
@@ -99,7 +100,7 @@ class CashierOrderController extends Controller
 
         DB::transaction(function () use ($order, $inventoryService) {
             $order->update([
-                'status'     => Order::STATUS_DIPROSES,
+                'status' => Order::STATUS_DIPROSES,
                 'cashier_id' => Auth::id(),
             ]);
 
@@ -107,6 +108,7 @@ class CashierOrderController extends Controller
         });
 
         BroadcastPendingCount::dispatch();
+
         return response()->json(['message' => 'Pembayaran cash dikonfirmasi.']);
     }
 
@@ -123,15 +125,16 @@ class CashierOrderController extends Controller
             }
 
             $order->update([
-                'status'         => Order::STATUS_DIPROSES,
-                'cashier_id'     => Auth::id(),
-                'payment_proof'  => null,
+                'status' => Order::STATUS_DIPROSES,
+                'cashier_id' => Auth::id(),
+                'payment_proof' => null,
             ]);
 
             $inventoryService->processSaleForOrder($order, Auth::id());
         });
 
         BroadcastPendingCount::dispatch();
+
         return response()->json(['message' => 'Pembayaran QRIS dikonfirmasi.']);
     }
 
@@ -147,9 +150,10 @@ class CashierOrderController extends Controller
         }
 
         $order->update([
-            'payment_proof'  => null,
+            'payment_proof' => null,
             'rejection_note' => $request->note,
         ]);
+
         return response()->json(['message' => 'Bukti QRIS ditolak.']);
     }
 }

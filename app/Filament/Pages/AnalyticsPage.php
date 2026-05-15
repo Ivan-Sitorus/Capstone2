@@ -11,18 +11,24 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 abstract class AnalyticsPage extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    public bool    $hasResult = false;
-    public bool    $isRunning = false;
+    public bool $hasResult = false;
+
+    public bool $isRunning = false;
+
     public ?string $lastRunAt = null;
-    public ?string $errorMsg  = null;
+
+    public ?string $errorMsg = null;
 
     abstract protected function getAnalysisType(): string;
+
     abstract protected function getFastApiEndpoint(): string;
+
     abstract protected function getFastApiTimeout(): int;
 
     public function table(Table $table): Table
@@ -53,10 +59,11 @@ abstract class AnalyticsPage extends Page implements HasTable
                     ->label('Ringkasan')
                     ->state(function (DataMiningRun $record): string {
                         $r = $record->result;
+
                         return match ($record->analysis_type) {
-                            'menu_clustering', 'ingredient_clustering' => ($r['best_k'] ?? '?') . ' klaster, silhouette ' . round((float) ($r['silhouette_score'] ?? 0), 3),
-                            'menu_prediction', 'ingredient_prediction' => count($r['predictions'] ?? []) . ' item diprediksi',
-                            'association' => ($r['total_rules'] ?? 0) . ' aturan ditemukan',
+                            'menu_clustering', 'ingredient_clustering' => ($r['best_k'] ?? '?').' klaster, silhouette '.round((float) ($r['silhouette_score'] ?? 0), 3),
+                            'menu_prediction', 'ingredient_prediction' => count($r['predictions'] ?? []).' item diprediksi',
+                            'association' => ($r['total_rules'] ?? 0).' aturan ditemukan',
                             default => 'Lihat detail',
                         };
                     }),
@@ -119,11 +126,11 @@ abstract class AnalyticsPage extends Page implements HasTable
 
     protected function callFastAPI(): array
     {
-        $url = config('services.datamining.url') . $this->getFastApiEndpoint();
-        $response = \Illuminate\Support\Facades\Http::timeout($this->getFastApiTimeout())->post($url);
+        $url = config('services.datamining.url').$this->getFastApiEndpoint();
+        $response = Http::timeout($this->getFastApiTimeout())->post($url);
 
         if (! $response->successful()) {
-            throw new \Exception('FastAPI merespons dengan status ' . $response->status());
+            throw new \Exception('FastAPI merespons dengan status '.$response->status());
         }
 
         return $response->json();
@@ -132,17 +139,17 @@ abstract class AnalyticsPage extends Page implements HasTable
     protected function storeRun(array $data): DataMiningRun
     {
         return DataMiningRun::create([
-            'analysis_type'     => $this->getAnalysisType(),
-            'status'            => $data['status'] ?? 'completed',
-            'date_range_start'  => $data['date_range']['from'] ?? now()->subDays(30)->format('Y-m-d'),
-            'date_range_end'    => $data['date_range']['to'] ?? now()->format('Y-m-d'),
-            'parameters'        => [],
+            'analysis_type' => $this->getAnalysisType(),
+            'status' => $data['status'] ?? 'completed',
+            'date_range_start' => $data['date_range']['from'] ?? now()->subDays(30)->format('Y-m-d'),
+            'date_range_end' => $data['date_range']['to'] ?? now()->format('Y-m-d'),
+            'parameters' => [],
             'preprocessing_logs' => $data['preprocessing_logs'] ?? null,
-            'result'            => $data,
-            'charts'            => $data['charts'] ?? null,
-            'error_message'     => null,
-            'run_at'            => now(),
-            'user_id'           => Auth::id(),
+            'result' => $data,
+            'charts' => $data['charts'] ?? null,
+            'error_message' => null,
+            'run_at' => now(),
+            'user_id' => Auth::id(),
         ]);
     }
 

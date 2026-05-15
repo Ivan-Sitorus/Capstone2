@@ -4,15 +4,15 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Format;
+use Intervention\Image\ImageManager;
 
 class MenuImageService
 {
     public function convertAndStore(UploadedFile $file, ?string $oldPath = null): ?string
     {
-        if (!$file->isValid()) {
+        if (! $file->isValid()) {
             return null;
         }
 
@@ -20,12 +20,12 @@ class MenuImageService
             Storage::disk('public')->delete($oldPath);
         }
 
-        $manager = new ImageManager(new Driver());
+        $manager = new ImageManager(new Driver);
         $image = $manager->decode($file);
         $image->scale(width: 800);
 
-        $filename = 'menu_' . time() . '_' . uniqid() . '.webp';
-        $path = 'menus/' . $filename;
+        $filename = 'menu_'.time().'_'.uniqid().'.webp';
+        $path = 'menus/'.$filename;
 
         $encoded = $image->encodeUsingFormat(Format::WEBP, quality: 70);
         $binary = base64_decode($encoded->toBase64());
@@ -46,6 +46,7 @@ class MenuImageService
         if (! $path) {
             return null;
         }
-        return asset('storage/' . $path);
+
+        return asset('storage/'.$path);
     }
 }

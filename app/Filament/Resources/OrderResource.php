@@ -2,22 +2,19 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Schemas\Components\Section;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\Filter;
-use Filament\Actions\ViewAction;
-use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\Pages\ViewOrder;
-use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 use App\Models\Order;
+use Filament\Actions\ViewAction;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
@@ -26,9 +23,9 @@ class OrderResource extends Resource
 {
     protected static ?string $model = Order::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Transaksi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
 
     protected static ?string $navigationLabel = 'Pesanan';
 
@@ -152,15 +149,15 @@ class OrderResource extends Resource
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
-                        'pending'  => 'Pending',
+                        'pending' => 'Pending',
                         'diproses' => 'Diproses',
-                        'selesai'  => 'Selesai',
+                        'selesai' => 'Selesai',
                     ]),
                 SelectFilter::make('payment_method')
                     ->label('Metode Bayar')
                     ->options([
-                        'cash'        => 'Tunai',
-                        'qris'        => 'QRIS',
+                        'cash' => 'Tunai',
+                        'qris' => 'QRIS',
                         'bayar_nanti' => 'Bayar Nanti',
                     ]),
                 Filter::make('today')
@@ -193,7 +190,7 @@ class OrderResource extends Resource
     {
         return [
             'index' => ListOrders::route('/'),
-            'view'  => ViewOrder::route('/{record}'),
+            'view' => ViewOrder::route('/{record}'),
         ];
     }
 

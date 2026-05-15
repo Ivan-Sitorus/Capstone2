@@ -2,9 +2,10 @@
 
 namespace App\Filament\Resources\IngredientResource\Pages;
 
+use App\Filament\Helpers\NumberInputHelper;
+use App\Filament\Resources\IngredientResource;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
-use App\Filament\Helpers\NumberInputHelper;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -25,7 +26,7 @@ class ManageBatches extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static string $resource = \App\Filament\Resources\IngredientResource::class;
+    protected static string $resource = IngredientResource::class;
 
     protected string $view = 'filament.pages.manage-batches';
 
@@ -54,13 +55,13 @@ class ManageBatches extends Page implements HasTable
                 TextColumn::make('quantity')
                     ->label('Quantity')
                     ->numeric(decimalPlaces: 2)
-                    ->suffix(' ' . $unit)
+                    ->suffix(' '.$unit)
                     ->sortable(),
                 TextColumn::make('expiry_date')
                     ->label('Expiry Date')
                     ->date()
                     ->sortable()
-                    ->color(fn ($record) => !$record->expiry_date ? 'gray' : ($record->expiry_date->isPast() ? 'danger' : ($record->expiry_date->diffInDays(now()) < 7 ? 'warning' : 'success'))),
+                    ->color(fn ($record) => ! $record->expiry_date ? 'gray' : ($record->expiry_date->isPast() ? 'danger' : ($record->expiry_date->diffInDays(now()) < 7 ? 'warning' : 'success'))),
                 TextColumn::make('received_at')
                     ->label('Received At')
                     ->dateTime()
@@ -83,7 +84,7 @@ class ManageBatches extends Page implements HasTable
                             ->stripCharacters('.')
                             ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                             ->extraInputAttributes(NumberInputHelper::decimal())
-                            ->suffix(fn () => ' ' . $this->record->unit),
+                            ->suffix(fn () => ' '.$this->record->unit),
                         DatePicker::make('expiry_date')
                             ->label('Expiry Date')
                             ->nullable()
@@ -93,15 +94,15 @@ class ManageBatches extends Page implements HasTable
                             ->required()
                             ->default(now())
                             ->native(false),
-                    TextInput::make('cost_per_unit')
-                        ->label('Cost per Unit')
-                        ->required()
-                        ->numeric()
-                        ->minValue(0)
-                        ->type('text')
-                        ->stripCharacters('.')
-                        ->extraInputAttributes(NumberInputHelper::integer())
-                        ->prefix('Rp'),
+                        TextInput::make('cost_per_unit')
+                            ->label('Cost per Unit')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->type('text')
+                            ->stripCharacters('.')
+                            ->extraInputAttributes(NumberInputHelper::integer())
+                            ->prefix('Rp'),
                     ])
                     ->using(function (array $data): IngredientBatch {
                         return $this->record->batches()->create($data);
@@ -119,7 +120,7 @@ class ManageBatches extends Page implements HasTable
                             ->stripCharacters('.')
                             ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                             ->extraInputAttributes(NumberInputHelper::decimal())
-                            ->suffix(fn () => ' ' . $this->record->unit),
+                            ->suffix(fn () => ' '.$this->record->unit),
                         DatePicker::make('expiry_date')
                             ->label('Expiry Date')
                             ->nullable()
@@ -129,15 +130,15 @@ class ManageBatches extends Page implements HasTable
                             ->required()
                             ->default(now())
                             ->native(false),
-                    TextInput::make('cost_per_unit')
-                        ->label('Cost per Unit')
-                        ->required()
-                        ->numeric()
-                        ->minValue(0)
-                        ->type('text')
-                        ->stripCharacters('.')
-                        ->extraInputAttributes(NumberInputHelper::integer())
-                        ->prefix('Rp'),
+                        TextInput::make('cost_per_unit')
+                            ->label('Cost per Unit')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->type('text')
+                            ->stripCharacters('.')
+                            ->extraInputAttributes(NumberInputHelper::integer())
+                            ->prefix('Rp'),
                     ]),
                 DeleteAction::make(),
             ])

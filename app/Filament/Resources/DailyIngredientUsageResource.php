@@ -2,25 +2,23 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\DailyIngredientUsageResource\Pages\ListDailyIngredientUsages;
+use App\Models\DailyIngredientUsage;
+use Filament\Forms\Components\DatePicker;
+use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Filters\SelectFilter;
-use App\Filament\Resources\DailyIngredientUsageResource\Pages\ListDailyIngredientUsages;
-use App\Filament\Resources\DailyIngredientUsageResource\Pages;
-use App\Models\DailyIngredientUsage;
-use Filament\Resources\Resource;
-use Filament\Tables;
 use Filament\Tables\Table;
 
 class DailyIngredientUsageResource extends Resource
 {
     protected static ?string $model = DailyIngredientUsage::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
 
     protected static ?string $navigationLabel = 'Pemakaian Bahan Harian';
 

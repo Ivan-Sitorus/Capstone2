@@ -5,18 +5,20 @@ namespace App\DTO;
 class ReportData
 {
     public const TYPE_SIMPLE = 'simple';
-    public const TYPE_RIGID  = 'rigid';
+
+    public const TYPE_RIGID = 'rigid';
+
     public const TYPE_CUSTOM = 'custom';
 
     /**
-     * @param  string         $type         simple|rigid|custom
-     * @param  string         $title        Report display title
-     * @param  string         $dateStart    Start date (Y-m-d)
-     * @param  string         $dateEnd      End date (Y-m-d)
-     * @param  string         $aggregation  daily|monthly
-     * @param  SummaryItem[]  $summary      Aggregated summary items
-     * @param  ReportRow[]    $rows         Detail rows
-     * @param  array          $config       Original config (custom report only)
+     * @param  string  $type  simple|rigid|custom
+     * @param  string  $title  Report display title
+     * @param  string  $dateStart  Start date (Y-m-d)
+     * @param  string  $dateEnd  End date (Y-m-d)
+     * @param  string  $aggregation  daily|monthly
+     * @param  SummaryItem[]  $summary  Aggregated summary items
+     * @param  ReportRow[]  $rows  Detail rows
+     * @param  array  $config  Original config (custom report only)
      */
     public function __construct(
         public readonly string $type,
@@ -24,11 +26,10 @@ class ReportData
         public readonly string $dateStart,
         public readonly string $dateEnd,
         public readonly string $aggregation,
-        public readonly array  $summary = [],
-        public readonly array  $rows = [],
-        public readonly array  $config = [],
-    ) {
-    }
+        public readonly array $summary = [],
+        public readonly array $rows = [],
+        public readonly array $config = [],
+    ) {}
 
     // ─── Factory: SimpleReportService output ──────────────────────────
 
@@ -38,34 +39,34 @@ class ReportData
 
         foreach ($data['income_breakdown'] ?? [] as $item) {
             $rows[] = new ReportRow(
-                date:     '',
+                date: '',
                 category: $item['source'] ?? 'Unknown',
-                type:     ReportRow::TYPE_INCOME,
-                amount:   (float) ($item['total'] ?? 0),
-                rawData:  $item,
+                type: ReportRow::TYPE_INCOME,
+                amount: (float) ($item['total'] ?? 0),
+                rawData: $item,
             );
         }
 
         foreach ($data['expense_breakdown'] ?? [] as $item) {
             $rows[] = new ReportRow(
-                date:     '',
+                date: '',
                 category: $item['source'] ?? 'Unknown',
-                type:     ReportRow::TYPE_EXPENSE,
-                amount:   (float) ($item['total'] ?? 0),
-                rawData:  $item,
+                type: ReportRow::TYPE_EXPENSE,
+                amount: (float) ($item['total'] ?? 0),
+                rawData: $item,
             );
         }
 
-        $totalIncome  = (float) ($data['total_income'] ?? 0);
+        $totalIncome = (float) ($data['total_income'] ?? 0);
         $totalExpense = (float) ($data['total_expense'] ?? 0);
-        $net          = (float) ($data['net'] ?? 0);
+        $net = (float) ($data['net'] ?? 0);
 
         $rows[] = new ReportRow(
-            date:     '',
+            date: '',
             category: 'Net',
-            type:     ReportRow::TYPE_GRAND_TOTAL,
-            amount:   $net,
-            isBold:   true,
+            type: ReportRow::TYPE_GRAND_TOTAL,
+            amount: $net,
+            isBold: true,
         );
 
         $summary = [
@@ -77,13 +78,13 @@ class ReportData
         $title = "Simple Report {$dateStart} — {$dateEnd}";
 
         return new self(
-            type:        self::TYPE_SIMPLE,
-            title:       $title,
-            dateStart:   $dateStart,
-            dateEnd:     $dateEnd,
+            type: self::TYPE_SIMPLE,
+            title: $title,
+            dateStart: $dateStart,
+            dateEnd: $dateEnd,
             aggregation: 'daily',
-            summary:     $summary,
-            rows:        $rows,
+            summary: $summary,
+            rows: $rows,
         );
     }
 
@@ -91,25 +92,25 @@ class ReportData
 
     public static function fromRigidReport(array $data, string $dateStart, string $dateEnd): self
     {
-        $is  = $data['income_statement'] ?? [];
-        $cf  = $data['cash_flow'] ?? [];
+        $is = $data['income_statement'] ?? [];
+        $cf = $data['cash_flow'] ?? [];
         $meta = $data['meta'] ?? [];
 
-        $pendapatan            = (float) ($is['pendapatan'] ?? 0);
-        $pendapatanOrders      = (float) ($is['pendapatan_orders'] ?? 0);
-        $pendapatanUnexpected  = (float) ($is['pendapatan_unexpected'] ?? 0);
-        $hpp                   = (float) ($is['hpp'] ?? 0);
-        $labaKotor             = (float) ($is['laba_kotor'] ?? 0);
-        $bebanOperasional      = (float) ($is['beban_operasional'] ?? 0);
-        $bebanTakTerduga       = (float) ($is['beban_tak_terduga'] ?? 0);
-        $labaRugiBersih        = (float) ($is['laba_rugi_bersih'] ?? 0);
+        $pendapatan = (float) ($is['pendapatan'] ?? 0);
+        $pendapatanOrders = (float) ($is['pendapatan_orders'] ?? 0);
+        $pendapatanUnexpected = (float) ($is['pendapatan_unexpected'] ?? 0);
+        $hpp = (float) ($is['hpp'] ?? 0);
+        $labaKotor = (float) ($is['laba_kotor'] ?? 0);
+        $bebanOperasional = (float) ($is['beban_operasional'] ?? 0);
+        $bebanTakTerduga = (float) ($is['beban_tak_terduga'] ?? 0);
+        $labaRugiBersih = (float) ($is['laba_rugi_bersih'] ?? 0);
 
-        $arusKasMasuk      = (float) ($cf['arus_kas_masuk'] ?? 0);
-        $arusKasKeluar     = (float) ($cf['arus_kas_keluar'] ?? 0);
-        $arusKasBersih     = (float) ($cf['arus_kas_bersih'] ?? 0);
+        $arusKasMasuk = (float) ($cf['arus_kas_masuk'] ?? 0);
+        $arusKasKeluar = (float) ($cf['arus_kas_keluar'] ?? 0);
+        $arusKasBersih = (float) ($cf['arus_kas_bersih'] ?? 0);
         $receivablePayments = (float) ($cf['receivable_payments'] ?? 0);
-        $saldoAwal          = (float) ($cf['saldo_awal'] ?? 0);
-        $saldoAkhir         = (float) ($cf['saldo_akhir'] ?? 0);
+        $saldoAwal = (float) ($cf['saldo_awal'] ?? 0);
+        $saldoAkhir = (float) ($cf['saldo_akhir'] ?? 0);
 
         $rows = [];
 
@@ -217,7 +218,7 @@ class ReportData
             amount: $saldoAkhir, isBold: true,
         );
 
-        $totalIncome  = $pendapatan + $arusKasMasuk + $saldoAwal;
+        $totalIncome = $pendapatan + $arusKasMasuk + $saldoAwal;
         $totalExpense = $hpp + $bebanOperasional + $bebanTakTerduga + $arusKasKeluar;
 
         $summary = [
@@ -230,13 +231,13 @@ class ReportData
         $title = "Rigid Report {$dateStart} — {$dateEnd}";
 
         return new self(
-            type:        self::TYPE_RIGID,
-            title:       $title,
-            dateStart:   $dateStart,
-            dateEnd:     $dateEnd,
+            type: self::TYPE_RIGID,
+            title: $title,
+            dateStart: $dateStart,
+            dateEnd: $dateEnd,
             aggregation: 'daily',
-            summary:     $summary,
-            rows:        $rows,
+            summary: $summary,
+            rows: $rows,
         );
     }
 
@@ -244,23 +245,23 @@ class ReportData
 
     public static function fromCustomReport(array $data, string $dateStart, string $dateEnd): self
     {
-        $config      = $data['config'] ?? [];
-        $sourceRows  = $data['rows'] ?? [];
+        $config = $data['config'] ?? [];
+        $sourceRows = $data['rows'] ?? [];
         $sourceSummary = $data['summary'] ?? [];
         $aggregation = $config['aggregation'] ?? 'monthly';
 
         $rows = [];
         foreach ($sourceRows as $item) {
             $rows[] = new ReportRow(
-                date:         $item['date'] ?? '',
-                category:     $item['category'] ?? '',
-                type:         $item['type'] ?? ReportRow::TYPE_INCOME,
-                amount:       (float) ($item['amount'] ?? 0),
+                date: $item['date'] ?? '',
+                category: $item['category'] ?? '',
+                type: $item['type'] ?? ReportRow::TYPE_INCOME,
+                amount: (float) ($item['amount'] ?? 0),
                 runningTotal: array_key_exists('running_total', $item)
                     ? (float) $item['running_total'] : null,
-                indentLevel:  (int) ($item['indent_level'] ?? 0),
-                isBold:       (bool) ($item['is_bold'] ?? false),
-                rawData:      $item,
+                indentLevel: (int) ($item['indent_level'] ?? 0),
+                isBold: (bool) ($item['is_bold'] ?? false),
+                rawData: $item,
             );
         }
 
@@ -286,14 +287,14 @@ class ReportData
         $title = "Custom Report {$dateStart} — {$dateEnd}";
 
         return new self(
-            type:        self::TYPE_CUSTOM,
-            title:       $title,
-            dateStart:   $dateStart,
-            dateEnd:     $dateEnd,
+            type: self::TYPE_CUSTOM,
+            title: $title,
+            dateStart: $dateStart,
+            dateEnd: $dateEnd,
             aggregation: $aggregation,
-            summary:     $summary,
-            rows:        $rows,
-            config:      $config,
+            summary: $summary,
+            rows: $rows,
+            config: $config,
         );
     }
 
@@ -301,12 +302,12 @@ class ReportData
 
     public static function fromGeneratedReport(array $result): self
     {
-        $type        = $result['type'] ?? self::TYPE_SIMPLE;
-        $title       = $result['title'] ?? '';
-        $dateStart   = $result['date_start'] ?? '';
-        $dateEnd     = $result['date_end'] ?? '';
+        $type = $result['type'] ?? self::TYPE_SIMPLE;
+        $title = $result['title'] ?? '';
+        $dateStart = $result['date_start'] ?? '';
+        $dateEnd = $result['date_end'] ?? '';
         $aggregation = $result['aggregation'] ?? 'daily';
-        $config      = $result['config'] ?? [];
+        $config = $result['config'] ?? [];
 
         $rows = [];
         foreach ($result['rows'] ?? [] as $item) {
@@ -319,14 +320,14 @@ class ReportData
         }
 
         return new self(
-            type:        $type,
-            title:       $title,
-            dateStart:   $dateStart,
-            dateEnd:     $dateEnd,
+            type: $type,
+            title: $title,
+            dateStart: $dateStart,
+            dateEnd: $dateEnd,
             aggregation: $aggregation,
-            summary:     $summary,
-            rows:        $rows,
-            config:      $config,
+            summary: $summary,
+            rows: $rows,
+            config: $config,
         );
     }
 
@@ -345,17 +346,17 @@ class ReportData
         }
 
         return [
-            'type'        => $this->type,
-            'title'       => $this->title,
-            'date_start'  => $this->dateStart,
-            'date_end'    => $this->dateEnd,
+            'type' => $this->type,
+            'title' => $this->title,
+            'date_start' => $this->dateStart,
+            'date_end' => $this->dateEnd,
             'aggregation' => $this->aggregation,
-            'total_income'  => $this->getTotalIncome(),
+            'total_income' => $this->getTotalIncome(),
             'total_expense' => $this->getTotalExpense(),
-            'net'           => $this->getNet(),
-            'rows'        => $rowsArray,
-            'summary'     => $summaryArray,
-            'config'      => $this->config,
+            'net' => $this->getNet(),
+            'rows' => $rowsArray,
+            'summary' => $summaryArray,
+            'config' => $this->config,
         ];
     }
 
@@ -369,6 +370,7 @@ class ReportData
                 $sum += $row->amount;
             }
         }
+
         return round($sum, 2);
     }
 
@@ -380,6 +382,7 @@ class ReportData
                 $sum += $row->amount;
             }
         }
+
         return round($sum, 2);
     }
 
@@ -392,6 +395,6 @@ class ReportData
 
     private static function formatCurrency(float $amount): string
     {
-        return 'Rp ' . number_format($amount, 0, ',', '.');
+        return 'Rp '.number_format($amount, 0, ',', '.');
     }
 }

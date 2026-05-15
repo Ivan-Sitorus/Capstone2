@@ -13,33 +13,26 @@ final class AccountingFormatter
 
     /**
      * Format angka ke Rupiah Indonesia: "Rp 1.000.000".
-     *
-     * @param  float  $amount
-     * @return string
      */
     public static function rupiah(float $amount): string
     {
-        return 'Rp ' . number_format($amount, 0, ',', '.');
+        return 'Rp '.number_format($amount, 0, ',', '.');
     }
 
     /**
      * Format angka untuk UI display (bisa negatif di-wrap parentheses).
-     *
-     * @param  float  $amount
-     * @return string
      */
     public static function rupiahAccounting(float $amount): string
     {
         if ($amount < 0) {
-            return '(Rp ' . number_format(abs($amount), 0, ',', '.') . ')';
+            return '(Rp '.number_format(abs($amount), 0, ',', '.').')';
         }
-        return 'Rp ' . number_format($amount, 0, ',', '.');
+
+        return 'Rp '.number_format($amount, 0, ',', '.');
     }
 
     /**
      * Return PhpSpreadsheet accounting format string for IDR.
-     *
-     * @return string
      */
     public static function excelFormatRupiah(): string
     {
@@ -48,8 +41,6 @@ final class AccountingFormatter
 
     /**
      * Return percentage format for PhpSpreadsheet.
-     *
-     * @return string
      */
     public static function excelPercentFormat(): string
     {
@@ -58,9 +49,6 @@ final class AccountingFormatter
 
     /**
      * Format tanggal ke Indonesia: "22 Feb 2026".
-     *
-     * @param  string  $date
-     * @return string
      */
     public static function dateIndo(string $date): string
     {
@@ -69,9 +57,6 @@ final class AccountingFormatter
 
     /**
      * Format tanggal lengkap: "22 Februari 2026".
-     *
-     * @param  string  $date
-     * @return string
      */
     public static function dateIndoFull(string $date): string
     {
@@ -85,9 +70,6 @@ final class AccountingFormatter
 
     /**
      * Map internal source codes to Indonesian labels.
-     *
-     * @param  string  $source
-     * @return string
      */
     public static function sourceLabel(string $source): string
     {

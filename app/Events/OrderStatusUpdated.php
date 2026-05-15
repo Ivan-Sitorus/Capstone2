@@ -14,7 +14,7 @@ class OrderStatusUpdated implements ShouldBroadcastNow
 
     public function __construct(
         public readonly string $status,
-        public readonly int    $pendingCount,
+        public readonly int $pendingCount,
     ) {}
 
     /**
@@ -34,8 +34,8 @@ class OrderStatusUpdated implements ShouldBroadcastNow
     public function broadcastWith(): array
     {
         return [
-            'status'        => $this->status,
-            'pendingCount'  => $this->pendingCount,
+            'status' => $this->status,
+            'pendingCount' => $this->pendingCount,
         ];
     }
 }

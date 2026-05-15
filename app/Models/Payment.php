@@ -18,7 +18,7 @@ class Payment extends Model
     protected function casts(): array
     {
         return [
-            'amount'  => 'integer',
+            'amount' => 'integer',
             'paid_at' => 'datetime',
         ];
     }

@@ -14,13 +14,13 @@ class DataMiningRun extends Model
     ];
 
     protected $casts = [
-        'parameters'        => 'array',
+        'parameters' => 'array',
         'preprocessing_logs' => 'array',
-        'result'             => 'array',
-        'charts'             => 'array',
-        'date_range_start'   => 'date',
-        'date_range_end'     => 'date',
-        'run_at'             => 'datetime',
+        'result' => 'array',
+        'charts' => 'array',
+        'date_range_start' => 'date',
+        'date_range_end' => 'date',
+        'run_at' => 'datetime',
     ];
 
     public function user(): BelongsTo

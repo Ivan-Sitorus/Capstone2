@@ -15,7 +15,7 @@ class CustomerMenuController extends Controller
     {
         $tableId = $request->query('table');
 
-        if (!$tableId) {
+        if (! $tableId) {
             return redirect()->route('pelanggan.menu');
         }
 
@@ -26,14 +26,14 @@ class CustomerMenuController extends Controller
     {
         $categories = Cache::remember('customer_menu_v1', 300, function () {
             return Category::with([
-                'menus' => fn($q) => $q
+                'menus' => fn ($q) => $q
                     ->where('is_available', true)
                     ->select(['id', 'category_id', 'name', 'price', 'cashback', 'image'])
                     ->orderBy('name'),
             ])->where('is_active', true)
-              ->select(['id', 'name', 'slug'])
-              ->orderBy('name')
-              ->get();
+                ->select(['id', 'name', 'slug'])
+                ->orderBy('name')
+                ->get();
         });
 
         $table = $request->query('table')

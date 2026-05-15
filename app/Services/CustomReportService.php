@@ -23,14 +23,14 @@ class CustomReportService
 
     /**
      * @param  array  $config  ['date_start','date_end','categories'=>[],'aggregation'=>'daily'|'monthly']
-     * @return array  ['config','rows'=>[['date','category','type','amount','running_total']],'summary'=>[...]]
+     * @return array ['config','rows'=>[['date','category','type','amount','running_total']],'summary'=>[...]]
      */
     public function generate(array $config): array
     {
-        $dateStart  = Carbon::parse($config['date_start']);
-        $dateEnd    = Carbon::parse($config['date_end']);
-        $from       = $dateStart->copy()->startOfDay();
-        $to         = $dateEnd->copy()->endOfDay();
+        $dateStart = Carbon::parse($config['date_start']);
+        $dateEnd = Carbon::parse($config['date_end']);
+        $from = $dateStart->copy()->startOfDay();
+        $to = $dateEnd->copy()->endOfDay();
         $aggregation = ($config['aggregation'] ?? 'monthly') === 'daily' ? 'daily' : 'monthly';
         $categoryFilters = $config['categories'] ?? [];
 
@@ -38,11 +38,11 @@ class CustomReportService
             = $this->parseCategoryFilters($categoryFilters);
 
         $dateExpr = $aggregation === 'daily'
-            ? "DATE(%s)"
+            ? 'DATE(%s)'
             : "DATE_TRUNC('month', %s)::date";
 
         $unionParts = [];
-        $bindings   = [];
+        $bindings = [];
 
         if ($menuCatIds !== null) {
             $unionParts[] = $this->incomeMenuSql($from, $to, $dateExpr, $menuCatIds, $bindings);
@@ -65,8 +65,8 @@ class CustomReportService
         } else {
             $unionSql = implode("\nUNION ALL\n", $unionParts);
             $sql = "SELECT bucket_date, category, type, CAST(amount AS NUMERIC(15,2)) AS amount\n"
-                  . "FROM ({$unionSql}) combined\n"
-                  . "ORDER BY bucket_date, type DESC, category";
+                  ."FROM ({$unionSql}) combined\n"
+                  .'ORDER BY bucket_date, type DESC, category';
 
             $rows = DB::select($sql, $bindings);
         }
@@ -91,7 +91,7 @@ class CustomReportService
         }
         unset($row);
 
-        $totalIncome  = 0;
+        $totalIncome = 0;
         $totalExpense = 0;
         foreach ($allRows as $row) {
             if ($row['type'] === 'Income') {
@@ -102,12 +102,12 @@ class CustomReportService
         }
 
         return [
-            'config'    => $config,
-            'rows'      => $allRows,
-            'summary'   => [
-                'total_income'  => round($totalIncome, 2),
+            'config' => $config,
+            'rows' => $allRows,
+            'summary' => [
+                'total_income' => round($totalIncome, 2),
                 'total_expense' => round($totalExpense, 2),
-                'net'           => round($totalIncome - $totalExpense, 2),
+                'net' => round($totalIncome - $totalExpense, 2),
             ],
         ];
     }
@@ -121,9 +121,9 @@ class CustomReportService
     {
         $includeAll = empty($categoryFilters);
 
-        $menuCatIds    = null;
+        $menuCatIds = null;
         $includeUncInc = true;
-        $includeBb     = true;
+        $includeBb = true;
         $includeUncExp = true;
 
         if ($includeAll) {
@@ -131,9 +131,9 @@ class CustomReportService
         }
 
         $menuIds = [];
-        $uncInc  = false;
-        $bb      = false;
-        $uncExp  = false;
+        $uncInc = false;
+        $bb = false;
+        $uncExp = false;
 
         foreach ($categoryFilters as $ident) {
             if ($ident === 'unexpected_income') {
@@ -165,7 +165,7 @@ class CustomReportService
     {
         $dateCol = sprintf($dateExpr, 'o.created_at');
 
-        $where = "o.is_paid = true AND o.created_at BETWEEN ? AND ?";
+        $where = 'o.is_paid = true AND o.created_at BETWEEN ? AND ?';
         $bindings[] = $from;
         $bindings[] = $to;
 
@@ -243,17 +243,17 @@ class CustomReportService
      * so empty categories are not hidden.
      */
     private function fillMissingCombos(
-        array   $rows,
-        Carbon  $from,
-        Carbon  $to,
-        string  $aggregation,
-        ?array  $menuCatIds,
-        bool    $includeUncInc,
-        bool    $includeBb,
-        bool    $includeUncExp,
+        array $rows,
+        Carbon $from,
+        Carbon $to,
+        string $aggregation,
+        ?array $menuCatIds,
+        bool $includeUncInc,
+        bool $includeBb,
+        bool $includeUncExp,
     ): array {
         $buckets = [];
-        $cur     = $from->copy();
+        $cur = $from->copy();
         if ($aggregation === 'daily') {
             while ($cur->lte($to)) {
                 $buckets[] = $cur->format('Y-m-d');
@@ -336,6 +336,7 @@ class CustomReportService
             if ($typeCmp !== 0) {
                 return $typeCmp;
             }
+
             return strcmp($a['category'], $b['category']);
         });
     }
@@ -348,10 +349,10 @@ class CustomReportService
     private function makeRow(string $date, string $category, string $type, float $amount): array
     {
         return [
-            'date'          => $date,
-            'category'      => $category,
-            'type'          => $type,
-            'amount'        => round($amount, 2),
+            'date' => $date,
+            'category' => $category,
+            'type' => $type,
+            'amount' => round($amount, 2),
             'running_total' => 0,
         ];
     }
@@ -359,10 +360,10 @@ class CustomReportService
     private function toArray(\stdClass $obj): array
     {
         return [
-            'date'          => $obj->bucket_date,
-            'category'      => $obj->category,
-            'type'          => $obj->type,
-            'amount'        => (float) $obj->amount,
+            'date' => $obj->bucket_date,
+            'category' => $obj->category,
+            'type' => $obj->type,
+            'amount' => (float) $obj->amount,
             'running_total' => 0,
         ];
     }

@@ -8,6 +8,7 @@ use App\Models\UnexpectedTransaction;
 use Carbon\Carbon;
 use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 use Livewire\Attributes\On;
 
@@ -16,17 +17,27 @@ class CashFlowChartWidget extends ChartWidget
     public string $period = 'month';
 
     public string $dateStart = '';
+
     public string $dateEnd = '';
 
     protected ?string $pollingInterval = null;
 
     protected int|string|array $columnSpan = 2;
 
-    public static function isLazy(): bool { return false; }
+    public static function isLazy(): bool
+    {
+        return false;
+    }
 
-    public function getHeading(): string { return 'Analisis Arus Kas'; }
+    public function getHeading(): string
+    {
+        return 'Analisis Arus Kas';
+    }
 
-    public function getDescription(): ?string { return 'Pemasukan dari transaksi vs Pengeluaran'; }
+    public function getDescription(): ?string
+    {
+        return 'Pemasukan dari transaksi vs Pengeluaran';
+    }
 
     #[On('cashflow-period-changed')]
     public function onPeriodChanged(string $period): void
@@ -43,7 +54,7 @@ class CashFlowChartWidget extends ChartWidget
         $this->dateEnd = $end;
     }
 
-    private function incomeQuery(): \Illuminate\Database\Eloquent\Builder
+    private function incomeQuery(): Builder
     {
         return Order::where('is_paid', true);
     }
@@ -54,6 +65,7 @@ class CashFlowChartWidget extends ChartWidget
             ->whereBetween('created_at', [$start, $end])->sum('total_amount');
         $unexpected = (float) UnexpectedTransaction::where('jenis', 'pemasukan')
             ->whereBetween('created_at', [$start, $end])->sum('nominal');
+
         return $orders + $unexpected;
     }
 
@@ -63,12 +75,13 @@ class CashFlowChartWidget extends ChartWidget
             ->selectRaw('SUM(quantity * cost_per_unit) as total')->value('total') ?? 0;
         $unexpected = (float) UnexpectedTransaction::where('jenis', 'pengeluaran')
             ->whereBetween('created_at', [$start, $end])->sum('nominal');
+
         return $batches + $unexpected;
     }
 
     private function buildData(): array
     {
-        $cacheKey = 'cashflow_chart_' . md5(serialize([
+        $cacheKey = 'cashflow_chart_'.md5(serialize([
             $this->period,
             $this->dateStart,
             $this->dateEnd,
@@ -80,10 +93,10 @@ class CashFlowChartWidget extends ChartWidget
             }
 
             return match ($this->period) {
-                'day'      => $this->byHour(),
-                'year'     => $this->byMonthOfYear(),
+                'day' => $this->byHour(),
+                'year' => $this->byMonthOfYear(),
                 'all_time' => $this->byMonth(),
-                default    => $this->byEvenDay(),   // month
+                default => $this->byEvenDay(),   // month
             };
         });
     }
@@ -91,14 +104,14 @@ class CashFlowChartWidget extends ChartWidget
     private function buildDynamicRange(): array
     {
         $start = Carbon::parse($this->dateStart)->startOfDay();
-        $end   = Carbon::parse($this->dateEnd)->endOfDay();
-        $days  = (int) $start->diffInDays($end) + 1;
+        $end = Carbon::parse($this->dateEnd)->endOfDay();
+        $days = (int) $start->diffInDays($end) + 1;
 
         return match (true) {
-            $days <= 7   => $this->byDayRange($start, $end),
-            $days <= 60  => $this->byWeekRange($start, $end),
+            $days <= 7 => $this->byDayRange($start, $end),
+            $days <= 60 => $this->byWeekRange($start, $end),
             $days <= 365 => $this->byMonthRange($start, $end),
-            default      => $this->byQuarterRange($start, $end),
+            default => $this->byQuarterRange($start, $end),
         };
     }
 
@@ -109,7 +122,7 @@ class CashFlowChartWidget extends ChartWidget
 
         while ($cur->lte($end)) {
             $dayStart = $cur->copy()->startOfDay();
-            $dayEnd   = $cur->copy()->endOfDay();
+            $dayEnd = $cur->copy()->endOfDay();
             $labels[] = $cur->isoFormat('D MMM');
             $incData[] = $this->slotIncome($dayStart, $dayEnd);
             $expData[] = $this->slotExpense($dayStart, $dayEnd);
@@ -129,7 +142,7 @@ class CashFlowChartWidget extends ChartWidget
             $weekEnd = $cur->copy()->endOfWeek();
             $slotEnd = $weekEnd->gt($end) ? $end->copy() : $weekEnd;
 
-            $labels[]  = 'Minggu ' . $weekNum;
+            $labels[] = 'Minggu '.$weekNum;
             $incData[] = $this->slotIncome($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
             $expData[] = $this->slotExpense($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
 
@@ -147,9 +160,9 @@ class CashFlowChartWidget extends ChartWidget
 
         while ($cur->lte($end)) {
             $monthEnd = $cur->copy()->endOfMonth();
-            $slotEnd  = $monthEnd->gt($end) ? $end->copy() : $monthEnd;
+            $slotEnd = $monthEnd->gt($end) ? $end->copy() : $monthEnd;
 
-            $labels[]  = $cur->isoFormat('MMM YYYY');
+            $labels[] = $cur->isoFormat('MMM YYYY');
             $incData[] = $this->slotIncome($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
             $expData[] = $this->slotExpense($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
 
@@ -168,9 +181,9 @@ class CashFlowChartWidget extends ChartWidget
 
         while ($cur->lte($end) && $pointCount < $maxPoints) {
             $quarterEnd = $cur->copy()->addMonths(2)->endOfMonth();
-            $slotEnd    = $quarterEnd->gt($end) ? $end->copy() : $quarterEnd;
+            $slotEnd = $quarterEnd->gt($end) ? $end->copy() : $quarterEnd;
 
-            $labels[]  = $cur->isoFormat('MMM YYYY') . ' – ' . $quarterEnd->isoFormat('MMM YYYY');
+            $labels[] = $cur->isoFormat('MMM YYYY').' – '.$quarterEnd->isoFormat('MMM YYYY');
             $incData[] = $this->slotIncome($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
             $expData[] = $this->slotExpense($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
 
@@ -185,16 +198,17 @@ class CashFlowChartWidget extends ChartWidget
     private function byHour(): array
     {
         $labels = $incData = $expData = [];
-        $today  = Carbon::today();
+        $today = Carbon::today();
 
         foreach ([0, 3, 6, 9, 12, 15, 18, 21] as $h) {
             $start = $today->copy()->setHour($h)->setMinute(0)->setSecond(0);
-            $end   = $today->copy()->setHour($h + 2)->setMinute(59)->setSecond(59);
+            $end = $today->copy()->setHour($h + 2)->setMinute(59)->setSecond(59);
 
-            $labels[]  = sprintf('%02d:00', $h);
+            $labels[] = sprintf('%02d:00', $h);
             $incData[] = $this->slotIncome($start, $end);
             $expData[] = $this->slotExpense($start, $end);
         }
+
         return compact('labels', 'incData', 'expData');
     }
 
@@ -202,57 +216,60 @@ class CashFlowChartWidget extends ChartWidget
     private function byEvenDay(): array
     {
         $labels = $incData = $expData = [];
-        $s      = Carbon::now()->startOfMonth();
-        $e      = Carbon::now()->endOfMonth();
-        $cur    = $s->copy();
+        $s = Carbon::now()->startOfMonth();
+        $e = Carbon::now()->endOfMonth();
+        $cur = $s->copy();
 
         while ($cur->lte($e)) {
             if ($cur->day % 2 === 0) {
-                $dayStart  = $cur->copy()->startOfDay();
-                $dayEnd    = $cur->copy()->endOfDay();
-                $labels[]  = $cur->format('d/m');
+                $dayStart = $cur->copy()->startOfDay();
+                $dayEnd = $cur->copy()->endOfDay();
+                $labels[] = $cur->format('d/m');
                 $incData[] = $this->slotIncome($dayStart, $dayEnd);
                 $expData[] = $this->slotExpense($dayStart, $dayEnd);
             }
             $cur->addDay();
         }
+
         return compact('labels', 'incData', 'expData');
     }
 
     /** Tahun Ini: Januari–Desember */
     private function byMonthOfYear(): array
     {
-        $monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
-        $year       = Carbon::now()->year;
+        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+        $year = Carbon::now()->year;
         $labels = $incData = $expData = [];
 
         for ($m = 1; $m <= 12; $m++) {
-            $mStart    = Carbon::create($year, $m, 1)->startOfMonth();
-            $mEnd      = Carbon::create($year, $m, 1)->endOfMonth();
-            $labels[]  = $monthNames[$m - 1];
+            $mStart = Carbon::create($year, $m, 1)->startOfMonth();
+            $mEnd = Carbon::create($year, $m, 1)->endOfMonth();
+            $labels[] = $monthNames[$m - 1];
             $incData[] = $this->slotIncome($mStart, $mEnd);
             $expData[] = $this->slotExpense($mStart, $mEnd);
         }
+
         return compact('labels', 'incData', 'expData');
     }
 
     /** Semua Waktu: per 6 bulan mulai Jan 2026 */
     private function byMonth(): array
     {
-        $e      = Carbon::now()->endOfDay();
+        $e = Carbon::now()->endOfDay();
         $labels = $incData = $expData = [];
-        $cur    = Carbon::createFromDate(2026, 1, 1)->startOfMonth();
+        $cur = Carbon::createFromDate(2026, 1, 1)->startOfMonth();
 
         while ($cur->lte($e)) {
             $periodEnd = $cur->copy()->addMonths(5)->endOfMonth();
-            $slotEnd   = $periodEnd->gt($e) ? $e->copy() : $periodEnd;
+            $slotEnd = $periodEnd->gt($e) ? $e->copy() : $periodEnd;
 
-            $labels[]  = $cur->format('M Y');
+            $labels[] = $cur->format('M Y');
             $incData[] = $this->slotIncome($cur->copy()->startOfDay(), $slotEnd);
             $expData[] = $this->slotExpense($cur->copy()->startOfDay(), $slotEnd);
 
             $cur->addMonths(6);
         }
+
         return compact('labels', 'incData', 'expData');
     }
 
@@ -261,30 +278,30 @@ class CashFlowChartWidget extends ChartWidget
         ['labels' => $labels, 'incData' => $incData, 'expData' => $expData] = $this->buildData();
 
         $shared = [
-            'fill'            => true,
-            'tension'         => 0.45,
-            'borderWidth'     => 2.5,
-            'pointRadius'     => 4,
-            'pointHoverRadius'=> 7,
-            'pointBorderWidth'=> 2,
-            'pointBorderColor'=> '#ffffff',
+            'fill' => true,
+            'tension' => 0.45,
+            'borderWidth' => 2.5,
+            'pointRadius' => 4,
+            'pointHoverRadius' => 7,
+            'pointBorderWidth' => 2,
+            'pointBorderColor' => '#ffffff',
             'cubicInterpolationMode' => 'monotone',
         ];
 
         return [
             'datasets' => [
                 array_merge($shared, [
-                    'label'                => 'Pemasukan',
-                    'data'                 => $incData,
-                    'borderColor'          => '#22c55e',
-                    'backgroundColor'      => 'rgba(34,197,94,0.12)',
+                    'label' => 'Pemasukan',
+                    'data' => $incData,
+                    'borderColor' => '#22c55e',
+                    'backgroundColor' => 'rgba(34,197,94,0.12)',
                     'pointBackgroundColor' => '#22c55e',
                 ]),
                 array_merge($shared, [
-                    'label'                => 'Pengeluaran',
-                    'data'                 => $expData,
-                    'borderColor'          => '#ef4444',
-                    'backgroundColor'      => 'rgba(239,68,68,0.12)',
+                    'label' => 'Pengeluaran',
+                    'data' => $expData,
+                    'borderColor' => '#ef4444',
+                    'backgroundColor' => 'rgba(239,68,68,0.12)',
                     'pointBackgroundColor' => '#ef4444',
                 ]),
             ],
@@ -292,7 +309,10 @@ class CashFlowChartWidget extends ChartWidget
         ];
     }
 
-    protected function getType(): string { return 'line'; }
+    protected function getType(): string
+    {
+        return 'line';
+    }
 
     protected function getOptions(): RawJs
     {

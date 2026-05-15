@@ -2,24 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Helpers\NumberInputHelper;
+use App\Filament\Helpers\TextInputHelper;
+use App\Filament\Resources\UserResource\Pages\EditUser;
+use App\Filament\Resources\UserResource\Pages\ListUsers;
+use App\Models\User;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
+use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use App\Filament\Resources\UserResource\Pages\ListUsers;
-use App\Filament\Resources\UserResource\Pages\EditUser;
-use App\Filament\Resources\UserResource\Pages;
-use App\Models\User;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Resources\Resource;
-use App\Filament\Helpers\TextInputHelper;
-use App\Filament\Helpers\NumberInputHelper;
-use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Hash;
 
@@ -27,9 +24,9 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-users';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Pengguna';
+    protected static string|\UnitEnum|null $navigationGroup = 'Pengguna';
 
     protected static ?string $navigationLabel = 'Pengguna';
 
@@ -60,8 +57,8 @@ class UserResource extends Resource
             Select::make('role')
                 ->label('Role')
                 ->options([
-                    'admin'    => 'Admin',
-                    'cashier'  => 'Kasir',
+                    'admin' => 'Admin',
+                    'cashier' => 'Kasir',
                 ])
                 ->required()
                 ->default('cashier'),
@@ -89,14 +86,14 @@ class UserResource extends Resource
                     ->label('Role')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'admin'    => 'success',
-                        'cashier'  => 'info',
-                        default    => 'gray',
+                        'admin' => 'success',
+                        'cashier' => 'info',
+                        default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'admin'    => 'Admin',
-                        'cashier'  => 'Kasir',
-                        default    => $state,
+                        'admin' => 'Admin',
+                        'cashier' => 'Kasir',
+                        default => $state,
                     })
                     ->sortable(),
                 TextColumn::make('created_at')
@@ -109,8 +106,8 @@ class UserResource extends Resource
                 SelectFilter::make('role')
                     ->label('Role')
                     ->options([
-                        'admin'    => 'Admin',
-                        'cashier'  => 'Kasir',
+                        'admin' => 'Admin',
+                        'cashier' => 'Kasir',
                     ]),
             ])
             ->recordActions([
@@ -128,8 +125,8 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListUsers::route('/'),
-            'edit'   => EditUser::route('/{record}/edit'),
+            'index' => ListUsers::route('/'),
+            'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 }

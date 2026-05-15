@@ -13,10 +13,12 @@ class TrackStaffSession
     /**
      * Handle an incoming request.
      *
-     * Only tracks sessions for cashier and kitchen staff.
+     * Only maintains existing sessions for cashier and kitchen staff.
      * - Closes expired sessions (idle > 30 min)
      * - Updates last_activity_at (throttled to once per 60s)
-     * - Creates a new session if none exists
+     *
+     * Session creation ONLY happens in AuthController after successful login.
+     * This middleware does NOT create sessions — it only maintains them.
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -39,9 +41,8 @@ class TrackStaffSession
 
         if ($activeSession) {
             $service->updateActivity($activeSession);
-        } else {
-            $service->startSession($user);
         }
+        // No else — session creation is AuthController's job
 
         return $next($request);
     }

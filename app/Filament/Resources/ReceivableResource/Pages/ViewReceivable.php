@@ -6,8 +6,8 @@ use App\Filament\Resources\ReceivableResource;
 use App\Models\Receivable;
 use Filament\Actions;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Support\Facades\Log;
 use Filament\Resources\Pages\ViewRecord;
+use Illuminate\Support\Facades\Log;
 
 class ViewReceivable extends ViewRecord
 {
@@ -30,7 +30,7 @@ class ViewReceivable extends ViewRecord
                         ->numeric()
                         ->minValue(1)
                         ->maxValue(fn (Receivable $record): float => (float) $record->remaining_amount)
-                        ->helperText(fn (Receivable $record): string => 'Maximum: Rp ' . number_format($record->remaining_amount, 0, ',', '.'))
+                        ->helperText(fn (Receivable $record): string => 'Maximum: Rp '.number_format($record->remaining_amount, 0, ',', '.'))
                         ->columnSpanFull(),
                 ])
                 ->action(function (Receivable $record, array $data): void {

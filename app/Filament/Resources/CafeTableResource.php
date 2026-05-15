@@ -5,16 +5,16 @@ namespace App\Filament\Resources;
 use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Resources\CafeTableResource\Pages\ListCafeTables;
 use App\Models\CafeTable;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
-use Filament\Resources\Resource;
-use Filament\Schemas\Schema;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Resources\Resource;
+use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -23,9 +23,9 @@ class CafeTableResource extends Resource
 {
     protected static ?string $model = CafeTable::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-table-cells';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-table-cells';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Data Master';
+    protected static string|\UnitEnum|null $navigationGroup = 'Data Master';
 
     protected static ?string $navigationLabel = 'Meja Cafe';
 
@@ -87,7 +87,7 @@ class CafeTableResource extends Resource
                 Action::make('view_qr')
                     ->label('Lihat QR')
                     ->icon('heroicon-o-qr-code')
-                    ->modalHeading(fn (CafeTable $record) => 'QR Code Meja ' . $record->table_number)
+                    ->modalHeading(fn (CafeTable $record) => 'QR Code Meja '.$record->table_number)
                     ->modalWidth('md')
                     ->infolist(fn (CafeTable $record) => [
                         ImageEntry::make('qr_image')
@@ -118,7 +118,7 @@ class CafeTableResource extends Resource
                             ->icon('heroicon-o-arrow-down-tray')
                             ->action(function (CafeTable $record) {
                                 return response()->streamDownload(
-                                    fn () => print($record->generatePngDownload()),
+                                    fn () => print ($record->generatePngDownload()),
                                     sprintf('qr-meja-%d.png', $record->table_number),
                                     ['Content-Type' => 'image/png'],
                                 );
@@ -126,7 +126,7 @@ class CafeTableResource extends Resource
                     ]),
                 DeleteAction::make()
                     ->requiresConfirmation()
-                    ->modalHeading(fn (CafeTable $record) => 'Hapus Meja ' . $record->table_number)
+                    ->modalHeading(fn (CafeTable $record) => 'Hapus Meja '.$record->table_number)
                     ->modalWidth('md'),
             ])
             ->toolbarActions([])

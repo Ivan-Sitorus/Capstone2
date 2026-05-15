@@ -17,7 +17,10 @@ class UnexpectedTransactionWidget extends BaseWidget
 {
     protected int|string|array $columnSpan = 'full';
 
-    public static function isLazy(): bool { return false; }
+    public static function isLazy(): bool
+    {
+        return false;
+    }
 
     private function formSchema(): array
     {
@@ -54,17 +57,15 @@ class UnexpectedTransactionWidget extends BaseWidget
                     ->label('Jenis')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pemasukan'   => 'success',
+                        'pemasukan' => 'success',
                         'pengeluaran' => 'danger',
                     })
                     ->formatStateUsing(fn (string $state): string => ucfirst($state)),
                 TextColumn::make('nominal')
                     ->label('Nominal')
-                    ->formatStateUsing(fn (float $state): string =>
-                        'Rp ' . number_format($state, 0, ',', '.') . ',-'
+                    ->formatStateUsing(fn (float $state): string => 'Rp '.number_format($state, 0, ',', '.').',-'
                     )
-                    ->color(fn (UnexpectedTransaction $record): string =>
-                        $record->jenis === 'pemasukan' ? 'success' : 'danger'
+                    ->color(fn (UnexpectedTransaction $record): string => $record->jenis === 'pemasukan' ? 'success' : 'danger'
                     ),
                 TextColumn::make('deskripsi')
                     ->label('Deskripsi')

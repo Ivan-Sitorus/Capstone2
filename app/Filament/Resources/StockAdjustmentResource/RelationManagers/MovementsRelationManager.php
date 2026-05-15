@@ -2,10 +2,9 @@
 
 namespace App\Filament\Resources\StockAdjustmentResource\RelationManagers;
 
+use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Resources\RelationManagers\RelationManager;
-use Filament\Tables;
 use Filament\Tables\Table;
 
 class MovementsRelationManager extends RelationManager

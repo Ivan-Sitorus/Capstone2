@@ -2,43 +2,40 @@
 
 namespace App\Filament\Resources;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\Repeater;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TrashedFilter;
-use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\RestoreAction;
-use Filament\Actions\ForceDeleteAction;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\RestoreBulkAction;
-use Filament\Actions\ForceDeleteBulkAction;
-use App\Filament\Resources\PromotionResource\Pages\ListPromotions;
+use App\Filament\Helpers\NumberInputHelper;
+use App\Filament\Helpers\TextInputHelper;
 use App\Filament\Resources\PromotionResource\Pages\EditPromotion;
-use App\Filament\Resources\PromotionResource\Pages;
+use App\Filament\Resources\PromotionResource\Pages\ListPromotions;
 use App\Models\Category;
 use App\Models\Menu;
 use App\Models\Promotion;
-use App\Filament\Helpers\NumberInputHelper;
-use App\Filament\Helpers\TextInputHelper;
-use Filament\Forms;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ForceDeleteAction;
+use Filament\Actions\ForceDeleteBulkAction;
+use Filament\Actions\RestoreAction;
+use Filament\Actions\RestoreBulkAction;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Tables;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
 
 class PromotionResource extends Resource
 {
     protected static ?string $model = Promotion::class;
 
-    protected static string | \BackedEnum | null $navigationIcon = 'heroicon-o-gift';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-gift';
 
-    protected static string | \UnitEnum | null $navigationGroup = 'Transaksi';
+    protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
 
     protected static ?string $navigationLabel = 'Promotions';
 
@@ -179,10 +176,10 @@ class PromotionResource extends Resource
                     ->label('Discount')
                     ->formatStateUsing(function (Promotion $record): string {
                         if ($record->type === Promotion::TYPE_PERCENTAGE) {
-                            return number_format((float) $record->discount_value, 2) . '%';
+                            return number_format((float) $record->discount_value, 2).'%';
                         }
 
-                        return 'Rp ' . number_format((float) $record->discount_value, 0, ',', '.');
+                        return 'Rp '.number_format((float) $record->discount_value, 0, ',', '.');
                     }),
                 TextColumn::make('start_date')
                     ->label('Start Date')
@@ -206,7 +203,7 @@ class PromotionResource extends Resource
                     ->label('Used')
                     ->formatStateUsing(function (Promotion $record): string {
                         if ($record->usage_limit !== null) {
-                            return $record->usage_count . ' / ' . $record->usage_limit;
+                            return $record->usage_count.' / '.$record->usage_limit;
                         }
 
                         return (string) $record->usage_count;

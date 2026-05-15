@@ -144,7 +144,7 @@ class DailyIngredientUsageAggregationTest extends TestCase
         return Menu::create([
             'category_id' => $category->id,
             'name' => 'Menu Mining',
-            'slug' => 'menu-mining-' . uniqid(),
+            'slug' => 'menu-mining-'.uniqid(),
             'description' => null,
             'price' => 10000,
             'cashback' => 0,

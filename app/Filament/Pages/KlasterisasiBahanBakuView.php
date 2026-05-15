@@ -2,6 +2,9 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\ElbowChart;
+use App\Filament\Widgets\IngredientBarChart;
+use App\Filament\Widgets\SilhouetteChart;
 use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -40,13 +43,13 @@ class KlasterisasiBahanBakuView extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\IngredientBarChart::make(['recordId' => $this->record->id]),
-            \App\Filament\Widgets\ElbowChart::make(['recordId' => $this->record->id]),
-            \App\Filament\Widgets\SilhouetteChart::make(['recordId' => $this->record->id]),
+            IngredientBarChart::make(['recordId' => $this->record->id]),
+            ElbowChart::make(['recordId' => $this->record->id]),
+            SilhouetteChart::make(['recordId' => $this->record->id]),
         ];
     }
 
-    public function getHeaderWidgetsColumns(): int | array
+    public function getHeaderWidgetsColumns(): int|array
     {
         return 2;
     }
@@ -98,7 +101,7 @@ class KlasterisasiBahanBakuView extends Page
                                     foreach ($rows as $i => $row) {
                                         $entries[] = TextEntry::make("row_{$i}")
                                             ->label($row['Nama Bahan Baku'] ?? "Item {$i}")
-                                            ->state('Klaster ' . ($row['Klaster'] ?? '?') . ' — ' . ($row['Kategori'] ?? ''));
+                                            ->state('Klaster '.($row['Klaster'] ?? '?').' — '.($row['Kategori'] ?? ''));
                                     }
 
                                     return $entries;

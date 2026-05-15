@@ -87,14 +87,14 @@ class MenuRecipeParityTest extends TestCase
     private function createMenu(string $slug): Menu
     {
         $category = Category::create([
-            'name' => 'Kategori ' . $slug,
-            'slug' => 'kategori-' . $slug,
+            'name' => 'Kategori '.$slug,
+            'slug' => 'kategori-'.$slug,
             'is_active' => true,
         ]);
 
         return Menu::create([
             'category_id' => $category->id,
-            'name' => 'Menu ' . $slug,
+            'name' => 'Menu '.$slug,
             'slug' => $slug,
             'description' => null,
             'price' => 10000,

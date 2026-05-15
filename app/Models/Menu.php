@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Services\MenuImageService;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Menu extends Model
 {
@@ -25,10 +26,10 @@ class Menu extends Model
     protected function casts(): array
     {
         return [
-            'price'               => 'integer',
-            'cashback'            => 'integer',
-            'student_price'       => 'integer',
-            'is_available'        => 'boolean',
+            'price' => 'integer',
+            'cashback' => 'integer',
+            'student_price' => 'integer',
+            'is_available' => 'boolean',
             'is_stock_calculated' => 'boolean',
             'is_student_discount' => 'boolean',
         ];
@@ -38,7 +39,7 @@ class Menu extends Model
     {
         static::creating(function (self $menu): void {
             if (blank($menu->slug)) {
-                $menu->slug = \Illuminate\Support\Str::slug($menu->name);
+                $menu->slug = Str::slug($menu->name);
             }
         });
 

@@ -7,6 +7,8 @@ use App\DTO\ReportRow;
 use App\Renderers\FilamentTableRenderer;
 use Filament\Support\Enums\Alignment;
 use Filament\Support\Enums\FontFamily;
+use Filament\Tables\Columns\Column;
+use Filament\Tables\Table;
 use PHPUnit\Framework\TestCase;
 use ReflectionProperty;
 
@@ -258,13 +260,14 @@ class FilamentTableRendererTest extends TestCase
 
     // ─── Helpers ──────────────────────────────────────────────────────
 
-    private function findColumnByName(\Filament\Tables\Table $table, string $name): ?\Filament\Tables\Columns\Column
+    private function findColumnByName(Table $table, string $name): ?Column
     {
         foreach ($table->getColumns() as $column) {
             if ($column->getName() === $name) {
                 return $column;
             }
         }
+
         return null;
     }
 
@@ -300,7 +303,7 @@ class FilamentTableRendererTest extends TestCase
      * parameters, so we extract the closure via reflection and call
      * it directly with our ReportRow DTO.
      */
-    private function getRecordClassesFor(\Filament\Tables\Table $table, ReportRow $row): string
+    private function getRecordClassesFor(Table $table, ReportRow $row): string
     {
         $ref = new ReflectionProperty($table, 'recordClasses');
         $closure = $ref->getValue($table);

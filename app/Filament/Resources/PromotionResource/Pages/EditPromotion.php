@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\PromotionResource\Pages;
 
+use App\Filament\Resources\PromotionResource;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ForceDeleteAction;
 use Filament\Actions\RestoreAction;
-use App\Filament\Resources\PromotionResource;
-use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditPromotion extends EditRecord

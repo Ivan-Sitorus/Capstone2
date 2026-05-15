@@ -2,6 +2,8 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\FeatureImportanceChart;
+use App\Filament\Widgets\IngredientForecastAllChart;
 use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -40,12 +42,12 @@ class PrediksiBahanBakuView extends Page
     protected function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\IngredientForecastAllChart::make(['recordId' => $this->record->id]),
-            \App\Filament\Widgets\FeatureImportanceChart::make(['recordId' => $this->record->id]),
+            IngredientForecastAllChart::make(['recordId' => $this->record->id]),
+            FeatureImportanceChart::make(['recordId' => $this->record->id]),
         ];
     }
 
-    public function getHeaderWidgetsColumns(): int | array
+    public function getHeaderWidgetsColumns(): int|array
     {
         return 2;
     }
@@ -87,7 +89,7 @@ class PrediksiBahanBakuView extends Page
                                             ->schema([
                                                 TextEntry::make("pred_total_{$i}")
                                                     ->label('Total Forecast')
-                                                    ->state(($pred['total_forecast'] ?? 0) . ' unit'),
+                                                    ->state(($pred['total_forecast'] ?? 0).' unit'),
                                                 RepeatableEntry::make("pred_detail_{$i}")
                                                     ->label('Forecast Harian')
                                                     ->state(fn (): array => $forecastDays)
@@ -102,6 +104,7 @@ class PrediksiBahanBakuView extends Page
                                                     ->columns(6),
                                             ]);
                                     }
+
                                     return $entries;
                                 }),
                             Section::make('Summary Table')
@@ -175,6 +178,7 @@ class PrediksiBahanBakuView extends Page
                                             ->label($log['tahap'] ?? "Step {$i}")
                                             ->state($log['detail'] ?? '');
                                     }
+
                                     return $entries;
                                 }),
                         ]),

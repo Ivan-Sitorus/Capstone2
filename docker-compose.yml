@@ -94,7 +94,7 @@ services:
             datamining:
                 condition: service_started
         healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:80/"]
+            test: ["CMD", "curl", "-f", "http://localhost:80/up"]
     datamining:
         build:
             context: ./datamining

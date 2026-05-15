@@ -9,8 +9,8 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Inertia\Response as InertiaResponse;
 use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class CustomerPaymentController extends Controller
 {
@@ -25,10 +25,10 @@ class CustomerPaymentController extends Controller
         }
 
         return Inertia::render('Pelanggan/Payment/Choose', [
-            'order'        => $order->only(['id', 'order_code', 'total_amount', 'customer_name']),
-            'items'        => $order->items->map(fn($i) => [
-                'name'     => $i->menu->name,
-                'qty'      => $i->quantity,
+            'order' => $order->only(['id', 'order_code', 'total_amount', 'customer_name']),
+            'items' => $order->items->map(fn ($i) => [
+                'name' => $i->menu->name,
+                'qty' => $i->quantity,
                 'subtotal' => $i->subtotal,
             ]),
             'table_number' => $order->cafeTable?->table_number,
@@ -41,6 +41,7 @@ class CustomerPaymentController extends Controller
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
         $order->update(['payment_method' => 'cash']);
+
         return response()->json(['message' => 'ok', 'order_code' => $order->order_code]);
     }
 
@@ -50,11 +51,12 @@ class CustomerPaymentController extends Controller
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
         $order->update(['payment_method' => 'qris']);
+
         return response()->json([
-            'qris_image'   => asset('storage/' . Setting::get('qris_image', 'qris/qris-w9cafe.png')),
-            'qris_name'    => Setting::get('qris_name', 'W9 Cafe'),
+            'qris_image' => asset('storage/'.Setting::get('qris_image', 'qris/qris-w9cafe.png')),
+            'qris_name' => Setting::get('qris_name', 'W9 Cafe'),
             'total_amount' => $order->total_amount,
-            'order_code'   => $order->order_code,
+            'order_code' => $order->order_code,
         ]);
     }
 
@@ -68,19 +70,19 @@ class CustomerPaymentController extends Controller
         $order = Order::where('order_code', $orderCode)->firstOrFail();
 
         if (in_array($order->status, [Order::STATUS_DIPROSES, Order::STATUS_SELESAI])) {
-return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderData($order)]);
+            return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderData($order)]);
         }
 
         // rejection_note is set when cashier rejects and clears proof, allowing re-upload
-        $rejectedMessage = ($order->payment_method === 'qris' && $order->rejection_note && !$order->payment_proof)
+        $rejectedMessage = ($order->payment_method === 'qris' && $order->rejection_note && ! $order->payment_proof)
             ? $order->rejection_note
             : null;
 
         return Inertia::render('Pelanggan/Payment/QrisUpload', [
-            'order'           => $order->only(['id', 'order_code', 'total_amount']),
-            'qrisImage'       => asset('storage/' . Setting::get('qris_image', 'qris/qris-w9cafe.png')),
-            'qrisName'        => Setting::get('qris_name', 'W9 Cafe'),
-            'totalAmount'     => $order->total_amount,
+            'order' => $order->only(['id', 'order_code', 'total_amount']),
+            'qrisImage' => asset('storage/'.Setting::get('qris_image', 'qris/qris-w9cafe.png')),
+            'qrisName' => Setting::get('qris_name', 'W9 Cafe'),
+            'totalAmount' => $order->total_amount,
             'rejectedMessage' => $rejectedMessage,
         ]);
     }
@@ -102,7 +104,7 @@ return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderD
         $path = $request->file('proof')->store('proofs', 'public');
 
         $order->update([
-            'payment_proof'  => $path,
+            'payment_proof' => $path,
             'payment_method' => 'qris',
             'rejection_note' => null,
         ]);
@@ -113,16 +115,17 @@ return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderD
     public function showQrisStatus(string $orderCode): InertiaResponse
     {
         $order = Order::where('order_code', $orderCode)->firstOrFail();
+
         return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderData($order)]);
     }
 
     private function orderData(Order $order): array
     {
         return [
-            'id'             => $order->id,
-            'order_code'     => $order->order_code,
-            'status'         => $order->status,
-            'total_amount'   => $order->total_amount,
+            'id' => $order->id,
+            'order_code' => $order->order_code,
+            'status' => $order->status,
+            'total_amount' => $order->total_amount,
             'payment_method' => $order->payment_method,
             'rejection_note' => $order->rejection_note,
         ];

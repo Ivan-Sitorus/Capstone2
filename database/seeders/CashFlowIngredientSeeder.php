@@ -96,17 +96,19 @@ class CashFlowIngredientSeeder extends Seeder
         ];
 
         foreach ($batches as $b) {
-            if (!isset($saved[$b['name']])) continue;
+            if (! isset($saved[$b['name']])) {
+                continue;
+            }
 
             IngredientBatch::create([
                 'ingredient_id' => $saved[$b['name']]->id,
-                'quantity'      => $b['qty'],
+                'quantity' => $b['qty'],
                 'cost_per_unit' => $b['cpu'],
-                'received_at'   => Carbon::parse($b['date'])->setHour(8)->setMinute(0),
-                'expiry_date'   => Carbon::parse($b['date'])->addDays(rand(30, 180)),
+                'received_at' => Carbon::parse($b['date'])->setHour(8)->setMinute(0),
+                'expiry_date' => Carbon::parse($b['date'])->addDays(rand(30, 180)),
             ]);
         }
 
-        $this->command->info('✓ ' . count($batches) . ' batch bahan baku berhasil di-seed.');
+        $this->command->info('✓ '.count($batches).' batch bahan baku berhasil di-seed.');
     }
 }

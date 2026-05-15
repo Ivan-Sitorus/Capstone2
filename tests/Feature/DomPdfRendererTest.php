@@ -64,13 +64,13 @@ class DomPdfRendererTest extends TestCase
         ];
 
         return new ReportData(
-            type:        ReportData::TYPE_SIMPLE,
-            title:       'Laporan Keuangan Januari 2026',
-            dateStart:   '2026-01-01',
-            dateEnd:     '2026-01-31',
+            type: ReportData::TYPE_SIMPLE,
+            title: 'Laporan Keuangan Januari 2026',
+            dateStart: '2026-01-01',
+            dateEnd: '2026-01-31',
             aggregation: 'daily',
-            summary:     $summary,
-            rows:        $rows,
+            summary: $summary,
+            rows: $rows,
         );
     }
 
@@ -136,27 +136,27 @@ class DomPdfRendererTest extends TestCase
         $data = ReportData::fromRigidReport(
             data: [
                 'income_statement' => [
-                    'pendapatan'           => 3000000,
-                    'pendapatan_orders'    => 2800000,
+                    'pendapatan' => 3000000,
+                    'pendapatan_orders' => 2800000,
                     'pendapatan_unexpected' => 200000,
-                    'hpp'                  => 1500000,
-                    'laba_kotor'           => 1500000,
-                    'beban_operasional'    => 600000,
-                    'beban_tak_terduga'    => 100000,
-                    'laba_rugi_bersih'     => 800000,
+                    'hpp' => 1500000,
+                    'laba_kotor' => 1500000,
+                    'beban_operasional' => 600000,
+                    'beban_tak_terduga' => 100000,
+                    'laba_rugi_bersih' => 800000,
                 ],
                 'cash_flow' => [
-                    'arus_kas_masuk'   => 3000000 + 400000,
-                    'arus_kas_keluar'  => 1500000 + 600000 + 100000,
-                    'arus_kas_bersih'  => 1200000,
+                    'arus_kas_masuk' => 3000000 + 400000,
+                    'arus_kas_keluar' => 1500000 + 600000 + 100000,
+                    'arus_kas_bersih' => 1200000,
                     'receivable_payments' => 400000,
-                    'saldo_awal'       => 5000000,
-                    'saldo_akhir'      => 6200000,
+                    'saldo_awal' => 5000000,
+                    'saldo_akhir' => 6200000,
                 ],
                 'meta' => [],
             ],
             dateStart: '2026-02-01',
-            dateEnd:   '2026-02-28',
+            dateEnd: '2026-02-28',
         );
 
         $pdf = DomPdfRenderer::generate($data);
@@ -226,7 +226,7 @@ class DomPdfRendererTest extends TestCase
                         }
                     }
                     if (strlen($decoded) >= 2) {
-                        $text .= ' ' . $decoded;
+                        $text .= ' '.$decoded;
                     }
                 }
             }

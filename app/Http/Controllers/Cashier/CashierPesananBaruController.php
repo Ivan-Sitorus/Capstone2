@@ -20,13 +20,12 @@ class CashierPesananBaruController extends Controller
     public function index()
     {
         // Cache 5 menit — menu jarang berubah, admin bisa clear cache jika update menu
-        $categories = Cache::remember('menu_categories_active', 300, fn() =>
-            Category::with([
-                'menus' => fn($q) => $q->where('is_available', true)->orderBy('name'),
-            ])
-                ->where('is_active', true)
-                ->orderBy('name')
-                ->get()
+        $categories = Cache::remember('menu_categories_active', 300, fn () => Category::with([
+            'menus' => fn ($q) => $q->where('is_available', true)->orderBy('name'),
+        ])
+            ->where('is_active', true)
+            ->orderBy('name')
+            ->get()
         );
 
         return Inertia::render('Kasir/PesananBaru', compact('categories'));
@@ -36,19 +35,18 @@ class CashierPesananBaruController extends Controller
         StoreOrderRequest $request,
         OrderPromotionService $orderPromotionService,
         InventoryService $inventoryService,
-    )
-    {
+    ) {
         DB::transaction(function () use ($request, $orderPromotionService, $inventoryService) {
             $isBayarNanti = $request->payment_method === 'bayar_nanti';
             $selectedPromotionIds = $request->input('promotion_ids', []);
 
             $order = Order::create([
-                'cashier_id'     => Auth::id(),
-                'order_type'     => 'cashier',
+                'cashier_id' => Auth::id(),
+                'order_type' => 'cashier',
                 'payment_method' => $request->payment_method,
-                'customer_name'  => $request->customer_name,
-                'status'         => Order::STATUS_PENDING,
-                'is_paid'        => !$isBayarNanti,
+                'customer_name' => $request->customer_name,
+                'status' => Order::STATUS_PENDING,
+                'is_paid' => ! $isBayarNanti,
             ]);
 
             $isMahasiswa = (bool) $request->input('is_mahasiswa', false);
@@ -58,7 +56,7 @@ class CashierPesananBaruController extends Controller
 
             // Bulk-fetch semua menu sekaligus — hindari N+1 query
             $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
-            $menus   = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
+            $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
             foreach ($request->items as $item) {
                 $menu = $menus->get($item['menu_id']);
@@ -71,11 +69,11 @@ class CashierPesananBaruController extends Controller
                 );
 
                 $itemsToInsert[] = [
-                    'order_id'   => $order->id,
-                    'menu_id'    => $menu->id,
-                    'quantity'   => $item['quantity'],
+                    'order_id' => $order->id,
+                    'menu_id' => $menu->id,
+                    'quantity' => $item['quantity'],
                     'unit_price' => $lineCalculation['unit_price'],
-                    'subtotal'   => $lineCalculation['subtotal'],
+                    'subtotal' => $lineCalculation['subtotal'],
                     'created_at' => now(),
                     'updated_at' => now(),
                 ];

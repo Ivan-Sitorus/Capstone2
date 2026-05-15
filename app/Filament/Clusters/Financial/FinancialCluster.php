@@ -9,7 +9,7 @@ class FinancialCluster extends Cluster
 {
     protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-chart-bar';
 
-    protected static \UnitEnum|string|null $navigationGroup = 'Detail Keuangan';
+    protected static string|\UnitEnum|null $navigationGroup = 'Detail Keuangan';
 
     protected static ?string $navigationLabel = 'Laporan Keuangan';
 

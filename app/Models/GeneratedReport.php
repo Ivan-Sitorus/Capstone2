@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\DTO\ReportData;
 use Illuminate\Database\Eloquent\Model;
 
 class GeneratedReport extends Model
@@ -34,8 +35,8 @@ class GeneratedReport extends Model
     /**
      * Convert the stored result JSON back to a ReportData DTO.
      */
-    public function toReportData(): \App\DTO\ReportData
+    public function toReportData(): ReportData
     {
-        return \App\DTO\ReportData::fromGeneratedReport($this->result ?? []);
+        return ReportData::fromGeneratedReport($this->result ?? []);
     }
 }

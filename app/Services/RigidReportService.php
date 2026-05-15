@@ -47,9 +47,9 @@ class RigidReportService
         $labaRugiBersih = $labaKotor - $bebanOperasional - $bebanTakTerduga;
 
         $receivablePayments = (float) Receivable::whereIn('status', [
-                Receivable::STATUS_PAID,
-                Receivable::STATUS_PARTIAL,
-            ])
+            Receivable::STATUS_PAID,
+            Receivable::STATUS_PARTIAL,
+        ])
             ->whereBetween('updated_at', [$s, $e])
             ->sum('paid_amount');
 
@@ -59,32 +59,32 @@ class RigidReportService
 
         return [
             'meta' => [
-                'date_start'   => $dateStart,
-                'date_end'     => $dateEnd,
+                'date_start' => $dateStart,
+                'date_end' => $dateEnd,
                 'generated_at' => now()->toDateTimeString(),
-                'type'         => 'rigid',
+                'type' => 'rigid',
             ],
             'income_statement' => [
-                'pendapatan'             => $pendapatan,
-                'pendapatan_orders'      => $pendapatanOrders,
-                'pendapatan_unexpected'  => $pendapatanUnexpected,
-                'hpp'                    => $hpp,
-                'laba_kotor'             => $labaKotor,
-                'beban_operasional'      => $bebanOperasional,
-                'beban_tak_terduga'      => $bebanTakTerduga,
-                'laba_rugi_bersih'       => $labaRugiBersih,
+                'pendapatan' => $pendapatan,
+                'pendapatan_orders' => $pendapatanOrders,
+                'pendapatan_unexpected' => $pendapatanUnexpected,
+                'hpp' => $hpp,
+                'laba_kotor' => $labaKotor,
+                'beban_operasional' => $bebanOperasional,
+                'beban_tak_terduga' => $bebanTakTerduga,
+                'laba_rugi_bersih' => $labaRugiBersih,
             ],
             'cash_flow' => [
-                'arus_kas_masuk'       => $arusKasMasuk,
-                'pendapatan'           => $pendapatan,
-                'receivable_payments'  => $receivablePayments,
-                'arus_kas_keluar'      => $arusKasKeluar,
-                'beban_operasional'    => $bebanOperasional,
-                'hpp'                  => $hpp,
-                'beban_tak_terduga'    => $bebanTakTerduga,
-                'arus_kas_bersih'      => $arusKasBersih,
-                'saldo_awal'           => 0,
-                'saldo_akhir'          => $arusKasBersih,
+                'arus_kas_masuk' => $arusKasMasuk,
+                'pendapatan' => $pendapatan,
+                'receivable_payments' => $receivablePayments,
+                'arus_kas_keluar' => $arusKasKeluar,
+                'beban_operasional' => $bebanOperasional,
+                'hpp' => $hpp,
+                'beban_tak_terduga' => $bebanTakTerduga,
+                'arus_kas_bersih' => $arusKasBersih,
+                'saldo_awal' => 0,
+                'saldo_akhir' => $arusKasBersih,
             ],
         ];
     }

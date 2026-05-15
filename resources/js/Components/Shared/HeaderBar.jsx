@@ -21,7 +21,9 @@ export default function HeaderBar({ tabs, user, pendingCount = 0 }) {
             {/* Tab Navigation */}
             <nav className="flex items-center gap-1 flex-1 min-w-0">
                 {tabs.map(({ label, href, icon: Icon }) => {
-                    const isActive = currentPath === href;
+                    const hrefPath = new URL(href, window.location.origin).pathname;
+                    const currentPathname = new URL(currentPath, window.location.origin).pathname;
+                    const isActive = currentPathname === hrefPath;
                     const showBadge = label === 'Pesanan Aktif' && pendingCount > 0;
                     return (
                         <Link
