@@ -4,7 +4,6 @@ namespace App\Filament\Pages;
 
 use App\DTO\ReportData;
 use App\Models\GeneratedReport;
-use App\Models\ReportTemplate;
 use App\Renderers\CsvRenderer;
 use App\Renderers\DomPdfRenderer;
 use App\Renderers\ExcelRenderer;
@@ -101,66 +100,6 @@ class ViewReport extends Page
                 ->color('gray')
                 ->url(fn () => url("/admin/view-report/{$this->report->id}/download-csv"))
                 ->openUrlInNewTab(),
-
-            Action::make('save_template')
-                ->label('Simpan sebagai Template')
-                ->icon('heroicon-o-bookmark')
-                ->color('gray')
-                ->modal()
-                ->modalHeading('Simpan Laporan sebagai Template')
-                ->modalDescription('Simpan konfigurasi laporan ini untuk digunakan kembali.')
-                ->schema([
-                    TextInput::make('template_name')
-                        ->label('Nama Template')
-                        ->required()
-                        ->maxLength(255)
-                        ->default($this->report->name),
-                ])
-                ->action(function (array $data) {
-                    $templateName = trim($data['template_name']);
-
-                    $existingTemplate = ReportTemplate::forUser(Auth::id())
-                        ->where('name', $templateName)
-                        ->first();
-
-                    if ($existingTemplate) {
-                        $existingTemplate->update([
-                            'config' => [
-                                'date_start' => $this->report->date_start->format('Y-m-d'),
-                                'date_end' => $this->report->date_end->format('Y-m-d'),
-                                'report_type' => $this->report->type,
-                                'categories' => $this->report->categories ?? [],
-                                'aggregation' => $this->report->aggregation,
-                            ],
-                            'type' => $this->report->type,
-                        ]);
-
-                        Notification::make()
-                            ->title('Template Diperbarui')
-                            ->body("Template \"{$templateName}\" telah diperbarui.")
-                            ->success()
-                            ->send();
-                    } else {
-                        ReportTemplate::create([
-                            'name' => $templateName,
-                            'user_id' => Auth::id(),
-                            'config' => [
-                                'date_start' => $this->report->date_start->format('Y-m-d'),
-                                'date_end' => $this->report->date_end->format('Y-m-d'),
-                                'report_type' => $this->report->type,
-                                'categories' => $this->report->categories ?? [],
-                                'aggregation' => $this->report->aggregation,
-                            ],
-                            'type' => $this->report->type,
-                        ]);
-
-                        Notification::make()
-                            ->title('Template Disimpan')
-                            ->body("Template \"{$templateName}\" telah disimpan.")
-                            ->success()
-                            ->send();
-                    }
-                }),
         ];
     }
 
