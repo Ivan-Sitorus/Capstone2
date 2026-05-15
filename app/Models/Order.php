@@ -32,7 +32,7 @@ class Order extends Model
                 if (! $order->receivable()->exists()) {
                     Receivable::create([
                         'customer_name' => $order->customer_name ?? 'Event Customer',
-                        'amount' => $order->total_amount,
+                        'amount' => $order->total_amount ?? 0,
                         'invoice_date' => $order->created_at,
                         'due_date' => $order->created_at->copy()->addDays(30),
                         'status' => Receivable::STATUS_PENDING,

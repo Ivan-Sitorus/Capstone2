@@ -47,6 +47,7 @@ class CashierPesananBaruController extends Controller
                 'customer_name' => $request->customer_name,
                 'status' => Order::STATUS_PENDING,
                 'is_paid' => ! $isBayarNanti,
+                'total_amount' => 0,
             ]);
 
             $isMahasiswa = (bool) $request->input('is_mahasiswa', false);
