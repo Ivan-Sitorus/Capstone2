@@ -1,0 +1,158 @@
+<?php
+
+namespace App\Filament\Pages;
+
+use App\Models\CashierSession;
+use App\Models\KitchenSession;
+use App\Models\Order;
+use App\Models\User;
+use App\Services\StaffSessionService;
+use BackedEnum;
+use Filament\Actions\Action;
+use Filament\Infolists\Components\TextEntry;
+use Filament\Pages\Page;
+use Filament\Schemas\Components\EmbeddedTable;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Table;
+
+class StaffSessionDetail extends Page implements HasTable
+{
+    use InteractsWithTable;
+
+    protected static string|BackedEnum|null $navigationIcon = null;
+
+    protected static bool $shouldRegisterNavigation = false;
+
+    protected static ?string $slug = 'staff-session-detail/{type}/{session}';
+
+    protected static ?string $title = 'Detail Sesi Staff';
+
+    public CashierSession|KitchenSession $session;
+
+    public User $staff;
+
+    public string $type;
+
+    public int $orderCount = 0;
+
+    public function mount(string $type, string $session): void
+    {
+        if (! in_array($type, ['cashier', 'kitchen'])) {
+            abort(404);
+        }
+
+        $this->type = $type;
+        $this->session = match ($type) {
+            'cashier' => CashierSession::with('user')->findOrFail($session),
+            'kitchen' => KitchenSession::with('user')->findOrFail($session),
+        };
+        $this->staff = $this->session->user;
+        $this->orderCount = app(StaffSessionService::class)->getOrderCount($this->session);
+    }
+
+    public function getTitle(): string
+    {
+        return "Detail Sesi {$this->getTypeLabel()} — {$this->staff->name}";
+    }
+
+    protected function getTypeLabel(): string
+    {
+        return match ($this->type) {
+            'cashier' => 'Kasir',
+            'kitchen' => 'Dapur',
+        };
+    }
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema->components([
+            Section::make('Informasi Sesi')
+                ->schema([
+                    TextEntry::make('nama')
+                        ->label('Nama Staff')
+                        ->state($this->staff->name),
+                    TextEntry::make('email')
+                        ->label('Email')
+                        ->state($this->staff->email),
+                    TextEntry::make('role')
+                        ->label('Role')
+                        ->state($this->getTypeLabel()),
+                    TextEntry::make('masuk')
+                        ->label('Waktu Masuk')
+                        ->state($this->session->started_at->format('d M Y, H:i')),
+                    TextEntry::make('keluar')
+                        ->label('Waktu Keluar')
+                        ->state($this->session->ended_at?->format('d M Y, H:i') ?? 'Masih Aktif'),
+                    TextEntry::make('pesanan')
+                        ->label('Jumlah Pesanan')
+                        ->state($this->orderCount),
+                ])
+                ->columns(3),
+            EmbeddedTable::make(),
+        ]);
+    }
+
+    public function table(Table $table): Table
+    {
+        $session = $this->session;
+        $type = $this->type;
+        $endedAt = $session->ended_at ?? now();
+
+        $baseQuery = match ($type) {
+            'cashier' => Order::with('cafeTable')
+                ->where('cashier_id', $session->user_id)
+                ->whereBetween('created_at', [$session->started_at, $endedAt]),
+            'kitchen' => Order::with('cafeTable')
+                ->where('processed_by', $session->user_id)
+                ->where('status', Order::STATUS_SELESAI)
+                ->whereBetween('created_at', [$session->started_at, $endedAt]),
+        };
+
+        return $table
+            ->query($baseQuery->latest())
+            ->columns([
+                TextColumn::make('order_code')
+                    ->label('Kode Pesanan')
+                    ->searchable()
+                    ->sortable()
+                    ->copyable(),
+                TextColumn::make('cafeTable.table_number')
+                    ->label('Meja')
+                    ->default('-'),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending' => 'warning',
+                        'diproses' => 'info',
+                        'selesai' => 'success',
+                        default => 'gray',
+                    })
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'Pending',
+                        'diproses' => 'Diproses',
+                        'selesai' => 'Selesai',
+                        default => $state,
+                    }),
+                TextColumn::make('total_amount')
+                    ->label('Total')
+                    ->money('IDR')
+                    ->sortable(),
+                TextColumn::make('created_at')
+                    ->label('Waktu')
+                    ->dateTime('d M Y, H:i')
+                    ->sortable(),
+            ])
+            ->recordActions([
+                Action::make('viewOrder')
+                    ->label('Lihat Pesanan')
+                    ->icon('heroicon-o-eye')
+                    ->url(fn (Order $record) => route('filament.admin.resources.orders.view', $record)),
+            ])
+            ->defaultSort('created_at', 'desc');
+    }
+}

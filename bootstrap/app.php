@@ -1,5 +1,10 @@
 <?php
 
+use App\Http\Middleware\CompressResponse;
+use App\Http\Middleware\HandleInertiaRequests;
+use App\Http\Middleware\RoleMiddleware;
+use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\TrackStaffSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,12 +19,13 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
-            \App\Http\Middleware\HandleInertiaRequests::class,
-            \App\Http\Middleware\CompressResponse::class,
-            \App\Http\Middleware\SecurityHeaders::class,
+            HandleInertiaRequests::class,
+            TrackStaffSession::class,
+            CompressResponse::class,
+            SecurityHeaders::class,
         ]);
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'role' => RoleMiddleware::class,
         ]);
         $middleware->validateCsrfTokens(except: [
             //
