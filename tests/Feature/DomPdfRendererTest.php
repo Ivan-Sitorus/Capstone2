@@ -105,7 +105,7 @@ class DomPdfRendererTest extends TestCase
         );
 
         $this->assertStringContainsString(
-            '2026-01-01',
+            '1 Januari 2026',
             $text,
             'PDF should contain period start date',
         );
