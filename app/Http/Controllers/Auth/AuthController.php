@@ -39,7 +39,24 @@ class AuthController extends Controller
             ]);
         }
 
-        if (! Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        // Role validation BEFORE authentication attempt
+        $existingUser = \App\Models\User::where('email', $request->email)->first();
+        if ($existingUser) {
+            if ($request->is('dapur/*') && !in_array($existingUser->role, ['kitchen', 'admin'])) {
+                return back()->withErrors([
+                    'email' => 'Akun ini tidak memiliki akses ke Dapur.',
+                ]);
+            }
+            if ($request->is('kasir/*') && !in_array($existingUser->role, ['cashier', 'admin'])) {
+                return back()->withErrors([
+                    'email' => 'Akun ini tidak memiliki akses ke Kasir.',
+                ]);
+            }
+        }
+
+        $guard = $request->is('dapur/*') ? 'kitchen' : 'web';
+
+        if (! Auth::guard($guard)->attempt($request->only('email', 'password'))) {
             RateLimiter::hit($key, 60);
 
             return back()->withErrors(['email' => 'Email atau kata sandi salah']);
@@ -48,7 +65,7 @@ class AuthController extends Controller
         RateLimiter::clear($key);
         $request->session()->regenerate();
 
-        $user = Auth::user();
+        $user = Auth::guard($guard)->user();
 
         app(StaffSessionService::class)->startSession($user);
 
@@ -75,7 +92,8 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
-        $user = Auth::user();
+        $guard = Auth::guard('kitchen')->check() ? 'kitchen' : 'web';
+        $user = Auth::guard($guard)->user();
         $role = $user->role ?? 'cashier';
 
         if ($user && in_array($user->role, ['cashier', 'kitchen'])) {
@@ -85,9 +103,22 @@ class AuthController extends Controller
             }
         }
 
-        Auth::logout();
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        Auth::guard($guard)->logout();
+
+        // Check if ANY other guard is still authenticated
+        $otherGuards = array_diff(['web', 'kitchen', 'admin'], [$guard]);
+        $stillActive = false;
+        foreach ($otherGuards as $g) {
+            if (Auth::guard($g)->check()) {
+                $stillActive = true;
+                break;
+            }
+        }
+
+        if (!$stillActive) {
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+        }
 
         if ($role === 'kitchen') {
             return redirect()->route('dapur.login');
