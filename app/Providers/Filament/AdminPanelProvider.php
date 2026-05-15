@@ -59,7 +59,6 @@ class AdminPanelProvider extends PanelProvider
             ->spa()
             ->spaUrlExceptions([
                 '/admin/view-report*',
-                '/admin/templates',
             ])
             ->sidebarCollapsibleOnDesktop()
             ->collapsedSidebarWidth('4rem')
