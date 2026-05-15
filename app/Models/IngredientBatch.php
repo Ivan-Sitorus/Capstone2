@@ -14,6 +14,7 @@ class IngredientBatch extends Model
         'expiry_date',
         'received_at',
         'cost_per_unit',
+        'custom_order',
     ];
 
     protected function casts(): array
@@ -23,6 +24,7 @@ class IngredientBatch extends Model
             'received_at' => 'datetime',
             'quantity' => 'decimal:2',
             'cost_per_unit' => 'decimal:2',
+            'custom_order' => 'integer',
         ];
     }
 

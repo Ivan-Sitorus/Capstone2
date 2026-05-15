@@ -21,11 +21,16 @@ class Ingredient extends Model
         'sdt' => 'Sendok Teh (sdt)',
     ];
 
+    const BATCH_MODE_FIFO = 'fifo';
+    const BATCH_MODE_FEFO = 'fefo';
+    const BATCH_MODE_CUSTOM = 'custom';
+
     protected $fillable = [
         'name',
         'unit',
         'low_stock_threshold',
         'is_active',
+        'batch_mode',
     ];
 
     protected function casts(): array
@@ -33,6 +38,16 @@ class Ingredient extends Model
         return [
             'is_active' => 'boolean',
             'low_stock_threshold' => 'decimal:2',
+            'batch_mode' => 'string',
+        ];
+    }
+
+    public static function batchModes(): array
+    {
+        return [
+            self::BATCH_MODE_FEFO => 'FEFO (First Expired First Out)',
+            self::BATCH_MODE_FIFO => 'FIFO (First In First Out)',
+            self::BATCH_MODE_CUSTOM => 'Custom (Manual Order)',
         ];
     }
 
