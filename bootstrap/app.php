@@ -4,6 +4,7 @@ use App\Http\Middleware\CompressResponse;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\SecurityHeaders;
+use App\Http\Middleware\SetSessionCookie;
 use App\Http\Middleware\TrackStaffSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -18,6 +19,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(prepend: [
+            SetSessionCookie::class,
+        ]);
+
         $middleware->web(append: [
             HandleInertiaRequests::class,
             TrackStaffSession::class,

@@ -14,19 +14,11 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
-        if (Auth::check()) {
-            return Inertia::location(route('kasir.pesanan-baru'));
-        }
-
         return Inertia::render('Auth/Login');
     }
 
     public function showKitchenLogin()
     {
-        if (Auth::check()) {
-            return Inertia::location(route('dapur.beranda'));
-        }
-
         return Inertia::render('Dapur/Login');
     }
 

@@ -8,6 +8,7 @@ class CashierSession extends Model
 {
     protected $fillable = [
         'user_id',
+        'session_id',
         'started_at',
         'ended_at',
         'last_activity_at',

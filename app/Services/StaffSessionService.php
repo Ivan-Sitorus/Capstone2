@@ -10,12 +10,19 @@ use Carbon\Carbon;
 
 class StaffSessionService
 {
+    /**
+     * Start a new session for the given user.
+     *
+     * Closes any existing active sessions on the SAME device (session_id)
+     * before creating a new one. Sessions on OTHER devices remain active.
+     */
     public function startSession(User $user): CashierSession|KitchenSession|null
     {
         if ($user->role === 'cashier') {
             $this->closeAllSessionsForUser($user);
             return CashierSession::create([
                 'user_id' => $user->id,
+                'session_id' => session()->getId(),
                 'started_at' => now(),
                 'last_activity_at' => now(),
                 'is_active' => true,
@@ -26,6 +33,7 @@ class StaffSessionService
             $this->closeAllSessionsForUser($user);
             return KitchenSession::create([
                 'user_id' => $user->id,
+                'session_id' => session()->getId(),
                 'started_at' => now(),
                 'last_activity_at' => now(),
                 'is_active' => true,
@@ -113,22 +121,30 @@ class StaffSessionService
         $session->save();
     }
 
+    /**
+     * Close all active sessions for the user on the CURRENT device only.
+     *
+     * Uses the Laravel session ID to isolate sessions per device/browser.
+     * Active sessions on other devices remain untouched.
+     */
     private function closeAllSessionsForUser(User $user): void
     {
+        $sessionId = session()->getId();
+
         CashierSession::where('user_id', $user->id)
             ->where('is_active', true)
-            ->each(function (CashierSession $session) {
-                $session->ended_at = now();
-                $session->is_active = false;
-                $session->save();
-            });
+            ->where('session_id', $sessionId)
+            ->update([
+                'ended_at' => now(),
+                'is_active' => false,
+            ]);
 
         KitchenSession::where('user_id', $user->id)
             ->where('is_active', true)
-            ->each(function (KitchenSession $session) {
-                $session->ended_at = now();
-                $session->is_active = false;
-                $session->save();
-            });
+            ->where('session_id', $sessionId)
+            ->update([
+                'ended_at' => now(),
+                'is_active' => false,
+            ]);
     }
 }
