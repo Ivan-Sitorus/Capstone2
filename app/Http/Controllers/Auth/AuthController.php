@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\StaffSessionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -14,12 +15,7 @@ class AuthController extends Controller
     public function showLogin()
     {
         if (Auth::check()) {
-            $user = Auth::user();
-            return match ($user->role) {
-                'admin' => redirect()->to('/admin'),
-                'kitchen' => redirect()->route('dapur.beranda'),
-                default => Inertia::location(route('kasir.pesanan-baru')),
-            };
+            return Inertia::location(route('kasir.pesanan-baru'));
         }
 
         return Inertia::render('Auth/Login');
@@ -27,27 +23,33 @@ class AuthController extends Controller
 
     public function showKitchenLogin()
     {
+        if (Auth::check()) {
+            return Inertia::location(route('dapur.beranda'));
+        }
+
         return Inertia::render('Dapur/Login');
     }
 
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
+            'email' => 'required|email',
             'password' => 'required',
         ]);
 
-        $key = Str::lower($request->email) . '|' . $request->ip();
+        $key = Str::lower($request->email).'|'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
+
             return back()->withErrors([
                 'email' => "Terlalu banyak percobaan login. Coba lagi dalam {$seconds} detik.",
             ]);
         }
 
-        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+        if (! Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             RateLimiter::hit($key, 60);
+
             return back()->withErrors(['email' => 'Email atau kata sandi salah']);
         }
 
@@ -56,6 +58,18 @@ class AuthController extends Controller
 
         $user = Auth::user();
 
+        app(StaffSessionService::class)->startSession($user);
+
+        // Redirect based on WHERE they logged in from (priority: URL > role)
+        if ($request->is('kasir/*')) {
+            return Inertia::location(route('kasir.pesanan-baru'));
+        }
+
+        if ($request->is('dapur/*')) {
+            return Inertia::location(route('dapur.beranda'));
+        }
+
+        // Fallback: role-based redirect
         if ($user->role === 'admin') {
             return redirect()->to('/admin');
         }
@@ -64,16 +78,20 @@ class AuthController extends Controller
             return Inertia::location(route('dapur.beranda'));
         }
 
-        if ($request->is('dapur/*')) {
-            return Inertia::location(route('dapur.beranda'));
-        }
-
         return Inertia::location(route('kasir.pesanan-baru'));
     }
 
     public function logout(Request $request)
     {
-        $role = Auth::user()->role ?? 'cashier';
+        $user = Auth::user();
+        $role = $user->role ?? 'cashier';
+
+        if ($user && in_array($user->role, ['cashier', 'kitchen'])) {
+            $activeSession = app(StaffSessionService::class)->getActiveSession($user);
+            if ($activeSession) {
+                app(StaffSessionService::class)->endSession($activeSession);
+            }
+        }
 
         Auth::logout();
         $request->session()->invalidate();
