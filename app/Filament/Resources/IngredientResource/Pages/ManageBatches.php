@@ -87,8 +87,11 @@ class ManageBatches extends Page implements HasTable
                             ->suffix(fn () => ' '.$this->record->unit),
                         DatePicker::make('expiry_date')
                             ->label('Expiry Date')
-                            ->nullable()
-                            ->native(false),
+                            ->native(false)
+                            ->required(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO)
+                            ->helperText(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO
+                                ? 'Required for FEFO mode'
+                                : null),
                         DateTimePicker::make('received_at')
                             ->label('Received At')
                             ->required()
@@ -123,8 +126,11 @@ class ManageBatches extends Page implements HasTable
                             ->suffix(fn () => ' '.$this->record->unit),
                         DatePicker::make('expiry_date')
                             ->label('Expiry Date')
-                            ->nullable()
-                            ->native(false),
+                            ->native(false)
+                            ->required(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO)
+                            ->helperText(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO
+                                ? 'Required for FEFO mode'
+                                : null),
                         DateTimePicker::make('received_at')
                             ->label('Received At')
                             ->required()

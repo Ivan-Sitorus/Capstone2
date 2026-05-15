@@ -15,6 +15,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -41,73 +42,88 @@ class IngredientResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            TextInput::make('name')
-                ->label('Ingredient Name')
-                ->required()
-                ->maxLength(255)
-                ->unique(ignoreRecord: true)
-                ->extraInputAttributes(TextInputHelper::string()),
-            Select::make('unit')
-                ->label('Unit')
-                ->options(Ingredient::UNITS)
-                ->required()
-                ->searchable()
-                ->native(false)
-                ->live(),
-            TextInput::make('low_stock_threshold')
-                ->label('Low Stock Threshold')
-                ->required()
-                ->type('text')
-                ->extraInputAttributes(NumberInputHelper::decimal())
-                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
-                ->stripCharacters('.')
-                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                ->suffix(fn ($get) => $get('unit') ? ' '.$get('unit') : ''),
-            Toggle::make('is_active')
-                ->label('Active')
-                ->default(true)
-                ->inline(false),
-            Repeater::make('batches')
-                ->relationship('batches')
-                ->label('Stok Awal (Batch)')
-                ->addActionLabel('+ Tambah Batch')
-                ->hiddenOn('edit')
-                ->columnSpanFull()
-                ->columns(1)
-                ->schema([
-                    TextInput::make('quantity')
-                        ->label('Jumlah')
-                        ->required()
-                        ->minValue(0)
-                        ->step(0.1)
-                        ->type('text')
-                        ->stripCharacters('.')
-                        ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                        ->extraInputAttributes(NumberInputHelper::decimal())
-                        ->suffix(fn ($get) => $get('../../unit') ? ' '.$get('../../unit') : ''),
-                    DatePicker::make('expiry_date')
-                        ->label('Tanggal Kadaluarsa')
-                        ->nullable()
-                        ->native(false),
-                    DateTimePicker::make('received_at')
-                        ->label('Diterima Tanggal')
-                        ->nullable()
-                        ->default(now())
-                        ->native(false),
-                    TextInput::make('cost_per_unit')
-                        ->label('Harga per Unit')
-                        ->required()
-                        ->numeric()
-                        ->minValue(0)
-                        ->type('text')
-                        ->stripCharacters('.')
-                        ->extraInputAttributes(NumberInputHelper::integer())
-                        ->prefix(fn ($get) => $get('../../unit') ? 'Rp/'.$get('../../unit') : 'Rp'),
-                ])
-                ->defaultItems(0)
-                ->collapsible(),
-        ]);
+        return $schema
+            ->components([
+                TextInput::make('name')
+                    ->label('Ingredient Name')
+                    ->required()
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true)
+                    ->extraInputAttributes(TextInputHelper::string()),
+                Select::make('unit')
+                    ->label('Unit')
+                    ->options(Ingredient::UNITS)
+                    ->required()
+                    ->searchable()
+                    ->native(false)
+                    ->live(),
+                TextInput::make('low_stock_threshold')
+                    ->label('Low Stock Threshold')
+                    ->required()
+                    ->type('text')
+                    ->extraInputAttributes(NumberInputHelper::decimal())
+                    ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
+                    ->stripCharacters('.')
+                    ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                    ->suffix(fn ($get) => $get('unit') ? ' '.$get('unit') : ''),
+                Toggle::make('is_active')
+                    ->label('Active')
+                    ->default(true)
+                    ->inline(false),
+                Radio::make('batch_mode')
+                    ->label('Mode Pengambilan Batch')
+                    ->options(array_slice(Ingredient::batchModes(), 0, 2))
+                    ->default(Ingredient::BATCH_MODE_FEFO)
+                    ->required()
+                    ->inline(false)
+                    ->helperText('FEFO: batch dengan tanggal kadaluarsa terdekat digunakan lebih dulu. FIFO: batch yang diterima lebih dulu digunakan lebih dulu.'),
+                Repeater::make('batches')
+                    ->relationship('batches')
+                    ->label('Stok Awal (Batch)')
+                    ->addActionLabel('+ Tambah Batch')
+                    ->hiddenOn('edit')
+                    ->columnSpanFull()
+                    ->columns(1)
+                    ->schema([
+                        TextInput::make('quantity')
+                            ->label('Jumlah')
+                            ->required()
+                            ->minValue(0)
+                            ->step(0.1)
+                            ->type('text')
+                            ->stripCharacters('.')
+                            ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                            ->extraInputAttributes(NumberInputHelper::decimal())
+                            ->suffix(fn ($get) => $get('../../unit') ? ' '.$get('../../unit') : ''),
+                        DatePicker::make('expiry_date')
+                            ->label('Tanggal Kadaluarsa')
+                            ->nullable()
+                            ->native(false)
+                            ->required(fn ($get) => $get('../../batch_mode') === Ingredient::BATCH_MODE_FEFO)
+                            ->helperText(fn ($get) => $get('../../batch_mode') === Ingredient::BATCH_MODE_FEFO
+                                ? 'Wajib diisi untuk mode FEFO'
+                                : null),
+                        DateTimePicker::make('received_at')
+                            ->label('Diterima Tanggal')
+                            ->nullable()
+                            ->default(now())
+                            ->native(false),
+                        TextInput::make('cost_per_unit')
+                            ->label('Harga per Unit')
+                            ->required()
+                            ->numeric()
+                            ->minValue(0)
+                            ->type('text')
+                            ->stripCharacters('.')
+                            ->extraInputAttributes(NumberInputHelper::integer())
+                            ->prefix(fn ($get) => $get('../../unit') ? 'Rp/'.$get('../../unit') : 'Rp'),
+                    ])
+                    ->defaultItems(0)
+                    ->collapsible(),
+            ])
+            ->validationMessages([
+                'batches.*.expiry_date.required' => 'FEFO harus ada expired, silakan berikan tanggal expired atau ubah ke mode FIFO.',
+            ]);
     }
 
     public static function table(Table $table): Table
