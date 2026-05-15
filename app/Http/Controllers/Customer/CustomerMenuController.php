@@ -36,24 +36,20 @@ class CustomerMenuController extends Controller
                 ->get();
         });
 
-        $table = null;
+        $tableNumber = $request->query('table');
 
-        if ($request->has('table')) {
-            $tableNumber = $request->query('table');
+        if (! $tableNumber || ! is_numeric($tableNumber) || (int) $tableNumber > 2147483647) {
+            return Inertia::render('Errors/404', ['status' => 404, 'message' => 'Nomor meja tidak valid'])
+                ->toResponse($request)
+                ->setStatusCode(404);
+        }
 
-            if (! is_numeric($tableNumber) || (int) $tableNumber > 2147483647) {
-                return Inertia::render('Errors/404', ['status' => 404, 'message' => 'Nomor meja tidak valid'])
-                    ->toResponse($request)
-                    ->setStatusCode(404);
-            }
+        $table = CafeTable::where('table_number', (int) $tableNumber)->first();
 
-            $table = CafeTable::where('table_number', (int) $tableNumber)->first();
-
-            if (! $table) {
-                return Inertia::render('Errors/404', ['status' => 404, 'message' => 'Meja tidak ditemukan'])
-                    ->toResponse($request)
-                    ->setStatusCode(404);
-            }
+        if (! $table) {
+            return Inertia::render('Errors/404', ['status' => 404, 'message' => 'Meja tidak ditemukan'])
+                ->toResponse($request)
+                ->setStatusCode(404);
         }
 
         return Inertia::render('Pelanggan/Menu/Index', compact('categories', 'table'));
