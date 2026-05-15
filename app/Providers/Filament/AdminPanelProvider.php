@@ -22,6 +22,16 @@ use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 class AdminPanelProvider extends PanelProvider
 {
+    public function register(): void
+    {
+        $this->app->bind(
+            \Filament\Auth\Http\Responses\Contracts\LoginResponse::class,
+            \App\Providers\Filament\LoginResponse::class,
+        );
+
+        parent::register();
+    }
+
     public function panel(Panel $panel): Panel
     {
         return $panel
