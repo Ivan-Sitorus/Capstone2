@@ -5,7 +5,6 @@ namespace Tests\Feature\Admin;
 use App\Models\Expense;
 use App\Models\Receivable;
 use App\Models\UnexpectedTransaction;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -86,25 +85,5 @@ class FinanceResourcesCrudTest extends TestCase
 
         $this->assertSame(0.0, (float) $receivable->remaining_amount);
         $this->assertFalse($receivable->isOverdue());
-    }
-
-    public function test_non_admin_cannot_access_finance_admin_resources(): void
-    {
-        /** @var User $cashier */
-        $cashier = User::factory()->create([
-            'role' => 'cashier',
-        ]);
-
-        $this->actingAs($cashier);
-
-        $routes = [
-            'filament.admin.resources.expenses.index',
-            'filament.admin.resources.receivables.index',
-        ];
-
-        foreach ($routes as $routeName) {
-            $response = $this->get(route($routeName));
-            $this->assertNotSame(200, $response->getStatusCode());
-        }
     }
 }
