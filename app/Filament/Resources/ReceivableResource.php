@@ -4,10 +4,11 @@ namespace App\Filament\Resources;
 
 use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Helpers\TextInputHelper;
+use App\Filament\Resources\ReceivableResource\Pages\CreateReceivable;
 use App\Filament\Resources\ReceivableResource\Pages\EditReceivable;
 use App\Filament\Resources\ReceivableResource\Pages\ListReceivables;
 use App\Filament\Resources\ReceivableResource\Pages\ViewReceivable;
-use App\Models\Order;
+use App\Models\Menu;
 use App\Models\Receivable;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -15,6 +16,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -35,55 +37,67 @@ class ReceivableResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-banknotes';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Finance Details';
+    protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
 
-    protected static ?string $navigationLabel = 'Receivables';
+    protected static ?string $navigationLabel = 'Piutang';
 
     protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('order_id')
-                ->label('Order')
-                ->relationship('order', 'order_code')
-                ->searchable()
-                ->nullable()
-                ->preload()
+            Repeater::make('items')
+                ->label('Item Pesanan')
+                ->schema([
+                    Select::make('menu_id')
+                        ->label('Menu')
+                        ->options(fn () => Menu::where('is_available', true)->orderBy('name')->pluck('name', 'id'))
+                        ->searchable()
+                        ->required()
+                        ->native(false),
+                    TextInput::make('quantity')
+                        ->label('Jumlah')
+                        ->numeric()
+                        ->default(1)
+                        ->minValue(1)
+                        ->required(),
+                ])
+                ->columns(2)
+                ->reorderable(false)
+                ->addActionLabel('+ Tambah Item')
+                ->columnSpanFull()
+                ->required(fn (string $operation): bool => $operation === 'create')
+                ->live()
                 ->afterStateUpdated(function ($state, Set $set) {
-                    if ($state) {
-                        $order = Order::find($state);
-                        if ($order) {
-                            // Auto-fill customer name from order's customer_name field
-                            if ($order->customer_name) {
-                                $set('customer_name', $order->customer_name);
-                            }
-                            // Auto-fill amount from order's total_amount
-                            $set('amount', $order->total_amount);
-                        }
+                    if (! is_array($state)) {
+                        return;
                     }
+                    $menuIds = collect($state)->pluck('menu_id')->filter()->unique();
+                    $menus = Menu::whereIn('id', $menuIds)->pluck('price', 'id');
+                    $total = collect($state)->sum(fn ($item) => ($menus[$item['menu_id']] ?? 0) * (int) ($item['quantity'] ?? 0));
+                    $set('amount', $total);
                 }),
             TextInput::make('customer_name')
-                ->label('Customer Name')
+                ->label('Nama Pelanggan')
                 ->required()
                 ->maxLength(255)
                 ->extraInputAttributes(TextInputHelper::string()),
             TextInput::make('amount')
-                ->label('Total Amount')
+                ->label('Jumlah Total')
                 ->required()
                 ->type('text')
                 ->prefix('Rp')
-                ->stripCharacters('.')
+                ->disabled()
+                ->dehydrated(false)
                 ->extraInputAttributes(NumberInputHelper::decimal())
-                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
             DatePicker::make('invoice_date')
-                ->label('Invoice Date')
+                ->label('Tanggal Invoice')
                 ->required()
                 ->default(now())
                 ->native(false),
             DatePicker::make('due_date')
-                ->label('Due Date')
+                ->label('Jatuh Tempo')
                 ->required()
                 ->default(now()->addDays(30))
                 ->native(false),
@@ -91,24 +105,32 @@ class ReceivableResource extends Resource
                 ->label('Status')
                 ->options([
                     Receivable::STATUS_PENDING => 'Pending',
-                    Receivable::STATUS_PARTIAL => 'Partial',
-                    Receivable::STATUS_PAID => 'Paid',
-                    Receivable::STATUS_OVERDUE => 'Overdue',
+                    Receivable::STATUS_PARTIAL => 'Cicilan',
+                    Receivable::STATUS_PAID => 'Lunas',
+                    Receivable::STATUS_OVERDUE => 'Jatuh Tempo',
                 ])
                 ->required()
                 ->default(Receivable::STATUS_PENDING)
-                ->native(false),
+                ->native(false)
+                ->live()
+                ->disabled(fn ($get) => (int) $get('paid_amount') > 0),
             TextInput::make('paid_amount')
-                ->label('Paid Amount')
+                ->label('Jumlah Dibayar')
                 ->required()
                 ->type('text')
                 ->prefix('Rp')
                 ->stripCharacters('.')
                 ->extraInputAttributes(NumberInputHelper::decimal())
                 ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
+                ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
+                ->live()
+                ->afterStateUpdated(function ($state, Set $set) {
+                    if ((int) $state > 0) {
+                        $set('status', 'partial');
+                    }
+                }),
             Textarea::make('notes')
-                ->label('Notes')
+                ->label('Catatan')
                 ->rows(3)
                 ->maxLength(500)
                 ->columnSpanFull(),
@@ -118,25 +140,25 @@ class ReceivableResource extends Resource
     public static function infolist(Schema $schema): Schema
     {
         return $schema->components([
-            Section::make('Receivable Information')
+            Section::make('Informasi Piutang')
                 ->schema([
                     TextEntry::make('customer_name')
-                        ->label('Customer Name'),
+                        ->label('Nama Pelanggan'),
                     TextEntry::make('invoice_date')
-                        ->label('Invoice Date')
+                        ->label('Tanggal Invoice')
                         ->date('d M Y'),
                     TextEntry::make('amount')
-                        ->label('Total Amount')
+                        ->label('Jumlah Total')
                         ->money('IDR'),
                     TextEntry::make('paid_amount')
-                        ->label('Paid Amount')
+                        ->label('Jumlah Dibayar')
                         ->money('IDR'),
                     TextEntry::make('remaining_amount')
-                        ->label('Remaining Amount')
+                        ->label('Sisa')
                         ->money('IDR')
                         ->color(fn (Receivable $record): string => $record->remaining_amount > 0 ? 'danger' : 'success'),
                     TextEntry::make('due_date')
-                        ->label('Due Date')
+                        ->label('Jatuh Tempo')
                         ->date('d M Y')
                         ->color(fn (Receivable $record): string => $record->isOverdue() ? 'danger' : 'gray'),
                     TextEntry::make('status')
@@ -149,21 +171,21 @@ class ReceivableResource extends Resource
                             default => 'gray',
                         }),
                     TextEntry::make('notes')
-                        ->label('Notes')
+                        ->label('Catatan')
                         ->visible(fn ($record) => $record->notes !== null && $record->notes !== ''),
                 ])->columns(2),
 
-            Section::make('Order Information')
+            Section::make('Informasi Pesanan')
                 ->visible(fn (Receivable $record): bool => $record->order !== null)
                 ->schema([
                     TextEntry::make('order.order_code')
-                        ->label('Order Code')
+                        ->label('Kode Pesanan')
                         ->url(fn (Receivable $record): ?string => $record->order
                             ? route('filament.admin.resources.orders.view', $record->order)
                             : null)
                         ->openUrlInNewTab(),
                     TextEntry::make('order.status')
-                        ->label('Order Status')
+                        ->label('Status Pesanan')
                         ->badge()
                         ->color(fn (string $state): string => match ($state) {
                             'selesai' => 'success',
@@ -171,11 +193,11 @@ class ReceivableResource extends Resource
                             default => 'gray',
                         }),
                     TextEntry::make('order.total_amount')
-                        ->label('Order Total')
+                        ->label('Total Pesanan')
                         ->money('IDR'),
                 ])->columns(3),
 
-            Section::make('Order Items')
+            Section::make('Item Pesanan')
                 ->visible(fn (Receivable $record): bool => $record->order !== null && $record->order->items()->exists())
                 ->schema([
                     TextEntry::make('order.items')
@@ -187,14 +209,6 @@ class ReceivableResource extends Resource
                             'subtotal' => $item->subtotal,
                         ])->toArray() : []),
                 ]),
-
-            Section::make('No Linked Order')
-                ->visible(fn (Receivable $record): bool => $record->order === null)
-                ->schema([
-                    TextEntry::make('')
-                        ->label('')
-                        ->content('This receivable is not linked to any order.'),
-                ]),
         ]);
     }
 
@@ -203,35 +217,35 @@ class ReceivableResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('order.order_code')
-                    ->label('Order')
+                    ->label('Pesanan')
                     ->searchable()
                     ->url(fn (Receivable $record): ?string => $record->order
                         ? route('filament.admin.resources.orders.view', $record->order)
                         : null)
                     ->openUrlInNewTab(),
                 TextColumn::make('customer_name')
-                    ->label('Customer')
+                    ->label('Pelanggan')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('invoice_date')
-                    ->label('Invoice Date')
+                    ->label('Tanggal Invoice')
                     ->date('d M Y')
                     ->sortable(),
                 TextColumn::make('due_date')
-                    ->label('Due Date')
+                    ->label('Jatuh Tempo')
                     ->date('d M Y')
                     ->sortable()
                     ->color(fn (Receivable $record): ?string => $record->isOverdue() ? 'danger' : null),
                 TextColumn::make('amount')
-                    ->label('Amount')
+                    ->label('Jumlah')
                     ->money('IDR')
                     ->sortable(),
                 TextColumn::make('paid_amount')
-                    ->label('Paid')
+                    ->label('Dibayar')
                     ->money('IDR')
                     ->sortable(),
                 TextColumn::make('remaining_amount')
-                    ->label('Remaining')
+                    ->label('Sisa')
                     ->money('IDR'),
                 TextColumn::make('status')
                     ->label('Status')
@@ -250,12 +264,12 @@ class ReceivableResource extends Resource
                     ->label('Status')
                     ->options([
                         Receivable::STATUS_PENDING => 'Pending',
-                        Receivable::STATUS_PARTIAL => 'Partial',
-                        Receivable::STATUS_PAID => 'Paid',
-                        Receivable::STATUS_OVERDUE => 'Overdue',
+                        Receivable::STATUS_PARTIAL => 'Cicilan',
+                        Receivable::STATUS_PAID => 'Lunas',
+                        Receivable::STATUS_OVERDUE => 'Jatuh Tempo',
                     ]),
                 Filter::make('due_date')
-                    ->label('Due Date Range')
+                    ->label('Rentang Jatuh Tempo')
                     ->schema([
                         DatePicker::make('from'),
                         DatePicker::make('until'),
@@ -289,6 +303,7 @@ class ReceivableResource extends Resource
     {
         return [
             'index' => ListReceivables::route('/'),
+            'create' => CreateReceivable::route('/create'),
             'view' => ViewReceivable::route('/{record}'),
             'edit' => EditReceivable::route('/{record}/edit'),
         ];
