@@ -10,12 +10,11 @@
 
 1. [Status Saat Ini](#status-saat-ini)
 2. [Perubahan dari Blade ke Filament Native](#perubahan-dari-blade-ke-filament-native)
-3. [TransaksiKeuangan Resource (Filament)](#transaksikeuangan-resource-filament)
-4. [CashFlow Page (Native Filament)](#cashflow-page-native-filament)
-5. [Income Model](#income-model)
-6. [Expense Model](#expense-model)
-7. [Widgets dan Chart](#widgets-dan-chart)
-8. [Diagram Alur Data](#diagram-alur-data)
+3. [CashFlow Page (Native Filament)](#cashflow-page-native-filament)
+4. [Income Model](#income-model)
+5. [Expense Model](#expense-model)
+6. [Widgets dan Chart](#widgets-dan-chart)
+7. [Diagram Alur Data](#diagram-alur-data)
 
 ---
 
@@ -38,7 +37,6 @@
 | Komponen | Status | Keterangan |
 |----------|--------|------------|
 | Model `Income.php` | ❌ BELUM ADA | Migration ada, model belum dibuat |
-| `TransaksiKeuanganResource` (Filament) | ❌ BELUM ADA | Resource untuk kelola incomes & expenses |
 | Native Filament widgets untuk CashFlow page | ⚠️ PARTIAL | Widget ada tapi page masih pakai Blade view |
 | Export CSV/Excel (Filament bulk action) | ❌ BELUM ADA | |
 
@@ -138,147 +136,6 @@ public function setPeriod(string $period): void
     $this->period = $period;
     $this->dispatch('cashflow-period-changed', period: $period);
 }
-```
-
----
-
-## TransaksiKeuangan Resource (Filament)
-
-Resource baru untuk mengelola semua transaksi keuangan (pemasukan dan pengeluaran) dalam satu interface. Data berasal dari dua tabel terpisah: `incomes` dan `expenses`.
-
-### Filter Tabs
-
-```
-[Semua] [Pemasukan] [Pengeluaran]
-```
-
-```php
-// app/Filament/Resources/TransaksiKeuanganResource.php (konseptual)
-class TransaksiKeuanganResource extends Resource
-{
-    protected static ?string $model = null; // Bukan single model — custom query
-    protected static ?string $navigationGroup = 'Finance';
-    protected static ?string $navigationIcon = 'heroicon-o-arrows-right-left';
-    protected static ?string $label = 'Transaksi Keuangan';
-    protected static ?string $pluralLabel = 'Transaksi Keuangan';
-
-    public static function getEloquentQuery(): Builder
-    {
-        // Union incomes + expenses (custom query)
-        // Karena data dari 2 tabel berbeda
-    }
-
-    // Filter tabs
-    public function getTabs(): array
-    {
-        return [
-            'all' => Tab::make('Semua'),
-            'income' => Tab::make('Pemasukan')
-                ->modifyQueryUsing(fn ($query) => $query->where('type', 'income')),
-            'expense' => Tab::make('Pengeluaran')
-                ->modifyQueryUsing(fn ($query) => $query->where('type', 'expense')),
-        ];
-    }
-}
-```
-
-### Kolom Tabel
-
-| Kolom | Sumber | Format |
-|-------|--------|--------|
-| **Tanggal** | `incomes.date` / `expenses.date` | `d M Y` |
-| **Tipe** | Enum: `Pemasukan` / `Pengeluaran` | Badge: hijau / merah |
-| **Kategori** | `incomes.category` / `expenses.category` | Teks |
-| **Sumber/Vendor** | `incomes.source` / `expenses.vendor` | Teks |
-| **Jumlah** | `incomes.amount` / `expenses.amount` | `formatRupiah()` |
-| **Deskripsi** | `incomes.description` / `expenses.description` | Teks, truncate |
-
-### Form: Field Berbeda per Tipe
-
-Saat memilih `transaction_type = pemasukan` vs `pengeluaran`, field yang tampil berbeda:
-
-**Pemasukan (`income`):**
-
-```php
-Forms\Components\Select::make('transaction_type')
-    ->options([
-        'income' => 'Pemasukan',
-        'expense' => 'Pengeluaran',
-    ])
-    ->reactive()
-    ->required(),
-
-// Field untuk PEMASUKAN (hanya tampil jika transaction_type = income)
-Forms\Components\TextInput::make('source')
-    ->label('Sumber Pemasukan')
-    ->visible(fn ($get) => $get('transaction_type') === 'income')
-    ->required(),
-Forms\Components\Select::make('category')
-    ->label('Kategori')
-    ->options([
-        'penjualan' => 'Penjualan',
-        'lainnya' => 'Lainnya',
-    ])
-    ->visible(fn ($get) => $get('transaction_type') === 'income'),
-```
-
-**Pengeluaran (`expense`):**
-
-```php
-// Field untuk PENGELUARAN (hanya tampil jika transaction_type = expense)
-Forms\Components\TextInput::make('vendor')
-    ->label('Vendor/Pemasok')
-    ->visible(fn ($get) => $get('transaction_type') === 'expense')
-    ->required(),
-Forms\Components\Select::make('category')
-    ->label('Kategori')
-    ->options([
-        'bahan_baku' => 'Bahan Baku',
-        'operasional' => 'Operasional',
-        'gaji' => 'Gaji',
-        'lainnya' => 'Lainnya',
-    ])
-    ->visible(fn ($get) => $get('transaction_type') === 'expense'),
-Forms\Components\Select::make('payment_method')
-    ->label('Metode Pembayaran')
-    ->options([
-        'cash' => 'Tunai',
-        'transfer' => 'Transfer',
-        'qris' => 'QRIS',
-    ])
-    ->visible(fn ($get) => $get('transaction_type') === 'expense'),
-```
-
-### Widget Stat Cards
-
-```php
-// Tampil di header TransaksiKeuangan Resource
-// 3 card stat dalam 1 row
-
-┌───────────────────┬───────────────────┬───────────────────┐
-│  Total Pemasukan  │  Total Pengeluaran│     Selisih       │
-│  Rp 12.450.000    │  Rp 8.200.000     │  Rp 4.250.000     │
-│  (hijau)          │  (merah)          │  (biru/hitam)     │
-└───────────────────┴───────────────────┴───────────────────┘
-```
-
-### Export via Filament Bulk Action
-
-```php
-use Filament\Tables\Actions\BulkAction;
-use Maatwebsite\Excel\Facades\Excel;
-
-// Export CSV
-BulkAction::make('export_csv')
-    ->label('Export CSV')
-    ->icon('heroicon-o-document-arrow-down')
-    ->action(fn ($records) => /* export logic */),
-
-// Export Excel
-BulkAction::make('export_excel')
-    ->label('Export Excel')
-    ->icon('heroicon-o-document-arrow-down')
-    ->action(fn ($records) => /* export logic */),
 ```
 
 ---
@@ -685,18 +542,18 @@ class CashFlowChartWidget extends ChartWidget
 │                        │                                 │
 │         ┌──────────────┼──────────────┐                  │
 │         ▼              ▼              ▼                  │
-│  ┌───────────┐  ┌───────────┐  ┌───────────┐           │
-│  │ Stats     │  │ Chart     │  │ Transaksi │           │
-│  │ Widget    │  │ Widget    │  │ Resource  │           │
-│  │           │  │           │  │           │           │
-│  │ Income    │  │ Line      │  │ CRUD      │           │
-│  │ Expense   │  │ Chart     │  │ incomes   │           │
-│  │ Nett      │  │ Pemasukan │  │ expenses  │           │
-│  │ Margin    │  │ vs        │  │           │           │
-│  │           │  │ Pengel.   │  │ Filter    │           │
-│  └─────┬─────┘  └─────┬─────┘  │ tabs      │           │
-│        │              │        └─────┬─────┘           │
-│        ▼              ▼              ▼                  │
+│  ┌───────────┐  ┌───────────┐                           │
+│  │ Stats     │  │ Chart     │                           │
+│  │ Widget    │  │ Widget    │                           │
+│  │           │  │           │                           │
+│  │ Income    │  │ Line      │                           │
+│  │ Expense   │  │ Chart     │                           │
+│  │ Nett      │  │ Pemasukan │                           │
+│  │ Margin    │  │ vs        │                           │
+│  │           │  │ Pengel.   │                           │
+│  └─────┬─────┘  └─────┬─────┘                           │
+│        │              │                                  │
+│        ▼              ▼                                  │
 │  ┌──────────────────────────────────────────┐          │
 │  │            Database                       │          │
 │  │  ┌──────────┐    ┌──────────┐            │          │
@@ -711,7 +568,6 @@ class CashFlowChartWidget extends ChartWidget
 | File | Aksi | Deskripsi |
 |------|------|-----------|
 | `app/Models/Income.php` | **BUAT** | Model untuk tabel `incomes` |
-| `app/Filament/Resources/TransaksiKeuanganResource.php` | **BUAT** | Resource untuk CRUD transaksi |
 | `app/Filament/Pages/CashFlow.php` | **UBAH** | Hapus Blade view → native Filament |
 | `app/Filament/Widgets/CashFlowStatsWidget.php` | **UBAH** | Tambah margin stat, period handler |
 | `app/Filament/Widgets/CashFlowChartWidget.php` | **UBAH** | Tambah period-aware data fetching |

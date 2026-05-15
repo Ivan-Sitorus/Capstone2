@@ -11,11 +11,10 @@
 1. [Arsitektur Layanan](#arsitektur-layanan)
 2. [3 Jenis Laporan](#3-jenis-laporan)
 3. [Tampilan Excel-like dengan AG Grid](#tampilan-excel-like-dengan-ag-grid)
-4. [Header Template (ReportHeaderTemplate)](#header-template-reportheadertemplate)
-5. [SAK Standar untuk Referensi](#sak-standar-untuk-referensi)
-6. [Teknis Implementasi](#teknis-implementasi)
-7. [PDF Export](#pdf-export)
-8. [Edge Cases](#edge-cases)
+4. [SAK Standar untuk Referensi](#sak-standar-untuk-referensi)
+5. [Teknis Implementasi](#teknis-implementasi)
+6. [PDF Export](#pdf-export)
+7. [Edge Cases](#edge-cases)
 
 ---
 
@@ -38,14 +37,12 @@ FinancialReportService (facade)
 | `app/Services/RigidReportService.php` | Laporan SAK EP: Neraca, Laba Rugi, Perubahan Ekuitas, Arus Kas, CALK |
 | `app/Services/SimpleReportService.php` | Laporan SAK EMKM: Neraca, Laba Rugi, CALK |
 | `app/Services/CustomReportService.php` | Laporan custom dengan filter bebas (kategori, agregasi, periode) |
-| `app/Models/ReportTemplate.php` | Template laporan tersimpan per user |
 | `app/Models/GeneratedReport.php` | Hasil generate laporan yang sudah disimpan |
 | `app/DTO/ReportData.php` | Data Transfer Object untuk hasil laporan |
 
 **Route Filament:**
 
 - `app/Filament/Clusters/Financial/FinancialCluster.php` — Cluster modul keuangan
-- `app/Filament/Clusters/Financial/Pages/SavedTemplates.php` — CRUD template laporan
 - `app/Filament/Clusters/Financial/Pages/GeneratedReports.php` — Riwayat laporan yang sudah di-generate
 - `app/Filament/Pages/ViewReport.php` — Halaman preview laporan
 
@@ -225,88 +222,6 @@ const AgGridReport = ({ rowData, columnDefs, onExportExcel, onExportPdf }) => {
 
 ---
 
-## Header Template (ReportHeaderTemplate)
-
-> **Catatan implementasi:** Model aktual bernama `ReportTemplate` (bukan `ReportHeaderTemplate`).  
-> File: `app/Models/ReportTemplate.php`  
-> Migration: `database/migrations/2026_05_08_000001_create_report_templates_table.php`
-
-### Schema Tabel `report_templates`
-
-```sql
-CREATE TABLE report_templates (
-    id         BIGSERIAL PRIMARY KEY,
-    user_id    BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    name       VARCHAR(255) NOT NULL,
-    type       VARCHAR(50) NOT NULL,
-    config     JSONB NULL,
-    created_at TIMESTAMP,
-    updated_at TIMESTAMP
-);
-```
-
-### Field `config` (JSON)
-
-Template header disimpan sebagai JSON dalam field `config`. Struktur yang akan ditambahkan:
-
-```json
-{
-  "header": {
-    "entity_name": "W9 Cafe STIE Totalwin",
-    "address": "Jl. Majapahit No. 605, Semarang",
-    "phone": "0812-3456-7890",
-    "periode": "Januari - Maret 2026",
-    "mata_uang": "Rp",
-    "pembulatan": "ribuan"
-  },
-  "additional_info": {
-    "npwp": "xx.xxx.xxx.x-xxx.xxx",
-    "note": "Laporan ini disusun berdasarkan SAK EMKM"
-  },
-  "is_default": true
-}
-```
-
-### Header sesuai Standar SAK
-
-Setiap laporan SAK wajib mencantumkan minimal:
-
-1. **Nama entitas** (`entity_name`): "W9 Cafe STIE Totalwin"
-2. **Jenis laporan**: "Laporan Posisi Keuangan" / "Laporan Laba Rugi" / dll.
-3. **Periode laporan** (`periode`): "31 Maret 2026" atau "Untuk periode yang berakhir 31 Maret 2026"
-4. **Mata uang pelaporan** (`mata_uang`): "Rupiah (Rp)"
-5. **Tingkat pembulatan** (`pembulatan`): "dalam ribuan Rupiah"
-
-### CRUD Template via Filament
-
-**File yang akan dibuat:** `app/Filament/Resources/ReportHeaderTemplateResource.php`
-
-```php
-// Konseptual - implementasi via Filament Resource
-class ReportTemplateResource extends Resource
-{
-    protected static ?string $model = ReportTemplate::class;
-
-    public static function form(Form $form): Form
-    {
-        return $form->schema([
-            TextInput::make('name')->required(),
-            Select::make('type')->options([
-                'simple' => 'SAK EMKM (Simpel)',
-                'rigid'  => 'SAK EP (Rigid)',
-                'custom' => 'Custom',
-            ]),
-            KeyValue::make('config.header')
-                ->label('Header Laporan'),
-            Toggle::make('config.is_default')
-                ->label('Jadikan Default'),
-        ]);
-    }
-}
-```
-
----
-
 ## SAK Standar untuk Referensi
 
 ### PSAK 201 — Penyajian Laporan Keuangan
@@ -368,22 +283,19 @@ Rounding dilakukan hanya pada TOTAL AKHIR (total = ROUND(true_total / 1000) * 10
 ```
 app/
 ├── Models/
-│   └── ReportHeaderTemplate.php          # NEW — model untuk header template (extend ReportTemplate)
+│   └── GeneratedReport.php                 # EXISTING — model untuk laporan tersimpan
 ├── Filament/
 │   ├── Clusters/Financial/
-│   │   ├── FinancialCluster.php          # EXISTING — cluster keuangan
-│   │   ├── Pages/
-│   │   │   ├── SavedTemplates.php        # EXISTING — CRUD templates
-│   │   │   └── GeneratedReports.php      # EXISTING — riwayat laporan
-│   └── Resources/
-│       └── ReportHeaderTemplateResource.php  # NEW — Filament resource untuk header
+│   │   ├── FinancialCluster.php            # EXISTING — cluster keuangan
+│   │   └── Pages/
+│   │       └── GeneratedReports.php        # EXISTING — riwayat laporan
 ├── Services/
-│   ├── FinancialReportService.php        # EXISTING — facade utama
-│   ├── RigidReportService.php            # EXISTING — extend untuk SAK EP
-│   ├── SimpleReportService.php           # EXISTING — extend untuk SAK EMKM
-│   └── CustomReportService.php           # EXISTING — extend untuk custom
+│   ├── FinancialReportService.php          # EXISTING — facade utama
+│   ├── RigidReportService.php              # EXISTING — extend untuk SAK EP
+│   ├── SimpleReportService.php             # EXISTING — extend untuk SAK EMKM
+│   └── CustomReportService.php             # EXISTING — extend untuk custom
 └── Renderers/
-    └── DomPdfRenderer.php                # NEW — PDF renderer custom (margin, footer, A4)
+    └── DomPdfRenderer.php                  # NEW — PDF renderer custom (margin, footer, A4)
 
 resources/
 └── js/
@@ -614,28 +526,7 @@ $roundedTotal = round($trueTotal / 1000) * 1000; // 12.346.000
 
 **Prinsip materialitas:** selisih pembulatan < Rp 3.000 tidak material.
 
-### 5. Report Template Dihapus
-
-**Kasus:** Admin menghapus template yang sedang dipakai oleh laporan aktif.
-
-**Penanganan:**
-
-```php
-// Soft reference — jangan hard delete template
-// Gunakan soft delete atau simpan snapshot config di generated_reports
-
-// Saat generate laporan, simpan SNAPSHOT template config:
-GeneratedReport::create([
-    'template_id' => $template->id,
-    'template_snapshot' => $template->config,  // JSON snapshot
-    'report_data' => $reportData,
-    'generated_at' => now(),
-]);
-
-// Jika template dihapus, laporan tetap bisa dirender dari snapshot
-```
-
-### 6. Laporan dengan Banyak Kolom (Landscape)
+### 5. Laporan dengan Banyak Kolom (Landscape)
 
 **Kasus:** Laporan custom dengan banyak kolom tidak muat di A4 portrait.
 
@@ -653,7 +544,6 @@ Admin pilih jenis laporan
 │
 ├─ Simpel (SAK EMKM)
 │   ├─ Pilih periode
-│   ├─ Pilih template header
 │   └─ [GENERATE] → FinancialReportService::generate('simple')
 │       ├─ SimpleReportService
 │       ├─ Tampilkan di AG Grid
@@ -661,7 +551,6 @@ Admin pilih jenis laporan
 │
 ├─ Rigid (SAK EP)
 │   ├─ Pilih periode
-│   ├─ Pilih template header
 │   └─ [GENERATE] → FinancialReportService::generate('rigid')
 │       ├─ RigidReportService
 │       ├─ Tampilkan 5 section (Neraca, Laba Rugi, Perubahan Ekuitas, Arus Kas, CALK)
