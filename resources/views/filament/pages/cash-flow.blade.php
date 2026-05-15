@@ -49,9 +49,6 @@
         {{-- Chart Widget --}}
         @livewire(\App\Filament\Widgets\CashFlowChartWidget::class, ['period' => $this->period])
 
-        {{-- Unexpected Transaction Widget --}}
-        @livewire(\App\Filament\Widgets\UnexpectedTransactionWidget::class)
-
     </div>
 
 </x-filament-panels::page>
