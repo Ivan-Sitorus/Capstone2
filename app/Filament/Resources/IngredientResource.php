@@ -100,6 +100,9 @@ class IngredientResource extends Resource
                             ->nullable()
                             ->native(false)
                             ->required(fn ($get) => $get('../../batch_mode') === Ingredient::BATCH_MODE_FEFO)
+                            ->validationMessages([
+                                'required' => 'FEFO harus ada expired, silakan berikan tanggal expired atau ubah ke mode FIFO.',
+                            ])
                             ->helperText(fn ($get) => $get('../../batch_mode') === Ingredient::BATCH_MODE_FEFO
                                 ? 'Wajib diisi untuk mode FEFO'
                                 : null),
@@ -120,9 +123,6 @@ class IngredientResource extends Resource
                     ])
                     ->defaultItems(0)
                     ->collapsible(),
-            ])
-            ->validationMessages([
-                'batches.*.expiry_date.required' => 'FEFO harus ada expired, silakan berikan tanggal expired atau ubah ke mode FIFO.',
             ]);
     }
 
