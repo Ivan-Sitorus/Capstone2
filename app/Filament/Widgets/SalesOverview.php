@@ -3,14 +3,11 @@
 namespace App\Filament\Widgets;
 
 use App\Models\Order;
-use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class SalesOverview extends BaseWidget
 {
-    use InteractsWithPageFilters;
 
     protected static ?int $sort = 1;
 
@@ -65,14 +62,7 @@ class SalesOverview extends BaseWidget
 
     protected function getStats(): array
     {
-        $period = $this->pageFilters['period'] ?? 'today';
-
-        [$start, $end] = match ($period) {
-            'today' => [now()->startOfDay(), now()->endOfDay()],
-            'this_week' => [now()->startOfWeek(Carbon::MONDAY), now()->endOfWeek(Carbon::SUNDAY)],
-            'this_month' => [now()->startOfMonth(), now()->endOfMonth()],
-            default => [now()->startOfDay(), now()->endOfDay()],
-        };
+        [$start, $end] = [now()->startOfDay(), now()->endOfDay()];
 
         $days = (int) $start->diffInDays($end) + 1;
         $prevEnd = $start->copy()->subDay()->endOfDay();

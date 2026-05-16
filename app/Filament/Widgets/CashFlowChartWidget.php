@@ -8,13 +8,11 @@ use App\Models\UnexpectedTransaction;
 use Carbon\Carbon;
 use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
 
 class CashFlowChartWidget extends ChartWidget
 {
-    use InteractsWithPageFilters;
 
     protected ?string $pollingInterval = null;
 
@@ -62,20 +60,8 @@ class CashFlowChartWidget extends ChartWidget
 
     private function buildData(): array
     {
-        $cacheKey = 'cashflow_chart_'.md5(json_encode($this->pageFilters));
-
-        return Cache::remember($cacheKey, 300, function () {
-            $period = $this->pageFilters['period'] ?? 'today';
-
-            return match ($period) {
-                'today' => $this->byHour(),
-                'this_week' => $this->byDayRange(
-                    Carbon::now()->startOfWeek(Carbon::MONDAY),
-                    Carbon::now()->endOfWeek(Carbon::SUNDAY)
-                ),
-                'this_month' => $this->byEvenDay(),
-                default => $this->byEvenDay(),
-            };
+        return Cache::remember('cashflow_chart_today', 300, function () {
+            return $this->byHour();
         });
     }
 

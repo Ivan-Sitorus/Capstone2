@@ -2,14 +2,16 @@
 
 namespace App\Filament\Clusters\Financial;
 
+use BackedEnum;
 use Filament\Clusters\Cluster;
 use Filament\Pages\Enums\SubNavigationPosition;
+use UnitEnum;
 
 class FinancialCluster extends Cluster
 {
-    protected static \BackedEnum|string|null $navigationIcon = 'heroicon-o-document-chart-bar';
+    protected static string | BackedEnum | null $navigationIcon = 'heroicon-o-document-chart-bar';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Keuangan';
+    protected static string | UnitEnum | null $navigationGroup = 'Keuangan';
 
     protected static ?string $navigationLabel = 'Laporan Keuangan';
 

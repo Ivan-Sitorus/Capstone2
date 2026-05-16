@@ -27,30 +27,7 @@ class SalesOverviewTest extends TestCase
         ]);
 
         Livewire::actingAs($admin)
-            ->test(\App\Filament\Widgets\SalesOverview::class, [
-                'pageFilters' => ['period' => 'today'],
-            ])
-            ->assertSee('Total Pendapatan');
-    }
-
-    public function test_this_week_period_counts_current_week_orders(): void
-    {
-        $admin = User::factory()->create(['role' => 'admin']);
-
-        Order::factory(3)->create([
-            'is_paid' => true,
-            'created_at' => now(),
-        ]);
-
-        Order::factory(2)->create([
-            'is_paid' => true,
-            'created_at' => now()->subWeek(),
-        ]);
-
-        Livewire::actingAs($admin)
-            ->test(\App\Filament\Widgets\SalesOverview::class, [
-                'pageFilters' => ['period' => 'this_week'],
-            ])
+            ->test(\App\Filament\Widgets\SalesOverview::class)
             ->assertSee('Total Pendapatan');
     }
 
@@ -59,13 +36,11 @@ class SalesOverviewTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
 
         Livewire::actingAs($admin)
-            ->test(\App\Filament\Widgets\SalesOverview::class, [
-                'pageFilters' => ['period' => 'today'],
-            ])
+            ->test(\App\Filament\Widgets\SalesOverview::class)
             ->assertSee('Rp 0');
     }
 
-    public function test_default_period_falls_back_to_today(): void
+    public function test_widget_renders_without_page_filters(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
 

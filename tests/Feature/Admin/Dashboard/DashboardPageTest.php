@@ -31,7 +31,7 @@ class DashboardPageTest extends TestCase
         $response->assertRedirect(route('filament.admin.auth.login'));
     }
 
-    public function test_period_toggle_buttons_exist(): void
+    public function test_dashboard_renders_without_period_toggles(): void
     {
         $admin = User::factory()->create([
             'role' => 'admin',
@@ -42,8 +42,6 @@ class DashboardPageTest extends TestCase
 
         Livewire::actingAs($admin)
             ->test(Dashboard::class)
-            ->assertSee('Hari Ini')
-            ->assertSee('Minggu Ini')
-            ->assertSee('Bulan Ini');
+            ->assertSuccessful();
     }
 }

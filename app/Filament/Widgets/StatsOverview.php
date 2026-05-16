@@ -4,44 +4,22 @@ namespace App\Filament\Widgets;
 
 use App\Models\Menu;
 use App\Models\Order;
-use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Support\Facades\DB;
 
 class StatsOverview extends StatsOverviewWidget
 {
-    use InteractsWithPageFilters;
 
     protected static ?int $sort = 1;
 
     protected function getStats(): array
     {
-        $period = $this->pageFilters['period'] ?? 'today';
-
-        [$salesStart, $salesEnd, $prevSalesStart, $prevSalesEnd, $salesLabel] = match ($period) {
-            'today' => [
-                today()->startOfDay(), today()->endOfDay(),
-                today()->subDay()->startOfDay(), today()->subDay()->endOfDay(),
-                'Penjualan Hari Ini',
-            ],
-            'this_week' => [
-                now()->startOfWeek(Carbon::MONDAY), now()->endOfWeek(Carbon::SUNDAY),
-                now()->subWeek()->startOfWeek(Carbon::MONDAY), now()->subWeek()->endOfWeek(Carbon::SUNDAY),
-                'Penjualan Minggu Ini',
-            ],
-            'this_month' => [
-                now()->startOfMonth(), now()->endOfMonth(),
-                now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth(),
-                'Penjualan Bulan Ini',
-            ],
-            default => [
-                today()->startOfDay(), today()->endOfDay(),
-                today()->subDay()->startOfDay(), today()->subDay()->endOfDay(),
-                'Penjualan Hari Ini',
-            ],
-        };
+        $salesStart = today()->startOfDay();
+        $salesEnd = today()->endOfDay();
+        $prevSalesStart = today()->subDay()->startOfDay();
+        $prevSalesEnd = today()->subDay()->endOfDay();
+        $salesLabel = 'Penjualan Hari Ini';
 
         // 1 query: ambil penjualan 7 hari terakhir sekaligus
         $salesByDay = Order::where('is_paid', true)

@@ -6,11 +6,9 @@ use App\Models\Ingredient;
 use App\Models\DailyIngredientUsage;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class InventoryOverview extends StatsOverviewWidget
 {
-    use InteractsWithPageFilters;
 
     protected static ?int $sort = 5;
 

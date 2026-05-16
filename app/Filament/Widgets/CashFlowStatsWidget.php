@@ -8,12 +8,10 @@ use App\Models\UnexpectedTransaction;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Support\Facades\Cache;
 
 class CashFlowStatsWidget extends StatsOverviewWidget
 {
-    use InteractsWithPageFilters;
 
     protected ?string $pollingInterval = null;
 
@@ -29,14 +27,7 @@ class CashFlowStatsWidget extends StatsOverviewWidget
 
     private function dateRange(): array
     {
-        $period = $this->pageFilters['period'] ?? 'today';
-
-        return match ($period) {
-            'today' => [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()],
-            'this_week' => [Carbon::now()->startOfWeek(Carbon::MONDAY), Carbon::now()->endOfWeek(Carbon::SUNDAY)],
-            'this_month' => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
-            default => [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()],
-        };
+        return [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()];
     }
 
     private function prevRange(): array
@@ -106,9 +97,7 @@ class CashFlowStatsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $cacheKey = 'cashflow_stats_'.md5(json_encode($this->pageFilters));
-
-        return Cache::remember($cacheKey, 300, function () {
+        return Cache::remember('cashflow_stats_today', 300, function () {
             [$s, $e] = $this->dateRange();
             [$ps, $pe] = $this->prevRange();
 

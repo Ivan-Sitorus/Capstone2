@@ -3,16 +3,13 @@
 namespace App\Filament\Widgets;
 
 use App\Models\OrderItem;
-use Carbon\Carbon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
 
 class TopMenuTable extends BaseWidget
 {
-    use InteractsWithPageFilters;
 
     protected ?string $pollingInterval = null;
 
@@ -27,14 +24,7 @@ class TopMenuTable extends BaseWidget
 
     public function table(Table $table): Table
     {
-        $period = $this->pageFilters['period'] ?? 'today';
-
-        [$start, $end] = match ($period) {
-            'today' => [now()->startOfDay(), now()->endOfDay()],
-            'this_week' => [now()->startOfWeek(Carbon::MONDAY), now()->endOfWeek(Carbon::SUNDAY)],
-            'this_month' => [now()->startOfMonth(), now()->endOfMonth()],
-            default => [now()->startOfDay(), now()->endOfDay()],
-        };
+        [$start, $end] = [now()->startOfMonth(), now()->endOfMonth()];
 
         return $table
             ->query(

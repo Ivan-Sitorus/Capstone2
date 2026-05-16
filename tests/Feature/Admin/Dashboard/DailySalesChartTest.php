@@ -12,7 +12,7 @@ class DailySalesChartTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_chart_renders_with_period_data(): void
+    public function test_chart_renders_without_period_filters(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);
 
@@ -30,9 +30,7 @@ class DailySalesChartTest extends TestCase
         ]);
 
         Livewire::actingAs($admin)
-            ->test(\App\Filament\Widgets\DailySalesChart::class, [
-                'pageFilters' => ['period' => 'this_week'],
-            ])
+            ->test(\App\Filament\Widgets\DailySalesChart::class)
             ->assertSee('Penjualan');
     }
 
@@ -46,9 +44,7 @@ class DailySalesChartTest extends TestCase
         ]);
 
         Livewire::actingAs($admin)
-            ->test(\App\Filament\Widgets\DailySalesChart::class, [
-                'pageFilters' => ['period' => 'this_week'],
-            ])
+            ->test(\App\Filament\Widgets\DailySalesChart::class)
             ->assertSee('Penjualan');
     }
 }

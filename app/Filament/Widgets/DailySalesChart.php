@@ -5,11 +5,9 @@ namespace App\Filament\Widgets;
 use App\Models\Order;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
-use Filament\Widgets\Concerns\InteractsWithPageFilters;
 
 class DailySalesChart extends ChartWidget
 {
-    use InteractsWithPageFilters;
 
     protected ?string $pollingInterval = null;
 
@@ -29,17 +27,7 @@ class DailySalesChart extends ChartWidget
 
     protected function getData(): array
     {
-        $period = $this->pageFilters['period'] ?? 'today';
-
-        return match ($period) {
-            'today' => $this->byHour(),
-            'this_week' => $this->byDayRange(
-                Carbon::now()->startOfWeek(Carbon::MONDAY),
-                Carbon::now()->endOfWeek(Carbon::SUNDAY),
-            ),
-            'this_month' => $this->byEvenDay(),
-            default => $this->byEvenDay(),
-        };
+        return $this->byHour();
     }
 
     /** Today: 6 buckets of 4 hours each */
