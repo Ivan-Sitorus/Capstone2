@@ -1,0 +1,63 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - link "W9 Cafe — Admin" [ref=e5] [cursor=pointer]:
+      - /url: http://localhost:8081/admin
+      - generic [ref=e6]: W9 Cafe — Admin
+    - button "User menu" [ref=e10] [cursor=pointer]:
+      - img "Avatar of Admin W9" [ref=e11]
+  - main [ref=e14]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - heading "Lihat Laporan — Simple — 2026-04-15 s/d 2026-05-15" [level=1] [ref=e19]
+        - generic [ref=e21]:
+          - link "Unduh PDF" [ref=e22] [cursor=pointer]:
+            - /url: http://localhost:8081/admin/view-report/1/download-pdf
+            - img [ref=e23]
+            - text: Unduh PDF
+          - link "Unduh Excel" [ref=e25] [cursor=pointer]:
+            - /url: http://localhost:8081/admin/view-report/1/download-excel
+            - img [ref=e26]
+            - text: Unduh Excel
+          - link "Unduh CSV" [ref=e28] [cursor=pointer]:
+            - /url: http://localhost:8081/admin/view-report/1/download-csv
+            - img [ref=e29]
+            - text: Unduh CSV
+      - generic [ref=e33]:
+        - link "Kembali ke Daftar Laporan" [ref=e36] [cursor=pointer]:
+          - /url: http://localhost:8081/admin/financial/generated-reports
+          - img [ref=e37]
+          - generic [ref=e39]: Kembali ke Daftar Laporan
+        - generic [ref=e40]:
+          - heading "Simple — 2026-04-15 s/d 2026-05-15" [level=1] [ref=e41]
+          - paragraph [ref=e42]: Dibuat oleh Admin W9 · 15 May 2026, 20:24 WIB
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - paragraph [ref=e45]: Tipe Laporan
+            - paragraph [ref=e46]: Simple (Ringkasan)
+          - generic [ref=e47]:
+            - paragraph [ref=e48]: Periode
+            - paragraph [ref=e49]: 15 Apr 2026 → 15 May 2026
+          - generic [ref=e50]:
+            - paragraph [ref=e51]: Agregasi
+            - paragraph [ref=e52]: Bulanan
+          - generic [ref=e53]:
+            - paragraph [ref=e54]: Status
+            - generic [ref=e55]: ● Generated
+        - generic [ref=e56]:
+          - heading "Ringkasan Keuangan" [level=2] [ref=e59]
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - paragraph [ref=e64]: Total Pendapatan
+              - paragraph [ref=e65]: Rp 0
+            - generic [ref=e66]:
+              - paragraph [ref=e67]: Total Pengeluaran
+              - paragraph [ref=e68]: Rp 0
+            - generic [ref=e69]:
+              - paragraph [ref=e70]: Net
+              - paragraph [ref=e71]: Rp 0
+        - button "Raw Report Data" [ref=e74] [cursor=pointer]:
+          - generic [ref=e75]:
+            - img [ref=e76]
+            - text: Raw Report Data
+          - img [ref=e78]
+          - img [ref=e80]

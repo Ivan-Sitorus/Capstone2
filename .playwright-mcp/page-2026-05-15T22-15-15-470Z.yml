@@ -1,0 +1,575 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - button "Collapse sidebar" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - link "W9 Cafe — Admin" [ref=e9] [cursor=pointer]:
+        - /url: http://localhost:8081/admin
+        - generic [ref=e10]: W9 Cafe — Admin
+    - button "User menu" [ref=e14] [cursor=pointer]:
+      - img "Avatar of Admin W9" [ref=e15]
+  - generic [ref=e16]:
+    - complementary [ref=e18]:
+      - navigation [ref=e19]:
+        - list [ref=e20]:
+          - listitem [ref=e21]:
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "Dashboard" [ref=e24] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin
+                  - img [ref=e25]
+                  - generic [ref=e27]: Dashboard
+          - listitem [ref=e28]:
+            - generic [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: Keuangan
+              - button "Keuangan" [expanded] [ref=e31]:
+                - img [ref=e32]
+            - list [ref=e34]:
+              - listitem [ref=e35]:
+                - link "Arus Kas" [ref=e36] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/cash-flow
+                  - img [ref=e37]
+                  - generic [ref=e39]: Arus Kas
+              - listitem [ref=e40]:
+                - link "Pemasukan & Pengeluaran" [ref=e41] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/unexpected-transactions
+                  - img [ref=e42]
+                  - generic [ref=e44]: Pemasukan & Pengeluaran
+              - listitem [ref=e45]:
+                - link "Laporan Keuangan" [ref=e46] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/financial
+                  - img [ref=e47]
+                  - generic [ref=e49]: Laporan Keuangan
+          - listitem [ref=e50]:
+            - generic [ref=e51] [cursor=pointer]:
+              - generic [ref=e52]: Inventory
+              - button "Inventory" [expanded] [ref=e53]:
+                - img [ref=e54]
+            - list [ref=e56]:
+              - listitem [ref=e57]:
+                - link "Ingredients" [ref=e58] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/ingredients
+                  - img [ref=e59]
+                  - generic [ref=e61]: Ingredients
+              - listitem [ref=e62]:
+                - link "Stock Adjustments" [ref=e63] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/stock-adjustments
+                  - img [ref=e64]
+                  - generic [ref=e66]: Stock Adjustments
+              - listitem [ref=e67]:
+                - link "Pemakaian Bahan Harian" [ref=e68] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/daily-ingredient-usages
+                  - img [ref=e69]
+                  - generic [ref=e71]: Pemakaian Bahan Harian
+          - listitem [ref=e72]:
+            - generic [ref=e73] [cursor=pointer]:
+              - generic [ref=e74]: Data Master
+              - button "Data Master" [expanded] [ref=e75]:
+                - img [ref=e76]
+            - list [ref=e78]:
+              - listitem [ref=e79]:
+                - link "Menu" [ref=e80] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menus
+                  - img [ref=e81]
+                  - generic [ref=e83]: Menu
+              - listitem [ref=e84]:
+                - link "Kategori" [ref=e85] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/categories
+                  - img [ref=e86]
+                  - generic [ref=e89]: Kategori
+              - listitem [ref=e90]:
+                - link "Meja Cafe" [ref=e91] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/cafe-tables
+                  - img [ref=e92]
+                  - generic [ref=e94]: Meja Cafe
+          - listitem [ref=e95]:
+            - generic [ref=e96] [cursor=pointer]:
+              - generic [ref=e97]: Transaksi
+              - button "Transaksi" [expanded] [ref=e98]:
+                - img [ref=e99]
+            - list [ref=e101]:
+              - listitem [ref=e102]:
+                - link "Pesanan 4" [ref=e103] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/orders
+                  - img [ref=e104]
+                  - generic [ref=e106]: Pesanan
+                  - generic [ref=e110]: "4"
+              - listitem [ref=e111]:
+                - link "Promotions" [ref=e112] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/promotions
+                  - img [ref=e113]
+                  - generic [ref=e115]: Promotions
+              - listitem [ref=e116]:
+                - link "Piutang" [ref=e117] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/receivables
+                  - img [ref=e118]
+                  - generic [ref=e120]: Piutang
+          - listitem [ref=e121]:
+            - generic [ref=e122] [cursor=pointer]:
+              - generic [ref=e123]: Pengguna
+              - button "Pengguna" [expanded] [ref=e124]:
+                - img [ref=e125]
+            - list [ref=e127]:
+              - listitem [ref=e128]:
+                - link "Pengguna" [ref=e129] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/users
+                  - img [ref=e130]
+                  - generic [ref=e132]: Pengguna
+              - listitem [ref=e133]:
+                - link "Riwayat Login Staff" [ref=e134] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/staff-history
+                  - img [ref=e135]
+                  - generic [ref=e137]: Riwayat Login Staff
+          - listitem [ref=e138]:
+            - generic [ref=e139] [cursor=pointer]:
+              - generic [ref=e140]: Analitik
+              - button "Analitik" [expanded] [ref=e141]:
+                - img [ref=e142]
+            - list [ref=e144]:
+              - listitem [ref=e145]:
+                - link "Klasterisasi Menu Penjualan" [ref=e146] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-menu
+                  - img [ref=e147]
+                  - generic [ref=e149]: Klasterisasi Menu Penjualan
+              - listitem [ref=e150]:
+                - link "Prediksi Menu" [ref=e151] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-menu
+                  - img [ref=e152]
+                  - generic [ref=e154]: Prediksi Menu
+              - listitem [ref=e155]:
+                - link "Asosiatif Menu" [ref=e156] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/asosiatif-menu
+                  - img [ref=e157]
+                  - generic [ref=e159]: Asosiatif Menu
+              - listitem [ref=e160]:
+                - link "Klasterisasi Bahan Baku" [ref=e161] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-bahan-baku
+                  - img [ref=e162]
+                  - generic [ref=e164]: Klasterisasi Bahan Baku
+              - listitem [ref=e165]:
+                - link "Prediksi Bahan Baku" [ref=e166] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-bahan-baku
+                  - img [ref=e167]
+                  - generic [ref=e169]: Prediksi Bahan Baku
+    - main [ref=e171]:
+      - generic [ref=e173]:
+        - generic [ref=e174]:
+          - generic [ref=e175]:
+            - navigation [ref=e176]:
+              - list [ref=e177]:
+                - listitem [ref=e178]:
+                  - link "Ingredients" [ref=e179] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients
+                - listitem [ref=e180]:
+                  - img [ref=e181]
+                  - generic [ref=e183]: List
+            - heading "Ingredients" [level=1] [ref=e184]
+          - button "New ingredient" [ref=e187] [cursor=pointer]
+        - generic [ref=e195]:
+          - generic [ref=e198]:
+            - generic [ref=e199]:
+              - generic [ref=e200]: Search
+              - generic [ref=e201]:
+                - img [ref=e203]
+                - searchbox "Search" [ref=e206]
+            - button "Filter" [ref=e209] [cursor=pointer]:
+              - img [ref=e210]
+              - generic [ref=e213]: "0"
+          - table [ref=e215]:
+            - rowgroup [ref=e216]:
+              - row "Select/deselect all items for bulk actions. Ingredient Name Unit Low Stock Threshold Total Stock Active Actions" [ref=e217]:
+                - columnheader "Select/deselect all items for bulk actions." [ref=e218]:
+                  - checkbox "Select/deselect all items for bulk actions." [ref=e219]
+                - columnheader "Ingredient Name" [ref=e220]:
+                  - button "Ingredient Name" [ref=e221] [cursor=pointer]:
+                    - text: Ingredient Name
+                    - img [ref=e222]
+                - columnheader "Unit" [ref=e224]:
+                  - button "Unit" [ref=e225] [cursor=pointer]:
+                    - text: Unit
+                    - img [ref=e226]
+                - columnheader "Low Stock Threshold" [ref=e228]:
+                  - button "Low Stock Threshold" [ref=e229] [cursor=pointer]:
+                    - text: Low Stock Threshold
+                    - img [ref=e230]
+                - columnheader "Total Stock" [ref=e232]:
+                  - button "Total Stock" [ref=e233] [cursor=pointer]:
+                    - text: Total Stock
+                    - img [ref=e234]
+                - columnheader "Active" [ref=e236]:
+                  - button "Active" [ref=e237] [cursor=pointer]:
+                    - text: Active
+                    - img [ref=e238]
+                - columnheader "Actions" [ref=e240]
+            - rowgroup [ref=e241]:
+              - row "Select/deselect item 15 for bulk actions. Sirup Vanila ml 200,00 ml 0 ml Batch Edit Delete" [ref=e242]:
+                - cell "Select/deselect item 15 for bulk actions." [ref=e243]:
+                  - checkbox "Select/deselect item 15 for bulk actions." [ref=e244]
+                - cell "Sirup Vanila" [ref=e245]:
+                  - link "Sirup Vanila" [ref=e246] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/15/edit
+                    - generic [ref=e247]: Sirup Vanila
+                - cell "ml" [ref=e248]:
+                  - link "ml" [ref=e249] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/15/edit
+                    - generic [ref=e250]: ml
+                - cell "200,00 ml" [ref=e251]:
+                  - link "200,00 ml" [ref=e252] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/15/edit
+                    - generic [ref=e253]: 200,00 ml
+                - cell "0 ml" [ref=e254]:
+                  - link "0 ml" [ref=e255] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/15/edit
+                    - generic [ref=e257]: 0 ml
+                - cell [ref=e258]:
+                  - link [ref=e259] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/15/edit
+                    - img [ref=e261]
+                - cell "Batch Edit Delete" [ref=e263]:
+                  - generic [ref=e264]:
+                    - link "Batch" [ref=e265] [cursor=pointer]:
+                      - /url: http://localhost:8081/admin/ingredients/15/batches
+                      - img [ref=e266]
+                      - text: Batch
+                    - button "Edit" [ref=e268] [cursor=pointer]:
+                      - img [ref=e269]
+                      - text: Edit
+                    - button "Delete" [ref=e272] [cursor=pointer]:
+                      - img [ref=e273]
+                      - text: Delete
+              - row "Select/deselect item 14 for bulk actions. Keju Parut gram 150,00 gram 0 gram Batch Edit Delete" [ref=e275]:
+                - cell "Select/deselect item 14 for bulk actions." [ref=e276]:
+                  - checkbox "Select/deselect item 14 for bulk actions." [ref=e277]
+                - cell "Keju Parut" [ref=e278]:
+                  - link "Keju Parut" [ref=e279] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/14/edit
+                    - generic [ref=e280]: Keju Parut
+                - cell "gram" [ref=e281]:
+                  - link "gram" [ref=e282] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/14/edit
+                    - generic [ref=e283]: gram
+                - cell "150,00 gram" [ref=e284]:
+                  - link "150,00 gram" [ref=e285] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/14/edit
+                    - generic [ref=e286]: 150,00 gram
+                - cell "0 gram" [ref=e287]:
+                  - link "0 gram" [ref=e288] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/14/edit
+                    - generic [ref=e290]: 0 gram
+                - cell [ref=e291]:
+                  - link [ref=e292] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/14/edit
+                    - img [ref=e294]
+                - cell "Batch Edit Delete" [ref=e296]:
+                  - generic [ref=e297]:
+                    - link "Batch" [ref=e298] [cursor=pointer]:
+                      - /url: http://localhost:8081/admin/ingredients/14/batches
+                      - img [ref=e299]
+                      - text: Batch
+                    - button "Edit" [ref=e301] [cursor=pointer]:
+                      - img [ref=e302]
+                      - text: Edit
+                    - button "Delete" [ref=e305] [cursor=pointer]:
+                      - img [ref=e306]
+                      - text: Delete
+              - row "Select/deselect item 13 for bulk actions. Mentega gram 200,00 gram 0 gram Batch Edit Delete" [ref=e308]:
+                - cell "Select/deselect item 13 for bulk actions." [ref=e309]:
+                  - checkbox "Select/deselect item 13 for bulk actions." [ref=e310]
+                - cell "Mentega" [ref=e311]:
+                  - link "Mentega" [ref=e312] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/13/edit
+                    - generic [ref=e313]: Mentega
+                - cell "gram" [ref=e314]:
+                  - link "gram" [ref=e315] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/13/edit
+                    - generic [ref=e316]: gram
+                - cell "200,00 gram" [ref=e317]:
+                  - link "200,00 gram" [ref=e318] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/13/edit
+                    - generic [ref=e319]: 200,00 gram
+                - cell "0 gram" [ref=e320]:
+                  - link "0 gram" [ref=e321] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/13/edit
+                    - generic [ref=e323]: 0 gram
+                - cell [ref=e324]:
+                  - link [ref=e325] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/13/edit
+                    - img [ref=e327]
+                - cell "Batch Edit Delete" [ref=e329]:
+                  - generic [ref=e330]:
+                    - link "Batch" [ref=e331] [cursor=pointer]:
+                      - /url: http://localhost:8081/admin/ingredients/13/batches
+                      - img [ref=e332]
+                      - text: Batch
+                    - button "Edit" [ref=e334] [cursor=pointer]:
+                      - img [ref=e335]
+                      - text: Edit
+                    - button "Delete" [ref=e338] [cursor=pointer]:
+                      - img [ref=e339]
+                      - text: Delete
+              - row "Select/deselect item 12 for bulk actions. Coklat Bubuk gram 300,00 gram 0 gram Batch Edit Delete" [ref=e341]:
+                - cell "Select/deselect item 12 for bulk actions." [ref=e342]:
+                  - checkbox "Select/deselect item 12 for bulk actions." [ref=e343]
+                - cell "Coklat Bubuk" [ref=e344]:
+                  - link "Coklat Bubuk" [ref=e345] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/12/edit
+                    - generic [ref=e346]: Coklat Bubuk
+                - cell "gram" [ref=e347]:
+                  - link "gram" [ref=e348] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/12/edit
+                    - generic [ref=e349]: gram
+                - cell "300,00 gram" [ref=e350]:
+                  - link "300,00 gram" [ref=e351] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/12/edit
+                    - generic [ref=e352]: 300,00 gram
+                - cell "0 gram" [ref=e353]:
+                  - link "0 gram" [ref=e354] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/12/edit
+                    - generic [ref=e356]: 0 gram
+                - cell [ref=e357]:
+                  - link [ref=e358] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/12/edit
+                    - img [ref=e360]
+                - cell "Batch Edit Delete" [ref=e362]:
+                  - generic [ref=e363]:
+                    - link "Batch" [ref=e364] [cursor=pointer]:
+                      - /url: http://localhost:8081/admin/ingredients/12/batches
+                      - img [ref=e365]
+                      - text: Batch
+                    - button "Edit" [ref=e367] [cursor=pointer]:
+                      - img [ref=e368]
+                      - text: Edit
+                    - button "Delete" [ref=e371] [cursor=pointer]:
+                      - img [ref=e372]
+                      - text: Delete
+              - row "Select/deselect item 11 for bulk actions. Gula Pasir gram 1.000,00 gram 0 gram Batch Edit Delete" [ref=e374]:
+                - cell "Select/deselect item 11 for bulk actions." [ref=e375]:
+                  - checkbox "Select/deselect item 11 for bulk actions." [ref=e376]
+                - cell "Gula Pasir" [ref=e377]:
+                  - link "Gula Pasir" [ref=e378] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/11/edit
+                    - generic [ref=e379]: Gula Pasir
+                - cell "gram" [ref=e380]:
+                  - link "gram" [ref=e381] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/11/edit
+                    - generic [ref=e382]: gram
+                - cell "1.000,00 gram" [ref=e383]:
+                  - link "1.000,00 gram" [ref=e384] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/11/edit
+                    - generic [ref=e385]: 1.000,00 gram
+                - cell "0 gram" [ref=e386]:
+                  - link "0 gram" [ref=e387] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/11/edit
+                    - generic [ref=e389]: 0 gram
+                - cell [ref=e390]:
+                  - link [ref=e391] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/11/edit
+                    - img [ref=e393]
+                - cell "Batch Edit Delete" [ref=e395]:
+                  - generic [ref=e396]:
+                    - link "Batch" [ref=e397] [cursor=pointer]:
+                      - /url: http://localhost:8081/admin/ingredients/11/batches
+                      - img [ref=e398]
+                      - text: Batch
+                    - button "Edit" [ref=e400] [cursor=pointer]:
+                      - img [ref=e401]
+                      - text: Edit
+                    - button "Delete" [ref=e404] [cursor=pointer]:
+                      - img [ref=e405]
+                      - text: Delete
+              - row "Select/deselect item 10 for bulk actions. Garam gram 100,00 gram 0 gram Batch Edit Delete" [ref=e407]:
+                - cell "Select/deselect item 10 for bulk actions." [ref=e408]:
+                  - checkbox "Select/deselect item 10 for bulk actions." [ref=e409]
+                - cell "Garam" [ref=e410]:
+                  - link "Garam" [ref=e411] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/10/edit
+                    - generic [ref=e412]: Garam
+                - cell "gram" [ref=e413]:
+                  - link "gram" [ref=e414] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/10/edit
+                    - generic [ref=e415]: gram
+                - cell "100,00 gram" [ref=e416]:
+                  - link "100,00 gram" [ref=e417] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/10/edit
+                    - generic [ref=e418]: 100,00 gram
+                - cell "0 gram" [ref=e419]:
+                  - link "0 gram" [ref=e420] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/10/edit
+                    - generic [ref=e422]: 0 gram
+                - cell [ref=e423]:
+                  - link [ref=e424] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/10/edit
+                    - img [ref=e426]
+                - cell "Batch Edit Delete" [ref=e428]:
+                  - generic [ref=e429]:
+                    - link "Batch" [ref=e430] [cursor=pointer]:
+                      - /url: http://localhost:8081/admin/ingredients/10/batches
+                      - img [ref=e431]
+                      - text: Batch
+                    - button "Edit" [ref=e433] [cursor=pointer]:
+                      - img [ref=e434]
+                      - text: Edit
+                    - button "Delete" [ref=e437] [cursor=pointer]:
+                      - img [ref=e438]
+                      - text: Delete
+              - row "Select/deselect item 9 for bulk actions. Bawang Merah gram 200,00 gram 0 gram Batch Edit Delete" [ref=e440]:
+                - cell "Select/deselect item 9 for bulk actions." [ref=e441]:
+                  - checkbox "Select/deselect item 9 for bulk actions." [ref=e442]
+                - cell "Bawang Merah" [ref=e443]:
+                  - link "Bawang Merah" [ref=e444] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/9/edit
+                    - generic [ref=e445]: Bawang Merah
+                - cell "gram" [ref=e446]:
+                  - link "gram" [ref=e447] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/9/edit
+                    - generic [ref=e448]: gram
+                - cell "200,00 gram" [ref=e449]:
+                  - link "200,00 gram" [ref=e450] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/9/edit
+                    - generic [ref=e451]: 200,00 gram
+                - cell "0 gram" [ref=e452]:
+                  - link "0 gram" [ref=e453] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/9/edit
+                    - generic [ref=e455]: 0 gram
+                - cell [ref=e456]:
+                  - link [ref=e457] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/9/edit
+                    - img [ref=e459]
+                - cell "Batch Edit Delete" [ref=e461]:
+                  - generic [ref=e462]:
+                    - link "Batch" [ref=e463] [cursor=pointer]:
+                      - /url: http://localhost:8081/admin/ingredients/9/batches
+                      - img [ref=e464]
+                      - text: Batch
+                    - button "Edit" [ref=e466] [cursor=pointer]:
+                      - img [ref=e467]
+                      - text: Edit
+                    - button "Delete" [ref=e470] [cursor=pointer]:
+                      - img [ref=e471]
+                      - text: Delete
+              - row "Select/deselect item 8 for bulk actions. Minyak Goreng ml 1.000,00 ml 0 ml Batch Edit Delete" [ref=e473]:
+                - cell "Select/deselect item 8 for bulk actions." [ref=e474]:
+                  - checkbox "Select/deselect item 8 for bulk actions." [ref=e475]
+                - cell "Minyak Goreng" [ref=e476]:
+                  - link "Minyak Goreng" [ref=e477] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/8/edit
+                    - generic [ref=e478]: Minyak Goreng
+                - cell "ml" [ref=e479]:
+                  - link "ml" [ref=e480] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/8/edit
+                    - generic [ref=e481]: ml
+                - cell "1.000,00 ml" [ref=e482]:
+                  - link "1.000,00 ml" [ref=e483] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/8/edit
+                    - generic [ref=e484]: 1.000,00 ml
+                - cell "0 ml" [ref=e485]:
+                  - link "0 ml" [ref=e486] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/8/edit
+                    - generic [ref=e488]: 0 ml
+                - cell [ref=e489]:
+                  - link [ref=e490] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/8/edit
+                    - img [ref=e492]
+                - cell "Batch Edit Delete" [ref=e494]:
+                  - generic [ref=e495]:
+                    - link "Batch" [ref=e496] [cursor=pointer]:
+                      - /url: http://localhost:8081/admin/ingredients/8/batches
+                      - img [ref=e497]
+                      - text: Batch
+                    - button "Edit" [ref=e499] [cursor=pointer]:
+                      - img [ref=e500]
+                      - text: Edit
+                    - button "Delete" [ref=e503] [cursor=pointer]:
+                      - img [ref=e504]
+                      - text: Delete
+              - row "Select/deselect item 7 for bulk actions. Telur Ayam pcs 30,00 pcs 0 pcs Batch Edit Delete" [ref=e506]:
+                - cell "Select/deselect item 7 for bulk actions." [ref=e507]:
+                  - checkbox "Select/deselect item 7 for bulk actions." [ref=e508]
+                - cell "Telur Ayam" [ref=e509]:
+                  - link "Telur Ayam" [ref=e510] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/7/edit
+                    - generic [ref=e511]: Telur Ayam
+                - cell "pcs" [ref=e512]:
+                  - link "pcs" [ref=e513] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/7/edit
+                    - generic [ref=e514]: pcs
+                - cell "30,00 pcs" [ref=e515]:
+                  - link "30,00 pcs" [ref=e516] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/7/edit
+                    - generic [ref=e517]: 30,00 pcs
+                - cell "0 pcs" [ref=e518]:
+                  - link "0 pcs" [ref=e519] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/7/edit
+                    - generic [ref=e521]: 0 pcs
+                - cell [ref=e522]:
+                  - link [ref=e523] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/7/edit
+                    - img [ref=e525]
+                - cell "Batch Edit Delete" [ref=e527]:
+                  - generic [ref=e528]:
+                    - link "Batch" [ref=e529] [cursor=pointer]:
+                      - /url: http://localhost:8081/admin/ingredients/7/batches
+                      - img [ref=e530]
+                      - text: Batch
+                    - button "Edit" [ref=e532] [cursor=pointer]:
+                      - img [ref=e533]
+                      - text: Edit
+                    - button "Delete" [ref=e536] [cursor=pointer]:
+                      - img [ref=e537]
+                      - text: Delete
+              - row "Select/deselect item 6 for bulk actions. Tepung Terigu gram 500,00 gram 0 gram Batch Edit Delete" [ref=e539]:
+                - cell "Select/deselect item 6 for bulk actions." [ref=e540]:
+                  - checkbox "Select/deselect item 6 for bulk actions." [ref=e541]
+                - cell "Tepung Terigu" [ref=e542]:
+                  - link "Tepung Terigu" [ref=e543] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/6/edit
+                    - generic [ref=e544]: Tepung Terigu
+                - cell "gram" [ref=e545]:
+                  - link "gram" [ref=e546] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/6/edit
+                    - generic [ref=e547]: gram
+                - cell "500,00 gram" [ref=e548]:
+                  - link "500,00 gram" [ref=e549] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/6/edit
+                    - generic [ref=e550]: 500,00 gram
+                - cell "0 gram" [ref=e551]:
+                  - link "0 gram" [ref=e552] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/6/edit
+                    - generic [ref=e554]: 0 gram
+                - cell [ref=e555]:
+                  - link [ref=e556] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/ingredients/6/edit
+                    - img [ref=e558]
+                - cell "Batch Edit Delete" [ref=e560]:
+                  - generic [ref=e561]:
+                    - link "Batch" [ref=e562] [cursor=pointer]:
+                      - /url: http://localhost:8081/admin/ingredients/6/batches
+                      - img [ref=e563]
+                      - text: Batch
+                    - button "Edit" [ref=e565] [cursor=pointer]:
+                      - img [ref=e566]
+                      - text: Edit
+                    - button "Delete" [ref=e569] [cursor=pointer]:
+                      - img [ref=e570]
+                      - text: Delete
+          - navigation "Pagination navigation" [ref=e572]:
+            - generic [ref=e573]: Showing 1 to 10 of 15 results
+            - generic [ref=e576]:
+              - generic [ref=e578]: Per page
+              - combobox "Per page" [ref=e580]:
+                - option "5"
+                - option "10" [selected]
+                - option "25"
+                - option "50"
+            - list [ref=e581]:
+              - listitem [ref=e582]:
+                - button "Go to page 1" [ref=e583] [cursor=pointer]:
+                  - generic [ref=e584]: "1"
+              - listitem [ref=e585]:
+                - button "Go to page 2" [ref=e586] [cursor=pointer]:
+                  - generic [ref=e587]: "2"
+              - listitem [ref=e588]:
+                - button "Next" [ref=e589] [cursor=pointer]:
+                  - img [ref=e590]
+  - generic:
+    - status

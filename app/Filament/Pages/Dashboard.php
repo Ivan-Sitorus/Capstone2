@@ -29,7 +29,17 @@ class Dashboard extends BaseDashboard
 
     public function getWidgets(): array
     {
-        return [];
+        return [
+            \App\Filament\Widgets\SalesOverview::class,
+            \App\Filament\Widgets\DailySalesChart::class,
+            \App\Filament\Widgets\TopMenuTable::class,
+            \App\Filament\Widgets\LatestOrdersTable::class,
+            \App\Filament\Widgets\InventoryOverview::class,
+            \App\Filament\Widgets\LowStockTable::class,
+            \App\Filament\Widgets\CashFlowStatsWidget::class,
+            \App\Filament\Widgets\CashFlowChartWidget::class,
+            \App\Filament\Widgets\UnexpectedTransactionWidget::class,
+        ];
     }
 
     public function getColumns(): int | array

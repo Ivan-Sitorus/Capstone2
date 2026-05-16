@@ -1,0 +1,412 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - button "Collapse sidebar" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - link "W9 Cafe — Admin" [ref=e9] [cursor=pointer]:
+        - /url: http://127.0.0.1:8081/admin
+        - generic [ref=e10]: W9 Cafe — Admin
+    - button "User menu" [ref=e14] [cursor=pointer]:
+      - img "Avatar of Admin W9" [ref=e15]
+  - generic [ref=e16]:
+    - complementary [ref=e18]:
+      - navigation [ref=e19]:
+        - list [ref=e20]:
+          - listitem [ref=e21]:
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "Dashboard" [ref=e24] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin
+                  - img [ref=e25]
+                  - generic [ref=e27]: Dashboard
+          - listitem [ref=e28]:
+            - generic [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: Detail Keuangan
+              - button "Detail Keuangan" [expanded] [ref=e31]:
+                - img [ref=e32]
+            - list [ref=e34]:
+              - listitem [ref=e35]:
+                - link "Arus Kas" [ref=e36] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/cash-flow
+                  - img [ref=e37]
+                  - generic [ref=e39]: Arus Kas
+              - listitem [ref=e40]:
+                - link "Laporan Keuangan" [ref=e41] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/financial
+                  - img [ref=e42]
+                  - generic [ref=e44]: Laporan Keuangan
+          - listitem [ref=e45]:
+            - generic [ref=e46] [cursor=pointer]:
+              - generic [ref=e47]: Inventory
+              - button "Inventory" [expanded] [ref=e48]:
+                - img [ref=e49]
+            - list [ref=e51]:
+              - listitem [ref=e52]:
+                - link "Ingredients" [ref=e53] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/ingredients
+                  - img [ref=e54]
+                  - generic [ref=e56]: Ingredients
+              - listitem [ref=e57]:
+                - link "Stock Adjustments" [ref=e58] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/stock-adjustments
+                  - img [ref=e59]
+                  - generic [ref=e61]: Stock Adjustments
+              - listitem [ref=e62]:
+                - link "Pemakaian Bahan Harian" [ref=e63] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/daily-ingredient-usages
+                  - img [ref=e64]
+                  - generic [ref=e66]: Pemakaian Bahan Harian
+          - listitem [ref=e67]:
+            - generic [ref=e68] [cursor=pointer]:
+              - generic [ref=e69]: Data Master
+              - button "Data Master" [expanded] [ref=e70]:
+                - img [ref=e71]
+            - list [ref=e73]:
+              - listitem [ref=e74]:
+                - link "Menu" [ref=e75] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/menus
+                  - img [ref=e76]
+                  - generic [ref=e78]: Menu
+              - listitem [ref=e79]:
+                - link "Kategori" [ref=e80] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/categories
+                  - img [ref=e81]
+                  - generic [ref=e84]: Kategori
+              - listitem [ref=e85]:
+                - link "Meja Cafe" [ref=e86] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/cafe-tables
+                  - img [ref=e87]
+                  - generic [ref=e89]: Meja Cafe
+          - listitem [ref=e90]:
+            - generic [ref=e91] [cursor=pointer]:
+              - generic [ref=e92]: Transaksi
+              - button "Transaksi" [expanded] [ref=e93]:
+                - img [ref=e94]
+            - list [ref=e96]:
+              - listitem [ref=e97]:
+                - link "Pesanan 2" [ref=e98] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/orders
+                  - img [ref=e99]
+                  - generic [ref=e101]: Pesanan
+                  - generic [ref=e105]: "2"
+              - listitem [ref=e106]:
+                - link "Promotions" [ref=e107] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/promotions
+                  - img [ref=e108]
+                  - generic [ref=e110]: Promotions
+          - listitem [ref=e111]:
+            - generic [ref=e112] [cursor=pointer]:
+              - generic [ref=e113]: Pengguna
+              - button "Pengguna" [expanded] [ref=e114]:
+                - img [ref=e115]
+            - list [ref=e117]:
+              - listitem [ref=e118]:
+                - link "Pengguna" [ref=e119] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/users
+                  - img [ref=e120]
+                  - generic [ref=e122]: Pengguna
+              - listitem [ref=e123]:
+                - link "Riwayat Login Staff" [ref=e124] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/staff-history
+                  - img [ref=e125]
+                  - generic [ref=e127]: Riwayat Login Staff
+          - listitem [ref=e128]:
+            - generic [ref=e129] [cursor=pointer]:
+              - generic [ref=e130]: Keuangan
+              - button "Keuangan" [expanded] [ref=e131]:
+                - img [ref=e132]
+            - list [ref=e134]:
+              - listitem [ref=e135]:
+                - link "Pemasukan" [ref=e136] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/incomes
+                  - img [ref=e137]
+                  - generic [ref=e139]: Pemasukan
+              - listitem [ref=e140]:
+                - link "Transaksi Keuangan" [ref=e141] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/transaksi-keuangans
+                  - img [ref=e142]
+                  - generic [ref=e144]: Transaksi Keuangan
+              - listitem [ref=e145]:
+                - link "Template Header Laporan" [ref=e146] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/report-header-templates
+                  - img [ref=e147]
+                  - generic [ref=e149]: Template Header Laporan
+          - listitem [ref=e150]:
+            - generic [ref=e151] [cursor=pointer]:
+              - generic [ref=e152]: Finance Details
+              - button "Finance Details" [expanded] [ref=e153]:
+                - img [ref=e154]
+            - list [ref=e156]:
+              - listitem [ref=e157]:
+                - link "Receivables" [ref=e158] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/receivables
+                  - img [ref=e159]
+                  - generic [ref=e161]: Receivables
+          - listitem [ref=e162]:
+            - generic [ref=e163] [cursor=pointer]:
+              - generic [ref=e164]: Analitik
+              - button "Analitik" [expanded] [ref=e165]:
+                - img [ref=e166]
+            - list [ref=e168]:
+              - listitem [ref=e169]:
+                - link "Klasterisasi Menu Penjualan" [ref=e170] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/klasterisasi-menu
+                  - img [ref=e171]
+                  - generic [ref=e173]: Klasterisasi Menu Penjualan
+              - listitem [ref=e174]:
+                - link "Prediksi Menu" [ref=e175] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/prediksi-menu
+                  - img [ref=e176]
+                  - generic [ref=e178]: Prediksi Menu
+              - listitem [ref=e179]:
+                - link "Asosiatif Menu" [ref=e180] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/asosiatif-menu
+                  - img [ref=e181]
+                  - generic [ref=e183]: Asosiatif Menu
+              - listitem [ref=e184]:
+                - link "Klasterisasi Bahan Baku" [ref=e185] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/klasterisasi-bahan-baku
+                  - img [ref=e186]
+                  - generic [ref=e188]: Klasterisasi Bahan Baku
+              - listitem [ref=e189]:
+                - link "Prediksi Bahan Baku" [ref=e190] [cursor=pointer]:
+                  - /url: http://127.0.0.1:8081/admin/prediksi-bahan-baku
+                  - img [ref=e191]
+                  - generic [ref=e193]: Prediksi Bahan Baku
+    - main [ref=e195]:
+      - generic [ref=e197]:
+        - heading "Riwayat Login Staff" [level=1] [ref=e200]
+        - generic [ref=e208]:
+          - generic [ref=e211]:
+            - generic [ref=e212]:
+              - generic [ref=e213]: Search
+              - generic [ref=e214]:
+                - img [ref=e216]
+                - searchbox "Search" [ref=e219]
+            - button "Filter" [ref=e222] [cursor=pointer]:
+              - img [ref=e223]
+              - generic [ref=e226]: "0"
+          - table [ref=e228]:
+            - rowgroup [ref=e229]:
+              - row "Nama Email Role Waktu Masuk Waktu Keluar Jumlah Pesanan Action" [ref=e230]:
+                - columnheader "Nama" [ref=e231]
+                - columnheader "Email" [ref=e232]
+                - columnheader "Role" [ref=e233]
+                - columnheader "Waktu Masuk" [ref=e234]:
+                  - button "Waktu Masuk" [ref=e235] [cursor=pointer]:
+                    - text: Waktu Masuk
+                    - img [ref=e236]
+                - columnheader "Waktu Keluar" [ref=e238]:
+                  - button "Waktu Keluar" [ref=e239] [cursor=pointer]:
+                    - text: Waktu Keluar
+                    - img [ref=e240]
+                - columnheader "Jumlah Pesanan" [ref=e242]
+                - columnheader "Action" [ref=e243]
+            - rowgroup [ref=e244]:
+              - row "Dapur W9 dapur@w9cafe.com Dapur 15 May 2026, 16:26 15 May 2026, 16:27 0 Detail" [ref=e245]:
+                - cell "Dapur W9" [ref=e246]:
+                  - generic [ref=e248]: Dapur W9
+                - cell "dapur@w9cafe.com" [ref=e249]:
+                  - generic [ref=e251]: dapur@w9cafe.com
+                - cell "Dapur" [ref=e252]:
+                  - generic [ref=e255]: Dapur
+                - cell "15 May 2026, 16:26" [ref=e256]:
+                  - generic [ref=e258]: 15 May 2026, 16:26
+                - cell "15 May 2026, 16:27" [ref=e259]:
+                  - generic [ref=e261]: 15 May 2026, 16:27
+                - cell "0" [ref=e262]:
+                  - generic [ref=e264]: "0"
+                - cell "Detail" [ref=e265]:
+                  - link "Detail" [ref=e267] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8081/admin/staff-session-detail/kitchen/30
+                    - img [ref=e268]
+                    - text: Detail
+              - row "Ahmad Kasir kasir@w9cafe.com Kasir 15 May 2026, 16:26 15 May 2026, 16:31 1 Detail" [ref=e271]:
+                - cell "Ahmad Kasir" [ref=e272]:
+                  - generic [ref=e274]: Ahmad Kasir
+                - cell "kasir@w9cafe.com" [ref=e275]:
+                  - generic [ref=e277]: kasir@w9cafe.com
+                - cell "Kasir" [ref=e278]:
+                  - generic [ref=e281]: Kasir
+                - cell "15 May 2026, 16:26" [ref=e282]:
+                  - generic [ref=e284]: 15 May 2026, 16:26
+                - cell "15 May 2026, 16:31" [ref=e285]:
+                  - generic [ref=e287]: 15 May 2026, 16:31
+                - cell "1" [ref=e288]:
+                  - generic [ref=e290]: "1"
+                - cell "Detail" [ref=e291]:
+                  - link "Detail" [ref=e293] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8081/admin/staff-session-detail/cashier/10
+                    - img [ref=e294]
+                    - text: Detail
+              - row "Dapur W9 dapur@w9cafe.com Dapur 15 May 2026, 16:23 15 May 2026, 16:24 0 Detail" [ref=e297]:
+                - cell "Dapur W9" [ref=e298]:
+                  - generic [ref=e300]: Dapur W9
+                - cell "dapur@w9cafe.com" [ref=e301]:
+                  - generic [ref=e303]: dapur@w9cafe.com
+                - cell "Dapur" [ref=e304]:
+                  - generic [ref=e307]: Dapur
+                - cell "15 May 2026, 16:23" [ref=e308]:
+                  - generic [ref=e310]: 15 May 2026, 16:23
+                - cell "15 May 2026, 16:24" [ref=e311]:
+                  - generic [ref=e313]: 15 May 2026, 16:24
+                - cell "0" [ref=e314]:
+                  - generic [ref=e316]: "0"
+                - cell "Detail" [ref=e317]:
+                  - link "Detail" [ref=e319] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8081/admin/staff-session-detail/kitchen/29
+                    - img [ref=e320]
+                    - text: Detail
+              - row "Ahmad Kasir kasir@w9cafe.com Kasir 15 May 2026, 15:52 15 May 2026, 15:52 0 Detail" [ref=e323]:
+                - cell "Ahmad Kasir" [ref=e324]:
+                  - generic [ref=e326]: Ahmad Kasir
+                - cell "kasir@w9cafe.com" [ref=e327]:
+                  - generic [ref=e329]: kasir@w9cafe.com
+                - cell "Kasir" [ref=e330]:
+                  - generic [ref=e333]: Kasir
+                - cell "15 May 2026, 15:52" [ref=e334]:
+                  - generic [ref=e336]: 15 May 2026, 15:52
+                - cell "15 May 2026, 15:52" [ref=e337]:
+                  - generic [ref=e339]: 15 May 2026, 15:52
+                - cell "0" [ref=e340]:
+                  - generic [ref=e342]: "0"
+                - cell "Detail" [ref=e343]:
+                  - link "Detail" [ref=e345] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8081/admin/staff-session-detail/cashier/9
+                    - img [ref=e346]
+                    - text: Detail
+              - row "Dapur W9 dapur@w9cafe.com Dapur 15 May 2026, 15:29 15 May 2026, 15:29 0 Detail" [ref=e349]:
+                - cell "Dapur W9" [ref=e350]:
+                  - generic [ref=e352]: Dapur W9
+                - cell "dapur@w9cafe.com" [ref=e353]:
+                  - generic [ref=e355]: dapur@w9cafe.com
+                - cell "Dapur" [ref=e356]:
+                  - generic [ref=e359]: Dapur
+                - cell "15 May 2026, 15:29" [ref=e360]:
+                  - generic [ref=e362]: 15 May 2026, 15:29
+                - cell "15 May 2026, 15:29" [ref=e363]:
+                  - generic [ref=e365]: 15 May 2026, 15:29
+                - cell "0" [ref=e366]:
+                  - generic [ref=e368]: "0"
+                - cell "Detail" [ref=e369]:
+                  - link "Detail" [ref=e371] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8081/admin/staff-session-detail/kitchen/21
+                    - img [ref=e372]
+                    - text: Detail
+              - row "Dapur W9 dapur@w9cafe.com Dapur 15 May 2026, 15:29 15 May 2026, 15:29 0 Detail" [ref=e375]:
+                - cell "Dapur W9" [ref=e376]:
+                  - generic [ref=e378]: Dapur W9
+                - cell "dapur@w9cafe.com" [ref=e379]:
+                  - generic [ref=e381]: dapur@w9cafe.com
+                - cell "Dapur" [ref=e382]:
+                  - generic [ref=e385]: Dapur
+                - cell "15 May 2026, 15:29" [ref=e386]:
+                  - generic [ref=e388]: 15 May 2026, 15:29
+                - cell "15 May 2026, 15:29" [ref=e389]:
+                  - generic [ref=e391]: 15 May 2026, 15:29
+                - cell "0" [ref=e392]:
+                  - generic [ref=e394]: "0"
+                - cell "Detail" [ref=e395]:
+                  - link "Detail" [ref=e397] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8081/admin/staff-session-detail/kitchen/20
+                    - img [ref=e398]
+                    - text: Detail
+              - row "Dapur W9 dapur@w9cafe.com Dapur 15 May 2026, 15:29 15 May 2026, 15:29 0 Detail" [ref=e401]:
+                - cell "Dapur W9" [ref=e402]:
+                  - generic [ref=e404]: Dapur W9
+                - cell "dapur@w9cafe.com" [ref=e405]:
+                  - generic [ref=e407]: dapur@w9cafe.com
+                - cell "Dapur" [ref=e408]:
+                  - generic [ref=e411]: Dapur
+                - cell "15 May 2026, 15:29" [ref=e412]:
+                  - generic [ref=e414]: 15 May 2026, 15:29
+                - cell "15 May 2026, 15:29" [ref=e415]:
+                  - generic [ref=e417]: 15 May 2026, 15:29
+                - cell "0" [ref=e418]:
+                  - generic [ref=e420]: "0"
+                - cell "Detail" [ref=e421]:
+                  - link "Detail" [ref=e423] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8081/admin/staff-session-detail/kitchen/19
+                    - img [ref=e424]
+                    - text: Detail
+              - row "Dapur W9 dapur@w9cafe.com Dapur 15 May 2026, 15:29 15 May 2026, 15:29 0 Detail" [ref=e427]:
+                - cell "Dapur W9" [ref=e428]:
+                  - generic [ref=e430]: Dapur W9
+                - cell "dapur@w9cafe.com" [ref=e431]:
+                  - generic [ref=e433]: dapur@w9cafe.com
+                - cell "Dapur" [ref=e434]:
+                  - generic [ref=e437]: Dapur
+                - cell "15 May 2026, 15:29" [ref=e438]:
+                  - generic [ref=e440]: 15 May 2026, 15:29
+                - cell "15 May 2026, 15:29" [ref=e441]:
+                  - generic [ref=e443]: 15 May 2026, 15:29
+                - cell "0" [ref=e444]:
+                  - generic [ref=e446]: "0"
+                - cell "Detail" [ref=e447]:
+                  - link "Detail" [ref=e449] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8081/admin/staff-session-detail/kitchen/26
+                    - img [ref=e450]
+                    - text: Detail
+              - row "Dapur W9 dapur@w9cafe.com Dapur 15 May 2026, 15:28 15 May 2026, 15:28 0 Detail" [ref=e453]:
+                - cell "Dapur W9" [ref=e454]:
+                  - generic [ref=e456]: Dapur W9
+                - cell "dapur@w9cafe.com" [ref=e457]:
+                  - generic [ref=e459]: dapur@w9cafe.com
+                - cell "Dapur" [ref=e460]:
+                  - generic [ref=e463]: Dapur
+                - cell "15 May 2026, 15:28" [ref=e464]:
+                  - generic [ref=e466]: 15 May 2026, 15:28
+                - cell "15 May 2026, 15:28" [ref=e467]:
+                  - generic [ref=e469]: 15 May 2026, 15:28
+                - cell "0" [ref=e470]:
+                  - generic [ref=e472]: "0"
+                - cell "Detail" [ref=e473]:
+                  - link "Detail" [ref=e475] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8081/admin/staff-session-detail/kitchen/22
+                    - img [ref=e476]
+                    - text: Detail
+              - row "Ahmad Kasir kasir@w9cafe.com Kasir 15 May 2026, 15:08 15 May 2026, 15:08 0 Detail" [ref=e479]:
+                - cell "Ahmad Kasir" [ref=e480]:
+                  - generic [ref=e482]: Ahmad Kasir
+                - cell "kasir@w9cafe.com" [ref=e483]:
+                  - generic [ref=e485]: kasir@w9cafe.com
+                - cell "Kasir" [ref=e486]:
+                  - generic [ref=e489]: Kasir
+                - cell "15 May 2026, 15:08" [ref=e490]:
+                  - generic [ref=e492]: 15 May 2026, 15:08
+                - cell "15 May 2026, 15:08" [ref=e493]:
+                  - generic [ref=e495]: 15 May 2026, 15:08
+                - cell "0" [ref=e496]:
+                  - generic [ref=e498]: "0"
+                - cell "Detail" [ref=e499]:
+                  - link "Detail" [ref=e501] [cursor=pointer]:
+                    - /url: http://127.0.0.1:8081/admin/staff-session-detail/cashier/8
+                    - img [ref=e502]
+                    - text: Detail
+          - navigation "Pagination navigation" [ref=e505]:
+            - generic [ref=e506]: Showing 1 to 10 of 36 results
+            - generic [ref=e509]:
+              - generic [ref=e511]: Per page
+              - combobox "Per page" [ref=e513]:
+                - option "5"
+                - option "10" [selected]
+                - option "25"
+                - option "50"
+            - list [ref=e514]:
+              - listitem [ref=e515]:
+                - button "Go to page 1" [ref=e516] [cursor=pointer]:
+                  - generic [ref=e517]: "1"
+              - listitem [ref=e518]:
+                - button "Go to page 2" [ref=e519] [cursor=pointer]:
+                  - generic [ref=e520]: "2"
+              - listitem [ref=e521]:
+                - button "Go to page 3" [ref=e522] [cursor=pointer]:
+                  - generic [ref=e523]: "3"
+              - listitem [ref=e524]:
+                - button "Go to page 4" [ref=e525] [cursor=pointer]:
+                  - generic [ref=e526]: "4"
+              - listitem [ref=e527]:
+                - button "Next" [ref=e528] [cursor=pointer]:
+                  - img [ref=e529]
+  - generic:
+    - status

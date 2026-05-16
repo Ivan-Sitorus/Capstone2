@@ -48,6 +48,7 @@ class TopMenuTable extends BaseWidget
                     ->orderByDesc('total_sold')
                     ->limit(5)
             )
+            ->defaultKeySort(false)
             ->heading($this->getTableHeading())
             ->paginated(false)
             ->columns([

@@ -4,16 +4,45 @@ namespace App\Filament\Widgets;
 
 use App\Models\Menu;
 use App\Models\Order;
+use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Support\Facades\DB;
 
 class StatsOverview extends StatsOverviewWidget
 {
+    use InteractsWithPageFilters;
+
     protected static ?int $sort = 1;
 
     protected function getStats(): array
     {
+        $period = $this->pageFilters['period'] ?? 'today';
+
+        [$salesStart, $salesEnd, $prevSalesStart, $prevSalesEnd, $salesLabel] = match ($period) {
+            'today' => [
+                today()->startOfDay(), today()->endOfDay(),
+                today()->subDay()->startOfDay(), today()->subDay()->endOfDay(),
+                'Penjualan Hari Ini',
+            ],
+            'this_week' => [
+                now()->startOfWeek(Carbon::MONDAY), now()->endOfWeek(Carbon::SUNDAY),
+                now()->subWeek()->startOfWeek(Carbon::MONDAY), now()->subWeek()->endOfWeek(Carbon::SUNDAY),
+                'Penjualan Minggu Ini',
+            ],
+            'this_month' => [
+                now()->startOfMonth(), now()->endOfMonth(),
+                now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth(),
+                'Penjualan Bulan Ini',
+            ],
+            default => [
+                today()->startOfDay(), today()->endOfDay(),
+                today()->subDay()->startOfDay(), today()->subDay()->endOfDay(),
+                'Penjualan Hari Ini',
+            ],
+        };
+
         // 1 query: ambil penjualan 7 hari terakhir sekaligus
         $salesByDay = Order::where('is_paid', true)
             ->whereBetween(DB::raw('created_at::date'), [today()->subDays(6)->toDateString(), today()->toDateString()])
@@ -26,10 +55,16 @@ class StatsOverview extends StatsOverviewWidget
             $last7Days[] = (float) ($salesByDay[today()->subDays($i)->toDateString()] ?? 0);
         }
 
-        $salesToday = $last7Days[6];
-        $salesYesterday = $last7Days[5];
-        $salesChange = $salesYesterday > 0
-            ? round((($salesToday - $salesYesterday) / $salesYesterday) * 100, 1)
+        $salesCurrent = (float) Order::where('is_paid', true)
+            ->whereBetween('created_at', [$salesStart, $salesEnd])
+            ->sum('total_amount');
+
+        $salesPrev = (float) Order::where('is_paid', true)
+            ->whereBetween('created_at', [$prevSalesStart, $prevSalesEnd])
+            ->sum('total_amount');
+
+        $salesChange = $salesPrev > 0
+            ? round((($salesCurrent - $salesPrev) / $salesPrev) * 100, 1)
             : 0;
 
         // 1 query: count menu + categories
@@ -56,8 +91,8 @@ class StatsOverview extends StatsOverviewWidget
             : 0;
 
         return [
-            Stat::make('Penjualan Hari Ini', 'Rp '.number_format($salesToday, 0, ',', '.'))
-                ->description(($salesChange >= 0 ? '↑ ' : '↓ ').abs($salesChange).'% dari kemarin')
+            Stat::make($salesLabel, 'Rp '.number_format($salesCurrent, 0, ',', '.'))
+                ->description(($salesChange >= 0 ? '↑ ' : '↓ ').abs($salesChange).'% dari periode lalu')
                 ->descriptionIcon($salesChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($salesChange >= 0 ? 'success' : 'danger')
                 ->chart($last7Days),

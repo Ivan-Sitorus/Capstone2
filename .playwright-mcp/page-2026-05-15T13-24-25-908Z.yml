@@ -1,0 +1,202 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - button "Collapse sidebar" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - link "W9 Cafe — Admin" [ref=e9] [cursor=pointer]:
+        - /url: http://localhost:8081/admin
+        - generic [ref=e10]: W9 Cafe — Admin
+    - button "User menu" [ref=e14] [cursor=pointer]:
+      - img "Avatar of Admin W9" [ref=e15]
+  - generic [ref=e16]:
+    - complementary [ref=e18]:
+      - navigation [ref=e19]:
+        - list [ref=e20]:
+          - listitem [ref=e21]:
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "Dashboard" [ref=e24] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin
+                  - img [ref=e25]
+                  - generic [ref=e27]: Dashboard
+          - listitem [ref=e28]:
+            - generic [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: Detail Keuangan
+              - button "Detail Keuangan" [expanded] [ref=e31]:
+                - img [ref=e32]
+            - list [ref=e34]:
+              - listitem [ref=e35]:
+                - link "Arus Kas" [ref=e36] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/cash-flow
+                  - img [ref=e37]
+                  - generic [ref=e39]: Arus Kas
+              - listitem [ref=e40]:
+                - link "Laporan Keuangan" [ref=e41] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/financial
+                  - img [ref=e42]
+                  - generic [ref=e44]: Laporan Keuangan
+          - listitem [ref=e45]:
+            - generic [ref=e46] [cursor=pointer]:
+              - generic [ref=e47]: Inventory
+              - button "Inventory" [expanded] [ref=e48]:
+                - img [ref=e49]
+            - list [ref=e51]:
+              - listitem [ref=e52]:
+                - link "Ingredients" [ref=e53] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/ingredients
+                  - img [ref=e54]
+                  - generic [ref=e56]: Ingredients
+              - listitem [ref=e57]:
+                - link "Stock Adjustments" [ref=e58] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/stock-adjustments
+                  - img [ref=e59]
+                  - generic [ref=e61]: Stock Adjustments
+              - listitem [ref=e62]:
+                - link "Pemakaian Bahan Harian" [ref=e63] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/daily-ingredient-usages
+                  - img [ref=e64]
+                  - generic [ref=e66]: Pemakaian Bahan Harian
+              - listitem [ref=e67]:
+                - link "Waste Records" [ref=e68] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/waste-records
+                  - img [ref=e69]
+                  - generic [ref=e71]: Waste Records
+          - listitem [ref=e72]:
+            - generic [ref=e73] [cursor=pointer]:
+              - generic [ref=e74]: Data Master
+              - button "Data Master" [expanded] [ref=e75]:
+                - img [ref=e76]
+            - list [ref=e78]:
+              - listitem [ref=e79]:
+                - link "Menu" [ref=e80] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menus
+                  - img [ref=e81]
+                  - generic [ref=e83]: Menu
+              - listitem [ref=e84]:
+                - link "Kategori" [ref=e85] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/categories
+                  - img [ref=e86]
+                  - generic [ref=e89]: Kategori
+              - listitem [ref=e90]:
+                - link "Meja Cafe" [ref=e91] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/cafe-tables
+                  - img [ref=e92]
+                  - generic [ref=e94]: Meja Cafe
+          - listitem [ref=e95]:
+            - generic [ref=e96] [cursor=pointer]:
+              - generic [ref=e97]: Transaksi
+              - button "Transaksi" [expanded] [ref=e98]:
+                - img [ref=e99]
+            - list [ref=e101]:
+              - listitem [ref=e102]:
+                - link "Pesanan" [ref=e103] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/orders
+                  - img [ref=e104]
+                  - generic [ref=e106]: Pesanan
+              - listitem [ref=e107]:
+                - link "Promotions" [ref=e108] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/promotions
+                  - img [ref=e109]
+                  - generic [ref=e111]: Promotions
+          - listitem [ref=e112]:
+            - generic [ref=e113] [cursor=pointer]:
+              - generic [ref=e114]: Pengguna
+              - button "Pengguna" [expanded] [ref=e115]:
+                - img [ref=e116]
+            - list [ref=e118]:
+              - listitem [ref=e119]:
+                - link "Pengguna" [ref=e120] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/users
+                  - img [ref=e121]
+                  - generic [ref=e123]: Pengguna
+              - listitem [ref=e124]:
+                - link "Riwayat Login Staff" [ref=e125] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/staff-history
+                  - img [ref=e126]
+                  - generic [ref=e128]: Riwayat Login Staff
+          - listitem [ref=e129]:
+            - generic [ref=e130] [cursor=pointer]:
+              - generic [ref=e131]: Finance Details
+              - button "Finance Details" [expanded] [ref=e132]:
+                - img [ref=e133]
+            - list [ref=e135]:
+              - listitem [ref=e136]:
+                - link "Expenses" [ref=e137] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/expenses
+                  - img [ref=e138]
+                  - generic [ref=e140]: Expenses
+              - listitem [ref=e141]:
+                - link "Receivables" [ref=e142] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/receivables
+                  - img [ref=e143]
+                  - generic [ref=e145]: Receivables
+          - listitem [ref=e146]:
+            - generic [ref=e147] [cursor=pointer]:
+              - generic [ref=e148]: Analitik
+              - button "Analitik" [expanded] [ref=e149]:
+                - img [ref=e150]
+            - list [ref=e152]:
+              - listitem [ref=e153]:
+                - link "Klasterisasi Menu Penjualan" [ref=e154] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-menu
+                  - img [ref=e155]
+                  - generic [ref=e157]: Klasterisasi Menu Penjualan
+              - listitem [ref=e158]:
+                - link "Prediksi Menu" [ref=e159] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-menu
+                  - img [ref=e160]
+                  - generic [ref=e162]: Prediksi Menu
+              - listitem [ref=e163]:
+                - link "Asosiatif Menu" [ref=e164] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/asosiatif-menu
+                  - img [ref=e165]
+                  - generic [ref=e167]: Asosiatif Menu
+              - listitem [ref=e168]:
+                - link "Klasterisasi Bahan Baku" [ref=e169] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-bahan-baku
+                  - img [ref=e170]
+                  - generic [ref=e172]: Klasterisasi Bahan Baku
+              - listitem [ref=e173]:
+                - link "Prediksi Bahan Baku" [ref=e174] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-bahan-baku
+                  - img [ref=e175]
+                  - generic [ref=e177]: Prediksi Bahan Baku
+    - main [ref=e179]:
+      - generic [ref=e181]:
+        - generic [ref=e182]:
+          - generic [ref=e183]:
+            - navigation [ref=e184]:
+              - list [ref=e185]:
+                - listitem [ref=e186]:
+                  - link "Laporan Keuangan" [ref=e187] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/financial
+            - heading "Laporan Hasil" [level=1] [ref=e188]
+          - button "Generate Laporan" [ref=e191] [cursor=pointer]:
+            - img [ref=e192]
+            - text: Generate Laporan
+        - generic [ref=e194]:
+          - tablist [ref=e195]:
+            - tab "Laporan Hasil" [ref=e196] [cursor=pointer]:
+              - generic [ref=e197]: Laporan Hasil
+          - generic [ref=e204]:
+            - generic [ref=e208]:
+              - generic [ref=e209]: Search
+              - generic [ref=e210]:
+                - img [ref=e212]
+                - searchbox "Search" [ref=e215]
+            - table [ref=e217]:
+              - rowgroup [ref=e218]:
+                - row "Nama Tipe Periode Aggregation Dibuat" [ref=e219]:
+                  - columnheader "Nama" [ref=e220]
+                  - columnheader "Tipe" [ref=e221]
+                  - columnheader "Periode" [ref=e222]
+                  - columnheader "Aggregation" [ref=e223]
+                  - columnheader "Dibuat" [ref=e224]:
+                    - button "Dibuat" [ref=e225] [cursor=pointer]:
+                      - text: Dibuat
+                      - img [ref=e226]
+            - generic [ref=e229]:
+              - img [ref=e231]
+              - heading "No generated reports" [level=2] [ref=e233]
+  - generic:
+    - status
