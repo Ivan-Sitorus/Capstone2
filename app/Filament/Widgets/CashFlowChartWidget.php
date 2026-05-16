@@ -8,21 +8,17 @@ use App\Models\UnexpectedTransaction;
 use Carbon\Carbon;
 use Filament\Support\RawJs;
 use Filament\Widgets\ChartWidget;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Cache;
-use Livewire\Attributes\On;
 
 class CashFlowChartWidget extends ChartWidget
 {
-    public string $period = 'month';
-
-    public string $dateStart = '';
-
-    public string $dateEnd = '';
+    use InteractsWithPageFilters;
 
     protected ?string $pollingInterval = null;
 
-    protected int|string|array $columnSpan = 2;
+    protected int|string|array $columnSpan = 'full';
 
     public static function isLazy(): bool
     {
@@ -37,21 +33,6 @@ class CashFlowChartWidget extends ChartWidget
     public function getDescription(): ?string
     {
         return 'Pemasukan dari transaksi vs Pengeluaran';
-    }
-
-    #[On('cashflow-period-changed')]
-    public function onPeriodChanged(string $period): void
-    {
-        $this->period = $period;
-        $this->dateStart = '';
-        $this->dateEnd = '';
-    }
-
-    #[On('cashflow-date-changed')]
-    public function onDateChanged(string $start, string $end): void
-    {
-        $this->dateStart = $start;
-        $this->dateEnd = $end;
     }
 
     private function incomeQuery(): Builder
@@ -81,38 +62,21 @@ class CashFlowChartWidget extends ChartWidget
 
     private function buildData(): array
     {
-        $cacheKey = 'cashflow_chart_'.md5(serialize([
-            $this->period,
-            $this->dateStart,
-            $this->dateEnd,
-        ]));
+        $cacheKey = 'cashflow_chart_'.md5(json_encode($this->pageFilters));
 
         return Cache::remember($cacheKey, 300, function () {
-            if ($this->dateStart && $this->dateEnd) {
-                return $this->buildDynamicRange();
-            }
+            $period = $this->pageFilters['period'] ?? 'today';
 
-            return match ($this->period) {
-                'day' => $this->byHour(),
-                'year' => $this->byMonthOfYear(),
-                'all_time' => $this->byMonth(),
-                default => $this->byEvenDay(),   // month
+            return match ($period) {
+                'today' => $this->byHour(),
+                'this_week' => $this->byDayRange(
+                    Carbon::now()->startOfWeek(Carbon::MONDAY),
+                    Carbon::now()->endOfWeek(Carbon::SUNDAY)
+                ),
+                'this_month' => $this->byEvenDay(),
+                default => $this->byEvenDay(),
             };
         });
-    }
-
-    private function buildDynamicRange(): array
-    {
-        $start = Carbon::parse($this->dateStart)->startOfDay();
-        $end = Carbon::parse($this->dateEnd)->endOfDay();
-        $days = (int) $start->diffInDays($end) + 1;
-
-        return match (true) {
-            $days <= 7 => $this->byDayRange($start, $end),
-            $days <= 60 => $this->byWeekRange($start, $end),
-            $days <= 365 => $this->byMonthRange($start, $end),
-            default => $this->byQuarterRange($start, $end),
-        };
     }
 
     private function byDayRange(Carbon $start, Carbon $end): array
@@ -172,28 +136,6 @@ class CashFlowChartWidget extends ChartWidget
         return compact('labels', 'incData', 'expData');
     }
 
-    private function byQuarterRange(Carbon $start, Carbon $end): array
-    {
-        $labels = $incData = $expData = [];
-        $cur = $start->copy()->startOfMonth();
-        $maxPoints = 200;
-        $pointCount = 0;
-
-        while ($cur->lte($end) && $pointCount < $maxPoints) {
-            $quarterEnd = $cur->copy()->addMonths(2)->endOfMonth();
-            $slotEnd = $quarterEnd->gt($end) ? $end->copy() : $quarterEnd;
-
-            $labels[] = $cur->isoFormat('MMM YYYY').' – '.$quarterEnd->isoFormat('MMM YYYY');
-            $incData[] = $this->slotIncome($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
-            $expData[] = $this->slotExpense($cur->copy()->startOfDay(), $slotEnd->copy()->endOfDay());
-
-            $cur->addMonths(3);
-            $pointCount++;
-        }
-
-        return compact('labels', 'incData', 'expData');
-    }
-
     /** Hari Ini: per 3 jam (00:00, 03:00, 06:00, …, 21:00) */
     private function byHour(): array
     {
@@ -229,45 +171,6 @@ class CashFlowChartWidget extends ChartWidget
                 $expData[] = $this->slotExpense($dayStart, $dayEnd);
             }
             $cur->addDay();
-        }
-
-        return compact('labels', 'incData', 'expData');
-    }
-
-    /** Tahun Ini: Januari–Desember */
-    private function byMonthOfYear(): array
-    {
-        $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-        $year = Carbon::now()->year;
-        $labels = $incData = $expData = [];
-
-        for ($m = 1; $m <= 12; $m++) {
-            $mStart = Carbon::create($year, $m, 1)->startOfMonth();
-            $mEnd = Carbon::create($year, $m, 1)->endOfMonth();
-            $labels[] = $monthNames[$m - 1];
-            $incData[] = $this->slotIncome($mStart, $mEnd);
-            $expData[] = $this->slotExpense($mStart, $mEnd);
-        }
-
-        return compact('labels', 'incData', 'expData');
-    }
-
-    /** Semua Waktu: per 6 bulan mulai Jan 2026 */
-    private function byMonth(): array
-    {
-        $e = Carbon::now()->endOfDay();
-        $labels = $incData = $expData = [];
-        $cur = Carbon::createFromDate(2026, 1, 1)->startOfMonth();
-
-        while ($cur->lte($e)) {
-            $periodEnd = $cur->copy()->addMonths(5)->endOfMonth();
-            $slotEnd = $periodEnd->gt($e) ? $e->copy() : $periodEnd;
-
-            $labels[] = $cur->format('M Y');
-            $incData[] = $this->slotIncome($cur->copy()->startOfDay(), $slotEnd);
-            $expData[] = $this->slotExpense($cur->copy()->startOfDay(), $slotEnd);
-
-            $cur->addMonths(6);
         }
 
         return compact('labels', 'incData', 'expData');
