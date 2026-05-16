@@ -18,7 +18,6 @@ class Dashboard extends BaseDashboard
         return [
             \App\Filament\Widgets\SalesOverview::class,
             \App\Filament\Widgets\DailySalesChart::class,
-            \App\Filament\Widgets\TopMenuTable::class,
             \App\Filament\Widgets\InventoryOverview::class,
             \App\Filament\Widgets\CashFlowStatsWidget::class,
             \App\Filament\Widgets\CashFlowChartWidget::class,
