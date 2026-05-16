@@ -8,16 +8,12 @@ use App\Models\UnexpectedTransaction;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Filament\Widgets\Concerns\InteractsWithPageFilters;
 use Illuminate\Support\Facades\Cache;
-use Livewire\Attributes\On;
 
 class CashFlowStatsWidget extends StatsOverviewWidget
 {
-    public string $period = 'day';
-
-    public string $dateStart = '';
-
-    public string $dateEnd = '';
+    use InteractsWithPageFilters;
 
     protected ?string $pollingInterval = null;
 
@@ -31,46 +27,25 @@ class CashFlowStatsWidget extends StatsOverviewWidget
         return 4;
     }
 
-    #[On('cashflow-period-changed')]
-    public function onPeriodChanged(string $period): void
-    {
-        $this->period = $period;
-        $this->dateStart = '';
-        $this->dateEnd = '';
-    }
-
-    #[On('cashflow-date-changed')]
-    public function onDateChanged(string $dateStart, string $dateEnd): void
-    {
-        $this->dateStart = $dateStart;
-        $this->dateEnd = $dateEnd;
-        $this->period = '';
-    }
-
     private function dateRange(): array
     {
-        if ($this->dateStart && $this->dateEnd) {
-            return [Carbon::parse($this->dateStart)->startOfDay(), Carbon::parse($this->dateEnd)->endOfDay()];
-        }
+        $period = $this->pageFilters['period'] ?? 'today';
 
-        return match ($this->period) {
-            'day' => [Carbon::today(),              Carbon::today()->endOfDay()],
-            'year' => [Carbon::now()->startOfYear(), Carbon::now()->endOfYear()],
-            'all_time' => [Carbon::createFromDate(2000, 1, 1), Carbon::now()->endOfDay()],
-            default => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
+        return match ($period) {
+            'today' => [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()],
+            'this_week' => [Carbon::now()->startOfWeek(Carbon::MONDAY), Carbon::now()->endOfWeek(Carbon::SUNDAY)],
+            'this_month' => [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()],
+            default => [Carbon::now()->startOfDay(), Carbon::now()->endOfDay()],
         };
     }
 
     private function prevRange(): array
     {
         [$s, $e] = $this->dateRange();
-        if ($this->period === 'all_time') {
-            return [$s, $e];
-        }
-        $days = $s->diffInDays($e) + 1;
-        $prevEnd = $s->copy()->subDay();
+        $days = (int) $s->diffInDays($e) + 1;
+        $prevEnd = $s->copy()->subDay()->endOfDay();
 
-        return [$prevEnd->copy()->subDays($days - 1), $prevEnd];
+        return [$prevEnd->copy()->subDays($days - 1)->startOfDay(), $prevEnd];
     }
 
     private function pct(float $curr, float $prev): ?float
@@ -131,7 +106,7 @@ class CashFlowStatsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $cacheKey = 'cashflow_stats_'.md5($this->period.$this->dateStart.$this->dateEnd);
+        $cacheKey = 'cashflow_stats_'.md5(json_encode($this->pageFilters));
 
         return Cache::remember($cacheKey, 300, function () {
             [$s, $e] = $this->dateRange();
