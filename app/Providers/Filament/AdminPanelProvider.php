@@ -52,7 +52,6 @@ class AdminPanelProvider extends PanelProvider
             ->discoverClusters(in: app_path('Filament/Clusters'), for: 'App\\Filament\\Clusters')
             ->pages([])
             ->font('Sans-Serif')
-            ->spa()
             ->spaUrlExceptions([
                 '/admin/view-report*',
             ])

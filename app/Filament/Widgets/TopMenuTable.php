@@ -7,9 +7,18 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 class TopMenuTable extends BaseWidget
 {
+    public function getTableRecordKey(Model|array $record): string
+    {
+        if (is_array($record)) {
+            return (string) ($record['menu_id'] ?? array_key_first($record));
+        }
+
+        return (string) ($record->menu_id ?? spl_object_id($record));
+    }
 
     protected ?string $pollingInterval = null;
 
