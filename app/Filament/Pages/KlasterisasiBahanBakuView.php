@@ -2,9 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\ElbowChart;
-use App\Filament\Widgets\IngredientBarChart;
-use App\Filament\Widgets\SilhouetteChart;
 use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -42,11 +39,7 @@ class KlasterisasiBahanBakuView extends Page
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            IngredientBarChart::make(['recordId' => $this->record->id]),
-            ElbowChart::make(['recordId' => $this->record->id]),
-            SilhouetteChart::make(['recordId' => $this->record->id]),
-        ];
+        return [];
     }
 
     public function getHeaderWidgetsColumns(): int|array

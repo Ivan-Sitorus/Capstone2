@@ -2,8 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\FeatureImportanceChart;
-use App\Filament\Widgets\IngredientForecastAllChart;
 use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -41,10 +39,7 @@ class PrediksiBahanBakuView extends Page
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            IngredientForecastAllChart::make(['recordId' => $this->record->id]),
-            FeatureImportanceChart::make(['recordId' => $this->record->id]),
-        ];
+        return [];
     }
 
     public function getHeaderWidgetsColumns(): int|array

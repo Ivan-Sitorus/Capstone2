@@ -2,9 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\FreqItemChart;
-use App\Filament\Widgets\SupConfChart;
-use App\Filament\Widgets\TopRulesChart;
 use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -42,11 +39,7 @@ class AsosiatifMenuView extends Page
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            TopRulesChart::make(['recordId' => $this->record->id]),
-            SupConfChart::make(['recordId' => $this->record->id]),
-            FreqItemChart::make(['recordId' => $this->record->id]),
-        ];
+        return [];
     }
 
     public function getHeaderWidgetsColumns(): int|array

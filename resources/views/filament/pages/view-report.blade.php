@@ -3,7 +3,7 @@
         {{-- Back Button & Header --}}
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <a href="{{ \App\Filament\Clusters\Financial\Pages\GeneratedReports::getUrl() }}"
+                <a href="{{ \App\Filament\Resources\GeneratedReportResource::getUrl('index') }}"
                    class="inline-flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
                     <x-heroicon-o-arrow-left class="w-4 h-4"/>
                     <span>Kembali ke Daftar Laporan</span>

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\Menu;
 use App\Models\Order;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -45,11 +44,6 @@ class StatsOverview extends StatsOverviewWidget
             ? round((($salesCurrent - $salesPrev) / $salesPrev) * 100, 1)
             : 0;
 
-        // 1 query: count menu + categories
-        $menuStats = Menu::where('is_available', true)
-            ->selectRaw('COUNT(*) as total_menu, COUNT(DISTINCT category_id) as total_categories')
-            ->first();
-
         // 1 query: orders bulan ini & bulan lalu sekaligus
         $ordersPerMonth = Order::selectRaw(
             "DATE_TRUNC('month', created_at) as month, COUNT(*) as total"
@@ -74,11 +68,6 @@ class StatsOverview extends StatsOverviewWidget
                 ->descriptionIcon($salesChange >= 0 ? 'heroicon-m-arrow-trending-up' : 'heroicon-m-arrow-trending-down')
                 ->color($salesChange >= 0 ? 'success' : 'danger')
                 ->chart($last7Days),
-
-            Stat::make('Menu Tersedia', $menuStats->total_menu ?? 0)
-                ->description(($menuStats->total_categories ?? 0).' kategori aktif')
-                ->descriptionIcon('heroicon-m-document-text')
-                ->color('info'),
 
             Stat::make('Pesanan Bulan Ini', $ordersThisMonth)
                 ->description(($ordersChange >= 0 ? '↑ ' : '↓ ').abs($ordersChange).'% dari bulan lalu')

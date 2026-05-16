@@ -2,8 +2,6 @@
 
 namespace App\Filament\Pages;
 
-use App\Filament\Widgets\FeatureImportanceChart;
-use App\Filament\Widgets\ForecastAllChart;
 use App\Models\DataMiningRun;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -41,10 +39,7 @@ class PrediksiMenuView extends Page
 
     protected function getHeaderWidgets(): array
     {
-        return [
-            ForecastAllChart::make(['recordId' => $this->record->id]),
-            FeatureImportanceChart::make(['recordId' => $this->record->id]),
-        ];
+        return [];
     }
 
     public function getHeaderWidgetsColumns(): int|array
