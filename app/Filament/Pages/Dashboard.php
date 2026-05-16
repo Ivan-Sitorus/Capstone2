@@ -6,13 +6,6 @@ use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
-    /**
-     * Kept for Livewire component checksum compatibility.
-     * Removing HasFiltersForm trait changes component signature;
-     * this empty property prevents checksum mismatch errors in SPA mode.
-     */
-    public array $filters = [];
-
     public function getWidgets(): array
     {
         return [
