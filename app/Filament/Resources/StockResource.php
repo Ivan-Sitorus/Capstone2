@@ -34,6 +34,8 @@ class StockResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cube';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string|\UnitEnum|null $navigationGroup = 'Inventori';
 
     protected static ?string $navigationLabel = 'Stok';
