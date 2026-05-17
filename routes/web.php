@@ -11,6 +11,7 @@ use App\Http\Controllers\Customer\CustomerOrderController;
 use App\Http\Controllers\Customer\CustomerPaymentController;
 use App\Http\Controllers\Kitchen\KitchenController;
 use App\Http\Controllers\ReceiptController;
+use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -63,4 +64,5 @@ Route::prefix('pelanggan')->group(function () {
 });
 
 // Receipt (public — no auth required)
-Route::get('/receipt/{order:code}', [ReceiptController::class, 'show'])->name('receipt.show');
+Route::get('/receipt/{order:code}', fn (Order $order) => redirect()->route('receipt.show-by-uuid', ['order' => $order->uuid], 301));
+Route::get('/struk-pesanan/{order:uuid}', [ReceiptController::class, 'showByUuid'])->name('receipt.show-by-uuid');

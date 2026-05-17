@@ -14,6 +14,18 @@ class ReceiptController extends Controller
             ->where('order_code', $orderCode)
             ->firstOrFail();
 
+        return $this->renderReceipt($order);
+    }
+
+    public function showByUuid(Order $order)
+    {
+        $order->load(['items.menu', 'cafeTable', 'cashier']);
+
+        return $this->renderReceipt($order);
+    }
+
+    private function renderReceipt(Order $order)
+    {
         // Hitung diskon (selisih total dari unit_price * qty vs subtotal)
         $items = $order->items->map(fn ($i) => [
             'name' => $i->menu->name,
