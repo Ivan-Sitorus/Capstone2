@@ -46,7 +46,11 @@ class MenuStockResource extends Resource
             ->components([
                 Select::make('menu_id')
                     ->label('Menu')
-                    ->relationship('menu', 'name', fn ($q) => $q->where('is_stock_calculated', false))
+                    ->relationship(
+                        name: 'menu',
+                        titleAttribute: 'name',
+                        modifyQueryUsing: fn ($q) => $q->where('is_stock_calculated', false),
+                    )
                     ->searchable()
                     ->preload()
                     ->required(),

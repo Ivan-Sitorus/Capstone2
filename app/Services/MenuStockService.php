@@ -30,13 +30,7 @@ class MenuStockService
                     ->orderBy('received_at', 'asc')
                     ->orderBy('id', 'asc');
                 break;
-            case MenuStock::BATCH_MODE_CUSTOM:
-                $query->orderByRaw('CASE WHEN custom_order IS NULL THEN 1 ELSE 0 END')
-                    ->orderBy('custom_order', 'asc')
-                    ->orderBy('received_at', 'asc')
-                    ->orderBy('id', 'asc');
-                break;
-            default: // FEFO (default)
+            default: // FEFO (default) — juga fallback untuk mode lain
                 $query->orderByRaw('CASE WHEN expiry_date IS NULL THEN 1 ELSE 0 END')
                     ->orderBy('expiry_date', 'asc')
                     ->orderBy('received_at', 'asc')
