@@ -8,6 +8,7 @@ use App\Models\IngredientBatch;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\StockMovement;
+use App\Services\MenuStockService;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -64,7 +65,7 @@ class InventoryService
 
             // Pre-load all menus in one query to avoid N+1
             $menuIds = array_unique(array_column($items, 'menu_id'));
-            $menus = Menu::with('menuIngredients.ingredient')
+            $menus = Menu::with(['menuIngredients.ingredient', 'menuStock.batches'])
                 ->whereIn('id', $menuIds)
                 ->get()
                 ->keyBy('id');
@@ -73,7 +74,7 @@ class InventoryService
                 $menu = $menus->get($item['menu_id']) ?? Menu::with('menuIngredients.ingredient')->findOrFail($item['menu_id']);
                 $quantity = (int) ($item['quantity'] ?? 0);
 
-                if ($quantity <= 0 || $menu->menuIngredients->isEmpty()) {
+                if ($quantity <= 0) {
                     continue;
                 }
 
@@ -88,24 +89,40 @@ class InventoryService
                     'usage_date' => $item['usage_date'] ?? null,
                 ];
 
-                foreach ($menu->menuIngredients as $menuIngredient) {
-                    $ingredient = $menuIngredient->ingredient;
-                    $requiredQuantity = (float) $menuIngredient->quantity_used * $quantity;
+                if ($menu->menuIngredients->isNotEmpty()) {
+                    foreach ($menu->menuIngredients as $menuIngredient) {
+                        $ingredient = $menuIngredient->ingredient;
+                        $requiredQuantity = (float) $menuIngredient->quantity_used * $quantity;
 
-                    $deduction = $this->deductIngredientStock(
-                        ingredientId: (int) $ingredient->id,
-                        requiredQuantity: $requiredQuantity,
-                        context: array_merge($itemContext, [
-                            'notes' => "Order usage for menu {$menu->name}",
-                        ])
+                        $deduction = $this->deductIngredientStock(
+                            ingredientId: (int) $ingredient->id,
+                            requiredQuantity: $requiredQuantity,
+                            context: array_merge($itemContext, [
+                                'notes' => "Order usage for menu {$menu->name}",
+                            ])
+                        );
+
+                        $stockChanges[] = [
+                            'ingredient_id' => $ingredient->id,
+                            'ingredient_name' => $ingredient->name,
+                            'total_deducted' => $requiredQuantity,
+                            'unit' => $ingredient->unit,
+                            'batches' => $deduction['batch_changes'],
+                        ];
+                    }
+                } elseif ($menu->menuStock) {
+                    $menuStockResult = app(MenuStockService::class)->deductMenuStockBatch(
+                        menuStockId: $menu->menuStock->id,
+                        requiredQuantity: (float) $quantity,
+                        context: $itemContext,
                     );
 
                     $stockChanges[] = [
-                        'ingredient_id' => $ingredient->id,
-                        'ingredient_name' => $ingredient->name,
-                        'total_deducted' => $requiredQuantity,
-                        'unit' => $ingredient->unit,
-                        'batches' => $deduction['batch_changes'],
+                        'menu_stock_id' => $menu->menuStock->id,
+                        'menu_name' => $menu->name,
+                        'total_deducted' => $menuStockResult['total_deducted'],
+                        'unit' => $menu->menuStock->unit,
+                        'batches' => $menuStockResult['batch_changes'],
                     ];
                 }
             }
@@ -130,24 +147,38 @@ class InventoryService
         $insufficient = [];
 
         foreach ($items as $item) {
-            $menu = Menu::with('menuIngredients.ingredient')->findOrFail($item['menu_id']);
+            $menu = Menu::with(['menuIngredients.ingredient', 'menuStock'])->findOrFail($item['menu_id']);
             $quantity = (int) ($item['quantity'] ?? 0);
 
-            if ($quantity <= 0 || $menu->menuIngredients->isEmpty()) {
+            if ($quantity <= 0) {
                 continue;
             }
 
-            foreach ($menu->menuIngredients as $menuIngredient) {
-                $ingredient = $menuIngredient->ingredient;
-                $requiredQuantity = (float) $menuIngredient->quantity_used * $quantity;
-                $availableQuantity = $ingredient->getTotalStock();
+            if ($menu->menuIngredients->isNotEmpty()) {
+                foreach ($menu->menuIngredients as $menuIngredient) {
+                    $ingredient = $menuIngredient->ingredient;
+                    $requiredQuantity = (float) $menuIngredient->quantity_used * $quantity;
+                    $availableQuantity = $ingredient->getTotalStock();
+
+                    if ($availableQuantity < $requiredQuantity) {
+                        $insufficient[] = [
+                            'ingredient_name' => $ingredient->name,
+                            'required' => $requiredQuantity,
+                            'available' => $availableQuantity,
+                            'unit' => $ingredient->unit,
+                        ];
+                    }
+                }
+            } elseif ($menu->menuStock) {
+                $requiredQuantity = (float) $quantity;
+                $availableQuantity = $menu->menuStock->getTotalStock();
 
                 if ($availableQuantity < $requiredQuantity) {
                     $insufficient[] = [
-                        'ingredient_name' => $ingredient->name,
+                        'menu_name' => $menu->name,
                         'required' => $requiredQuantity,
                         'available' => $availableQuantity,
-                        'unit' => $ingredient->unit,
+                        'unit' => $menu->menuStock->unit,
                     ];
                 }
             }
