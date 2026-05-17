@@ -60,6 +60,10 @@ class Order extends Model
         'total_amount',
         'notes',
         'processed_by',
+        'uuid',
+        'resubmit_count',
+        'qris_status',
+        'whatsapp_phone',
     ];
 
     protected function casts(): array
