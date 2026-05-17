@@ -14,6 +14,7 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'uuid' => 'required|uuid|unique:orders,uuid',
             'items' => 'required|array|min:1',
             'items.*.menu_id' => 'required|integer|exists:menus,id',
             'items.*.quantity' => 'required|integer|min:1',

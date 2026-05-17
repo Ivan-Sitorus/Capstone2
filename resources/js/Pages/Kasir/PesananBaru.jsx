@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
+import { v7 as uuidv7 } from 'uuid';
 import { Search, X, Banknote, Lock, User, CircleCheck, Clock, Printer, Percent } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
@@ -91,10 +92,11 @@ export default function PesananBaru({ categories, promotions }) {
 
     function submitOrder(method) {
         const orderTotal = grandTotal;
+        const orderUuid = uuidv7();
         setProcessing(true);
         router.post(
             route('kasir.pesanan-baru.simpan'),
-            { items: cartItems.map(i => ({ menu_id: i.menuId, quantity: i.quantity })), payment_method: method, customer_name: customerName.trim() || null, is_mahasiswa: isMahasiswa },
+            { uuid: orderUuid, items: cartItems.map(i => ({ menu_id: i.menuId, quantity: i.quantity })), payment_method: method, customer_name: customerName.trim() || null, is_mahasiswa: isMahasiswa },
             {
                 onSuccess: (page) => {
                     setProcessing(false);

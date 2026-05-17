@@ -10,10 +10,12 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\InventoryService;
 use App\Services\OrderPromotionService;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use Ramsey\Uuid\Uuid;
 
 class CashierPesananBaruController extends Controller
 {
@@ -36,65 +38,77 @@ class CashierPesananBaruController extends Controller
         OrderPromotionService $orderPromotionService,
         InventoryService $inventoryService,
     ) {
-        DB::transaction(function () use ($request, $orderPromotionService, $inventoryService) {
-            $isBayarNanti = $request->payment_method === 'bayar_nanti';
-            $selectedPromotionIds = $request->input('promotion_ids', []);
+        $uuid = $request->uuid;
 
-            $order = Order::create([
-                'cashier_id' => Auth::id(),
-                'order_type' => 'cashier',
-                'payment_method' => $request->payment_method,
-                'customer_name' => $request->customer_name,
-                'status' => Order::STATUS_PENDING,
-                'is_paid' => ! $isBayarNanti,
-                'total_amount' => 0,
-            ]);
+        $attempt = function () use ($request, $orderPromotionService, $inventoryService, &$uuid) {
+            DB::transaction(function () use ($request, $orderPromotionService, $inventoryService, &$uuid) {
+                $isBayarNanti = $request->payment_method === 'bayar_nanti';
+                $selectedPromotionIds = $request->input('promotion_ids', []);
 
-            $isMahasiswa = (bool) $request->input('is_mahasiswa', false);
-            $total = 0;
-            $appliedPromotions = [];
-            $itemsToInsert = [];
+                $order = Order::create([
+                    'uuid' => $uuid,
+                    'cashier_id' => Auth::id(),
+                    'order_type' => 'cashier',
+                    'payment_method' => $request->payment_method,
+                    'customer_name' => $request->customer_name,
+                    'status' => Order::STATUS_PENDING,
+                    'is_paid' => ! $isBayarNanti,
+                    'total_amount' => 0,
+                ]);
 
-            // Bulk-fetch semua menu sekaligus — hindari N+1 query
-            $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
-            $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
+                $isMahasiswa = (bool) $request->input('is_mahasiswa', false);
+                $total = 0;
+                $appliedPromotions = [];
+                $itemsToInsert = [];
 
-            foreach ($request->items as $item) {
-                $menu = $menus->get($item['menu_id']);
+                // Bulk-fetch semua menu sekaligus — hindari N+1 query
+                $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
+                $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
-                $lineCalculation = $orderPromotionService->calculateLine(
-                    $menu,
-                    (int) $item['quantity'],
-                    $isMahasiswa,
-                    $selectedPromotionIds,
-                );
+                foreach ($request->items as $item) {
+                    $menu = $menus->get($item['menu_id']);
 
-                $itemsToInsert[] = [
-                    'order_id' => $order->id,
-                    'menu_id' => $menu->id,
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $lineCalculation['unit_price'],
-                    'subtotal' => $lineCalculation['subtotal'],
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
+                    $lineCalculation = $orderPromotionService->calculateLine(
+                        $menu,
+                        (int) $item['quantity'],
+                        $isMahasiswa,
+                        $selectedPromotionIds,
+                    );
 
-                if ($lineCalculation['applied_promotion'] !== null) {
-                    $appliedPromotions[] = $lineCalculation['applied_promotion'];
+                    $itemsToInsert[] = [
+                        'order_id' => $order->id,
+                        'menu_id' => $menu->id,
+                        'quantity' => $item['quantity'],
+                        'unit_price' => $lineCalculation['unit_price'],
+                        'subtotal' => $lineCalculation['subtotal'],
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ];
+
+                    if ($lineCalculation['applied_promotion'] !== null) {
+                        $appliedPromotions[] = $lineCalculation['applied_promotion'];
+                    }
+
+                    $total += $lineCalculation['subtotal'];
                 }
 
-                $total += $lineCalculation['subtotal'];
-            }
+                OrderItem::insert($itemsToInsert);
 
-            OrderItem::insert($itemsToInsert);
+                $order->update(['total_amount' => $total]);
 
-            $order->update(['total_amount' => $total]);
+                $orderPromotionService->persistOrderPromotions($order, $appliedPromotions);
 
-            $orderPromotionService->persistOrderPromotions($order, $appliedPromotions);
+                $inventoryService->processSaleForOrder($order, Auth::id());
+            });
+        };
 
-            $inventoryService->processSaleForOrder($order, Auth::id());
-        });
-
-        return back()->with('success', 'Pesanan berhasil dibuat');
+        try {
+            $attempt();
+            return back()->with('success', 'Pesanan berhasil dibuat');
+        } catch (UniqueConstraintViolationException) {
+            $uuid = (string) Uuid::uuid7();
+            $attempt();
+            return back()->with('success', 'Pesanan berhasil dibuat');
+        }
     }
 }
