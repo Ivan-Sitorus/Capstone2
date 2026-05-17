@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -71,6 +72,8 @@ class Order extends Model
         return [
             'total_amount' => 'integer',
             'is_paid' => 'boolean',
+            'resubmit_count' => 'integer',
+            'qris_status' => 'string',
         ];
     }
 
@@ -117,5 +120,20 @@ class Order extends Model
     public function isActive(): bool
     {
         return $this->status !== self::STATUS_SELESAI;
+    }
+
+    public function scopeByUuid(Builder $query, string $uuid): Builder
+    {
+        return $query->where('uuid', $uuid);
+    }
+
+    public function isQrisResubmitable(): bool
+    {
+        return $this->resubmit_count < 3 && $this->qris_status === 'resubmit_requested';
+    }
+
+    public function getReceiptUrlAttribute(): string
+    {
+        return url('/struk-pesanan/' . $this->uuid);
     }
 }

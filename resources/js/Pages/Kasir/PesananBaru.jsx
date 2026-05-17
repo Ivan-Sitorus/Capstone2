@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import CashierLayout from '@/Layouts/CashierLayout';
 import SharedMenuItem from '@/Components/Shared/SharedMenuItem';
 import SharedCartItem from '@/Components/Shared/SharedCartItem';
+import Modal from '@/Components/Shared/Modal';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 import { cn } from '@/lib/utils';
 import useCartStore from '@/Store/cartStore';
@@ -425,91 +426,84 @@ export default function PesananBaru({ categories, promotions }) {
             )}
 
             {/* ══ RECEIPT MODAL ══ */}
-            {showSuccess && (
-                <div
-                    className="fixed inset-0 z-[100] flex items-start justify-center py-8 px-4 overflow-y-auto bg-black/50"
-                    onClick={e => { if (e.target === e.currentTarget) handleSuccessOk(); }}
-                >
-                    <div className="w-full max-w-[400px] bg-card rounded-2xl shadow-xl overflow-hidden">
-                        <div className="text-center pt-7 pb-4 px-6 border-b-2 border-dashed border-border">
-                            <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-3">
-                                <CircleCheck size={28} className="text-green-500" strokeWidth={2} />
-                            </div>
-                            <h2 className="text-lg font-bold text-foreground">Pembayaran Berhasil</h2>
-                            <p className="text-sm mt-1 text-muted-foreground">Struk digital tersedia</p>
-                        </div>
+            <Modal isOpen={showSuccess} onClose={handleSuccessOk} size="sm">
+                <div className="text-center pt-7 pb-4 px-6 border-b-2 border-dashed border-border">
+                    <div className="w-12 h-12 rounded-full bg-green-50 flex items-center justify-center mx-auto mb-3">
+                        <CircleCheck size={28} className="text-green-500" strokeWidth={2} />
+                    </div>
+                    <h2 className="text-lg font-bold text-foreground">Pembayaran Berhasil</h2>
+                    <p className="text-sm mt-1 text-muted-foreground">Struk digital tersedia</p>
+                </div>
 
-                        <div className="px-6 py-4">
-                            <div className="flex justify-between items-center py-2 border-b border-border">
-                                <span className="text-sm text-muted-foreground">No. Pesanan</span>
-                                <span className="text-sm font-bold text-foreground">#{successOrderCode}</span>
-                            </div>
+                <div className="px-6 py-4">
+                    <div className="flex justify-between items-center py-2 border-b border-border">
+                        <span className="text-sm text-muted-foreground">No. Pesanan</span>
+                        <span className="text-sm font-bold text-foreground">#{successOrderCode}</span>
+                    </div>
 
-                            <div className="py-3 border-b border-border">
-                                <p className="text-xs font-semibold mb-2 uppercase tracking-wider text-muted-foreground/70">
-                                    Item ({cartItems.length})
-                                </p>
-                                {cartItems.map((item) => (
-                                    <div key={item.menuId} className="flex justify-between items-center py-1.5 text-sm">
-                                        <span className="text-foreground/80">
-                                            {item.quantity}x {item.name}
-                                        </span>
-                                        <span className="font-medium text-foreground">
-                                            {formatRupiah(item.price * item.quantity)}
-                                        </span>
-                                    </div>
-                                ))}
+                    <div className="py-3 border-b border-border">
+                        <p className="text-xs font-semibold mb-2 uppercase tracking-wider text-muted-foreground/70">
+                            Item ({cartItems.length})
+                        </p>
+                        {cartItems.map((item) => (
+                            <div key={item.menuId} className="flex justify-between items-center py-1.5 text-sm">
+                                <span className="text-foreground/80">
+                                    {item.quantity}x {item.name}
+                                </span>
+                                <span className="font-medium text-foreground">
+                                    {formatRupiah(item.price * item.quantity)}
+                                </span>
                             </div>
+                        ))}
+                    </div>
 
-                            <div className="flex justify-between items-center py-3 border-b border-border">
-                                <span className="text-base font-bold text-foreground">Total</span>
-                                <span className="text-lg font-bold text-primary">{formatRupiah(successTotal)}</span>
+                    <div className="flex justify-between items-center py-3 border-b border-border">
+                        <span className="text-base font-bold text-foreground">Total</span>
+                        <span className="text-lg font-bold text-primary">{formatRupiah(successTotal)}</span>
+                    </div>
+
+                    <div className="flex flex-col items-center py-4">
+                        {successOrderCode && (
+                            <div className="bg-card p-2 rounded-xl shadow-sm border border-border">
+                                <QRCodeCanvas
+                                    value={window.location.origin + '/receipt/' + successOrderCode}
+                                    size={120}
+                                    level="M"
+                                    fgColor="hsl(var(--foreground))"
+                                    style={{ display: 'block' }}
+                                />
                             </div>
+                        )}
+                        <p className="text-xs mt-2 text-center text-muted-foreground/70">
+                            Pindai QR untuk lihat struk
+                        </p>
+                    </div>
 
-                            <div className="flex flex-col items-center py-4">
-                                {successOrderCode && (
-                                    <div className="bg-card p-2 rounded-xl shadow-sm border border-border">
-                                        <QRCodeCanvas
-                                            value={window.location.origin + '/receipt/' + successOrderCode}
-                                            size={120}
-                                            level="M"
-                                            fgColor="hsl(var(--foreground))"
-                                            style={{ display: 'block' }}
-                                        />
-                                    </div>
-                                )}
-                                <p className="text-xs mt-2 text-center text-muted-foreground/70">
-                                    Pindai QR untuk lihat struk
-                                </p>
-                            </div>
-
-                            <div className="text-xs text-center text-muted-foreground/70">
-                                {formatDate(new Date().toISOString())} · {formatTime(new Date().toISOString())}
-                            </div>
-                        </div>
-
-                        <div className="px-6 pb-6 flex flex-col gap-2">
-                            <Button
-                                variant="outline"
-                                onClick={() => {
-                                    const url = window.location.origin + '/receipt/' + successOrderCode;
-                                    window.open(url, '_blank');
-                                }}
-                                className="w-full h-11 flex items-center justify-center gap-2"
-                            >
-                                <Printer size={16} />
-                                Cetak / Lihat Struk
-                            </Button>
-                            <Button
-                                onClick={handleSuccessOk}
-                                className="w-full h-11"
-                            >
-                                Lanjut ke Pesanan Aktif
-                            </Button>
-                        </div>
+                    <div className="text-xs text-center text-muted-foreground/70">
+                        {formatDate(new Date().toISOString())} · {formatTime(new Date().toISOString())}
                     </div>
                 </div>
-            )}
+
+                <div className="px-6 pb-6 flex flex-col gap-2">
+                    <Button
+                        variant="outline"
+                        onClick={() => {
+                            const url = window.location.origin + '/receipt/' + successOrderCode;
+                            window.open(url, '_blank');
+                        }}
+                        className="w-full h-11 flex items-center justify-center gap-2"
+                    >
+                        <Printer size={16} />
+                        Cetak / Lihat Struk
+                    </Button>
+                    <Button
+                        onClick={handleSuccessOk}
+                        className="w-full h-11"
+                    >
+                        Lanjut ke Pesanan Aktif
+                    </Button>
+                </div>
+            </Modal>
         </CashierLayout></>
     );
 }
