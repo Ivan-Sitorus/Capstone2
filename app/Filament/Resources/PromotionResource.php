@@ -37,7 +37,7 @@ class PromotionResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
 
-    protected static ?string $navigationLabel = 'Promotions';
+    protected static ?string $navigationLabel = 'Promosi';
 
     protected static ?int $navigationSort = 3;
 

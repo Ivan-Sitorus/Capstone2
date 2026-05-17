@@ -25,7 +25,7 @@ class StaffHistory extends Page implements HasTable
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Pengguna';
+    protected static string|\UnitEnum|null $navigationGroup = 'Staff';
 
     protected static ?string $navigationLabel = 'Riwayat Login Staff';
 

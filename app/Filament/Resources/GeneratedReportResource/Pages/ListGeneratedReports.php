@@ -9,6 +9,7 @@ use App\Services\FinancialReportService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\ListRecords;
 use Illuminate\Support\Facades\Auth;
@@ -16,12 +17,6 @@ use Illuminate\Support\Facades\Auth;
 class ListGeneratedReports extends ListRecords
 {
     protected static string $resource = GeneratedReportResource::class;
-
-    protected function generateReportName(array $data): string
-    {
-        $labels = ['simple' => 'Simple', 'rigid' => 'Rigid', 'custom' => 'Custom'];
-        return ($labels[$data['report_type']] ?? $data['report_type'])." - {$data['date_start']} s/d {$data['date_end']}";
-    }
 
     protected function getHeaderActions(): array
     {
@@ -31,8 +26,14 @@ class ListGeneratedReports extends ListRecords
                 ->icon('heroicon-o-plus-circle')
                 ->color('primary')
                 ->modal()
+                ->modalWidth('md')
                 ->modalHeading('Generate Laporan Baru')
                 ->form([
+                    TextInput::make('name')
+                        ->label('Nama Laporan')
+                        ->required()
+                        ->maxLength(255)
+                        ->placeholder('Masukkan nama laporan...'),
                     Select::make('report_type')->label('Tipe Laporan')
                         ->options([
                             'simple' => 'Simple (Ringkasan)',
@@ -56,7 +57,7 @@ class ListGeneratedReports extends ListRecords
                     );
                     $report = GeneratedReport::create([
                         'user_id' => Auth::id(),
-                        'name' => $this->generateReportName($data),
+                        'name' => $data['name'],
                         'type' => $data['report_type'],
                         'date_start' => $data['date_start'],
                         'date_end' => $data['date_end'],

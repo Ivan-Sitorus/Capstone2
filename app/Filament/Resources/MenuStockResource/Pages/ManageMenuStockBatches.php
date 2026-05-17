@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\IngredientResource\Pages;
+namespace App\Filament\Resources\MenuStockResource\Pages;
 
 use App\Filament\Helpers\NumberInputHelper;
-use App\Filament\Resources\IngredientResource;
-use App\Models\Ingredient;
-use App\Models\IngredientBatch;
+use App\Filament\Resources\MenuStockResource;
+use App\Models\MenuStock;
+use App\Models\MenuStockBatch;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -22,24 +22,24 @@ use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
 
-class ManageBatches extends Page implements HasTable
+class ManageMenuStockBatches extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static string $resource = IngredientResource::class;
+    protected static string $resource = MenuStockResource::class;
 
-    protected string $view = 'filament.pages.manage-batches';
+    protected string $view = 'filament.pages.manage-menu-stock-batches';
 
-    public Ingredient $record;
+    public MenuStock $record;
 
-    public function mount(Ingredient $record): void
+    public function mount(MenuStock $record): void
     {
         $this->record = $record;
     }
 
     public function getTitle(): string|Htmlable
     {
-        return "Batch Stok - {$this->record->name}";
+        return "Batch Stok - {$this->record->menu->name}";
     }
 
     public function table(Table $table): Table
@@ -47,7 +47,7 @@ class ManageBatches extends Page implements HasTable
         $unit = $this->record->unit;
 
         return $table
-            ->query(IngredientBatch::where('ingredient_id', $this->record->id))
+            ->query(MenuStockBatch::where('menu_stock_id', $this->record->id))
             ->columns([
                 TextColumn::make('id')
                     ->label('Batch ID')
@@ -73,13 +73,12 @@ class ManageBatches extends Page implements HasTable
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->model(IngredientBatch::class)
+                    ->model(MenuStockBatch::class)
                     ->form([
                         TextInput::make('quantity')
                             ->label('Quantity')
                             ->required()
                             ->minValue(0)
-                            ->step(0.1)
                             ->type('text')
                             ->stripCharacters('.')
                             ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
@@ -88,8 +87,8 @@ class ManageBatches extends Page implements HasTable
                         DatePicker::make('expiry_date')
                             ->label('Expiry Date')
                             ->native(false)
-                            ->required(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO)
-                            ->helperText(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO
+                            ->required(fn () => $this->record->batch_mode === MenuStock::BATCH_MODE_FEFO)
+                            ->helperText(fn () => $this->record->batch_mode === MenuStock::BATCH_MODE_FEFO
                                 ? 'Required for FEFO mode'
                                 : null),
                         DateTimePicker::make('received_at')
@@ -107,7 +106,7 @@ class ManageBatches extends Page implements HasTable
                             ->extraInputAttributes(NumberInputHelper::integer())
                             ->prefix('Rp'),
                     ])
-                    ->using(function (array $data): IngredientBatch {
+                    ->using(function (array $data): MenuStockBatch {
                         return $this->record->batches()->create($data);
                     }),
             ])
@@ -118,7 +117,6 @@ class ManageBatches extends Page implements HasTable
                             ->label('Quantity')
                             ->required()
                             ->minValue(0)
-                            ->step(0.1)
                             ->type('text')
                             ->stripCharacters('.')
                             ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
@@ -127,8 +125,8 @@ class ManageBatches extends Page implements HasTable
                         DatePicker::make('expiry_date')
                             ->label('Expiry Date')
                             ->native(false)
-                            ->required(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO)
-                            ->helperText(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO
+                            ->required(fn () => $this->record->batch_mode === MenuStock::BATCH_MODE_FEFO)
+                            ->helperText(fn () => $this->record->batch_mode === MenuStock::BATCH_MODE_FEFO
                                 ? 'Required for FEFO mode'
                                 : null),
                         DateTimePicker::make('received_at')

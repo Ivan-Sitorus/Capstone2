@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\IngredientResource\Pages;
+namespace App\Filament\Resources\MenuStockResource\Pages;
 
-use App\Filament\Resources\IngredientResource;
+use App\Filament\Resources\MenuStockResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditIngredient extends EditRecord
+class EditMenuStock extends EditRecord
 {
-    protected static string $resource = IngredientResource::class;
+    protected static string $resource = MenuStockResource::class;
 
     protected function getHeaderActions(): array
     {

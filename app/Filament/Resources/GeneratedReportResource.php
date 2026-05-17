@@ -24,10 +24,8 @@ class GeneratedReportResource extends Resource
             ->query(GeneratedReport::with('user')->latest())
             ->columns([
                 TextColumn::make('name')->label('Nama')->searchable()->weight('medium'),
-                TextColumn::make('type')->label('Tipe')->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'simple' => 'gray', 'rigid' => 'blue', 'custom' => 'orange', default => 'gray',
-                    })->formatStateUsing(fn (string $state): string => ucfirst($state)),
+                TextColumn::make('type')->label('Tipe')
+                    ->formatStateUsing(fn (string $state): string => ucfirst($state)),
                 TextColumn::make('date_start')->label('Periode')
                     ->formatStateUsing(fn ($record): string => $record->date_start->format('d M').' -> '.$record->date_end->format('d M Y')),
                 TextColumn::make('aggregation')->label('Aggregation')
@@ -37,8 +35,6 @@ class GeneratedReportResource extends Resource
             ->actions([
                 Action::make('view')->label('Lihat')->icon('heroicon-o-eye')
                     ->url(fn (GeneratedReport $record): string => ViewReport::getUrl(['id' => $record->id])),
-                Action::make('pdf')->label('PDF')->icon('heroicon-o-document-arrow-down')->color('gray')
-                    ->url(fn (GeneratedReport $record): string => url("/admin/view-report/{$record->id}/download-pdf")),
             ])
             ->defaultSort('created_at', 'desc');
     }

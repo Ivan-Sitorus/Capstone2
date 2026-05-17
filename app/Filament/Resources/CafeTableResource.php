@@ -27,7 +27,7 @@ class CafeTableResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Data Master';
 
-    protected static ?string $navigationLabel = 'Meja Cafe';
+    protected static ?string $navigationLabel = 'Nomor Meja';
 
     protected static ?int $navigationSort = 3;
 

@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Filament\Resources\IngredientResource\Pages;
+namespace App\Filament\Resources\MenuStockResource\Pages;
 
-use App\Filament\Resources\IngredientResource;
+use App\Filament\Resources\MenuStockResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
-class ListIngredients extends ListRecords
+class ListMenuStocks extends ListRecords
 {
-    protected static string $resource = IngredientResource::class;
+    protected static string $resource = MenuStockResource::class;
 
     protected function getHeaderActions(): array
     {

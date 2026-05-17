@@ -8,12 +8,11 @@ use App\Renderers\CsvRenderer;
 use App\Renderers\DomPdfRenderer;
 use App\Renderers\ExcelRenderer;
 use Filament\Actions\Action;
-use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Pages\PageConfiguration;
 use Filament\Panel;
-use Illuminate\Support\Facades\Auth;
+use Filament\Schemas\Components\View as SchemaView;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Route;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -28,8 +27,6 @@ class ViewReport extends Page
     protected static ?string $slug = 'view-report/{id}';
 
     protected static ?string $title = 'Lihat Laporan';
-
-    protected string $view = 'filament.pages.view-report';
 
     public GeneratedReport $report;
 
@@ -77,6 +74,34 @@ class ViewReport extends Page
         return $this->report->toReportData();
     }
 
+    public function getTitle(): string
+    {
+        return $this->report->name;
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [
+            \App\Filament\Resources\GeneratedReportResource::getUrl('index') => 'Laporan Keuangan',
+            $this->report->name,
+        ];
+    }
+
+    public function getSubheading(): string
+    {
+        return 'Periode: '
+            .\Carbon\Carbon::parse($this->report->date_start)->format('d M')
+            .' → '
+            .\Carbon\Carbon::parse($this->report->date_end)->format('d M Y');
+    }
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema->components([
+            SchemaView::make('filament.pages.view-report-table'),
+        ]);
+    }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -97,7 +122,7 @@ class ViewReport extends Page
             Action::make('download_csv')
                 ->label('Unduh CSV')
                 ->icon('heroicon-o-document-arrow-down')
-                ->color('gray')
+                ->color('success')
                 ->url(fn () => url("/admin/view-report/{$this->report->id}/download-csv"))
                 ->openUrlInNewTab(),
         ];
@@ -128,32 +153,5 @@ class ViewReport extends Page
         $report = GeneratedReport::findOrFail($id);
 
         return CsvRenderer::download($report->toReportData(), "report-{$report->id}.csv");
-    }
-
-    public function getTitle(): string
-    {
-        return "Lihat Laporan — {$this->report->name}";
-    }
-
-    public function getTypeLabel(): string
-    {
-        return match ($this->report->type) {
-            'simple' => 'Simple (Ringkasan)',
-            'rigid' => 'Rigid (Laba Rugi + Arus Kas)',
-            'custom' => 'Custom (Per Kategori)',
-            default => ucfirst($this->report->type),
-        };
-    }
-
-    public function getAggregationLabel(): string
-    {
-        return match ($this->report->aggregation) {
-            'daily' => 'Harian',
-            'weekly' => 'Mingguan',
-            'monthly' => 'Bulanan',
-            'quarterly' => 'Triwulan',
-            'yearly' => 'Tahunan',
-            default => ucfirst($this->report->aggregation),
-        };
     }
 }
