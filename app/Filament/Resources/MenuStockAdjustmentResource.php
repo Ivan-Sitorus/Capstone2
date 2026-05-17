@@ -24,6 +24,8 @@ class MenuStockAdjustmentResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
 
+    protected static bool $shouldRegisterNavigation = false;
+
     protected static string | \UnitEnum | null $navigationGroup = 'Inventori';
 
     protected static ?string $navigationLabel = 'Penyesuaian Stok Menu';
