@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { v7 as uuidv7 } from 'uuid';
-import { Search, X, Banknote, Lock, User, CircleCheck, Clock, Printer, Percent } from 'lucide-react';
+import { Search, X, Banknote, Lock, User, CircleCheck, Clock, Printer, Percent, MessageSquare } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,8 @@ import CashierLayout from '@/Layouts/CashierLayout';
 import SharedMenuItem from '@/Components/Shared/SharedMenuItem';
 import SharedCartItem from '@/Components/Shared/SharedCartItem';
 import Modal from '@/Components/Shared/Modal';
+import FlashToast from '@/Components/Shared/FlashToast';
+import WhatsAppShareModal from '@/Components/Cashier/WhatsAppShareModal';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 import { cn } from '@/lib/utils';
 import useCartStore from '@/Store/cartStore';
@@ -32,6 +34,9 @@ export default function PesananBaru({ categories, promotions }) {
     const [showSuccess, setShowSuccess] = useState(false);
     const [successTotal, setSuccessTotal] = useState(0);
     const [successOrderCode, setSuccessOrderCode] = useState('');
+    const [successOrderId, setSuccessOrderId] = useState(null);
+    const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+    const [skipToast, setSkipToast] = useState(null);
     const [isPortrait, setIsPortrait] = useState(() => {
         if (typeof window === 'undefined') return false;
         return window.innerHeight > window.innerWidth;
@@ -103,7 +108,8 @@ export default function PesananBaru({ categories, promotions }) {
                     setShowPayModal(false);
                     setSuccessTotal(orderTotal);
                     const flash = page?.props?.flash || {};
-                    setSuccessOrderCode(flash.receipt_order_code || '');
+                    setSuccessOrderCode(flash.order_code || '');
+                    setSuccessOrderId(flash.order_id || null);
                     setShowSuccess(true);
                 },
                 onError: () => setProcessing(false),
@@ -499,13 +505,48 @@ export default function PesananBaru({ categories, promotions }) {
                         Cetak / Lihat Struk
                     </Button>
                     <Button
+                        variant="outline"
+                        onClick={() => {
+                            if (successOrderId) setShowWhatsAppModal(true);
+                        }}
+                        disabled={!successOrderId}
+                        className="w-full h-11 flex items-center justify-center gap-2"
+                    >
+                        <MessageSquare size={16} />
+                        Bagikan via WhatsApp
+                    </Button>
+                    <Button
                         onClick={handleSuccessOk}
                         className="w-full h-11"
                     >
                         Lanjut ke Pesanan Aktif
                     </Button>
                 </div>
+
+                {/* WhatsApp share modal */}
+                <WhatsAppShareModal
+                    isOpen={showWhatsAppModal}
+                    onClose={() => setShowWhatsAppModal(false)}
+                    order={{
+                        id: successOrderId,
+                        order_code: successOrderCode,
+                        total_amount: successTotal,
+                        created_at: new Date().toISOString(),
+                        items: cartItems.map(i => ({
+                            quantity: i.quantity,
+                            name: i.name,
+                        })),
+                    }}
+                    onSkip={() => {
+                        setShowWhatsAppModal(false);
+                        setSkipToast({ type: 'error', message: 'Struk tidak terkirim karena nomor WhatsApp tidak diisi' });
+                        setTimeout(() => setSkipToast(null), 4000);
+                    }}
+                />
             </Modal>
+
+            {/* Skip toast */}
+            <FlashToast toast={skipToast} onDismiss={() => setSkipToast(null)} />
         </CashierLayout></>
     );
 }

@@ -18,7 +18,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
     function handleFileChange(e) {
         const f = e.target.files[0];
         if (!f) return;
-        if (!['image/jpeg', 'image/png', 'image/jpg', 'image/webp'].includes(f.type)) {
+        if (!['image/jpeg', 'image/png', 'image/jpg'].includes(f.type)) {
             setError('File harus berupa gambar (JPG atau PNG)');
             return;
         }
@@ -149,7 +149,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                     </div>
                                     <input
                                         id="proof-upload" type="file"
-                                        accept="image/jpeg,image/png,image/jpg,image/webp"
+                                        accept="image/jpeg,image/png,image/jpg"
                                         className="hidden"
                                         onChange={handleFileChange}
                                         capture="environment"

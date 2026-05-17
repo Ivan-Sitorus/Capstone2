@@ -32,6 +32,9 @@ Route::prefix('kasir')->middleware(['auth:web', 'role:cashier,admin'])->group(fu
     Route::patch('/pesanan/{order}/konfirmasi-bayar', [CashierOrderController::class, 'confirmPayment'])->name('kasir.pesanan.konfirmasi-bayar');
     Route::patch('/pesanan/{order}/konfirmasi-qris', [CashierOrderController::class, 'confirmQris'])->name('kasir.pesanan.konfirmasi-qris');
     Route::patch('/pesanan/{order}/tolak-qris', [CashierOrderController::class, 'rejectQris'])->name('kasir.pesanan.tolak-qris');
+    Route::post('/pesanan/{order}/qris/accept', [CashierOrderController::class, 'acceptQrisProof'])->name('kasir.pesanan.qris.accept');
+    Route::post('/pesanan/{order}/qris/reject', [CashierOrderController::class, 'rejectQrisProof'])->name('kasir.pesanan.qris.reject');
+    Route::post('/pesanan/{order}/qris/resubmit', [CashierOrderController::class, 'requestQrisResubmit'])->name('kasir.pesanan.qris.resubmit');
 
     Route::get('/pesanan-menunggu', CashierPendingCountController::class)->name('kasir.pesanan-menunggu');
 });

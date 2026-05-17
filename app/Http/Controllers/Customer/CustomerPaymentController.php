@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
+use Intervention\Image\Drivers\Gd\Driver;
+use Intervention\Image\Format;
+use Intervention\Image\ImageManager;
 
 class CustomerPaymentController extends Controller
 {
@@ -90,22 +93,53 @@ class CustomerPaymentController extends Controller
     public function uploadQrisProof(Request $request, Order $order): JsonResponse
     {
         $request->validate([
-            'proof' => 'required|file|mimes:jpg,jpeg,png,webp|max:5120',
+            'proof' => 'required|file|mimes:jpg,jpeg,png|max:5120',
         ]);
 
         if ($order->status !== Order::STATUS_PENDING) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
 
+        // Resubmit tracking: increment on resubmit_requested, block if limit reached
+        if ($order->qris_status === 'resubmit_requested') {
+            $order->increment('resubmit_count');
+            $order->refresh();
+
+            if ($order->resubmit_count >= 3) {
+                return response()->json([
+                    'message' => 'Batas kirim ulang tercapai (maks 3x)',
+                ], 422);
+            }
+        }
+
+        // Delete old proof file
         if ($order->payment_proof) {
             Storage::disk('public')->delete($order->payment_proof);
         }
 
-        $path = $request->file('proof')->store('proofs', 'public');
+        // Compress to WebP (quality 70), fallback to JPEG
+        $file = $request->file('proof');
+        $manager = new ImageManager(new Driver);
+            $image = $manager->decode($file);
+
+        try {
+            $encoded = $image->encodeUsingFormat(Format::WEBP, quality: 70);
+            $extension = 'webp';
+        } catch (\Exception) {
+            $encoded = $image->encodeUsingFormat(Format::JPEG, quality: 70);
+            $extension = 'jpg';
+        }
+
+        $binary = base64_decode($encoded->toBase64());
+        $filename = 'qris_'.time().'_'.uniqid().'.'.$extension;
+        $path = 'qris-proofs/'.$filename;
+
+        Storage::disk('public')->put($path, $binary);
 
         $order->update([
             'payment_proof' => $path,
             'payment_method' => 'qris',
+            'qris_status' => 'proof_submitted',
             'rejection_note' => null,
         ]);
 

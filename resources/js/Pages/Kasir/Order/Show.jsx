@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { router, Link } from '@inertiajs/react';
 import axios from 'axios';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/table';
 import CashierLayout from '@/Layouts/CashierLayout';
 import StatusBadge from '@/Components/Common/StatusBadge';
+import FlashToast from '@/Components/Shared/FlashToast';
+import WhatsAppShareModal from '@/Components/Cashier/WhatsAppShareModal';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
 const paymentLabel = { cash: 'Tunai (Cash)', qris: 'QRIS' };
@@ -22,6 +24,8 @@ export default function OrderShow({ order }) {
     const [processing, setProcessing] = useState(false);
     const [showRejectModal, setShowRejectModal] = useState(false);
     const [rejectNote, setRejectNote] = useState('');
+    const [showWhatsAppModal, setShowWhatsAppModal] = useState(false);
+    const [waToast, setWaToast] = useState(null);
 
     const isCashPending = order.status === 'pending' && order.payment_method === 'cash';
     const isQrisPending = order.status === 'pending' && order.payment_method === 'qris' && !!order.payment_proof;
@@ -74,6 +78,15 @@ export default function OrderShow({ order }) {
                                         {processing ? 'Memproses...' : 'Tandai Selesai'}
                                     </Button>
                                 )}
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => setShowWhatsAppModal(true)}
+                                    className="flex items-center gap-1.5"
+                                >
+                                    <MessageSquare size={15} />
+                                    Bagikan Struk
+                                </Button>
                                 <StatusBadge status={order.status} />
                             </div>
                         </div>
@@ -188,6 +201,27 @@ export default function OrderShow({ order }) {
                             </div>
                         </div>
 
+                        {/* ── WhatsApp share modal ── */}
+                        <WhatsAppShareModal
+                            isOpen={showWhatsAppModal}
+                            onClose={() => setShowWhatsAppModal(false)}
+                            order={{
+                                id: order.id,
+                                order_code: order.order_code,
+                                total_amount: order.total_amount,
+                                created_at: order.created_at,
+                                items: order.items.map(i => ({
+                                    quantity: i.quantity,
+                                    name: i.name,
+                                })),
+                            }}
+                            onSkip={() => {
+                                setShowWhatsAppModal(false);
+                                setWaToast({ type: 'error', message: 'Struk tidak terkirim karena nomor WhatsApp tidak diisi' });
+                                setTimeout(() => setWaToast(null), 4000);
+                            }}
+                        />
+
                         {/* ── Reject QRIS modal ── */}
                         {showRejectModal && (
                             <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/40">
@@ -227,6 +261,8 @@ export default function OrderShow({ order }) {
                     </CardContent>
                 </Card>
             </div>
+
+            <FlashToast toast={waToast} onDismiss={() => setWaToast(null)} />
         </CashierLayout>
     );
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cashier;
 
+use App\Events\OrderQrisReviewed;
 use App\Http\Controllers\Controller;
 use App\Jobs\BroadcastPendingCount;
 use App\Models\Order;
@@ -155,5 +156,112 @@ class CashierOrderController extends Controller
         ]);
 
         return response()->json(['message' => 'Bukti QRIS ditolak.']);
+    }
+
+    /**
+     * Accept QRIS payment proof and advance order to diproses.
+     */
+
+    /**
+     * Accept QRIS payment proof and advance order to diproses.
+     */
+    public function acceptQrisProof(Order $order, InventoryService $inventoryService)
+    {
+        if ($order->qris_status !== 'proof_submitted') {
+            return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
+        }
+
+        DB::transaction(function () use ($order, $inventoryService) {
+            if ($order->payment_proof) {
+                Storage::disk('public')->delete($order->payment_proof);
+            }
+
+            $order->update([
+                'qris_status'   => 'accepted',
+                'status'        => Order::STATUS_DIPROSES,
+                'cashier_id'    => Auth::id(),
+                'payment_proof' => null,
+            ]);
+
+            $inventoryService->processSaleForOrder($order, Auth::id());
+        });
+
+        broadcast(new OrderQrisReviewed($order, 'accepted', null));
+
+        BroadcastPendingCount::dispatch();
+
+        return response()->json(['message' => 'Bukti QRIS diterima. Pesanan diproses.']);
+    }
+
+    /**
+     * Reject QRIS payment proof with a required reason.
+     */
+    public function rejectQrisProof(Request $request, Order $order)
+    {
+        if ($order->qris_status !== 'proof_submitted') {
+            return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
+        }
+
+        $request->validate(['reason' => 'required|string|max:500']);
+
+        DB::transaction(function () use ($request, $order) {
+            if ($order->payment_proof) {
+                Storage::disk('public')->delete($order->payment_proof);
+            }
+
+            $order->update([
+                'qris_status'    => 'rejected',
+                'is_paid'        => false,
+                'payment_proof'  => null,
+                'rejection_note' => $request->reason,
+            ]);
+        });
+
+        broadcast(new OrderQrisReviewed($order, 'rejected', $request->reason));
+
+        return response()->json(['message' => 'Bukti QRIS ditolak.']);
+    }
+
+    /**
+     * Request the customer to resubmit their QRIS payment proof.
+     */
+    public function requestQrisResubmit(Request $request, Order $order)
+    {
+        if ($order->qris_status !== 'proof_submitted') {
+            return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
+        }
+
+        $request->validate(['reason' => 'required|string|max:500']);
+
+        DB::transaction(function () use ($request, $order) {
+            if ($order->payment_proof) {
+                Storage::disk('public')->delete($order->payment_proof);
+            }
+
+            $order->update([
+                'qris_status'    => 'resubmit_requested',
+                'payment_proof'  => null,
+                'rejection_note' => $request->reason,
+            ]);
+        });
+
+        broadcast(new OrderQrisReviewed($order, 'resubmit_requested', $request->reason));
+
+        return response()->json(['message' => 'Pengunggahan ulang bukti QRIS diminta.']);
+    }
+
+    public function whatsappLink(Request $request, Order $order, WhatsAppReceiptService $waService)
+    {
+        $request->validate([
+            'phone' => 'required|string',
+        ]);
+
+        try {
+            $waLink = $waService->buildWaMeLink($order, $request->phone);
+        } catch (\InvalidArgumentException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json(['wa_link' => $waLink]);
     }
 }

@@ -39,9 +39,10 @@ class CashierPesananBaruController extends Controller
         InventoryService $inventoryService,
     ) {
         $uuid = $request->uuid;
+        $orderModel = null;
 
-        $attempt = function () use ($request, $orderPromotionService, $inventoryService, &$uuid) {
-            DB::transaction(function () use ($request, $orderPromotionService, $inventoryService, &$uuid) {
+        $attempt = function () use ($request, $orderPromotionService, $inventoryService, &$uuid, &$orderModel) {
+            DB::transaction(function () use ($request, $orderPromotionService, $inventoryService, &$uuid, &$orderModel) {
                 $isBayarNanti = $request->payment_method === 'bayar_nanti';
                 $selectedPromotionIds = $request->input('promotion_ids', []);
 
@@ -95,6 +96,7 @@ class CashierPesananBaruController extends Controller
                 OrderItem::insert($itemsToInsert);
 
                 $order->update(['total_amount' => $total]);
+                $orderModel = $order;
 
                 $orderPromotionService->persistOrderPromotions($order, $appliedPromotions);
 
@@ -104,11 +106,17 @@ class CashierPesananBaruController extends Controller
 
         try {
             $attempt();
-            return back()->with('success', 'Pesanan berhasil dibuat');
+            return back()
+                ->with('success', 'Pesanan berhasil dibuat')
+                ->with('order_id', $orderModel?->id)
+                ->with('order_code', $orderModel?->order_code);
         } catch (UniqueConstraintViolationException) {
             $uuid = (string) Uuid::uuid7();
             $attempt();
-            return back()->with('success', 'Pesanan berhasil dibuat');
+            return back()
+                ->with('success', 'Pesanan berhasil dibuat')
+                ->with('order_id', $orderModel?->id)
+                ->with('order_code', $orderModel?->order_code);
         }
     }
 }
