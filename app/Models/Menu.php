@@ -97,6 +97,11 @@ class Menu extends Model
         return round($totalCost, 2);
     }
 
+    public function menuStock()
+    {
+        return $this->hasOne(MenuStock::class);
+    }
+
     public function hasRecipe(): bool
     {
         return $this->menuIngredients()->exists();

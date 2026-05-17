@@ -4,9 +4,9 @@ namespace App\Filament\Resources;
 
 use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Helpers\TextInputHelper;
-use App\Filament\Resources\IngredientResource\Pages\EditIngredient;
-use App\Filament\Resources\IngredientResource\Pages\ListIngredients;
-use App\Filament\Resources\IngredientResource\Pages\ManageBatches;
+use App\Filament\Resources\StockResource\Pages\EditStock;
+use App\Filament\Resources\StockResource\Pages\ListStocks;
+use App\Filament\Resources\StockResource\Pages\ManageBatches;
 use App\Models\Ingredient;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -28,15 +28,15 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 
-class IngredientResource extends Resource
+class StockResource extends Resource
 {
     protected static ?string $model = Ingredient::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cube';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Inventory';
+    protected static string|\UnitEnum|null $navigationGroup = 'Inventori';
 
-    protected static ?string $navigationLabel = 'Ingredients';
+    protected static ?string $navigationLabel = 'Stok';
 
     protected static ?int $navigationSort = 1;
 
@@ -187,8 +187,8 @@ class IngredientResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListIngredients::route('/'),
-            'edit' => EditIngredient::route('/{record}/edit'),
+            'index' => ListStocks::route('/'),
+            'edit' => EditStock::route('/{record}/edit'),
             'batches' => ManageBatches::route('/{record}/batches'),
         ];
     }
