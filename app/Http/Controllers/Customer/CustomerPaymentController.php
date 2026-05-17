@@ -35,6 +35,7 @@ class CustomerPaymentController extends Controller
                 'subtotal' => $i->subtotal,
             ]),
             'table_number' => $order->cafeTable?->table_number,
+            'qrisImage' => asset('storage/'.Setting::get('qris_image', 'qris/qris-w9cafe.png')),
         ]);
     }
 
@@ -87,6 +88,7 @@ class CustomerPaymentController extends Controller
             'qrisName' => Setting::get('qris_name', 'W9 Cafe'),
             'totalAmount' => $order->total_amount,
             'rejectedMessage' => $rejectedMessage,
+            'resubmitCount' => $order->resubmit_count,
         ]);
     }
 
@@ -162,6 +164,8 @@ class CustomerPaymentController extends Controller
             'total_amount' => $order->total_amount,
             'payment_method' => $order->payment_method,
             'rejection_note' => $order->rejection_note,
+            'qris_status' => $order->qris_status,
+            'resubmit_count' => $order->resubmit_count,
         ];
     }
 }

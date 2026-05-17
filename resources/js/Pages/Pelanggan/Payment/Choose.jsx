@@ -7,7 +7,7 @@ import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
 import { cn } from '@/lib/utils';
 
-export default function PaymentChoose({ order, items, table_number }) {
+export default function PaymentChoose({ order, items, table_number, qrisImage }) {
     const [selected,   setSelected]   = useState(null);
     const [loading,    setLoading]    = useState(false);
     const [error,      setError]      = useState('');
@@ -173,6 +173,22 @@ export default function PaymentChoose({ order, items, table_number }) {
                     })}
                 </div>
 
+                {selected === 'qris' && (
+                    <div className="bg-card rounded-[20px] border border-border px-5 pb-4 pt-[18px] flex flex-col items-center gap-[10px] shadow-[0_3px_14px_rgba(45,32,22,0.05)]">
+                        <div className="w-[170px] h-[170px] rounded-[14px] overflow-hidden bg-muted flex items-center justify-center shadow-[0_2px_8px_rgba(45,32,22,0.10)]">
+                            <img
+                                src={qrisImage}
+                                alt="QRIS W9 Cafe"
+                                className="w-full h-full object-contain"
+                                onError={e => { e.target.src = '/images/logo.jpg'; }}
+                            />
+                        </div>
+                        <span className="text-[11px] text-muted-foreground/50 text-center max-w-[260px]">
+                            Pindai QR menggunakan aplikasi dompet digital Anda, lalu unggah bukti pembayaran
+                        </span>
+                    </div>
+                )}
+
                 <div className="flex-1" />
 
                 {error && (
@@ -189,7 +205,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                         !selected ? 'bg-muted text-muted-foreground/50 cursor-default' : 'bg-primary text-primary-foreground cursor-pointer shadow-[0_4px_16px_rgba(232,118,58,0.30)]',
                     )}
                 >
-                    {loading ? 'Memproses...' : 'Konfirmasi Pembayaran'}
+                    {loading ? 'Memproses...' : selected === 'qris' ? 'Upload Bukti Pembayaran' : 'Konfirmasi Pembayaran'}
                 </button>
             </div>
 

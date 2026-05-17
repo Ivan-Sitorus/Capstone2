@@ -7,7 +7,7 @@ import { formatRupiah } from '@/helpers';
 import useCart from '@/Hooks/useCart';
 import { cn } from '@/lib/utils';
 
-export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, rejectedMessage }) {
+export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, rejectedMessage, resubmitCount = 0 }) {
     const [file,      setFile]      = useState(null);
     const [preview,   setPreview]   = useState(null);
     const [uploading, setUploading] = useState(false);
@@ -82,6 +82,9 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                         <div className="text-[13px] text-muted-foreground">{rejectedMessage}</div>
                         <div className="text-xs text-muted-foreground/70 mt-1.5">
                             Silakan unggah ulang bukti pembayaran yang valid.
+                        </div>
+                        <div className="text-xs font-semibold text-primary mt-1">
+                            Sisa kesempatan: {Math.max(0, 3 - resubmitCount)}x
                         </div>
                     </div>
                 )}
@@ -174,7 +177,12 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                 !file ? 'bg-muted text-muted-foreground/50 cursor-default' : 'bg-primary text-primary-foreground cursor-pointer shadow-[0_4px_16px_rgba(232,118,58,0.30)]',
                             )}
                         >
-                            <Send size={18} />
+                            {uploading ? (
+                                <svg className="animate-spin" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" opacity="0.25" />
+                                    <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+                                </svg>
+                            ) : <Send size={18} />}
                             {uploading ? 'Mengupload...' : 'Kirim Bukti Pembayaran'}
                         </button>
                     </>

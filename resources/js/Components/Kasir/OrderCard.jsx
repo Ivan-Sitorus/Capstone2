@@ -12,6 +12,7 @@ const METHOD_META = {
 
 import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import QrisReviewModal from '@/Components/Cashier/QrisReviewModal';
 
 
 const STATUS_META = {
@@ -21,8 +22,9 @@ const STATUS_META = {
 };
 
 export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone, onConfirmPayment }) {
-    const [menuOpen,    setMenuOpen]    = useState(false);
-    const [payPopover,  setPayPopover]  = useState(false);
+    const [menuOpen,      setMenuOpen]      = useState(false);
+    const [payPopover,    setPayPopover]    = useState(false);
+    const [showQrisReview, setShowQrisReview] = useState(false);
     const menuRef    = useRef(null);
     const payRef     = useRef(null);
 
@@ -187,6 +189,16 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                     </span>
 
                     <div className="flex gap-1.5">
+                        {order.qris_status === 'proof_submitted' && (
+                            <Button
+                                size="sm"
+                                variant="default"
+                                onClick={() => setShowQrisReview(true)}
+                            >
+                                Review Bukti QRIS
+                            </Button>
+                        )}
+
                         {isQrisPending && hasProof && (
                             <Button
                                 size="sm"
@@ -255,6 +267,14 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                     </div>
                 </div>
             </CardContent>
+
+            {showQrisReview && (
+                <QrisReviewModal
+                    isOpen={showQrisReview}
+                    onClose={() => setShowQrisReview(false)}
+                    order={order}
+                />
+            )}
         </Card>
     );
 }
