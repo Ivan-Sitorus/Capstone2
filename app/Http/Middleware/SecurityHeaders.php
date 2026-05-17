@@ -24,14 +24,15 @@ class SecurityHeaders
         $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
 
         // Content Security Policy — Vite dev server on 127.0.0.1:5173 (IPv4 only)
-        $vite = 'http://127.0.0.1:5173 http://localhost:5173';
+        $vite = 'http://127.0.0.1:5173 http://localhost:5173 http://127.0.0.1:5174 http://localhost:5174';
         $csp = implode('; ', [
             "default-src 'self'",
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' $vite",
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' $vite blob:",
             "style-src 'self' 'unsafe-inline' $vite",
             "img-src 'self' data: blob: https: http:",
             "font-src 'self' data: $vite",
             "connect-src 'self' ws://127.0.0.1:* wss://127.0.0.1:* ws://localhost:* wss://localhost:* http://127.0.0.1:* http://localhost:*",
+            "worker-src 'self' blob:",
             "frame-ancestors 'none'",
             "base-uri 'self'",
             "form-action 'self'",

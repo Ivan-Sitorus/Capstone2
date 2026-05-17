@@ -8,7 +8,6 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/js/app.jsx',
-                'resources/js/report-grid.jsx',
                 'resources/css/filament/admin/theme.css',
             ],
             refresh: [

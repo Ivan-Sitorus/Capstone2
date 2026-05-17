@@ -40,6 +40,7 @@ class ReceiptController extends Controller
         return Inertia::render('Receipt/Show', [
             'order' => [
                 'id' => $order->id,
+                'uuid' => $order->uuid,
                 'order_code' => $order->order_code,
                 'status' => $order->status,
                 'total_amount' => $order->total_amount,
@@ -58,7 +59,11 @@ class ReceiptController extends Controller
                 'name' => Setting::get('cafe_name', 'W9 Cafe'),
                 'address' => Setting::get('cafe_address', 'STIE Totalwin Semarang'),
                 'phone' => Setting::get('cafe_phone', ''),
+                'receipt_footer' => Setting::get('receipt_footer', ''),
+                'receipt_show_npwp' => (bool) Setting::get('receipt_show_npwp', false),
+                'receipt_npwp' => Setting::get('receipt_npwp', ''),
             ],
+            'receiptUrl' => $order->receipt_url,
         ]);
     }
 }

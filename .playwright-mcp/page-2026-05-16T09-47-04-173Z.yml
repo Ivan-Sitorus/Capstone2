@@ -1,0 +1,375 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - button "Collapse sidebar" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - link "W9 Cafe — Admin" [ref=e9] [cursor=pointer]:
+        - /url: http://localhost:8081/admin
+        - generic [ref=e10]: W9 Cafe — Admin
+    - button "User menu" [ref=e14] [cursor=pointer]:
+      - img "Avatar of Admin W9" [ref=e15]
+  - generic [ref=e16]:
+    - complementary [ref=e18]:
+      - navigation [ref=e19]:
+        - list [ref=e20]:
+          - listitem [ref=e21]:
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "Dashboard" [ref=e24] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin
+                  - img [ref=e25]
+                  - generic [ref=e27]: Dashboard
+          - listitem [ref=e28]:
+            - generic [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: Inventory
+              - button "Inventory" [expanded] [ref=e31]:
+                - img [ref=e32]
+            - list [ref=e34]:
+              - listitem [ref=e35]:
+                - link "Ingredients" [ref=e36] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/ingredients
+                  - img [ref=e37]
+                  - generic [ref=e39]: Ingredients
+              - listitem [ref=e40]:
+                - link "Stock Adjustments" [ref=e41] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/stock-adjustments
+                  - img [ref=e42]
+                  - generic [ref=e44]: Stock Adjustments
+              - listitem [ref=e45]:
+                - link "Pemakaian Bahan Harian" [ref=e46] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/daily-ingredient-usages
+                  - img [ref=e47]
+                  - generic [ref=e49]: Pemakaian Bahan Harian
+          - listitem [ref=e50]:
+            - generic [ref=e51] [cursor=pointer]:
+              - generic [ref=e52]: Data Master
+              - button "Data Master" [expanded] [ref=e53]:
+                - img [ref=e54]
+            - list [ref=e56]:
+              - listitem [ref=e57]:
+                - link "Menu" [ref=e58] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menus
+                  - img [ref=e59]
+                  - generic [ref=e61]: Menu
+              - listitem [ref=e62]:
+                - link "Kategori" [ref=e63] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/categories
+                  - img [ref=e64]
+                  - generic [ref=e67]: Kategori
+              - listitem [ref=e68]:
+                - link "Meja Cafe" [ref=e69] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/cafe-tables
+                  - img [ref=e70]
+                  - generic [ref=e72]: Meja Cafe
+          - listitem [ref=e73]:
+            - generic [ref=e74] [cursor=pointer]:
+              - generic [ref=e75]: Transaksi
+              - button "Transaksi" [expanded] [ref=e76]:
+                - img [ref=e77]
+            - list [ref=e79]:
+              - listitem [ref=e80]:
+                - link "Pesanan 4" [ref=e81] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/orders
+                  - img [ref=e82]
+                  - generic [ref=e84]: Pesanan
+                  - generic [ref=e88]: "4"
+              - listitem [ref=e89]:
+                - link "Promotions" [ref=e90] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/promotions
+                  - img [ref=e91]
+                  - generic [ref=e93]: Promotions
+              - listitem [ref=e94]:
+                - link "Piutang" [ref=e95] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/receivables
+                  - img [ref=e96]
+                  - generic [ref=e98]: Piutang
+          - listitem [ref=e99]:
+            - generic [ref=e100] [cursor=pointer]:
+              - generic [ref=e101]: Keuangan
+              - button "Keuangan" [expanded] [ref=e102]:
+                - img [ref=e103]
+            - list [ref=e105]:
+              - listitem [ref=e106]:
+                - link "Pemasukan & Pengeluaran" [ref=e107] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/unexpected-transactions
+                  - img [ref=e108]
+                  - generic [ref=e110]: Pemasukan & Pengeluaran
+              - listitem [ref=e111]:
+                - link "Laporan Keuangan" [ref=e112] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/generated-reports
+                  - img [ref=e113]
+                  - generic [ref=e115]: Laporan Keuangan
+          - listitem [ref=e116]:
+            - generic [ref=e117] [cursor=pointer]:
+              - generic [ref=e118]: Pengguna
+              - button "Pengguna" [expanded] [ref=e119]:
+                - img [ref=e120]
+            - list [ref=e122]:
+              - listitem [ref=e123]:
+                - link "Pengguna" [ref=e124] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/users
+                  - img [ref=e125]
+                  - generic [ref=e127]: Pengguna
+              - listitem [ref=e128]:
+                - link "Riwayat Login Staff" [ref=e129] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/staff-history
+                  - img [ref=e130]
+                  - generic [ref=e132]: Riwayat Login Staff
+          - listitem [ref=e133]:
+            - generic [ref=e134] [cursor=pointer]:
+              - generic [ref=e135]: Analitik
+              - button "Analitik" [expanded] [ref=e136]:
+                - img [ref=e137]
+            - list [ref=e139]:
+              - listitem [ref=e140]:
+                - link "Klasterisasi Menu Penjualan" [ref=e141] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-menu
+                  - img [ref=e142]
+                  - generic [ref=e144]: Klasterisasi Menu Penjualan
+              - listitem [ref=e145]:
+                - link "Prediksi Menu" [ref=e146] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-menu
+                  - img [ref=e147]
+                  - generic [ref=e149]: Prediksi Menu
+              - listitem [ref=e150]:
+                - link "Asosiatif Menu" [ref=e151] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/asosiatif-menu
+                  - img [ref=e152]
+                  - generic [ref=e154]: Asosiatif Menu
+              - listitem [ref=e155]:
+                - link "Klasterisasi Bahan Baku" [ref=e156] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-bahan-baku
+                  - img [ref=e157]
+                  - generic [ref=e159]: Klasterisasi Bahan Baku
+              - listitem [ref=e160]:
+                - link "Prediksi Bahan Baku" [ref=e161] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-bahan-baku
+                  - img [ref=e162]
+                  - generic [ref=e164]: Prediksi Bahan Baku
+    - main [ref=e166]:
+      - generic [ref=e168]:
+        - generic [ref=e169]:
+          - generic [ref=e170]:
+            - navigation [ref=e171]:
+              - list [ref=e172]:
+                - listitem [ref=e173]:
+                  - link "Generated Reports" [ref=e174] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/generated-reports
+                - listitem [ref=e175]:
+                  - img [ref=e176]
+                  - generic [ref=e178]: List
+            - heading "Generated Reports" [level=1] [ref=e179]
+          - button "Generate Laporan" [ref=e182] [cursor=pointer]:
+            - img [ref=e183]
+            - text: Generate Laporan
+        - generic [ref=e192]:
+          - generic [ref=e196]:
+            - generic [ref=e197]: Search
+            - generic [ref=e198]:
+              - img [ref=e200]
+              - searchbox "Search" [ref=e203]
+          - table [ref=e205]:
+            - rowgroup [ref=e206]:
+              - row "Nama Tipe Periode Aggregation Dibuat Action" [ref=e207]:
+                - columnheader "Nama" [ref=e208]
+                - columnheader "Tipe" [ref=e209]
+                - columnheader "Periode" [ref=e210]
+                - columnheader "Aggregation" [ref=e211]
+                - columnheader "Dibuat" [ref=e212]:
+                  - button "Dibuat" [ref=e213] [cursor=pointer]:
+                    - text: Dibuat
+                    - img [ref=e214]
+                - columnheader "Action" [ref=e216]
+            - rowgroup [ref=e217]:
+              - row "hhhhhhhhh Simple 16 Apr -> 16 May 2026 Monthly 16 May 2026, 13:00 Lihat" [ref=e218]:
+                - cell "hhhhhhhhh" [ref=e219]:
+                  - link "hhhhhhhhh" [ref=e220] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/7
+                    - generic [ref=e221]: hhhhhhhhh
+                - cell "Simple" [ref=e222]:
+                  - link "Simple" [ref=e223] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/7
+                    - generic [ref=e224]: Simple
+                - cell "16 Apr -> 16 May 2026" [ref=e225]:
+                  - link "16 Apr -> 16 May 2026" [ref=e226] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/7
+                    - generic [ref=e227]: 16 Apr -> 16 May 2026
+                - cell "Monthly" [ref=e228]:
+                  - link "Monthly" [ref=e229] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/7
+                    - generic [ref=e230]: Monthly
+                - cell "16 May 2026, 13:00" [ref=e231]:
+                  - link "16 May 2026, 13:00" [ref=e232] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/7
+                    - generic [ref=e233]: 16 May 2026, 13:00
+                - cell "Lihat" [ref=e234]:
+                  - link "Lihat" [ref=e236] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/7
+                    - img [ref=e237]
+                    - text: Lihat
+              - row "tes sigit rill Rigid 09 Aug -> 16 May 2026 Monthly 16 May 2026, 11:41 Lihat" [ref=e240]:
+                - cell "tes sigit rill" [ref=e241]:
+                  - link "tes sigit rill" [ref=e242] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/6
+                    - generic [ref=e243]: tes sigit rill
+                - cell "Rigid" [ref=e244]:
+                  - link "Rigid" [ref=e245] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/6
+                    - generic [ref=e246]: Rigid
+                - cell "09 Aug -> 16 May 2026" [ref=e247]:
+                  - link "09 Aug -> 16 May 2026" [ref=e248] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/6
+                    - generic [ref=e249]: 09 Aug -> 16 May 2026
+                - cell "Monthly" [ref=e250]:
+                  - link "Monthly" [ref=e251] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/6
+                    - generic [ref=e252]: Monthly
+                - cell "16 May 2026, 11:41" [ref=e253]:
+                  - link "16 May 2026, 11:41" [ref=e254] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/6
+                    - generic [ref=e255]: 16 May 2026, 11:41
+                - cell "Lihat" [ref=e256]:
+                  - link "Lihat" [ref=e258] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/6
+                    - img [ref=e259]
+                    - text: Lihat
+              - row "Tes sigit Simple 08 Aug -> 16 May 2026 Monthly 16 May 2026, 11:40 Lihat" [ref=e262]:
+                - cell "Tes sigit" [ref=e263]:
+                  - link "Tes sigit" [ref=e264] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/5
+                    - generic [ref=e265]: Tes sigit
+                - cell "Simple" [ref=e266]:
+                  - link "Simple" [ref=e267] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/5
+                    - generic [ref=e268]: Simple
+                - cell "08 Aug -> 16 May 2026" [ref=e269]:
+                  - link "08 Aug -> 16 May 2026" [ref=e270] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/5
+                    - generic [ref=e271]: 08 Aug -> 16 May 2026
+                - cell "Monthly" [ref=e272]:
+                  - link "Monthly" [ref=e273] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/5
+                    - generic [ref=e274]: Monthly
+                - cell "16 May 2026, 11:40" [ref=e275]:
+                  - link "16 May 2026, 11:40" [ref=e276] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/5
+                    - generic [ref=e277]: 16 May 2026, 11:40
+                - cell "Lihat" [ref=e278]:
+                  - link "Lihat" [ref=e280] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/5
+                    - img [ref=e281]
+                    - text: Lihat
+              - row "Rigid — 2024-03-01 s/d 2026-05-16 Rigid 01 Mar -> 16 May 2026 Monthly 16 May 2026, 06:56 Lihat" [ref=e284]:
+                - cell "Rigid — 2024-03-01 s/d 2026-05-16" [ref=e285]:
+                  - link "Rigid — 2024-03-01 s/d 2026-05-16" [ref=e286] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/4
+                    - generic [ref=e287]: Rigid — 2024-03-01 s/d 2026-05-16
+                - cell "Rigid" [ref=e288]:
+                  - link "Rigid" [ref=e289] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/4
+                    - generic [ref=e290]: Rigid
+                - cell "01 Mar -> 16 May 2026" [ref=e291]:
+                  - link "01 Mar -> 16 May 2026" [ref=e292] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/4
+                    - generic [ref=e293]: 01 Mar -> 16 May 2026
+                - cell "Monthly" [ref=e294]:
+                  - link "Monthly" [ref=e295] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/4
+                    - generic [ref=e296]: Monthly
+                - cell "16 May 2026, 06:56" [ref=e297]:
+                  - link "16 May 2026, 06:56" [ref=e298] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/4
+                    - generic [ref=e299]: 16 May 2026, 06:56
+                - cell "Lihat" [ref=e300]:
+                  - link "Lihat" [ref=e302] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/4
+                    - img [ref=e303]
+                    - text: Lihat
+              - row "Simple — 2025-10-01 s/d 2026-05-16 Simple 01 Oct -> 16 May 2026 Monthly 16 May 2026, 04:52 Lihat" [ref=e306]:
+                - cell "Simple — 2025-10-01 s/d 2026-05-16" [ref=e307]:
+                  - link "Simple — 2025-10-01 s/d 2026-05-16" [ref=e308] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/3
+                    - generic [ref=e309]: Simple — 2025-10-01 s/d 2026-05-16
+                - cell "Simple" [ref=e310]:
+                  - link "Simple" [ref=e311] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/3
+                    - generic [ref=e312]: Simple
+                - cell "01 Oct -> 16 May 2026" [ref=e313]:
+                  - link "01 Oct -> 16 May 2026" [ref=e314] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/3
+                    - generic [ref=e315]: 01 Oct -> 16 May 2026
+                - cell "Monthly" [ref=e316]:
+                  - link "Monthly" [ref=e317] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/3
+                    - generic [ref=e318]: Monthly
+                - cell "16 May 2026, 04:52" [ref=e319]:
+                  - link "16 May 2026, 04:52" [ref=e320] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/3
+                    - generic [ref=e321]: 16 May 2026, 04:52
+                - cell "Lihat" [ref=e322]:
+                  - link "Lihat" [ref=e324] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/3
+                    - img [ref=e325]
+                    - text: Lihat
+              - row "Rigid — 2026-04-15 s/d 2026-05-15 Rigid 15 Apr -> 15 May 2026 Monthly 15 May 2026, 21:10 Lihat" [ref=e328]:
+                - cell "Rigid — 2026-04-15 s/d 2026-05-15" [ref=e329]:
+                  - link "Rigid — 2026-04-15 s/d 2026-05-15" [ref=e330] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/2
+                    - generic [ref=e331]: Rigid — 2026-04-15 s/d 2026-05-15
+                - cell "Rigid" [ref=e332]:
+                  - link "Rigid" [ref=e333] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/2
+                    - generic [ref=e334]: Rigid
+                - cell "15 Apr -> 15 May 2026" [ref=e335]:
+                  - link "15 Apr -> 15 May 2026" [ref=e336] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/2
+                    - generic [ref=e337]: 15 Apr -> 15 May 2026
+                - cell "Monthly" [ref=e338]:
+                  - link "Monthly" [ref=e339] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/2
+                    - generic [ref=e340]: Monthly
+                - cell "15 May 2026, 21:10" [ref=e341]:
+                  - link "15 May 2026, 21:10" [ref=e342] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/2
+                    - generic [ref=e343]: 15 May 2026, 21:10
+                - cell "Lihat" [ref=e344]:
+                  - link "Lihat" [ref=e346] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/2
+                    - img [ref=e347]
+                    - text: Lihat
+              - row "Simple — 2026-04-15 s/d 2026-05-15 Simple 15 Apr -> 15 May 2026 Monthly 15 May 2026, 20:24 Lihat" [ref=e350]:
+                - cell "Simple — 2026-04-15 s/d 2026-05-15" [ref=e351]:
+                  - link "Simple — 2026-04-15 s/d 2026-05-15" [ref=e352] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/1
+                    - generic [ref=e353]: Simple — 2026-04-15 s/d 2026-05-15
+                - cell "Simple" [ref=e354]:
+                  - link "Simple" [ref=e355] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/1
+                    - generic [ref=e356]: Simple
+                - cell "15 Apr -> 15 May 2026" [ref=e357]:
+                  - link "15 Apr -> 15 May 2026" [ref=e358] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/1
+                    - generic [ref=e359]: 15 Apr -> 15 May 2026
+                - cell "Monthly" [ref=e360]:
+                  - link "Monthly" [ref=e361] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/1
+                    - generic [ref=e362]: Monthly
+                - cell "15 May 2026, 20:24" [ref=e363]:
+                  - link "15 May 2026, 20:24" [ref=e364] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/1
+                    - generic [ref=e365]: 15 May 2026, 20:24
+                - cell "Lihat" [ref=e366]:
+                  - link "Lihat" [ref=e368] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/view-report/1
+                    - img [ref=e369]
+                    - text: Lihat
+          - navigation "Pagination navigation" [ref=e372]:
+            - generic [ref=e375]:
+              - generic [ref=e377]: Per page
+              - combobox "Per page" [ref=e379]:
+                - option "5"
+                - option "10" [selected]
+                - option "25"
+                - option "50"
+  - generic:
+    - status

@@ -196,7 +196,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             Pembayaran Anda sedang diverifikasi kasir.
                         </p>
                         <button
-                            onClick={() => router.visit(`/receipt/${order.order_code}`)}
+                            onClick={() => router.visit(`/struk-pesanan/${order.uuid}`)}
                             className="w-full h-[52px] bg-primary text-primary-foreground border-none rounded-[18px] text-[15px] font-bold cursor-pointer flex items-center justify-center gap-2 shadow-[0_4px_16px_rgba(232,118,58,0.30)]"
                         >
                             Lihat Struk Digital

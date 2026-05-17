@@ -1,0 +1,595 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - button "Collapse sidebar" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - link "W9 Cafe — Admin" [ref=e9] [cursor=pointer]:
+        - /url: http://localhost:8081/admin
+        - generic [ref=e10]: W9 Cafe — Admin
+    - button "User menu" [ref=e14] [cursor=pointer]:
+      - img "Avatar of Admin W9" [ref=e15]
+  - generic [ref=e16]:
+    - complementary [ref=e18]:
+      - navigation [ref=e19]:
+        - list [ref=e20]:
+          - listitem [ref=e21]:
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "Dashboard" [ref=e24] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin
+                  - img [ref=e25]
+                  - generic [ref=e27]: Dashboard
+          - listitem [ref=e28]:
+            - generic [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: Data Master
+              - button "Data Master" [expanded] [ref=e31]:
+                - img [ref=e32]
+            - list [ref=e34]:
+              - listitem [ref=e35]:
+                - link "Menu" [ref=e36] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menus
+                  - img [ref=e37]
+                  - generic [ref=e39]: Menu
+              - listitem [ref=e40]:
+                - link "Kategori" [ref=e41] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/categories
+                  - img [ref=e42]
+                  - generic [ref=e45]: Kategori
+              - listitem [ref=e46]:
+                - link "Nomor Meja" [ref=e47] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/cafe-tables
+                  - img [ref=e48]
+                  - generic [ref=e50]: Nomor Meja
+          - listitem [ref=e51]:
+            - generic [ref=e52] [cursor=pointer]:
+              - generic [ref=e53]: Transaksi
+              - button "Transaksi" [expanded] [ref=e54]:
+                - img [ref=e55]
+            - list [ref=e57]:
+              - listitem [ref=e58]:
+                - link "Pesanan" [ref=e59] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/orders
+                  - img [ref=e60]
+                  - generic [ref=e62]: Pesanan
+              - listitem [ref=e63]:
+                - link "Promosi" [ref=e64] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/promotions
+                  - img [ref=e65]
+                  - generic [ref=e67]: Promosi
+              - listitem [ref=e68]:
+                - link "Piutang" [ref=e69] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/receivables
+                  - img [ref=e70]
+                  - generic [ref=e72]: Piutang
+          - listitem [ref=e73]:
+            - generic [ref=e74] [cursor=pointer]:
+              - generic [ref=e75]: Inventori
+              - button "Inventori" [expanded] [ref=e76]:
+                - img [ref=e77]
+            - list [ref=e79]:
+              - listitem [ref=e80]:
+                - link "Stok" [ref=e81] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/stok
+                  - img [ref=e82]
+                  - generic [ref=e84]: Stok
+              - listitem [ref=e85]:
+                - link "Stok Menu" [ref=e86] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menu-stocks
+                  - img [ref=e87]
+                  - generic [ref=e89]: Stok Menu
+              - listitem [ref=e90]:
+                - link "Penyesuaian Stok" [ref=e91] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/adjustments-page
+                  - img [ref=e92]
+                  - generic [ref=e94]: Penyesuaian Stok
+              - listitem [ref=e95]:
+                - link "Pemakaian Bahan Harian" [ref=e96] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/daily-ingredient-usages
+                  - img [ref=e97]
+                  - generic [ref=e99]: Pemakaian Bahan Harian
+              - listitem [ref=e100]:
+                - link "Penyesuaian Stok Menu" [ref=e101] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menu-stock-adjustments
+                  - img [ref=e102]
+                  - generic [ref=e104]: Penyesuaian Stok Menu
+          - listitem [ref=e105]:
+            - generic [ref=e106] [cursor=pointer]:
+              - generic [ref=e107]: Keuangan
+              - button "Keuangan" [expanded] [ref=e108]:
+                - img [ref=e109]
+            - list [ref=e111]:
+              - listitem [ref=e112]:
+                - link "Pemasukan & Pengeluaran" [ref=e113] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/unexpected-transactions
+                  - img [ref=e114]
+                  - generic [ref=e116]: Pemasukan & Pengeluaran
+              - listitem [ref=e117]:
+                - link "Laporan Keuangan" [ref=e118] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/generated-reports
+                  - img [ref=e119]
+                  - generic [ref=e121]: Laporan Keuangan
+          - listitem [ref=e122]:
+            - generic [ref=e123] [cursor=pointer]:
+              - generic [ref=e124]: Pengguna
+              - button "Pengguna" [expanded] [ref=e125]:
+                - img [ref=e126]
+            - list [ref=e128]:
+              - listitem [ref=e129]:
+                - link "Pengguna" [ref=e130] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/users
+                  - img [ref=e131]
+                  - generic [ref=e133]: Pengguna
+          - listitem [ref=e134]:
+            - generic [ref=e135] [cursor=pointer]:
+              - generic [ref=e136]: Staff
+              - button "Staff" [expanded] [ref=e137]:
+                - img [ref=e138]
+            - list [ref=e140]:
+              - listitem [ref=e141]:
+                - link "Staff" [ref=e142] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/staff
+                  - img [ref=e143]
+                  - generic [ref=e145]: Staff
+              - listitem [ref=e146]:
+                - link "Riwayat Login Staff" [ref=e147] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/staff-history
+                  - img [ref=e148]
+                  - generic [ref=e150]: Riwayat Login Staff
+          - listitem [ref=e151]:
+            - generic [ref=e152] [cursor=pointer]:
+              - generic [ref=e153]: Analitik
+              - button "Analitik" [expanded] [ref=e154]:
+                - img [ref=e155]
+            - list [ref=e157]:
+              - listitem [ref=e158]:
+                - link "Klasterisasi Menu Penjualan" [ref=e159] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-menu
+                  - img [ref=e160]
+                  - generic [ref=e162]: Klasterisasi Menu Penjualan
+              - listitem [ref=e163]:
+                - link "Prediksi Menu" [ref=e164] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-menu
+                  - img [ref=e165]
+                  - generic [ref=e167]: Prediksi Menu
+              - listitem [ref=e168]:
+                - link "Asosiatif Menu" [ref=e169] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/asosiatif-menu
+                  - img [ref=e170]
+                  - generic [ref=e172]: Asosiatif Menu
+              - listitem [ref=e173]:
+                - link "Klasterisasi Bahan Baku" [ref=e174] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-bahan-baku
+                  - img [ref=e175]
+                  - generic [ref=e177]: Klasterisasi Bahan Baku
+              - listitem [ref=e178]:
+                - link "Prediksi Bahan Baku" [ref=e179] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-bahan-baku
+                  - img [ref=e180]
+                  - generic [ref=e182]: Prediksi Bahan Baku
+    - main [ref=e184]:
+      - generic [ref=e186]:
+        - heading "Stok Page" [level=1] [ref=e189]
+        - generic [ref=e195]:
+          - tablist "stok" [ref=e196]:
+            - tab "Bahan Baku" [ref=e197] [cursor=pointer]:
+              - img [ref=e198]
+              - generic [ref=e200]: Bahan Baku
+            - tab "Menu" [ref=e201] [cursor=pointer]:
+              - img [ref=e202]
+              - generic [ref=e204]: Menu
+          - tabpanel [ref=e205]:
+            - generic [ref=e210]:
+              - generic [ref=e211]:
+                - generic [ref=e212]:
+                  - navigation [ref=e213]:
+                    - list [ref=e214]:
+                      - listitem [ref=e215]:
+                        - link "Ingredients" [ref=e216] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks
+                      - listitem [ref=e217]:
+                        - img [ref=e218]
+                        - generic [ref=e220]: List
+                  - heading "Ingredients" [level=1] [ref=e221]
+                - button "New ingredient" [ref=e224] [cursor=pointer]
+              - generic [ref=e232]:
+                - generic [ref=e235]:
+                  - generic [ref=e236]:
+                    - generic [ref=e237]: Search
+                    - generic [ref=e238]:
+                      - img [ref=e240]
+                      - searchbox "Search" [ref=e243]
+                  - button "Filter" [ref=e246] [cursor=pointer]:
+                    - img [ref=e247]
+                    - generic [ref=e250]: "0"
+                - table [ref=e252]:
+                  - rowgroup [ref=e253]:
+                    - row "Select/deselect all items for bulk actions. Ingredient Name Unit Low Stock Threshold Total Stock Active Actions" [ref=e254]:
+                      - columnheader "Select/deselect all items for bulk actions." [ref=e255]:
+                        - checkbox "Select/deselect all items for bulk actions." [ref=e256]
+                      - columnheader "Ingredient Name" [ref=e257]:
+                        - button "Ingredient Name" [ref=e258] [cursor=pointer]:
+                          - text: Ingredient Name
+                          - img [ref=e259]
+                      - columnheader "Unit" [ref=e261]:
+                        - button "Unit" [ref=e262] [cursor=pointer]:
+                          - text: Unit
+                          - img [ref=e263]
+                      - columnheader "Low Stock Threshold" [ref=e265]:
+                        - button "Low Stock Threshold" [ref=e266] [cursor=pointer]:
+                          - text: Low Stock Threshold
+                          - img [ref=e267]
+                      - columnheader "Total Stock" [ref=e269]:
+                        - button "Total Stock" [ref=e270] [cursor=pointer]:
+                          - text: Total Stock
+                          - img [ref=e271]
+                      - columnheader "Active" [ref=e273]:
+                        - button "Active" [ref=e274] [cursor=pointer]:
+                          - text: Active
+                          - img [ref=e275]
+                      - columnheader "Actions" [ref=e277]
+                  - rowgroup [ref=e278]:
+                    - row "Select/deselect item 15 for bulk actions. Sirup Vanila ml 200,00 ml 0 ml Batch Edit Delete" [ref=e279]:
+                      - cell "Select/deselect item 15 for bulk actions." [ref=e280]:
+                        - checkbox "Select/deselect item 15 for bulk actions." [ref=e281]
+                      - cell "Sirup Vanila" [ref=e282]:
+                        - link "Sirup Vanila" [ref=e283] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/15/edit
+                          - generic [ref=e284]: Sirup Vanila
+                      - cell "ml" [ref=e285]:
+                        - link "ml" [ref=e286] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/15/edit
+                          - generic [ref=e287]: ml
+                      - cell "200,00 ml" [ref=e288]:
+                        - link "200,00 ml" [ref=e289] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/15/edit
+                          - generic [ref=e290]: 200,00 ml
+                      - cell "0 ml" [ref=e291]:
+                        - link "0 ml" [ref=e292] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/15/edit
+                          - generic [ref=e294]: 0 ml
+                      - cell [ref=e295]:
+                        - link [ref=e296] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/15/edit
+                          - img [ref=e298]
+                      - cell "Batch Edit Delete" [ref=e300]:
+                        - generic [ref=e301]:
+                          - link "Batch" [ref=e302] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/stocks/15/batches
+                            - img [ref=e303]
+                            - text: Batch
+                          - button "Edit" [ref=e305] [cursor=pointer]:
+                            - img [ref=e306]
+                            - text: Edit
+                          - button "Delete" [ref=e309] [cursor=pointer]:
+                            - img [ref=e310]
+                            - text: Delete
+                    - row "Select/deselect item 14 for bulk actions. Keju Parut gram 150,00 gram 0 gram Batch Edit Delete" [ref=e312]:
+                      - cell "Select/deselect item 14 for bulk actions." [ref=e313]:
+                        - checkbox "Select/deselect item 14 for bulk actions." [ref=e314]
+                      - cell "Keju Parut" [ref=e315]:
+                        - link "Keju Parut" [ref=e316] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/14/edit
+                          - generic [ref=e317]: Keju Parut
+                      - cell "gram" [ref=e318]:
+                        - link "gram" [ref=e319] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/14/edit
+                          - generic [ref=e320]: gram
+                      - cell "150,00 gram" [ref=e321]:
+                        - link "150,00 gram" [ref=e322] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/14/edit
+                          - generic [ref=e323]: 150,00 gram
+                      - cell "0 gram" [ref=e324]:
+                        - link "0 gram" [ref=e325] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/14/edit
+                          - generic [ref=e327]: 0 gram
+                      - cell [ref=e328]:
+                        - link [ref=e329] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/14/edit
+                          - img [ref=e331]
+                      - cell "Batch Edit Delete" [ref=e333]:
+                        - generic [ref=e334]:
+                          - link "Batch" [ref=e335] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/stocks/14/batches
+                            - img [ref=e336]
+                            - text: Batch
+                          - button "Edit" [ref=e338] [cursor=pointer]:
+                            - img [ref=e339]
+                            - text: Edit
+                          - button "Delete" [ref=e342] [cursor=pointer]:
+                            - img [ref=e343]
+                            - text: Delete
+                    - row "Select/deselect item 13 for bulk actions. Mentega gram 200,00 gram 0 gram Batch Edit Delete" [ref=e345]:
+                      - cell "Select/deselect item 13 for bulk actions." [ref=e346]:
+                        - checkbox "Select/deselect item 13 for bulk actions." [ref=e347]
+                      - cell "Mentega" [ref=e348]:
+                        - link "Mentega" [ref=e349] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/13/edit
+                          - generic [ref=e350]: Mentega
+                      - cell "gram" [ref=e351]:
+                        - link "gram" [ref=e352] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/13/edit
+                          - generic [ref=e353]: gram
+                      - cell "200,00 gram" [ref=e354]:
+                        - link "200,00 gram" [ref=e355] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/13/edit
+                          - generic [ref=e356]: 200,00 gram
+                      - cell "0 gram" [ref=e357]:
+                        - link "0 gram" [ref=e358] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/13/edit
+                          - generic [ref=e360]: 0 gram
+                      - cell [ref=e361]:
+                        - link [ref=e362] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/13/edit
+                          - img [ref=e364]
+                      - cell "Batch Edit Delete" [ref=e366]:
+                        - generic [ref=e367]:
+                          - link "Batch" [ref=e368] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/stocks/13/batches
+                            - img [ref=e369]
+                            - text: Batch
+                          - button "Edit" [ref=e371] [cursor=pointer]:
+                            - img [ref=e372]
+                            - text: Edit
+                          - button "Delete" [ref=e375] [cursor=pointer]:
+                            - img [ref=e376]
+                            - text: Delete
+                    - row "Select/deselect item 12 for bulk actions. Coklat Bubuk gram 300,00 gram 0 gram Batch Edit Delete" [ref=e378]:
+                      - cell "Select/deselect item 12 for bulk actions." [ref=e379]:
+                        - checkbox "Select/deselect item 12 for bulk actions." [ref=e380]
+                      - cell "Coklat Bubuk" [ref=e381]:
+                        - link "Coklat Bubuk" [ref=e382] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/12/edit
+                          - generic [ref=e383]: Coklat Bubuk
+                      - cell "gram" [ref=e384]:
+                        - link "gram" [ref=e385] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/12/edit
+                          - generic [ref=e386]: gram
+                      - cell "300,00 gram" [ref=e387]:
+                        - link "300,00 gram" [ref=e388] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/12/edit
+                          - generic [ref=e389]: 300,00 gram
+                      - cell "0 gram" [ref=e390]:
+                        - link "0 gram" [ref=e391] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/12/edit
+                          - generic [ref=e393]: 0 gram
+                      - cell [ref=e394]:
+                        - link [ref=e395] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/12/edit
+                          - img [ref=e397]
+                      - cell "Batch Edit Delete" [ref=e399]:
+                        - generic [ref=e400]:
+                          - link "Batch" [ref=e401] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/stocks/12/batches
+                            - img [ref=e402]
+                            - text: Batch
+                          - button "Edit" [ref=e404] [cursor=pointer]:
+                            - img [ref=e405]
+                            - text: Edit
+                          - button "Delete" [ref=e408] [cursor=pointer]:
+                            - img [ref=e409]
+                            - text: Delete
+                    - row "Select/deselect item 11 for bulk actions. Gula Pasir gram 1.000,00 gram 0 gram Batch Edit Delete" [ref=e411]:
+                      - cell "Select/deselect item 11 for bulk actions." [ref=e412]:
+                        - checkbox "Select/deselect item 11 for bulk actions." [ref=e413]
+                      - cell "Gula Pasir" [ref=e414]:
+                        - link "Gula Pasir" [ref=e415] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/11/edit
+                          - generic [ref=e416]: Gula Pasir
+                      - cell "gram" [ref=e417]:
+                        - link "gram" [ref=e418] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/11/edit
+                          - generic [ref=e419]: gram
+                      - cell "1.000,00 gram" [ref=e420]:
+                        - link "1.000,00 gram" [ref=e421] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/11/edit
+                          - generic [ref=e422]: 1.000,00 gram
+                      - cell "0 gram" [ref=e423]:
+                        - link "0 gram" [ref=e424] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/11/edit
+                          - generic [ref=e426]: 0 gram
+                      - cell [ref=e427]:
+                        - link [ref=e428] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/11/edit
+                          - img [ref=e430]
+                      - cell "Batch Edit Delete" [ref=e432]:
+                        - generic [ref=e433]:
+                          - link "Batch" [ref=e434] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/stocks/11/batches
+                            - img [ref=e435]
+                            - text: Batch
+                          - button "Edit" [ref=e437] [cursor=pointer]:
+                            - img [ref=e438]
+                            - text: Edit
+                          - button "Delete" [ref=e441] [cursor=pointer]:
+                            - img [ref=e442]
+                            - text: Delete
+                    - row "Select/deselect item 10 for bulk actions. Garam gram 100,00 gram 0 gram Batch Edit Delete" [ref=e444]:
+                      - cell "Select/deselect item 10 for bulk actions." [ref=e445]:
+                        - checkbox "Select/deselect item 10 for bulk actions." [ref=e446]
+                      - cell "Garam" [ref=e447]:
+                        - link "Garam" [ref=e448] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/10/edit
+                          - generic [ref=e449]: Garam
+                      - cell "gram" [ref=e450]:
+                        - link "gram" [ref=e451] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/10/edit
+                          - generic [ref=e452]: gram
+                      - cell "100,00 gram" [ref=e453]:
+                        - link "100,00 gram" [ref=e454] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/10/edit
+                          - generic [ref=e455]: 100,00 gram
+                      - cell "0 gram" [ref=e456]:
+                        - link "0 gram" [ref=e457] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/10/edit
+                          - generic [ref=e459]: 0 gram
+                      - cell [ref=e460]:
+                        - link [ref=e461] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/10/edit
+                          - img [ref=e463]
+                      - cell "Batch Edit Delete" [ref=e465]:
+                        - generic [ref=e466]:
+                          - link "Batch" [ref=e467] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/stocks/10/batches
+                            - img [ref=e468]
+                            - text: Batch
+                          - button "Edit" [ref=e470] [cursor=pointer]:
+                            - img [ref=e471]
+                            - text: Edit
+                          - button "Delete" [ref=e474] [cursor=pointer]:
+                            - img [ref=e475]
+                            - text: Delete
+                    - row "Select/deselect item 9 for bulk actions. Bawang Merah gram 200,00 gram 0 gram Batch Edit Delete" [ref=e477]:
+                      - cell "Select/deselect item 9 for bulk actions." [ref=e478]:
+                        - checkbox "Select/deselect item 9 for bulk actions." [ref=e479]
+                      - cell "Bawang Merah" [ref=e480]:
+                        - link "Bawang Merah" [ref=e481] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/9/edit
+                          - generic [ref=e482]: Bawang Merah
+                      - cell "gram" [ref=e483]:
+                        - link "gram" [ref=e484] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/9/edit
+                          - generic [ref=e485]: gram
+                      - cell "200,00 gram" [ref=e486]:
+                        - link "200,00 gram" [ref=e487] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/9/edit
+                          - generic [ref=e488]: 200,00 gram
+                      - cell "0 gram" [ref=e489]:
+                        - link "0 gram" [ref=e490] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/9/edit
+                          - generic [ref=e492]: 0 gram
+                      - cell [ref=e493]:
+                        - link [ref=e494] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/9/edit
+                          - img [ref=e496]
+                      - cell "Batch Edit Delete" [ref=e498]:
+                        - generic [ref=e499]:
+                          - link "Batch" [ref=e500] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/stocks/9/batches
+                            - img [ref=e501]
+                            - text: Batch
+                          - button "Edit" [ref=e503] [cursor=pointer]:
+                            - img [ref=e504]
+                            - text: Edit
+                          - button "Delete" [ref=e507] [cursor=pointer]:
+                            - img [ref=e508]
+                            - text: Delete
+                    - row "Select/deselect item 8 for bulk actions. Minyak Goreng ml 1.000,00 ml 0 ml Batch Edit Delete" [ref=e510]:
+                      - cell "Select/deselect item 8 for bulk actions." [ref=e511]:
+                        - checkbox "Select/deselect item 8 for bulk actions." [ref=e512]
+                      - cell "Minyak Goreng" [ref=e513]:
+                        - link "Minyak Goreng" [ref=e514] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/8/edit
+                          - generic [ref=e515]: Minyak Goreng
+                      - cell "ml" [ref=e516]:
+                        - link "ml" [ref=e517] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/8/edit
+                          - generic [ref=e518]: ml
+                      - cell "1.000,00 ml" [ref=e519]:
+                        - link "1.000,00 ml" [ref=e520] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/8/edit
+                          - generic [ref=e521]: 1.000,00 ml
+                      - cell "0 ml" [ref=e522]:
+                        - link "0 ml" [ref=e523] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/8/edit
+                          - generic [ref=e525]: 0 ml
+                      - cell [ref=e526]:
+                        - link [ref=e527] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/8/edit
+                          - img [ref=e529]
+                      - cell "Batch Edit Delete" [ref=e531]:
+                        - generic [ref=e532]:
+                          - link "Batch" [ref=e533] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/stocks/8/batches
+                            - img [ref=e534]
+                            - text: Batch
+                          - button "Edit" [ref=e536] [cursor=pointer]:
+                            - img [ref=e537]
+                            - text: Edit
+                          - button "Delete" [ref=e540] [cursor=pointer]:
+                            - img [ref=e541]
+                            - text: Delete
+                    - row "Select/deselect item 7 for bulk actions. Telur Ayam pcs 30,00 pcs 0 pcs Batch Edit Delete" [ref=e543]:
+                      - cell "Select/deselect item 7 for bulk actions." [ref=e544]:
+                        - checkbox "Select/deselect item 7 for bulk actions." [ref=e545]
+                      - cell "Telur Ayam" [ref=e546]:
+                        - link "Telur Ayam" [ref=e547] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/7/edit
+                          - generic [ref=e548]: Telur Ayam
+                      - cell "pcs" [ref=e549]:
+                        - link "pcs" [ref=e550] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/7/edit
+                          - generic [ref=e551]: pcs
+                      - cell "30,00 pcs" [ref=e552]:
+                        - link "30,00 pcs" [ref=e553] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/7/edit
+                          - generic [ref=e554]: 30,00 pcs
+                      - cell "0 pcs" [ref=e555]:
+                        - link "0 pcs" [ref=e556] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/7/edit
+                          - generic [ref=e558]: 0 pcs
+                      - cell [ref=e559]:
+                        - link [ref=e560] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/7/edit
+                          - img [ref=e562]
+                      - cell "Batch Edit Delete" [ref=e564]:
+                        - generic [ref=e565]:
+                          - link "Batch" [ref=e566] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/stocks/7/batches
+                            - img [ref=e567]
+                            - text: Batch
+                          - button "Edit" [ref=e569] [cursor=pointer]:
+                            - img [ref=e570]
+                            - text: Edit
+                          - button "Delete" [ref=e573] [cursor=pointer]:
+                            - img [ref=e574]
+                            - text: Delete
+                    - row "Select/deselect item 6 for bulk actions. Tepung Terigu gram 500,00 gram 0 gram Batch Edit Delete" [ref=e576]:
+                      - cell "Select/deselect item 6 for bulk actions." [ref=e577]:
+                        - checkbox "Select/deselect item 6 for bulk actions." [ref=e578]
+                      - cell "Tepung Terigu" [ref=e579]:
+                        - link "Tepung Terigu" [ref=e580] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/6/edit
+                          - generic [ref=e581]: Tepung Terigu
+                      - cell "gram" [ref=e582]:
+                        - link "gram" [ref=e583] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/6/edit
+                          - generic [ref=e584]: gram
+                      - cell "500,00 gram" [ref=e585]:
+                        - link "500,00 gram" [ref=e586] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/6/edit
+                          - generic [ref=e587]: 500,00 gram
+                      - cell "0 gram" [ref=e588]:
+                        - link "0 gram" [ref=e589] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/6/edit
+                          - generic [ref=e591]: 0 gram
+                      - cell [ref=e592]:
+                        - link [ref=e593] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/stocks/6/edit
+                          - img [ref=e595]
+                      - cell "Batch Edit Delete" [ref=e597]:
+                        - generic [ref=e598]:
+                          - link "Batch" [ref=e599] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/stocks/6/batches
+                            - img [ref=e600]
+                            - text: Batch
+                          - button "Edit" [ref=e602] [cursor=pointer]:
+                            - img [ref=e603]
+                            - text: Edit
+                          - button "Delete" [ref=e606] [cursor=pointer]:
+                            - img [ref=e607]
+                            - text: Delete
+                - navigation "Pagination navigation" [ref=e609]:
+                  - generic [ref=e612]:
+                    - generic [ref=e614]: Per page
+                    - combobox "Per page" [ref=e616]:
+                      - option "5"
+                      - option "10" [selected]
+                      - option "25"
+                      - option "50"
+                  - button "Next" [ref=e617] [cursor=pointer]
+          - option "5"
+          - option "10" [selected]
+          - option "25"
+          - option "50"
+  - generic:
+    - status

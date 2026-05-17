@@ -1,6 +1,7 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { QRCodeCanvas } from 'qrcode.react';
+import { Share2 } from 'lucide-react';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -12,9 +13,10 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import WhatsAppShareModal from '@/Components/Cashier/WhatsAppShareModal';
 
-export default function ReceiptShow({ order, cafe }) {
-    const receiptUrl = window.location.origin + '/receipt/' + order.order_code;
+export default function ReceiptShow({ order, cafe, receiptUrl }) {
+    const [showWhatsApp, setShowWhatsApp] = useState(false);
 
     useEffect(() => {
         document.title = `Struk #${order.order_code} | ${cafe.name}`;
@@ -49,6 +51,11 @@ export default function ReceiptShow({ order, cafe }) {
                             {cafe.phone && (
                                 <p className="text-sm text-gray-500 m-0 mt-0.5">
                                     {cafe.phone}
+                                </p>
+                            )}
+                            {cafe.receipt_show_npwp && cafe.receipt_npwp && (
+                                <p className="text-xs text-gray-400 m-0 mt-1">
+                                    NPWP: {cafe.receipt_npwp}
                                 </p>
                             )}
                         </div>
@@ -204,18 +211,25 @@ export default function ReceiptShow({ order, cafe }) {
                                     value={receiptUrl}
                                     size={140}
                                     level="M"
-                                    
                                     className="block"
                                 />
                             </div>
                             <p className="text-xs text-gray-500 mt-3 m-0 text-center">
                                 Scan untuk melihat struk digital
                             </p>
+                            <button
+                                onClick={() => setShowWhatsApp(true)}
+                                className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 bg-blue-50 px-3.5 py-2 rounded-lg hover:bg-blue-100 transition-colors"
+                            >
+                                <Share2 size={14} />
+                                Bagikan via WhatsApp
+                            </button>
                         </div>
 
                         <div className="text-center py-5 px-6">
                             <p className="text-xs text-gray-500 m-0 leading-relaxed">
-                                Terima kasih telah berbelanja di {cafe.name}
+                                {cafe.receipt_footer ||
+                                    `Terima kasih telah berbelanja di ${cafe.name}`}
                             </p>
                             <p className="text-[10px] text-gray-400 m-0 mt-1">
                                 #{order.order_code} ·{' '}
@@ -225,6 +239,13 @@ export default function ReceiptShow({ order, cafe }) {
                     </CardContent>
                 </Card>
             </div>
+
+            <WhatsAppShareModal
+                isOpen={showWhatsApp}
+                onClose={() => setShowWhatsApp(false)}
+                order={order}
+                onSkip={() => setShowWhatsApp(false)}
+            />
         </>
     );
 }

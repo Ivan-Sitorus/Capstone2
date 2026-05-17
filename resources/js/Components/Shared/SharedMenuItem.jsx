@@ -4,23 +4,36 @@ import { Plus, Minus } from 'lucide-react';
 import { formatRupiah } from '@/helpers';
 import { cn } from '@/lib/utils';
 
-export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCart = false, quantity = 0, onIncrement, onDecrement }) {
+export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCart = false, quantity = 0, onIncrement, onDecrement, stock }) {
     const isCustomer = variant === 'customer';
+    const isOutOfStock = stock !== undefined && stock <= 0;
 
     const displayPrice = menu.is_student_discount && menu.student_price
         ? Number(menu.student_price)
         : Number(menu.price);
 
+    const handleAdd = (e) => {
+        if (isOutOfStock) return;
+        onAdd(menu);
+    };
+
     return (
         <Card
             size="sm"
             className={cn(
-                'cursor-pointer transition-all duration-150 select-none',
+                'cursor-pointer transition-all duration-150 select-none relative',
                 'hover:shadow-md hover:-translate-y-0.5',
                 isCustomer && 'overflow-hidden rounded-[18px]',
+                isOutOfStock && 'opacity-70 pointer-events-none',
             )}
-            onClick={() => onAdd(menu)}
+            onClick={(e) => { e.stopPropagation(); handleAdd(e); }}
         >
+            {isOutOfStock && (
+                <span className="absolute top-2 right-2 z-10 bg-red-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
+                    Stok Habis
+                </span>
+            )}
+
             {isCustomer && (
                 <div className="bg-muted h-[110px] flex items-center justify-center overflow-hidden">
                     {menu.image_url ? (
@@ -98,10 +111,11 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
                             size="sm"
                             className="w-full mt-1.5 rounded-[14px] min-h-[44px] gap-1.5 text-xs font-bold"
                             style={{ background: 'var(--orange-primary)', color: 'white' }}
-                            onClick={(e) => { e.stopPropagation(); onAdd(menu); }}
+                            disabled={isOutOfStock}
+                            onClick={(e) => { e.stopPropagation(); handleAdd(e); }}
                         >
                             <Plus size={14} />
-                            Tambah
+                            {isOutOfStock ? 'Stok Habis' : 'Tambah'}
                         </Button>
                     )
                 )}
@@ -112,10 +126,11 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
                     <Button
                         variant="ghost"
                         size="sm"
-                        className="w-full text-primary"
-                        onClick={(e) => { e.stopPropagation(); onAdd(menu); }}
+                        className={cn('w-full', isOutOfStock ? 'text-red-500 cursor-not-allowed' : 'text-primary')}
+                        disabled={isOutOfStock}
+                        onClick={(e) => { e.stopPropagation(); handleAdd(e); }}
                     >
-                        + Tambah
+                        {isOutOfStock ? 'Stok Habis' : '+ Tambah'}
                     </Button>
                 </div>
             )}

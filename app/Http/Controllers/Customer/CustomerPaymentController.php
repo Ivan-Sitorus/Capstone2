@@ -28,7 +28,7 @@ class CustomerPaymentController extends Controller
         }
 
         return Inertia::render('Pelanggan/Payment/Choose', [
-            'order' => $order->only(['id', 'order_code', 'total_amount', 'customer_name']),
+            'order' => $order->only(['id', 'order_code', 'total_amount', 'customer_name', 'uuid']),
             'items' => $order->items->map(fn ($i) => [
                 'name' => $i->menu->name,
                 'qty' => $i->quantity,
@@ -83,7 +83,7 @@ class CustomerPaymentController extends Controller
             : null;
 
         return Inertia::render('Pelanggan/Payment/QrisUpload', [
-            'order' => $order->only(['id', 'order_code', 'total_amount']),
+            'order' => $order->only(['id', 'order_code', 'total_amount', 'uuid']),
             'qrisImage' => asset('storage/'.Setting::get('qris_image', 'qris/qris-w9cafe.png')),
             'qrisName' => Setting::get('qris_name', 'W9 Cafe'),
             'totalAmount' => $order->total_amount,

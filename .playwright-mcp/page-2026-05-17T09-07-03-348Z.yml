@@ -1,0 +1,226 @@
+- generic [ref=e1]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - button "Collapse sidebar" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - link "W9 Cafe — Admin" [ref=e9] [cursor=pointer]:
+        - /url: http://localhost:8081/admin
+        - generic [ref=e10]: W9 Cafe — Admin
+    - button "User menu" [ref=e14] [cursor=pointer]:
+      - img "Avatar of Admin W9" [ref=e15]
+  - generic [ref=e16]:
+    - complementary [ref=e18]:
+      - navigation [ref=e19]:
+        - list [ref=e20]:
+          - listitem [ref=e21]:
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "Dashboard" [ref=e24] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin
+                  - img [ref=e25]
+                  - generic [ref=e27]: Dashboard
+          - listitem [ref=e28]:
+            - generic [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: Data Master
+              - button "Data Master" [expanded] [ref=e31]:
+                - img [ref=e32]
+            - list [ref=e34]:
+              - listitem [ref=e35]:
+                - link "Menu" [ref=e36] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menus
+                  - img [ref=e37]
+                  - generic [ref=e39]: Menu
+              - listitem [ref=e40]:
+                - link "Kategori" [ref=e41] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/categories
+                  - img [ref=e42]
+                  - generic [ref=e45]: Kategori
+              - listitem [ref=e46]:
+                - link "Nomor Meja" [ref=e47] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/cafe-tables
+                  - img [ref=e48]
+                  - generic [ref=e50]: Nomor Meja
+          - listitem [ref=e51]:
+            - generic [ref=e52] [cursor=pointer]:
+              - generic [ref=e53]: Transaksi
+              - button "Transaksi" [expanded] [ref=e54]:
+                - img [ref=e55]
+            - list [ref=e57]:
+              - listitem [ref=e58]:
+                - link "Pesanan 1" [ref=e59] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/orders
+                  - img [ref=e60]
+                  - generic [ref=e62]: Pesanan
+                  - generic [ref=e66]: "1"
+              - listitem [ref=e67]:
+                - link "Promosi" [ref=e68] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/promotions
+                  - img [ref=e69]
+                  - generic [ref=e71]: Promosi
+              - listitem [ref=e72]:
+                - link "Piutang" [ref=e73] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/receivables
+                  - img [ref=e74]
+                  - generic [ref=e76]: Piutang
+          - listitem [ref=e77]:
+            - generic [ref=e78] [cursor=pointer]:
+              - generic [ref=e79]: Inventori
+              - button "Inventori" [expanded] [ref=e80]:
+                - img [ref=e81]
+            - list [ref=e83]:
+              - listitem [ref=e84]:
+                - link "Stok" [ref=e85] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/stok
+                  - img [ref=e86]
+                  - generic [ref=e88]: Stok
+              - listitem [ref=e89]:
+                - link "Stok Menu" [ref=e90] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menu-stocks
+                  - img [ref=e91]
+                  - generic [ref=e93]: Stok Menu
+              - listitem [ref=e94]:
+                - link "Penyesuaian Stok" [ref=e95] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/adjustments-page
+                  - img [ref=e96]
+                  - generic [ref=e98]: Penyesuaian Stok
+              - listitem [ref=e99]:
+                - link "Pemakaian Bahan Harian" [ref=e100] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/daily-ingredient-usages
+                  - img [ref=e101]
+                  - generic [ref=e103]: Pemakaian Bahan Harian
+              - listitem [ref=e104]:
+                - link "Penyesuaian Stok Menu" [ref=e105] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menu-stock-adjustments
+                  - img [ref=e106]
+                  - generic [ref=e108]: Penyesuaian Stok Menu
+          - listitem [ref=e109]:
+            - generic [ref=e110] [cursor=pointer]:
+              - generic [ref=e111]: Keuangan
+              - button "Keuangan" [expanded] [ref=e112]:
+                - img [ref=e113]
+            - list [ref=e115]:
+              - listitem [ref=e116]:
+                - link "Pemasukan & Pengeluaran" [ref=e117] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/unexpected-transactions
+                  - img [ref=e118]
+                  - generic [ref=e120]: Pemasukan & Pengeluaran
+              - listitem [ref=e121]:
+                - link "Laporan Keuangan" [ref=e122] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/generated-reports
+                  - img [ref=e123]
+                  - generic [ref=e125]: Laporan Keuangan
+          - listitem [ref=e126]:
+            - generic [ref=e127] [cursor=pointer]:
+              - generic [ref=e128]: Pengguna
+              - button "Pengguna" [expanded] [ref=e129]:
+                - img [ref=e130]
+            - list [ref=e132]:
+              - listitem [ref=e133]:
+                - link "Pengguna" [ref=e134] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/users
+                  - img [ref=e135]
+                  - generic [ref=e137]: Pengguna
+          - listitem [ref=e138]:
+            - generic [ref=e139] [cursor=pointer]:
+              - generic [ref=e140]: Staff
+              - button "Staff" [expanded] [ref=e141]:
+                - img [ref=e142]
+            - list [ref=e144]:
+              - listitem [ref=e145]:
+                - link "Staff" [ref=e146] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/staff
+                  - img [ref=e147]
+                  - generic [ref=e149]: Staff
+              - listitem [ref=e150]:
+                - link "Riwayat Login Staff" [ref=e151] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/staff-history
+                  - img [ref=e152]
+                  - generic [ref=e154]: Riwayat Login Staff
+          - listitem [ref=e155]:
+            - generic [ref=e156] [cursor=pointer]:
+              - generic [ref=e157]: Analitik
+              - button "Analitik" [expanded] [ref=e158]:
+                - img [ref=e159]
+            - list [ref=e161]:
+              - listitem [ref=e162]:
+                - link "Klasterisasi Menu Penjualan" [ref=e163] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-menu
+                  - img [ref=e164]
+                  - generic [ref=e166]: Klasterisasi Menu Penjualan
+              - listitem [ref=e167]:
+                - link "Prediksi Menu" [ref=e168] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-menu
+                  - img [ref=e169]
+                  - generic [ref=e171]: Prediksi Menu
+              - listitem [ref=e172]:
+                - link "Asosiatif Menu" [ref=e173] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/asosiatif-menu
+                  - img [ref=e174]
+                  - generic [ref=e176]: Asosiatif Menu
+              - listitem [ref=e177]:
+                - link "Klasterisasi Bahan Baku" [ref=e178] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-bahan-baku
+                  - img [ref=e179]
+                  - generic [ref=e181]: Klasterisasi Bahan Baku
+              - listitem [ref=e182]:
+                - link "Prediksi Bahan Baku" [ref=e183] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-bahan-baku
+                  - img [ref=e184]
+                  - generic [ref=e186]: Prediksi Bahan Baku
+    - main [ref=e188]:
+      - generic [ref=e190]:
+        - heading "Adjustments Page" [level=1] [ref=e193]
+        - generic [ref=e199]:
+          - tablist "adjustments" [ref=e200]:
+            - tab "Bahan Baku" [ref=e201] [cursor=pointer]:
+              - img [ref=e202]
+              - generic [ref=e204]: Bahan Baku
+            - tab "Menu" [active] [ref=e205] [cursor=pointer]:
+              - img [ref=e206]
+              - generic [ref=e208]: Menu
+          - tabpanel "Menu Stock Adjustments List Menu Stock Adjustments Penyesuaian Baru Search Filter Tanggal Produk Tipe Jumlah Sebelum Sesudah Alasan Oleh No menu stock adjustments" [ref=e291]:
+            - generic [ref=e296]:
+              - generic [ref=e297]:
+                - generic [ref=e298]:
+                  - navigation [ref=e299]:
+                    - list [ref=e300]:
+                      - listitem [ref=e301]:
+                        - link "Menu Stock Adjustments" [ref=e302] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stock-adjustments
+                      - listitem [ref=e303]:
+                        - img [ref=e304]
+                        - generic [ref=e306]: List
+                  - heading "Menu Stock Adjustments" [level=1] [ref=e307]
+                - button "Penyesuaian Baru" [ref=e310] [cursor=pointer]
+              - generic [ref=e318]:
+                - generic [ref=e321]:
+                  - generic [ref=e322]:
+                    - generic [ref=e323]: Search
+                    - generic [ref=e324]:
+                      - img [ref=e326]
+                      - searchbox "Search" [ref=e329]
+                  - button "Filter" [ref=e332] [cursor=pointer]:
+                    - img [ref=e333]
+                    - generic [ref=e336]: "0"
+                - table [ref=e338]:
+                  - rowgroup [ref=e339]:
+                    - row "Tanggal Produk Tipe Jumlah Sebelum Sesudah Alasan Oleh" [ref=e340]:
+                      - columnheader "Tanggal" [ref=e341]:
+                        - button "Tanggal" [ref=e342] [cursor=pointer]:
+                          - text: Tanggal
+                          - img [ref=e343]
+                      - columnheader "Produk" [ref=e345]:
+                        - button "Produk" [ref=e346] [cursor=pointer]:
+                          - text: Produk
+                          - img [ref=e347]
+                      - columnheader "Tipe" [ref=e349]
+                      - columnheader "Jumlah" [ref=e350]
+                      - columnheader "Sebelum" [ref=e351]
+                      - columnheader "Sesudah" [ref=e352]
+                      - columnheader "Alasan" [ref=e353]
+                      - columnheader "Oleh" [ref=e354]
+                - generic [ref=e356]:
+                  - img [ref=e358]
+                  - heading "No menu stock adjustments" [level=2] [ref=e360]
+  - generic:
+    - status

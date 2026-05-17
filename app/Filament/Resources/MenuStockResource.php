@@ -8,6 +8,7 @@ use App\Filament\Resources\MenuStockResource\Pages\ListMenuStocks;
 use App\Filament\Resources\MenuStockResource\Pages\ManageMenuStockBatches;
 use App\Filament\Resources\MenuStockResource\RelationManagers\MenuStockBatchesRelationManager;
 use App\Models\MenuStock;
+use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -51,7 +52,7 @@ class MenuStockResource extends Resource
                     ->relationship(
                         name: 'menu',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn ($q) => $q->where('is_stock_calculated', false),
+                        modifyQueryUsing: fn (Builder $query) => $query->where('is_stock_calculated', false),
                     )
                     ->searchable()
                     ->preload()

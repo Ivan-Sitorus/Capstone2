@@ -1,0 +1,643 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e3]:
+    - generic [ref=e4]:
+      - button "Collapse sidebar" [ref=e6] [cursor=pointer]:
+        - img [ref=e7]
+      - link "W9 Cafe — Admin" [ref=e9] [cursor=pointer]:
+        - /url: http://localhost:8081/admin
+        - generic [ref=e10]: W9 Cafe — Admin
+    - button "User menu" [ref=e14] [cursor=pointer]:
+      - img "Avatar of Admin W9" [ref=e15]
+  - generic [ref=e16]:
+    - complementary [ref=e18]:
+      - navigation [ref=e19]:
+        - list [ref=e20]:
+          - listitem [ref=e21]:
+            - list [ref=e22]:
+              - listitem [ref=e23]:
+                - link "Dashboard" [ref=e24] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin
+                  - img [ref=e25]
+                  - generic [ref=e27]: Dashboard
+          - listitem [ref=e28]:
+            - generic [ref=e29] [cursor=pointer]:
+              - generic [ref=e30]: Data Master
+              - button "Data Master" [expanded] [ref=e31]:
+                - img [ref=e32]
+            - list [ref=e34]:
+              - listitem [ref=e35]:
+                - link "Menu" [ref=e36] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menus
+                  - img [ref=e37]
+                  - generic [ref=e39]: Menu
+              - listitem [ref=e40]:
+                - link "Kategori" [ref=e41] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/categories
+                  - img [ref=e42]
+                  - generic [ref=e45]: Kategori
+              - listitem [ref=e46]:
+                - link "Nomor Meja" [ref=e47] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/cafe-tables
+                  - img [ref=e48]
+                  - generic [ref=e50]: Nomor Meja
+          - listitem [ref=e51]:
+            - generic [ref=e52] [cursor=pointer]:
+              - generic [ref=e53]: Transaksi
+              - button "Transaksi" [expanded] [ref=e54]:
+                - img [ref=e55]
+            - list [ref=e57]:
+              - listitem [ref=e58]:
+                - link "Pesanan" [ref=e59] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/orders
+                  - img [ref=e60]
+                  - generic [ref=e62]: Pesanan
+              - listitem [ref=e63]:
+                - link "Promosi" [ref=e64] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/promotions
+                  - img [ref=e65]
+                  - generic [ref=e67]: Promosi
+              - listitem [ref=e68]:
+                - link "Piutang" [ref=e69] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/receivables
+                  - img [ref=e70]
+                  - generic [ref=e72]: Piutang
+          - listitem [ref=e73]:
+            - generic [ref=e74] [cursor=pointer]:
+              - generic [ref=e75]: Inventori
+              - button "Inventori" [expanded] [ref=e76]:
+                - img [ref=e77]
+            - list [ref=e79]:
+              - listitem [ref=e80]:
+                - link "Stok" [ref=e81] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/stok
+                  - img [ref=e82]
+                  - generic [ref=e84]: Stok
+              - listitem [ref=e85]:
+                - link "Stok Menu" [ref=e86] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menu-stocks
+                  - img [ref=e87]
+                  - generic [ref=e89]: Stok Menu
+              - listitem [ref=e90]:
+                - link "Penyesuaian Stok" [ref=e91] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/adjustments-page
+                  - img [ref=e92]
+                  - generic [ref=e94]: Penyesuaian Stok
+              - listitem [ref=e95]:
+                - link "Pemakaian Bahan Harian" [ref=e96] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/daily-ingredient-usages
+                  - img [ref=e97]
+                  - generic [ref=e99]: Pemakaian Bahan Harian
+              - listitem [ref=e100]:
+                - link "Penyesuaian Stok Menu" [ref=e101] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menu-stock-adjustments
+                  - img [ref=e102]
+                  - generic [ref=e104]: Penyesuaian Stok Menu
+          - listitem [ref=e105]:
+            - generic [ref=e106] [cursor=pointer]:
+              - generic [ref=e107]: Keuangan
+              - button "Keuangan" [expanded] [ref=e108]:
+                - img [ref=e109]
+            - list [ref=e111]:
+              - listitem [ref=e112]:
+                - link "Pemasukan & Pengeluaran" [ref=e113] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/unexpected-transactions
+                  - img [ref=e114]
+                  - generic [ref=e116]: Pemasukan & Pengeluaran
+              - listitem [ref=e117]:
+                - link "Laporan Keuangan" [ref=e118] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/generated-reports
+                  - img [ref=e119]
+                  - generic [ref=e121]: Laporan Keuangan
+          - listitem [ref=e122]:
+            - generic [ref=e123] [cursor=pointer]:
+              - generic [ref=e124]: Pengguna
+              - button "Pengguna" [expanded] [ref=e125]:
+                - img [ref=e126]
+            - list [ref=e128]:
+              - listitem [ref=e129]:
+                - link "Pengguna" [ref=e130] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/users
+                  - img [ref=e131]
+                  - generic [ref=e133]: Pengguna
+          - listitem [ref=e134]:
+            - generic [ref=e135] [cursor=pointer]:
+              - generic [ref=e136]: Staff
+              - button "Staff" [expanded] [ref=e137]:
+                - img [ref=e138]
+            - list [ref=e140]:
+              - listitem [ref=e141]:
+                - link "Staff" [ref=e142] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/staff
+                  - img [ref=e143]
+                  - generic [ref=e145]: Staff
+              - listitem [ref=e146]:
+                - link "Riwayat Login Staff" [ref=e147] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/staff-history
+                  - img [ref=e148]
+                  - generic [ref=e150]: Riwayat Login Staff
+          - listitem [ref=e151]:
+            - generic [ref=e152] [cursor=pointer]:
+              - generic [ref=e153]: Analitik
+              - button "Analitik" [expanded] [ref=e154]:
+                - img [ref=e155]
+            - list [ref=e157]:
+              - listitem [ref=e158]:
+                - link "Klasterisasi Menu Penjualan" [ref=e159] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-menu
+                  - img [ref=e160]
+                  - generic [ref=e162]: Klasterisasi Menu Penjualan
+              - listitem [ref=e163]:
+                - link "Prediksi Menu" [ref=e164] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-menu
+                  - img [ref=e165]
+                  - generic [ref=e167]: Prediksi Menu
+              - listitem [ref=e168]:
+                - link "Asosiatif Menu" [ref=e169] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/asosiatif-menu
+                  - img [ref=e170]
+                  - generic [ref=e172]: Asosiatif Menu
+              - listitem [ref=e173]:
+                - link "Klasterisasi Bahan Baku" [ref=e174] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-bahan-baku
+                  - img [ref=e175]
+                  - generic [ref=e177]: Klasterisasi Bahan Baku
+              - listitem [ref=e178]:
+                - link "Prediksi Bahan Baku" [ref=e179] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-bahan-baku
+                  - img [ref=e180]
+                  - generic [ref=e182]: Prediksi Bahan Baku
+    - main [ref=e184]:
+      - generic [ref=e186]:
+        - heading "Stok Page" [level=1] [ref=e189]
+        - generic [ref=e195]:
+          - tablist "stok" [ref=e196]:
+            - tab "Bahan Baku" [ref=e197] [cursor=pointer]:
+              - img [ref=e198]
+              - generic [ref=e200]: Bahan Baku
+            - tab "Menu" [ref=e201] [cursor=pointer]:
+              - img [ref=e202]
+              - generic [ref=e204]: Menu
+          - option "5"
+          - option "10" [selected]
+          - option "25"
+          - option "50"
+          - tabpanel [ref=e618]:
+            - generic [ref=e623]:
+              - generic [ref=e624]:
+                - generic [ref=e625]:
+                  - navigation [ref=e626]:
+                    - list [ref=e627]:
+                      - listitem [ref=e628]:
+                        - link "Menu Stocks" [ref=e629] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks
+                      - listitem [ref=e630]:
+                        - img [ref=e631]
+                        - generic [ref=e633]: List
+                  - heading "Menu Stocks" [level=1] [ref=e634]
+                - button "New menu stock" [ref=e637] [cursor=pointer]
+              - generic [ref=e645]:
+                - generic [ref=e648]:
+                  - generic [ref=e649]:
+                    - generic [ref=e650]: Search
+                    - generic [ref=e651]:
+                      - img [ref=e653]
+                      - searchbox "Search" [ref=e656]
+                  - button "Filter" [ref=e659] [cursor=pointer]:
+                    - img [ref=e660]
+                    - generic [ref=e663]: "0"
+                - table [ref=e665]:
+                  - rowgroup [ref=e666]:
+                    - row "Select/deselect all items for bulk actions. Menu Unit Batas Stok Total Stok Aktif Mode Actions" [ref=e667]:
+                      - columnheader "Select/deselect all items for bulk actions." [ref=e668]:
+                        - checkbox "Select/deselect all items for bulk actions." [ref=e669]
+                      - columnheader "Menu" [ref=e670]:
+                        - button "Menu" [ref=e671] [cursor=pointer]:
+                          - text: Menu
+                          - img [ref=e672]
+                      - columnheader "Unit" [ref=e674]:
+                        - button "Unit" [ref=e675] [cursor=pointer]:
+                          - text: Unit
+                          - img [ref=e676]
+                      - columnheader "Batas Stok" [ref=e678]:
+                        - button "Batas Stok" [ref=e679] [cursor=pointer]:
+                          - text: Batas Stok
+                          - img [ref=e680]
+                      - columnheader "Total Stok" [ref=e682]
+                      - columnheader "Aktif" [ref=e683]:
+                        - button "Aktif" [ref=e684] [cursor=pointer]:
+                          - text: Aktif
+                          - img [ref=e685]
+                      - columnheader "Mode" [ref=e687]:
+                        - button "Mode" [ref=e688] [cursor=pointer]:
+                          - text: Mode
+                          - img [ref=e689]
+                      - columnheader "Actions" [ref=e691]
+                  - rowgroup [ref=e692]:
+                    - row "Select/deselect item 28 for bulk actions. Cappucino pcs 0.00 pcs 0 pcs fefo Batch Edit Delete" [ref=e693]:
+                      - cell "Select/deselect item 28 for bulk actions." [ref=e694]:
+                        - checkbox "Select/deselect item 28 for bulk actions." [ref=e695]
+                      - cell "Cappucino" [ref=e696]:
+                        - link "Cappucino" [ref=e697] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/28/edit
+                          - generic [ref=e698]: Cappucino
+                      - cell "pcs" [ref=e699]:
+                        - link "pcs" [ref=e700] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/28/edit
+                          - generic [ref=e701]: pcs
+                      - cell "0.00 pcs" [ref=e702]:
+                        - link "0.00 pcs" [ref=e703] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/28/edit
+                          - generic [ref=e704]: 0.00 pcs
+                      - cell "0 pcs" [ref=e705]:
+                        - link "0 pcs" [ref=e706] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/28/edit
+                          - generic [ref=e708]: 0 pcs
+                      - cell [ref=e709]:
+                        - link [ref=e710] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/28/edit
+                          - img [ref=e712]
+                      - cell "fefo" [ref=e714]:
+                        - link "fefo" [ref=e715] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/28/edit
+                          - generic [ref=e717]: fefo
+                      - cell "Batch Edit Delete" [ref=e718]:
+                        - generic [ref=e719]:
+                          - link "Batch" [ref=e720] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/menu-stocks/28/batches
+                            - img [ref=e721]
+                            - text: Batch
+                          - button "Edit" [ref=e723] [cursor=pointer]:
+                            - img [ref=e724]
+                            - text: Edit
+                          - button "Delete" [ref=e727] [cursor=pointer]:
+                            - img [ref=e728]
+                            - text: Delete
+                    - row "Select/deselect item 27 for bulk actions. French Fries pcs 0.00 pcs 0 pcs fefo Batch Edit Delete" [ref=e730]:
+                      - cell "Select/deselect item 27 for bulk actions." [ref=e731]:
+                        - checkbox "Select/deselect item 27 for bulk actions." [ref=e732]
+                      - cell "French Fries" [ref=e733]:
+                        - link "French Fries" [ref=e734] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/27/edit
+                          - generic [ref=e735]: French Fries
+                      - cell "pcs" [ref=e736]:
+                        - link "pcs" [ref=e737] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/27/edit
+                          - generic [ref=e738]: pcs
+                      - cell "0.00 pcs" [ref=e739]:
+                        - link "0.00 pcs" [ref=e740] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/27/edit
+                          - generic [ref=e741]: 0.00 pcs
+                      - cell "0 pcs" [ref=e742]:
+                        - link "0 pcs" [ref=e743] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/27/edit
+                          - generic [ref=e745]: 0 pcs
+                      - cell [ref=e746]:
+                        - link [ref=e747] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/27/edit
+                          - img [ref=e749]
+                      - cell "fefo" [ref=e751]:
+                        - link "fefo" [ref=e752] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/27/edit
+                          - generic [ref=e754]: fefo
+                      - cell "Batch Edit Delete" [ref=e755]:
+                        - generic [ref=e756]:
+                          - link "Batch" [ref=e757] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/menu-stocks/27/batches
+                            - img [ref=e758]
+                            - text: Batch
+                          - button "Edit" [ref=e760] [cursor=pointer]:
+                            - img [ref=e761]
+                            - text: Edit
+                          - button "Delete" [ref=e764] [cursor=pointer]:
+                            - img [ref=e765]
+                            - text: Delete
+                    - row "Select/deselect item 26 for bulk actions. Nasi Goreng pcs 0.00 pcs 0 pcs fefo Batch Edit Delete" [ref=e767]:
+                      - cell "Select/deselect item 26 for bulk actions." [ref=e768]:
+                        - checkbox "Select/deselect item 26 for bulk actions." [ref=e769]
+                      - cell "Nasi Goreng" [ref=e770]:
+                        - link "Nasi Goreng" [ref=e771] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/26/edit
+                          - generic [ref=e772]: Nasi Goreng
+                      - cell "pcs" [ref=e773]:
+                        - link "pcs" [ref=e774] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/26/edit
+                          - generic [ref=e775]: pcs
+                      - cell "0.00 pcs" [ref=e776]:
+                        - link "0.00 pcs" [ref=e777] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/26/edit
+                          - generic [ref=e778]: 0.00 pcs
+                      - cell "0 pcs" [ref=e779]:
+                        - link "0 pcs" [ref=e780] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/26/edit
+                          - generic [ref=e782]: 0 pcs
+                      - cell [ref=e783]:
+                        - link [ref=e784] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/26/edit
+                          - img [ref=e786]
+                      - cell "fefo" [ref=e788]:
+                        - link "fefo" [ref=e789] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/26/edit
+                          - generic [ref=e791]: fefo
+                      - cell "Batch Edit Delete" [ref=e792]:
+                        - generic [ref=e793]:
+                          - link "Batch" [ref=e794] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/menu-stocks/26/batches
+                            - img [ref=e795]
+                            - text: Batch
+                          - button "Edit" [ref=e797] [cursor=pointer]:
+                            - img [ref=e798]
+                            - text: Edit
+                          - button "Delete" [ref=e801] [cursor=pointer]:
+                            - img [ref=e802]
+                            - text: Delete
+                    - row "Select/deselect item 25 for bulk actions. Mie Goreng pcs 0.00 pcs 0 pcs fefo Batch Edit Delete" [ref=e804]:
+                      - cell "Select/deselect item 25 for bulk actions." [ref=e805]:
+                        - checkbox "Select/deselect item 25 for bulk actions." [ref=e806]
+                      - cell "Mie Goreng" [ref=e807]:
+                        - link "Mie Goreng" [ref=e808] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/25/edit
+                          - generic [ref=e809]: Mie Goreng
+                      - cell "pcs" [ref=e810]:
+                        - link "pcs" [ref=e811] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/25/edit
+                          - generic [ref=e812]: pcs
+                      - cell "0.00 pcs" [ref=e813]:
+                        - link "0.00 pcs" [ref=e814] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/25/edit
+                          - generic [ref=e815]: 0.00 pcs
+                      - cell "0 pcs" [ref=e816]:
+                        - link "0 pcs" [ref=e817] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/25/edit
+                          - generic [ref=e819]: 0 pcs
+                      - cell [ref=e820]:
+                        - link [ref=e821] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/25/edit
+                          - img [ref=e823]
+                      - cell "fefo" [ref=e825]:
+                        - link "fefo" [ref=e826] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/25/edit
+                          - generic [ref=e828]: fefo
+                      - cell "Batch Edit Delete" [ref=e829]:
+                        - generic [ref=e830]:
+                          - link "Batch" [ref=e831] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/menu-stocks/25/batches
+                            - img [ref=e832]
+                            - text: Batch
+                          - button "Edit" [ref=e834] [cursor=pointer]:
+                            - img [ref=e835]
+                            - text: Edit
+                          - button "Delete" [ref=e838] [cursor=pointer]:
+                            - img [ref=e839]
+                            - text: Delete
+                    - row "Select/deselect item 24 for bulk actions. Cheesecake pcs 0.00 pcs 0 pcs fefo Batch Edit Delete" [ref=e841]:
+                      - cell "Select/deselect item 24 for bulk actions." [ref=e842]:
+                        - checkbox "Select/deselect item 24 for bulk actions." [ref=e843]
+                      - cell "Cheesecake" [ref=e844]:
+                        - link "Cheesecake" [ref=e845] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/24/edit
+                          - generic [ref=e846]: Cheesecake
+                      - cell "pcs" [ref=e847]:
+                        - link "pcs" [ref=e848] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/24/edit
+                          - generic [ref=e849]: pcs
+                      - cell "0.00 pcs" [ref=e850]:
+                        - link "0.00 pcs" [ref=e851] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/24/edit
+                          - generic [ref=e852]: 0.00 pcs
+                      - cell "0 pcs" [ref=e853]:
+                        - link "0 pcs" [ref=e854] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/24/edit
+                          - generic [ref=e856]: 0 pcs
+                      - cell [ref=e857]:
+                        - link [ref=e858] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/24/edit
+                          - img [ref=e860]
+                      - cell "fefo" [ref=e862]:
+                        - link "fefo" [ref=e863] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/24/edit
+                          - generic [ref=e865]: fefo
+                      - cell "Batch Edit Delete" [ref=e866]:
+                        - generic [ref=e867]:
+                          - link "Batch" [ref=e868] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/menu-stocks/24/batches
+                            - img [ref=e869]
+                            - text: Batch
+                          - button "Edit" [ref=e871] [cursor=pointer]:
+                            - img [ref=e872]
+                            - text: Edit
+                          - button "Delete" [ref=e875] [cursor=pointer]:
+                            - img [ref=e876]
+                            - text: Delete
+                    - row "Select/deselect item 23 for bulk actions. Nasi Ayam Geprek pcs 0.00 pcs 0 pcs fefo Batch Edit Delete" [ref=e878]:
+                      - cell "Select/deselect item 23 for bulk actions." [ref=e879]:
+                        - checkbox "Select/deselect item 23 for bulk actions." [ref=e880]
+                      - cell "Nasi Ayam Geprek" [ref=e881]:
+                        - link "Nasi Ayam Geprek" [ref=e882] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/23/edit
+                          - generic [ref=e883]: Nasi Ayam Geprek
+                      - cell "pcs" [ref=e884]:
+                        - link "pcs" [ref=e885] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/23/edit
+                          - generic [ref=e886]: pcs
+                      - cell "0.00 pcs" [ref=e887]:
+                        - link "0.00 pcs" [ref=e888] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/23/edit
+                          - generic [ref=e889]: 0.00 pcs
+                      - cell "0 pcs" [ref=e890]:
+                        - link "0 pcs" [ref=e891] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/23/edit
+                          - generic [ref=e893]: 0 pcs
+                      - cell [ref=e894]:
+                        - link [ref=e895] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/23/edit
+                          - img [ref=e897]
+                      - cell "fefo" [ref=e899]:
+                        - link "fefo" [ref=e900] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/23/edit
+                          - generic [ref=e902]: fefo
+                      - cell "Batch Edit Delete" [ref=e903]:
+                        - generic [ref=e904]:
+                          - link "Batch" [ref=e905] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/menu-stocks/23/batches
+                            - img [ref=e906]
+                            - text: Batch
+                          - button "Edit" [ref=e908] [cursor=pointer]:
+                            - img [ref=e909]
+                            - text: Edit
+                          - button "Delete" [ref=e912] [cursor=pointer]:
+                            - img [ref=e913]
+                            - text: Delete
+                    - row "Select/deselect item 22 for bulk actions. Nasi Telur Kecap pcs 0.00 pcs 0 pcs fefo Batch Edit Delete" [ref=e915]:
+                      - cell "Select/deselect item 22 for bulk actions." [ref=e916]:
+                        - checkbox "Select/deselect item 22 for bulk actions." [ref=e917]
+                      - cell "Nasi Telur Kecap" [ref=e918]:
+                        - link "Nasi Telur Kecap" [ref=e919] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/22/edit
+                          - generic [ref=e920]: Nasi Telur Kecap
+                      - cell "pcs" [ref=e921]:
+                        - link "pcs" [ref=e922] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/22/edit
+                          - generic [ref=e923]: pcs
+                      - cell "0.00 pcs" [ref=e924]:
+                        - link "0.00 pcs" [ref=e925] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/22/edit
+                          - generic [ref=e926]: 0.00 pcs
+                      - cell "0 pcs" [ref=e927]:
+                        - link "0 pcs" [ref=e928] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/22/edit
+                          - generic [ref=e930]: 0 pcs
+                      - cell [ref=e931]:
+                        - link [ref=e932] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/22/edit
+                          - img [ref=e934]
+                      - cell "fefo" [ref=e936]:
+                        - link "fefo" [ref=e937] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/22/edit
+                          - generic [ref=e939]: fefo
+                      - cell "Batch Edit Delete" [ref=e940]:
+                        - generic [ref=e941]:
+                          - link "Batch" [ref=e942] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/menu-stocks/22/batches
+                            - img [ref=e943]
+                            - text: Batch
+                          - button "Edit" [ref=e945] [cursor=pointer]:
+                            - img [ref=e946]
+                            - text: Edit
+                          - button "Delete" [ref=e949] [cursor=pointer]:
+                            - img [ref=e950]
+                            - text: Delete
+                    - row "Select/deselect item 21 for bulk actions. Nasi Telur Saus pcs 0.00 pcs 0 pcs fefo Batch Edit Delete" [ref=e952]:
+                      - cell "Select/deselect item 21 for bulk actions." [ref=e953]:
+                        - checkbox "Select/deselect item 21 for bulk actions." [ref=e954]
+                      - cell "Nasi Telur Saus" [ref=e955]:
+                        - link "Nasi Telur Saus" [ref=e956] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/21/edit
+                          - generic [ref=e957]: Nasi Telur Saus
+                      - cell "pcs" [ref=e958]:
+                        - link "pcs" [ref=e959] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/21/edit
+                          - generic [ref=e960]: pcs
+                      - cell "0.00 pcs" [ref=e961]:
+                        - link "0.00 pcs" [ref=e962] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/21/edit
+                          - generic [ref=e963]: 0.00 pcs
+                      - cell "0 pcs" [ref=e964]:
+                        - link "0 pcs" [ref=e965] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/21/edit
+                          - generic [ref=e967]: 0 pcs
+                      - cell [ref=e968]:
+                        - link [ref=e969] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/21/edit
+                          - img [ref=e971]
+                      - cell "fefo" [ref=e973]:
+                        - link "fefo" [ref=e974] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/21/edit
+                          - generic [ref=e976]: fefo
+                      - cell "Batch Edit Delete" [ref=e977]:
+                        - generic [ref=e978]:
+                          - link "Batch" [ref=e979] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/menu-stocks/21/batches
+                            - img [ref=e980]
+                            - text: Batch
+                          - button "Edit" [ref=e982] [cursor=pointer]:
+                            - img [ref=e983]
+                            - text: Edit
+                          - button "Delete" [ref=e986] [cursor=pointer]:
+                            - img [ref=e987]
+                            - text: Delete
+                    - row "Select/deselect item 20 for bulk actions. Nasgor Ayam/Udang pcs 0.00 pcs 0 pcs fefo Batch Edit Delete" [ref=e989]:
+                      - cell "Select/deselect item 20 for bulk actions." [ref=e990]:
+                        - checkbox "Select/deselect item 20 for bulk actions." [ref=e991]
+                      - cell "Nasgor Ayam/Udang" [ref=e992]:
+                        - link "Nasgor Ayam/Udang" [ref=e993] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/20/edit
+                          - generic [ref=e994]: Nasgor Ayam/Udang
+                      - cell "pcs" [ref=e995]:
+                        - link "pcs" [ref=e996] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/20/edit
+                          - generic [ref=e997]: pcs
+                      - cell "0.00 pcs" [ref=e998]:
+                        - link "0.00 pcs" [ref=e999] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/20/edit
+                          - generic [ref=e1000]: 0.00 pcs
+                      - cell "0 pcs" [ref=e1001]:
+                        - link "0 pcs" [ref=e1002] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/20/edit
+                          - generic [ref=e1004]: 0 pcs
+                      - cell [ref=e1005]:
+                        - link [ref=e1006] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/20/edit
+                          - img [ref=e1008]
+                      - cell "fefo" [ref=e1010]:
+                        - link "fefo" [ref=e1011] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/20/edit
+                          - generic [ref=e1013]: fefo
+                      - cell "Batch Edit Delete" [ref=e1014]:
+                        - generic [ref=e1015]:
+                          - link "Batch" [ref=e1016] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/menu-stocks/20/batches
+                            - img [ref=e1017]
+                            - text: Batch
+                          - button "Edit" [ref=e1019] [cursor=pointer]:
+                            - img [ref=e1020]
+                            - text: Edit
+                          - button "Delete" [ref=e1023] [cursor=pointer]:
+                            - img [ref=e1024]
+                            - text: Delete
+                    - row "Select/deselect item 19 for bulk actions. Nasgor Telur pcs 0.00 pcs 0 pcs fefo Batch Edit Delete" [ref=e1026]:
+                      - cell "Select/deselect item 19 for bulk actions." [ref=e1027]:
+                        - checkbox "Select/deselect item 19 for bulk actions." [ref=e1028]
+                      - cell "Nasgor Telur" [ref=e1029]:
+                        - link "Nasgor Telur" [ref=e1030] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/19/edit
+                          - generic [ref=e1031]: Nasgor Telur
+                      - cell "pcs" [ref=e1032]:
+                        - link "pcs" [ref=e1033] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/19/edit
+                          - generic [ref=e1034]: pcs
+                      - cell "0.00 pcs" [ref=e1035]:
+                        - link "0.00 pcs" [ref=e1036] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/19/edit
+                          - generic [ref=e1037]: 0.00 pcs
+                      - cell "0 pcs" [ref=e1038]:
+                        - link "0 pcs" [ref=e1039] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/19/edit
+                          - generic [ref=e1041]: 0 pcs
+                      - cell [ref=e1042]:
+                        - link [ref=e1043] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/19/edit
+                          - img [ref=e1045]
+                      - cell "fefo" [ref=e1047]:
+                        - link "fefo" [ref=e1048] [cursor=pointer]:
+                          - /url: http://localhost:8081/admin/menu-stocks/19/edit
+                          - generic [ref=e1050]: fefo
+                      - cell "Batch Edit Delete" [ref=e1051]:
+                        - generic [ref=e1052]:
+                          - link "Batch" [ref=e1053] [cursor=pointer]:
+                            - /url: http://localhost:8081/admin/menu-stocks/19/batches
+                            - img [ref=e1054]
+                            - text: Batch
+                          - button "Edit" [ref=e1056] [cursor=pointer]:
+                            - img [ref=e1057]
+                            - text: Edit
+                          - button "Delete" [ref=e1060] [cursor=pointer]:
+                            - img [ref=e1061]
+                            - text: Delete
+                - navigation "Pagination navigation" [ref=e1063]:
+                  - generic [ref=e1066]:
+                    - generic [ref=e1068]: Per page
+                    - combobox "Per page" [ref=e1070]:
+                      - option "5"
+                      - option "10" [selected]
+                      - option "25"
+                      - option "50"
+                  - button "Next" [ref=e1071] [cursor=pointer]
+  - generic:
+    - status:
+      - generic [ref=e1072]:
+        - img [ref=e1073]
+        - generic [ref=e1076]:
+          - heading "Error while loading page" [level=3] [ref=e1077]
+          - generic [ref=e1078]: There was an error while attempting to load this page. Please try again later.
+        - button [ref=e1079] [cursor=pointer]:
+          - img [ref=e1080]

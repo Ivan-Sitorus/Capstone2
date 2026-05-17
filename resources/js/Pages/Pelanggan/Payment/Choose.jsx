@@ -249,7 +249,7 @@ export default function PaymentChoose({ order, items, table_number, qrisImage })
                         </div>
 
                         <button
-                            onClick={() => router.visit(`/receipt/${order.order_code}`)}
+                            onClick={() => router.visit(`/struk-pesanan/${order.uuid}`)}
                             className="w-full h-[46px] bg-transparent border border-muted-foreground/30 rounded-[14px] text-[14px] font-semibold cursor-pointer text-muted-foreground"
                         >
                             Lihat Struk Digital

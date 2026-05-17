@@ -1,0 +1,285 @@
+- generic [active] [ref=e380]:
+  - navigation [ref=e382]:
+    - generic [ref=e383]:
+      - button "Collapse sidebar" [ref=e385] [cursor=pointer]:
+        - img [ref=e386]
+      - link "W9 Cafe — Admin" [ref=e388] [cursor=pointer]:
+        - /url: http://localhost:8081/admin
+        - generic [ref=e389]: W9 Cafe — Admin
+    - button "User menu" [ref=e14] [cursor=pointer]:
+      - img "Avatar of Admin W9" [ref=e15]
+  - generic [ref=e390]:
+    - complementary [ref=e392]:
+      - navigation [ref=e393]:
+        - list [ref=e394]:
+          - listitem [ref=e395]:
+            - list [ref=e396]:
+              - listitem [ref=e397]:
+                - link "Dashboard" [ref=e398] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin
+                  - img [ref=e399]
+                  - generic [ref=e401]: Dashboard
+          - listitem [ref=e402]:
+            - generic [ref=e403] [cursor=pointer]:
+              - generic [ref=e404]: Inventory
+              - button "Inventory" [expanded] [ref=e405]:
+                - img [ref=e406]
+            - list [ref=e408]:
+              - listitem [ref=e409]:
+                - link "Ingredients" [ref=e410] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/ingredients
+                  - img [ref=e411]
+                  - generic [ref=e413]: Ingredients
+              - listitem [ref=e414]:
+                - link "Stock Adjustments" [ref=e415] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/stock-adjustments
+                  - img [ref=e416]
+                  - generic [ref=e418]: Stock Adjustments
+              - listitem [ref=e419]:
+                - link "Pemakaian Bahan Harian" [ref=e420] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/daily-ingredient-usages
+                  - img [ref=e421]
+                  - generic [ref=e423]: Pemakaian Bahan Harian
+          - listitem [ref=e424]:
+            - generic [ref=e425] [cursor=pointer]:
+              - generic [ref=e426]: Data Master
+              - button "Data Master" [expanded] [ref=e427]:
+                - img [ref=e428]
+            - list [ref=e430]:
+              - listitem [ref=e431]:
+                - link "Menu" [ref=e432] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/menus
+                  - img [ref=e433]
+                  - generic [ref=e435]: Menu
+              - listitem [ref=e436]:
+                - link "Kategori" [ref=e437] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/categories
+                  - img [ref=e438]
+                  - generic [ref=e441]: Kategori
+              - listitem [ref=e442]:
+                - link "Meja Cafe" [ref=e443] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/cafe-tables
+                  - img [ref=e444]
+                  - generic [ref=e446]: Meja Cafe
+          - listitem [ref=e447]:
+            - generic [ref=e448] [cursor=pointer]:
+              - generic [ref=e449]: Transaksi
+              - button "Transaksi" [expanded] [ref=e450]:
+                - img [ref=e451]
+            - list [ref=e453]:
+              - listitem [ref=e454]:
+                - link "Pesanan 4" [ref=e455] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/orders
+                  - img [ref=e456]
+                  - generic [ref=e458]: Pesanan
+                  - generic [ref=e462]: "4"
+              - listitem [ref=e463]:
+                - link "Promotions" [ref=e464] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/promotions
+                  - img [ref=e465]
+                  - generic [ref=e467]: Promotions
+              - listitem [ref=e468]:
+                - link "Piutang" [ref=e469] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/receivables
+                  - img [ref=e470]
+                  - generic [ref=e472]: Piutang
+          - listitem [ref=e473]:
+            - generic [ref=e474] [cursor=pointer]:
+              - generic [ref=e475]: Keuangan
+              - button "Keuangan" [expanded] [ref=e476]:
+                - img [ref=e477]
+            - list [ref=e479]:
+              - listitem [ref=e480]:
+                - link "Pemasukan & Pengeluaran" [ref=e481] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/unexpected-transactions
+                  - img [ref=e482]
+                  - generic [ref=e484]: Pemasukan & Pengeluaran
+              - listitem [ref=e485]:
+                - link "Laporan Keuangan" [ref=e486] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/generated-reports
+                  - img [ref=e487]
+                  - generic [ref=e489]: Laporan Keuangan
+          - listitem [ref=e490]:
+            - generic [ref=e491] [cursor=pointer]:
+              - generic [ref=e492]: Pengguna
+              - button "Pengguna" [expanded] [ref=e493]:
+                - img [ref=e494]
+            - list [ref=e496]:
+              - listitem [ref=e497]:
+                - link "Pengguna" [ref=e498] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/users
+                  - img [ref=e499]
+                  - generic [ref=e501]: Pengguna
+              - listitem [ref=e502]:
+                - link "Riwayat Login Staff" [ref=e503] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/staff-history
+                  - img [ref=e504]
+                  - generic [ref=e506]: Riwayat Login Staff
+          - listitem [ref=e507]:
+            - generic [ref=e508] [cursor=pointer]:
+              - generic [ref=e509]: Analitik
+              - button "Analitik" [expanded] [ref=e510]:
+                - img [ref=e511]
+            - list [ref=e513]:
+              - listitem [ref=e514]:
+                - link "Klasterisasi Menu Penjualan" [ref=e515] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-menu
+                  - img [ref=e516]
+                  - generic [ref=e518]: Klasterisasi Menu Penjualan
+              - listitem [ref=e519]:
+                - link "Prediksi Menu" [ref=e520] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-menu
+                  - img [ref=e521]
+                  - generic [ref=e523]: Prediksi Menu
+              - listitem [ref=e524]:
+                - link "Asosiatif Menu" [ref=e525] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/asosiatif-menu
+                  - img [ref=e526]
+                  - generic [ref=e528]: Asosiatif Menu
+              - listitem [ref=e529]:
+                - link "Klasterisasi Bahan Baku" [ref=e530] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/klasterisasi-bahan-baku
+                  - img [ref=e531]
+                  - generic [ref=e533]: Klasterisasi Bahan Baku
+              - listitem [ref=e534]:
+                - link "Prediksi Bahan Baku" [ref=e535] [cursor=pointer]:
+                  - /url: http://localhost:8081/admin/prediksi-bahan-baku
+                  - img [ref=e536]
+                  - generic [ref=e538]: Prediksi Bahan Baku
+    - main [ref=e540]:
+      - generic [ref=e542]:
+        - generic [ref=e543]:
+          - generic [ref=e544]:
+            - navigation [ref=e545]:
+              - list [ref=e546]:
+                - listitem [ref=e547]:
+                  - link "Laporan Keuangan" [ref=e548] [cursor=pointer]:
+                    - /url: http://localhost:8081/admin/generated-reports
+                - listitem [ref=e549]:
+                  - img [ref=e550]
+                  - generic [ref=e552]: hhhhhhhhh
+            - heading "hhhhhhhhh" [level=1] [ref=e553]
+          - generic [ref=e555]:
+            - link "Unduh PDF" [ref=e556] [cursor=pointer]:
+              - /url: http://localhost:8081/admin/view-report/7/download-pdf
+              - img [ref=e557]
+              - text: Unduh PDF
+            - link "Unduh Excel" [ref=e559] [cursor=pointer]:
+              - /url: http://localhost:8081/admin/view-report/7/download-excel
+              - img [ref=e560]
+              - text: Unduh Excel
+            - link "Unduh CSV" [ref=e562] [cursor=pointer]:
+              - /url: http://localhost:8081/admin/view-report/7/download-csv
+              - img [ref=e563]
+              - text: Unduh CSV
+        - generic [ref=e567]:
+          - paragraph [ref=e568]: "Periode: 16 Apr → 16 May 2026"
+          - generic [ref=e570]:
+            - generic [ref=e571]:
+              - button "Ekspor CSV" [ref=e572] [cursor=pointer]:
+                - img [ref=e573]
+                - text: Ekspor CSV
+              - button "Ekspor Excel" [ref=e576] [cursor=pointer]:
+                - img [ref=e577]
+                - text: Ekspor Excel
+              - generic [ref=e580]: 6 baris
+            - generic [ref=e582]:
+              - grid [ref=e584]:
+                - rowgroup [ref=e585]:
+                  - row "Akun" [ref=e586]:
+                    - columnheader "Akun" [ref=e587]:
+                      - generic [ref=e589] [cursor=pointer]: 
+                      - generic [ref=e590] [cursor=pointer]: Akun
+                      - generic:      
+                - rowgroup [ref=e591]:
+                  - row "Column with Header Selection  Tanggal Tipe Jumlah Saldo Berjalan" [ref=e592]:
+                    - columnheader "Column with Header Selection " [ref=e593]:
+                      - checkbox "Column with Header Selection" [ref=e594] [cursor=pointer]
+                      - text: 
+                      - text: 
+                      - generic: 
+                    - columnheader "Tanggal" [ref=e595]:
+                      - generic [ref=e597] [cursor=pointer]: 
+                      - generic [ref=e598] [cursor=pointer]: Tanggal
+                      - generic:      
+                    - columnheader "Tipe" [ref=e599]:
+                      - generic [ref=e601] [cursor=pointer]: 
+                      - generic [ref=e602] [cursor=pointer]: Tipe
+                      - generic:      
+                    - columnheader "Jumlah" [ref=e603]:
+                      - generic [ref=e605] [cursor=pointer]: 
+                      - generic [ref=e606] [cursor=pointer]: Jumlah
+                      - generic:      
+                    - columnheader "Saldo Berjalan" [ref=e607]:
+                      - generic [ref=e609] [cursor=pointer]: 
+                      - generic [ref=e610] [cursor=pointer]: Saldo Berjalan
+                      - generic:      
+                - rowgroup [ref=e611]:
+                  - row "cash" [ref=e612]:
+                    - gridcell "cash" [ref=e613]
+                  - row "qris" [ref=e614]:
+                    - gridcell "qris" [ref=e615]
+                  - row "unexpected_income" [ref=e616]:
+                    - gridcell "unexpected_income" [ref=e617]
+                  - row "ingredient_purchase" [ref=e618]:
+                    - gridcell "ingredient_purchase" [ref=e619]
+                  - row "unexpected_expense" [ref=e620]:
+                    - gridcell "unexpected_expense" [ref=e621]
+                  - row "Net" [ref=e622]:
+                    - gridcell "Net" [ref=e623]
+                - rowgroup [ref=e624]:
+                  - row "Press Space to toggle row selection (unchecked)  - Income Rp 25.000 Rp 0" [ref=e625]:
+                    - gridcell "Press Space to toggle row selection (unchecked) " [ref=e626]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e627] [cursor=pointer]
+                      - text: 
+                    - gridcell "-" [ref=e628]
+                    - gridcell "Income" [ref=e629]
+                    - gridcell "Rp 25.000" [ref=e630]
+                    - gridcell "Rp 0" [ref=e631]
+                  - row "Press Space to toggle row selection (unchecked)  - Income Rp 16.000 Rp 0" [ref=e632]:
+                    - gridcell "Press Space to toggle row selection (unchecked) " [ref=e633]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e634] [cursor=pointer]
+                      - text: 
+                    - gridcell "-" [ref=e635]
+                    - gridcell "Income" [ref=e636]
+                    - gridcell "Rp 16.000" [ref=e637]
+                    - gridcell "Rp 0" [ref=e638]
+                  - row "Press Space to toggle row selection (unchecked)  - Income Rp 222.222.221 Rp 0" [ref=e639]:
+                    - gridcell "Press Space to toggle row selection (unchecked) " [ref=e640]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e641] [cursor=pointer]
+                      - text: 
+                    - gridcell "-" [ref=e642]
+                    - gridcell "Income" [ref=e643]
+                    - gridcell "Rp 222.222.221" [ref=e644]
+                    - gridcell "Rp 0" [ref=e645]
+                  - row "Press Space to toggle row selection (unchecked)  - Expense Rp 0 Rp 0" [ref=e646]:
+                    - gridcell "Press Space to toggle row selection (unchecked) " [ref=e647]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e648] [cursor=pointer]
+                      - text: 
+                    - gridcell "-" [ref=e649]
+                    - gridcell "Expense" [ref=e650]
+                    - gridcell "Rp 0" [ref=e651]
+                    - gridcell "Rp 0" [ref=e652]
+                  - row "Press Space to toggle row selection (unchecked)  - Expense Rp 2.222.212 Rp 0" [ref=e653]:
+                    - gridcell "Press Space to toggle row selection (unchecked) " [ref=e654]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e655] [cursor=pointer]
+                      - text: 
+                    - gridcell "-" [ref=e656]
+                    - gridcell "Expense" [ref=e657]
+                    - gridcell "Rp 2.222.212" [ref=e658]
+                    - gridcell "Rp 0" [ref=e659]
+                  - row "Press Space to toggle row selection (unchecked)  - GrandTotal Rp 220.041.009 Rp 0" [ref=e660]:
+                    - gridcell "Press Space to toggle row selection (unchecked) " [ref=e661]:
+                      - checkbox "Press Space to toggle row selection (unchecked)" [ref=e662] [cursor=pointer]
+                      - text: 
+                    - gridcell "-" [ref=e663]
+                    - gridcell "GrandTotal" [ref=e664]
+                    - gridcell "Rp 220.041.009" [ref=e665]
+                    - gridcell "Rp 0" [ref=e666]
+                - rowgroup
+                - rowgroup
+                - rowgroup
+                - rowgroup
+              - text:     
+  - generic:
+    - status

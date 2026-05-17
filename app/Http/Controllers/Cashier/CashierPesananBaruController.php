@@ -23,12 +23,43 @@ class CashierPesananBaruController extends Controller
     {
         // Cache 5 menit — menu jarang berubah, admin bisa clear cache jika update menu
         $categories = Cache::remember('menu_categories_active', 300, fn () => Category::with([
-            'menus' => fn ($q) => $q->where('is_available', true)->orderBy('name'),
+            'menus' => fn ($q) => $q->where('is_available', true)
+                ->with(['menuStock.batches', 'menuIngredients.ingredient.batches'])
+                ->orderBy('name'),
         ])
             ->where('is_active', true)
             ->orderBy('name')
             ->get()
         );
+
+        // Compute stock per menu (tidak di-cache agar stok real-time)
+        $categories->each(function ($category) {
+            $category->menus->each(function ($menu) {
+                if ($menu->menuIngredients->isNotEmpty()) {
+                    // Recipe-based: find bottleneck ingredient
+                    $stock = PHP_INT_MAX;
+                    foreach ($menu->menuIngredients as $mi) {
+                        $ingredient = $mi->ingredient;
+                        if (! $ingredient) {
+                            continue;
+                        }
+                        $ingredientStock = (float) $ingredient->batches->sum('quantity');
+                        $needed = (float) $mi->quantity_used;
+                        if ($needed <= 0) {
+                            continue;
+                        }
+                        $possible = (int) floor($ingredientStock / $needed);
+                        $stock = min($stock, $possible);
+                    }
+                    $menu->stock = $stock;
+                } else {
+                    // No recipe: use direct MenuStock total
+                    $menu->stock = $menu->menuStock
+                        ? (float) $menu->menuStock->batches->sum('quantity')
+                        : PHP_INT_MAX;
+                }
+            });
+        });
 
         return Inertia::render('Kasir/PesananBaru', compact('categories'));
     }
