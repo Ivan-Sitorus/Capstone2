@@ -48,6 +48,29 @@ export default function PesananBaru({ categories, promotions }) {
         return () => window.removeEventListener('resize', onResize);
     }, []);
 
+    // ── Real-time stock updates (Echo + polling) ──
+    useEffect(() => {
+        const reload = () => {
+            if (showPayModal) return;
+            if (document.visibilityState !== 'visible') return;
+            router.reload({ only: ['categories'], preserveState: true, preserveScroll: true });
+        };
+
+        if (window.Echo) {
+            window.Echo.channel('stock').listen('.StockUpdated', reload);
+        }
+
+        const id = setInterval(reload, 5_000);
+        const onVisible = () => { if (document.visibilityState === 'visible') reload(); };
+        document.addEventListener('visibilitychange', onVisible);
+
+        return () => {
+            if (window.Echo) window.Echo.leaveChannel('stock');
+            clearInterval(id);
+            document.removeEventListener('visibilitychange', onVisible);
+        };
+    }, [showPayModal]);
+
     const allMenus = useMemo(
         () => categories.flatMap(c => c.menus.map(m => ({ ...m, category: { name: c.name } }))),
         [categories]
