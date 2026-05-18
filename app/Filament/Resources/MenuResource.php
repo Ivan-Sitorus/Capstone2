@@ -43,6 +43,8 @@ class MenuResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    protected static bool $shouldRegisterNavigation = false;
+
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
@@ -81,7 +83,6 @@ class MenuResource extends Resource
                 ->label('Gambar Menu')
                 ->directory('menus/')
                 ->disk('public')
-                ->fetchFileInformation(false)
                 ->imagePreviewHeight('200')
                 ->placeholder('Pilih gambar...')
                 ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])

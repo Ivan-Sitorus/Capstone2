@@ -20,6 +20,8 @@ class StokPage extends Page
 
     protected static ?int $navigationSort = 1;
 
+    protected static ?string $title = 'Stok';
+
     protected string $view = 'filament.pages.stok';
 
     protected static ?string $slug = 'stok';

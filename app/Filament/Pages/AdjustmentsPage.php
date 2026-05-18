@@ -20,6 +20,8 @@ class AdjustmentsPage extends Page
 
     protected static ?int $navigationSort = 3;
 
+    protected static ?string $title = 'Penyesuaian Stok';
+
     protected string $view = 'filament.pages.adjustments';
 
     public function content(Schema $schema): Schema
