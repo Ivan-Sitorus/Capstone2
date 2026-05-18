@@ -41,12 +41,12 @@ class ReceiptSettingsPage extends Page implements HasForms
             'cafe_name' => Setting::get('cafe_name', 'W9 Cafe'),
             'cafe_address' => Setting::get('cafe_address', 'STIE Totalwin Semarang'),
             'cafe_phone' => Setting::get('cafe_phone', ''),
-            'receipt_logo' => Setting::get('receipt_logo', ''),
+            'receipt_logo' => Setting::get('receipt_logo') ?: null,
             'receipt_footer' => Setting::get('receipt_footer', 'Terima kasih telah berbelanja'),
             'receipt_show_npwp' => Setting::get('receipt_show_npwp', '0') === '1',
             'receipt_npwp' => Setting::get('receipt_npwp', ''),
             'receipt_whatsapp_template' => Setting::get('receipt_whatsapp_template', "Halo %s,\n\nTerima kasih telah memesan:\n%s\n\nSilakan ditunggu."),
-            'qris_image' => Setting::get('qris_image', ''),
+            'qris_image' => Setting::get('qris_image') ?: null,
         ]);
 
         $this->previewData = $this->data;
@@ -72,7 +72,8 @@ class ReceiptSettingsPage extends Page implements HasForms
                     ->label('Logo Struk')
                     ->image()
                     ->maxSize(5120)
-                    ->directory('receipts'),
+                    ->directory('receipts')
+                    ->default(fn () => Setting::get('receipt_logo') ?: null),
                 Textarea::make('receipt_footer')
                     ->label('Footer Struk')
                     ->rows(3)
@@ -90,7 +91,8 @@ class ReceiptSettingsPage extends Page implements HasForms
                     ->label('Gambar QRIS')
                     ->image()
                     ->maxSize(5120)
-                    ->directory('qris'),
+                    ->directory('qris')
+                    ->default(fn () => Setting::get('qris_image') ?: null),
             ])
             ->statePath('data');
     }
