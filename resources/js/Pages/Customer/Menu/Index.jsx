@@ -278,6 +278,7 @@ export default function CustomerMenu({ categories, table }) {
             {/* Wallpaper */}
             <div className="w9-wallpaper" aria-hidden="true">
                 <img src="/images/wallpaper-menu.jpg" alt=""
+                    fetchPriority="high" loading="eager"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
                 />
             </div>

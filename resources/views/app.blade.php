@@ -7,7 +7,8 @@
     <link rel="manifest" href="/manifest.json" fetchpriority="low">
     <meta name="theme-color" content="#E8692A">
     <title>W9 Cafe POS</title>
-    <link rel="preload" as="image" href="/images/logo.jpg" fetchpriority="high">
+    <link rel="preload" as="image" href="/images/wallpaper-menu.jpg" fetchpriority="high">
+    <link rel="preload" as="image" href="/images/logo.jpg" fetchpriority="low">
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     @routes

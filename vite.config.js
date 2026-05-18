@@ -13,7 +13,7 @@ export default defineConfig({
             output: {
                 manualChunks: {
                     // React + Inertia — core runtime, jarang berubah
-                    vendor: ['react', 'react-dom', '@inertiajs/react'],
+                    vendor: ['react', 'react-dom', '@inertiajs/react', 'axios'],
                     // State management — pisah agar bisa cache terpisah
                     store: ['zustand'],
                     // Icons — besar, jarang berubah
