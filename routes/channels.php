@@ -9,3 +9,6 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
 // Public channel — no auth needed for kasir order badge
 // (Kasir already behind auth middleware in web.php)
 Broadcast::channel('orders', fn () => true);
+
+// Public channel — stock updates for menu availability
+Broadcast::channel('stock', fn () => true);

@@ -208,7 +208,7 @@ export default function PesananBaru({ categories, promotions }) {
                             style={{ gridTemplateColumns: menuGridColumns }}
                         >
                             {filteredMenus.map(menu => (
-                                <SharedMenuItem key={menu.id} menu={menu} onAdd={cashierAddItem} variant="cashier" />
+                                <SharedMenuItem key={menu.id} menu={menu} onAdd={cashierAddItem} variant="cashier" stock={menu.stock} />
                             ))}
                         </div>
                     )}

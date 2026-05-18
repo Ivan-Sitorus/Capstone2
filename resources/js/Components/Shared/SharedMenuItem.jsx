@@ -6,14 +6,17 @@ import { cn } from '@/lib/utils';
 
 export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCart = false, quantity = 0, onIncrement, onDecrement, stock }) {
     const isCustomer = variant === 'customer';
-    const isOutOfStock = stock !== undefined && stock <= 0;
+    const isAdminDisabled = menu.is_available === false;
+    const isUnlimitedStock = stock !== undefined && stock >= 999999;
+    const isStockOut = !isUnlimitedStock && stock !== undefined && stock <= 0;
+    const isUnavailable = isAdminDisabled || isStockOut;
 
     const displayPrice = menu.is_student_discount && menu.student_price
         ? Number(menu.student_price)
         : Number(menu.price);
 
     const handleAdd = (e) => {
-        if (isOutOfStock) return;
+        if (isUnavailable) return;
         onAdd(menu);
     };
 
@@ -24,11 +27,16 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
                 'cursor-pointer transition-all duration-150 select-none relative',
                 'hover:shadow-md hover:-translate-y-0.5',
                 isCustomer && 'overflow-hidden rounded-[18px]',
-                isOutOfStock && 'opacity-70 pointer-events-none',
+                isUnavailable && 'opacity-70 pointer-events-none',
             )}
             onClick={(e) => { e.stopPropagation(); handleAdd(e); }}
         >
-            {isOutOfStock && (
+            {isAdminDisabled && (
+                <span className="absolute top-2 right-2 z-10 bg-gray-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
+                    Tidak Tersedia
+                </span>
+            )}
+            {isStockOut && (
                 <span className="absolute top-2 right-2 z-10 bg-red-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
                     Stok Habis
                 </span>
@@ -111,11 +119,11 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
                             size="sm"
                             className="w-full mt-1.5 rounded-[14px] min-h-[44px] gap-1.5 text-xs font-bold"
                             style={{ background: 'var(--orange-primary)', color: 'white' }}
-                            disabled={isOutOfStock}
+                            disabled={isUnavailable}
                             onClick={(e) => { e.stopPropagation(); handleAdd(e); }}
                         >
                             <Plus size={14} />
-                            {isOutOfStock ? 'Stok Habis' : 'Tambah'}
+                            {isAdminDisabled ? 'Tidak Tersedia' : isStockOut ? 'Stok Habis' : 'Tambah'}
                         </Button>
                     )
                 )}
@@ -126,11 +134,11 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
                     <Button
                         variant="ghost"
                         size="sm"
-                        className={cn('w-full', isOutOfStock ? 'text-red-500 cursor-not-allowed' : 'text-primary')}
-                        disabled={isOutOfStock}
+                        className={cn('w-full', isUnavailable ? 'text-red-500 cursor-not-allowed' : 'text-primary')}
+                        disabled={isUnavailable}
                         onClick={(e) => { e.stopPropagation(); handleAdd(e); }}
                     >
-                        {isOutOfStock ? 'Stok Habis' : '+ Tambah'}
+                        {isAdminDisabled ? 'Tidak Tersedia' : isStockOut ? 'Stok Habis' : '+ Tambah'}
                     </Button>
                 </div>
             )}
