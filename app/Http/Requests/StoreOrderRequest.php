@@ -34,4 +34,20 @@ class StoreOrderRequest extends FormRequest
             'items.*.quantity.min' => 'Jumlah item minimal 1.',
         ];
     }
+
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $result = app(\App\Services\InventoryService::class)
+                ->canFulfillOrder($this->input('items'));
+
+            if (!$result['can_fulfill']) {
+                foreach ($result['insufficient_ingredients'] as $item) {
+                    $name = $item['menu_name'] ?? $item['ingredient_name'] ?? 'Unknown';
+                    $message = "Stok '{$name}' tidak mencukupi. Dibutuhkan: {$item['required']}, Tersedia: {$item['available']}";
+                    $validator->errors()->add('items', $message);
+                }
+            }
+        });
+    }
 }

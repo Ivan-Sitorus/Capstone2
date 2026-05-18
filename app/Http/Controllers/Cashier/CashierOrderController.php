@@ -63,6 +63,18 @@ class CashierOrderController extends Controller
             return response()->json(['message' => 'Pesanan belum lunas. Konfirmasi pembayaran terlebih dahulu.'], 409);
         }
 
+        if ($request->status === Order::STATUS_DIPROSES) {
+            $order->load('items.menu');
+            $items = $order->items->map(fn($i) => ['menu_id' => $i->menu_id, 'quantity' => $i->quantity])->toArray();
+            $fulfillment = $inventoryService->canFulfillOrder($items);
+
+            if (! $fulfillment['can_fulfill']) {
+                $first = $fulfillment['insufficient_ingredients'][0];
+                $name = $first['ingredient_name'] ?? $first['menu_name'] ?? 'item';
+                return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
+            }
+        }
+
         DB::transaction(function () use ($request, $order, $inventoryService) {
             $order->update(['status' => $request->status, 'cashier_id' => Auth::id()]);
 
@@ -99,6 +111,16 @@ class CashierOrderController extends Controller
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
 
+        $order->load('items.menu');
+        $items = $order->items->map(fn($i) => ['menu_id' => $i->menu_id, 'quantity' => $i->quantity])->toArray();
+        $fulfillment = $inventoryService->canFulfillOrder($items);
+
+        if (! $fulfillment['can_fulfill']) {
+            $first = $fulfillment['insufficient_ingredients'][0];
+            $name = $first['ingredient_name'] ?? $first['menu_name'] ?? 'item';
+            return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
+        }
+
         DB::transaction(function () use ($order, $inventoryService) {
             $order->update([
                 'status' => Order::STATUS_DIPROSES,
@@ -117,6 +139,16 @@ class CashierOrderController extends Controller
     {
         if ($order->status !== Order::STATUS_PENDING || $order->payment_method !== 'qris') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
+        }
+
+        $order->load('items.menu');
+        $items = $order->items->map(fn($i) => ['menu_id' => $i->menu_id, 'quantity' => $i->quantity])->toArray();
+        $fulfillment = $inventoryService->canFulfillOrder($items);
+
+        if (! $fulfillment['can_fulfill']) {
+            $first = $fulfillment['insufficient_ingredients'][0];
+            $name = $first['ingredient_name'] ?? $first['menu_name'] ?? 'item';
+            return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
         }
 
         DB::transaction(function () use ($order, $inventoryService) {
@@ -169,6 +201,16 @@ class CashierOrderController extends Controller
     {
         if ($order->qris_status !== 'proof_submitted') {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
+        }
+
+        $order->load('items.menu');
+        $items = $order->items->map(fn($i) => ['menu_id' => $i->menu_id, 'quantity' => $i->quantity])->toArray();
+        $fulfillment = $inventoryService->canFulfillOrder($items);
+
+        if (! $fulfillment['can_fulfill']) {
+            $first = $fulfillment['insufficient_ingredients'][0];
+            $name = $first['ingredient_name'] ?? $first['menu_name'] ?? 'item';
+            return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
         }
 
         DB::transaction(function () use ($order, $inventoryService) {
