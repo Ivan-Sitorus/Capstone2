@@ -60,7 +60,7 @@ class ReceiptController extends Controller
                 'address' => Setting::get('cafe_address', 'STIE Totalwin Semarang'),
                 'phone' => Setting::get('cafe_phone', ''),
                 'receipt_footer' => Setting::get('receipt_footer', ''),
-                'receipt_show_npwp' => (bool) Setting::get('receipt_show_npwp', false),
+                'receipt_show_npwp' => (bool) Setting::get('receipt_show_npwp', '0'),
                 'receipt_npwp' => Setting::get('receipt_npwp', ''),
             ],
             'receiptUrl' => $order->receipt_url,
