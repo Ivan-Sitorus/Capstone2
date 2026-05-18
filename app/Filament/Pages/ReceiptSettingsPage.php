@@ -73,6 +73,7 @@ class ReceiptSettingsPage extends Page implements HasForms
                     ->image()
                     ->maxSize(5120)
                     ->directory('receipts')
+                    ->visibility('public')
                     ->default(fn () => Setting::get('receipt_logo') ?: null),
                 Textarea::make('receipt_footer')
                     ->label('Footer Struk')
@@ -92,6 +93,7 @@ class ReceiptSettingsPage extends Page implements HasForms
                     ->image()
                     ->maxSize(5120)
                     ->directory('qris')
+                    ->visibility('public')
                     ->default(fn () => Setting::get('qris_image') ?: null),
             ])
             ->statePath('data');
