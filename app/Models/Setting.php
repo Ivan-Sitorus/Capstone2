@@ -18,6 +18,13 @@ class Setting extends Model
 
     public static function set(string $key, mixed $value): void
     {
+        // Ensure value is string-compatible for database text column
+        if (is_bool($value)) {
+            $value = $value ? '1' : '0';
+        } elseif (!is_string($value) && !is_null($value)) {
+            $value = (string) $value;
+        }
+
         static::updateOrCreate(['key' => $key], ['value' => $value]);
         Cache::forget("setting_{$key}");
     }

@@ -109,8 +109,21 @@ class ReceiptSettingsPage extends Page implements HasForms
             'qris_image',
         ];
 
+        $fileUploadFields = ['receipt_logo', 'qris_image'];
+
         foreach ($fields as $field) {
             $value = $this->data[$field] ?? '';
+
+            // FileUpload fields may return array from Livewire temp state
+            if (in_array($field, $fileUploadFields)) {
+                if (is_array($value)) {
+                    $value = $value[0] ?? null;
+                }
+                // If no new file uploaded, skip to preserve existing value
+                if (empty($value)) {
+                    continue;
+                }
+            }
 
             if ($field === 'receipt_show_npwp') {
                 $value = $value ? '1' : '0';
