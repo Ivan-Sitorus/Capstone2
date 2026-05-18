@@ -37,16 +37,19 @@ class ReceiptSettingsPage extends Page implements HasForms
 
     public function mount(): void
     {
+        $receiptLogo = Setting::get('receipt_logo');
+        $qrisImage = Setting::get('qris_image');
+
         $this->form->fill([
             'cafe_name' => Setting::get('cafe_name', 'W9 Cafe'),
             'cafe_address' => Setting::get('cafe_address', 'STIE Totalwin Semarang'),
             'cafe_phone' => Setting::get('cafe_phone', ''),
-            'receipt_logo' => Setting::get('receipt_logo') ?: null,
+            'receipt_logo' => $receiptLogo ? [$receiptLogo] : null,
             'receipt_footer' => Setting::get('receipt_footer', 'Terima kasih telah berbelanja'),
             'receipt_show_npwp' => Setting::get('receipt_show_npwp', '0') === '1',
             'receipt_npwp' => Setting::get('receipt_npwp', ''),
             'receipt_whatsapp_template' => Setting::get('receipt_whatsapp_template', "Halo %s,\n\nTerima kasih telah memesan:\n%s\n\nSilakan ditunggu."),
-            'qris_image' => Setting::get('qris_image') ?: null,
+            'qris_image' => $qrisImage ? [$qrisImage] : null,
         ]);
 
         $this->previewData = $this->data;
