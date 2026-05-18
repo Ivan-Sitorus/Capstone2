@@ -1,71 +1,62 @@
 import { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
+import { router, Head } from '@inertiajs/react';
 import axios from 'axios';
-import { ShoppingBag, Coffee } from 'lucide-react';
+import { Coffee } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
 import { formatRupiah } from '@/helpers';
 
-const F = '"Plus Jakarta Sans", system-ui, sans-serif';
+const F = '"Inter", system-ui, sans-serif';
+const C = {
+    bg:          '#F7F5F2',
+    surface:     '#FFFFFF',
+    alt:         '#EFEDE9',
+    border:      '#E2DED8',
+    accent:      '#44403C',
+    textPrimary: '#1C1917',
+    textSecond:  '#78716C',
+    textMuted:   '#A8A29E',
+    success:     '#059669',
+};
 
 export default function CustomerCart() {
     const { items, tableId, updateQty, total, count } = useCart();
-    const [loading,      setLoading]      = useState(false);
-    const [errorMsg,     setErrorMsg]     = useState('');
-    const [isMahasiswa,  setIsMahasiswa]  = useState(false);
+    const [loading,     setLoading]     = useState(false);
+    const [errorMsg,    setErrorMsg]    = useState('');
+    const [isMahasiswa, setIsMahasiswa] = useState(false);
 
     const isEmpty = items.length === 0;
 
     useEffect(() => {
-        if (!document.getElementById('pjs-font')) {
-            const link = document.createElement('link');
-            link.id   = 'pjs-font';
-            link.rel  = 'stylesheet';
-            link.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
-            document.head.appendChild(link);
-        }
-    }, []);
-
-    useEffect(() => {
         try {
             const saved = sessionStorage.getItem('w9_customer');
-            if (saved) {
-                const data = JSON.parse(saved);
-                setIsMahasiswa(data.isMahasiswa === true);
-            }
+            if (saved) setIsMahasiswa(JSON.parse(saved).isMahasiswa === true);
         } catch (_) {}
     }, []);
 
     const totalCashback = isMahasiswa
         ? items.reduce((s, i) => s + (i.cashback ?? 0) * i.quantity, 0)
         : 0;
-
     const grandTotal = total - totalCashback;
 
-    function handleIncrement(menuId) {
+    const handleIncrement = (menuId) => {
         const item = items.find(i => i.menuId === menuId);
         if (item) updateQty(menuId, item.quantity + 1);
-    }
-
-    function handleDecrement(menuId) {
+    };
+    const handleDecrement = (menuId) => {
         const item = items.find(i => i.menuId === menuId);
         if (item) updateQty(menuId, item.quantity - 1);
-    }
+    };
 
     async function handleCheckout() {
         if (isEmpty) return;
         setErrorMsg('');
-
         let customer = null;
-        try {
-            customer = JSON.parse(sessionStorage.getItem('w9_customer') || 'null');
-        } catch (_) {}
-
+        try { customer = JSON.parse(sessionStorage.getItem('w9_customer') || 'null'); } catch (_) {}
         if (!customer?.name || !customer?.phone) {
             router.visit(`/order?table=${tableId ?? ''}`);
             return;
         }
-
         setLoading(true);
         try {
             const res = await axios.post('/api/order', {
@@ -75,13 +66,9 @@ export default function CustomerCart() {
                 is_mahasiswa:   isMahasiswa,
                 items: items.map(i => ({ menu_id: i.menuId, quantity: i.quantity })),
             });
-
-            const { order_code } = res.data;
-            router.visit(`/customer/payment/${order_code}/choose`);
+            router.visit(`/customer/payment/${res.data.order_id}/choose`);
         } catch (err) {
-            const msg = err.response?.data?.message
-                ?? err.response?.data?.errors
-                ?? 'Terjadi kesalahan. Coba lagi.';
+            const msg = err.response?.data?.message ?? err.response?.data?.errors ?? 'Terjadi kesalahan. Coba lagi.';
             setErrorMsg(typeof msg === 'object' ? Object.values(msg).flat().join(' ') : msg);
         } finally {
             setLoading(false);
@@ -90,201 +77,264 @@ export default function CustomerCart() {
 
     return (
         <CustomerLayout activeTab="cart">
-            {/* ── Header ── */}
-            <div style={{ background: '#FFFFFF', padding: '0 20px', borderBottom: '1px solid #F0EBE5' }}>
-                <div style={{ height: 54, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ fontSize: 18, fontWeight: 800, color: '#1A1814', fontFamily: F, letterSpacing: -0.3 }}>
-                        Keranjang
-                    </span>
-                </div>
-                {!isEmpty && (
-                    <div style={{ display: 'flex', justifyContent: 'center', paddingBottom: 10 }}>
-                        <span style={{ fontSize: 12.5, color: '#A8998A', fontFamily: F }}>
-                            {count} item
-                        </span>
-                    </div>
-                )}
+            <Head>
+                <title>Keranjang — W9 Cafe</title>
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
+                <style>{`
+                    html, body { background: ${C.bg}; }
+                    .w9cart-btn:active { transform: scale(0.98); }
+                    .w9qty-btn:active  { opacity: 0.75; }
+                    ::-webkit-scrollbar { display: none; }
+                `}</style>
+            </Head>
+
+            {/* ── Wallpaper ── */}
+            <div style={{
+                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: '100%', maxWidth: 430, height: '100vh',
+                zIndex: 0, pointerEvents: 'none', overflow: 'hidden', background: C.bg,
+            }}>
+                <img src="/images/wallpaper-menu.jpg" alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
+                />
             </div>
 
-            {/* ── Empty state ── */}
-            {isEmpty ? (
-                <div style={{
-                    display: 'flex', flexDirection: 'column', alignItems: 'center',
-                    justifyContent: 'center', padding: '60px 24px', gap: 16,
-                    background: '#F5F5F0', minHeight: 'calc(100vh - 180px)',
-                }}>
-                    <div style={{
-                        width: 80, height: 80, borderRadius: 20,
-                        background: '#EFEFEA',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
-                        <ShoppingBag size={36} color="#C4B5A5" />
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
-                        <p style={{ fontSize: 16, fontWeight: 700, color: '#1A1814', margin: 0, fontFamily: F }}>
-                            Keranjang Kosong
-                        </p>
-                        <p style={{ fontSize: 13, color: '#A8998A', margin: 0, textAlign: 'center', fontFamily: F }}>
-                            Tambahkan menu favoritmu dari halaman menu
-                        </p>
-                    </div>
-                    <button
-                        onClick={() => router.visit(`/customer/menu?table=${tableId ?? ''}`)}
-                        style={{
-                            marginTop: 8, height: 46, padding: '0 28px',
-                            background: '#E8763A', color: '#FFFFFF',
-                            border: 'none', borderRadius: 50,
-                            fontSize: 14, fontWeight: 600, cursor: 'pointer',
-                            fontFamily: F,
-                            boxShadow: '0 4px 14px rgba(232,118,58,0.28)',
-                        }}
-                    >
-                        Kembali ke Menu
-                    </button>
-                </div>
-            ) : (
-                <>
-                    <div style={{ background: '#F5F5F0', padding: '14px 16px 160px', display: 'flex', flexDirection: 'column', gap: 10 }}>
+            {/* ── Fixed content container ── */}
+            <div style={{
+                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: '100%', maxWidth: 430, height: '100vh',
+                display: 'flex', flexDirection: 'column', zIndex: 1,
+            }}>
 
-                        {/* Cart items */}
-                        {items.map((item) => {
-                            const itemCashback   = isMahasiswa ? (item.cashback ?? 0) : 0;
-                            const effectivePrice = item.price - itemCashback;
-                            const itemSubtotal   = effectivePrice * item.quantity;
-                            return (
-                                <div
-                                    key={item.menuId}
-                                    style={{
-                                        background: '#FFFFFF',
-                                        borderRadius: 16,
-                                        padding: '14px 16px',
-                                        boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
-                                    }}
-                                >
-                                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                                        {/* Image circle */}
+                {/* ── Header ── */}
+                <header style={{
+                    paddingTop: 32, paddingBottom: 16,
+                    paddingLeft: 24, paddingRight: 24,
+                    textAlign: 'center', flexShrink: 0,
+                }}>
+                    <h1 style={{
+                        fontSize: 17, fontWeight: 700, color: C.textPrimary,
+                        fontFamily: F, letterSpacing: '0.10em', textTransform: 'uppercase',
+                        margin: 0,
+                    }}>
+                        Keranjang
+                    </h1>
+                    <p style={{ fontSize: 13, color: C.textSecond, fontFamily: F, marginTop: 4, marginBottom: 0 }}>
+                        {isEmpty ? 'Belum ada item' : `${count} item tersimpan`}
+                    </p>
+                </header>
+
+                {/* ── Scrollable area ── */}
+                <div style={{
+                    flex: 1, overflowY: 'auto', scrollbarWidth: 'none',
+                    WebkitOverflowScrolling: 'touch',
+                    padding: '0 24px', paddingBottom: 100,
+                }}>
+
+                    {/* ── Empty state ── */}
+                    {isEmpty ? (
+                        <div style={{
+                            display: 'flex', flexDirection: 'column', alignItems: 'center',
+                            justifyContent: 'center', gap: 16, padding: '60px 8px',
+                            minHeight: 'calc(100vh - 180px)',
+                        }}>
+                            <div style={{
+                                width: 72, height: 72, borderRadius: 18,
+                                background: 'rgba(255,255,255,0.85)',
+                                border: `1px solid ${C.border}`,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                backdropFilter: 'blur(6px)',
+                            }}>
+                                <Coffee size={30} color={C.textMuted} strokeWidth={1.5} />
+                            </div>
+                            <div style={{ textAlign: 'center' }}>
+                                <p style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, margin: '0 0 6px', fontFamily: F }}>
+                                    Keranjang Kosong
+                                </p>
+                                <p style={{ fontSize: 13, color: C.textMuted, margin: 0, fontFamily: F, lineHeight: 1.6 }}>
+                                    Tambahkan menu favoritmu dari halaman menu
+                                </p>
+                            </div>
+                            <button
+                                onClick={() => router.visit(`/customer/menu?table=${tableId ?? ''}`)}
+                                className="w9cart-btn"
+                                style={{
+                                    marginTop: 4, height: 46, padding: '0 28px',
+                                    background: C.accent, color: C.bg,
+                                    border: 'none', borderRadius: 8,
+                                    fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: F,
+                                    transition: 'transform 0.1s',
+                                }}>
+                                Kembali ke Menu
+                            </button>
+                        </div>
+
+                    ) : (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 4 }}>
+
+                            {/* ── Item cards ── */}
+                            {items.map((item) => {
+                                const cb       = isMahasiswa ? (item.cashback ?? 0) : 0;
+                                const effPrice = item.price - cb;
+                                const subtotal = effPrice * item.quantity;
+                                return (
+                                    <article key={item.menuId} style={{
+                                        background: 'rgba(255,255,255,0.90)',
+                                        backdropFilter: 'blur(8px)',
+                                        WebkitBackdropFilter: 'blur(8px)',
+                                        borderRadius: 12, padding: 16,
+                                        border: `1px solid ${C.border}`,
+                                        display: 'flex', alignItems: 'center', gap: 16,
+                                        boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                                    }}>
+                                        {/* Thumbnail */}
                                         <div style={{
-                                            width: 52, height: 52, borderRadius: '50%',
-                                            background: 'linear-gradient(135deg, #C4956A, #A67B55)',
-                                            flexShrink: 0,
+                                            width: 64, height: 64, borderRadius: 10,
+                                            background: C.alt, flexShrink: 0,
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             overflow: 'hidden',
                                         }}>
                                             {item.image
                                                 ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                : <Coffee size={22} color="rgba(255,255,255,0.8)" />
+                                                : <Coffee size={24} color={C.textSecond} strokeWidth={1.5} />
                                             }
                                         </div>
 
-                                        {/* Text */}
+                                        {/* Info */}
                                         <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: '#1A1814', fontFamily: F, marginBottom: 3 }}>
+                                            <h3 style={{
+                                                fontSize: 14, fontWeight: 600,
+                                                color: C.textPrimary, fontFamily: F,
+                                                margin: '0 0 2px',
+                                            }}>
                                                 {item.name}
-                                            </div>
-                                            <div style={{ fontSize: 12.5, color: '#A8998A', fontFamily: F }}>
-                                                {formatRupiah(effectivePrice)} × {item.quantity}
-                                            </div>
-                                            <div style={{ fontSize: 16, fontWeight: 800, color: '#1A1814', fontFamily: F, marginTop: 6, letterSpacing: -0.3 }}>
-                                                {formatRupiah(itemSubtotal)}
-                                            </div>
+                                            </h3>
+                                            <p style={{ fontSize: 11, color: C.textSecond, fontFamily: F, margin: '0 0 4px' }}>
+                                                {formatRupiah(effPrice)} × {item.quantity}
+                                            </p>
+                                            <p style={{ fontSize: 14, fontWeight: 700, color: C.textPrimary, fontFamily: F, margin: 0 }}>
+                                                {formatRupiah(subtotal)}
+                                            </p>
                                         </div>
 
                                         {/* Qty controls */}
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0, marginTop: 2 }}>
+                                        <div style={{
+                                            display: 'flex', alignItems: 'center', gap: 10,
+                                            background: C.alt, padding: '6px 8px', borderRadius: 8,
+                                            flexShrink: 0,
+                                        }}>
                                             <button
                                                 onClick={() => handleDecrement(item.menuId)}
+                                                className="w9qty-btn"
                                                 style={{
-                                                    width: 30, height: 30, borderRadius: 8,
-                                                    background: '#FFFFFF', border: '1.5px solid #D6CFC8',
+                                                    width: 26, height: 26, borderRadius: 6,
+                                                    background: C.surface, border: `1px solid ${C.border}`,
                                                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    fontSize: 18, fontWeight: 500, color: '#6B5E52', fontFamily: F,
-                                                }}
-                                            >
-                                                −
-                                            </button>
-                                            <span style={{ fontSize: 15, fontWeight: 700, color: '#1A1814', minWidth: 18, textAlign: 'center', fontFamily: F }}>
+                                                    fontSize: 15, color: C.textSecond, fontFamily: F, transition: 'opacity 0.1s',
+                                                }}>−</button>
+                                            <span style={{
+                                                fontSize: 13, fontWeight: 600, color: C.textPrimary,
+                                                minWidth: 18, textAlign: 'center', fontFamily: F,
+                                            }}>
                                                 {item.quantity}
                                             </span>
                                             <button
                                                 onClick={() => handleIncrement(item.menuId)}
+                                                className="w9qty-btn"
                                                 style={{
-                                                    width: 30, height: 30, borderRadius: 8,
-                                                    background: '#E8763A', border: 'none',
+                                                    width: 26, height: 26, borderRadius: 6,
+                                                    background: C.accent, border: 'none',
                                                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    fontSize: 18, fontWeight: 600, color: '#FFFFFF',
-                                                    boxShadow: '0 2px 8px rgba(232,118,58,0.30)',
-                                                }}
-                                            >
-                                                +
-                                            </button>
+                                                    fontSize: 15, fontWeight: 600, color: '#FFFFFF', fontFamily: F, transition: 'opacity 0.1s',
+                                                }}>+</button>
                                         </div>
+                                    </article>
+                                );
+                            })}
+
+                            {/* ── Order Summary ── */}
+                            <section style={{
+                                background: 'rgba(255,255,255,0.90)',
+                                backdropFilter: 'blur(8px)',
+                                WebkitBackdropFilter: 'blur(8px)',
+                                borderRadius: 12, padding: 20,
+                                border: `1px solid ${C.border}`,
+                                boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
+                                marginTop: 4,
+                            }}>
+                                <p style={{
+                                    fontSize: 10, fontWeight: 600, color: C.textSecond,
+                                    letterSpacing: '0.10em', textTransform: 'uppercase',
+                                    fontFamily: F, margin: '0 0 16px',
+                                }}>
+                                    Ringkasan Pesanan
+                                </p>
+
+                                {/* Rows above divider */}
+                                <div style={{ borderBottom: `1px solid ${C.border}`, paddingBottom: 14, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>Subtotal</span>
+                                        <span style={{ fontSize: 13, color: C.textPrimary, fontFamily: F }}>{formatRupiah(total)}</span>
+                                    </div>
+                                    {isMahasiswa && totalCashback > 0 && (
+                                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>Cashback Mahasiswa</span>
+                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>− {formatRupiah(totalCashback)}</span>
+                                        </div>
+                                    )}
+                                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                        <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>Biaya Layanan</span>
+                                        <span style={{ fontSize: 13, color: C.textPrimary, fontFamily: F }}>Gratis</span>
                                     </div>
                                 </div>
-                            );
-                        })}
 
-                        {/* Order summary */}
-                        <div style={{
-                            background: '#FFFFFF', borderRadius: 16,
-                            padding: '16px 18px',
-                            boxShadow: '0 1px 6px rgba(0,0,0,0.06)',
-                        }}>
-                            <div style={{ fontSize: 11, fontWeight: 700, color: '#A8998A', letterSpacing: 0.8, marginBottom: 14, fontFamily: F }}>
-                                RINGKASAN PESANAN
-                            </div>
+                                {/* Total */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, fontFamily: F }}>Total</span>
+                                    <span style={{ fontSize: 17, fontWeight: 700, color: C.textPrimary, fontFamily: F }}>
+                                        {formatRupiah(grandTotal)}
+                                    </span>
+                                </div>
+                            </section>
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                                <span style={{ fontSize: 14, color: '#6B5E52', fontFamily: F }}>Subtotal</span>
-                                <span style={{ fontSize: 14, color: '#1A1814', fontFamily: F }}>{formatRupiah(total)}</span>
-                            </div>
-
-                            {isMahasiswa && totalCashback > 0 && (
-                                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                                    <span style={{ fontSize: 14, color: '#16A34A', fontFamily: F }}>Cashback Mahasiswa</span>
-                                    <span style={{ fontSize: 14, color: '#16A34A', fontFamily: F }}>- {formatRupiah(totalCashback)}</span>
+                            {/* ── Error ── */}
+                            {errorMsg && (
+                                <div style={{
+                                    background: '#FEF2F2', border: '1px solid #FECACA',
+                                    borderRadius: 10, padding: '10px 14px',
+                                    fontSize: 13, color: '#DC2626', fontFamily: F,
+                                }}>
+                                    {errorMsg}
                                 </div>
                             )}
 
-                            <div style={{ height: 1, background: '#F0EBE4', marginBottom: 14 }} />
-
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontSize: 16, fontWeight: 700, color: '#1A1814', fontFamily: F }}>Total</span>
-                                <span style={{ fontSize: 18, fontWeight: 800, color: '#1A1814', fontFamily: F, letterSpacing: -0.4 }}>
-                                    {formatRupiah(grandTotal)}
-                                </span>
+                            {/* ── CTA ── */}
+                            <div style={{ paddingTop: 4 }}>
+                                <button
+                                    onClick={handleCheckout}
+                                    disabled={loading}
+                                    className="w9cart-btn"
+                                    style={{
+                                        width: '100%', height: 54,
+                                        background: loading ? C.textMuted : C.accent,
+                                        color: C.bg, border: 'none', borderRadius: 8,
+                                        fontSize: 15, fontWeight: 700,
+                                        cursor: loading ? 'not-allowed' : 'pointer',
+                                        fontFamily: F,
+                                        boxShadow: loading ? 'none' : '0 4px 12px rgba(68,64,60,0.25)',
+                                        transition: 'transform 0.1s',
+                                    }}
+                                >
+                                    {loading ? 'Memproses...' : `Lanjut Pembayaran  ${formatRupiah(grandTotal)}`}
+                                </button>
                             </div>
+
                         </div>
-
-                        {errorMsg && (
-                            <div style={{
-                                background: '#FEF2F2', border: '1px solid #FECACA',
-                                borderRadius: 12, padding: '10px 14px',
-                                fontSize: 13, color: '#DC2626', fontFamily: F,
-                            }}>
-                                {errorMsg}
-                            </div>
-                        )}
-
-                        {/* ── Pay button (inline, bawah ringkasan) ── */}
-                        <button
-                            onClick={handleCheckout}
-                            disabled={loading}
-                            style={{
-                                width: '100%', height: 52,
-                                background: loading ? '#C4B5A5' : '#E8763A',
-                                color: '#FFFFFF', border: 'none', borderRadius: 14,
-                                fontSize: 15, fontWeight: 700,
-                                cursor: loading ? 'not-allowed' : 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                boxShadow: loading ? 'none' : '0 6px 18px rgba(232,118,58,0.35)',
-                                fontFamily: F, letterSpacing: -0.2,
-                            }}
-                        >
-                            {loading ? 'Memproses...' : `Lanjut Pembayaran  ${formatRupiah(grandTotal)}`}
-                        </button>
-                    </div>
-                </>
-            )}
+                    )}
+                </div>{/* end scrollable */}
+            </div>{/* end fixed container */}
         </CustomerLayout>
     );
 }

@@ -11,6 +11,7 @@ use App\Models\CafeTable;
 use App\Services\OrderPromotionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 
@@ -36,7 +37,10 @@ class CustomerOrderController extends Controller
         ]);
 
         return DB::transaction(function () use ($request, $orderPromotionService) {
-            CafeTable::findOrFail($request->table_id);
+            // Cache table lookup — meja jarang berubah, aman di-cache 10 menit
+            Cache::remember("cafe_table_{$request->table_id}", 600, fn() =>
+                CafeTable::findOrFail($request->table_id)
+            );
 
             $isMahasiswa = (bool) $request->input('is_mahasiswa', false);
             $selectedPromotionIds = $request->input('promotion_ids', []);
@@ -55,9 +59,20 @@ class CustomerOrderController extends Controller
             $appliedPromotions = [];
             $orderItemsToInsert = [];
 
-            // Bulk-fetch semua menu sekaligus — hindari N+1 query
+            // Bulk-fetch menu dengan cache per menu_id — menghindari query berulang
             $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
-            $menus   = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
+            $menus   = collect(Cache::many(array_map(fn($id) => "menu_{$id}", $menuIds)))
+                ->filter()
+                ->mapWithKeys(fn($m, $k) => [str_replace('menu_', '', $k) => $m]);
+
+            $missingIds = collect($menuIds)->filter(fn($id) => !$menus->has($id))->values()->all();
+            if (!empty($missingIds)) {
+                $fresh = Menu::whereIn('id', $missingIds)->get()->keyBy('id');
+                foreach ($fresh as $id => $menu) {
+                    Cache::put("menu_{$id}", $menu, 300);
+                }
+                $menus = $menus->union($fresh);
+            }
 
             foreach ($request->items as $item) {
                 $menu = $menus->get($item['menu_id']);

@@ -46,9 +46,9 @@ Route::prefix('customer')->group(function () {
     Route::get('/riwayat', [CustomerOrderController::class, 'riwayat'])->name('customer.riwayat');
     Route::get('/order/{code}/status', [CustomerOrderController::class, 'status'])->name('customer.order.status');
 
-    // Payment flow
-    Route::get('/payment/{orderCode}/choose',      [CustomerPaymentController::class, 'showChoose'])->name('customer.payment.choose');
-    Route::get('/payment/{orderCode}/cash-status', [CustomerPaymentController::class, 'showCashStatus'])->name('customer.payment.cash-status');
-    Route::get('/payment/{orderCode}/qris',        [CustomerPaymentController::class, 'showQrisUpload'])->name('customer.payment.qris-upload');
-    Route::get('/payment/{orderCode}/qris-status', [CustomerPaymentController::class, 'showQrisStatus'])->name('customer.payment.qris-status');
+    // Payment flow — uses order ID (order_code assigned only after payment method chosen)
+    Route::get('/payment/{order}/choose',      [CustomerPaymentController::class, 'showChoose'])->name('customer.payment.choose');
+    Route::get('/payment/{order}/cash-status', [CustomerPaymentController::class, 'showCashStatus'])->name('customer.payment.cash-status');
+    Route::get('/payment/{order}/qris',        [CustomerPaymentController::class, 'showQrisUpload'])->name('customer.payment.qris-upload');
+    Route::get('/payment/{order}/qris-status', [CustomerPaymentController::class, 'showQrisStatus'])->name('customer.payment.qris-status');
 });

@@ -1,9 +1,21 @@
 import { useState, useEffect } from 'react';
-import { router } from '@inertiajs/react';
-import { User, Phone, Coffee, Check, MapPin } from 'lucide-react';
+import { router, Head } from '@inertiajs/react';
+import { User, Phone, Check, MapPin } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 
-const F = '"Plus Jakarta Sans", system-ui, sans-serif';
+const F = '"Inter", system-ui, sans-serif';
+const C = {
+    bg:          '#F7F5F2',
+    surface:     '#FFFFFF',
+    border:      '#E2DED8',
+    accent:      '#44403C',
+    accentHover: '#292524',
+    textPrimary: '#1C1917',
+    textSecond:  '#78716C',
+    textMuted:   '#A8A29E',
+    headerBg:    '#1E3A4C',
+    headerDark:  '#112D3E',
+};
 
 export default function Identitas({ table }) {
     const [name,        setName]        = useState('');
@@ -11,16 +23,6 @@ export default function Identitas({ table }) {
     const [isMahasiswa, setIsMahasiswa] = useState(false);
     const [nameError,   setNameError]   = useState('');
     const [phoneError,  setPhoneError]  = useState('');
-
-    useEffect(() => {
-        if (!document.getElementById('pjs-font')) {
-            const link = document.createElement('link');
-            link.id   = 'pjs-font';
-            link.rel  = 'stylesheet';
-            link.href = 'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
-            document.head.appendChild(link);
-        }
-    }, []);
 
     /* Jika sudah pernah isi identitas untuk meja ini → skip ke menu */
     useEffect(() => {
@@ -67,36 +69,49 @@ export default function Identitas({ table }) {
         router.visit(table ? `/customer/menu?table=${table.id}` : '/customer/menu');
     }
 
-    /* Jika tidak ada meja (akses langsung tanpa QR) */
+    /* ── No table state ── */
     if (!table) {
         return (
             <CustomerLayout activeTab="menu" showBottomNav={false}>
+                <Head>
+                    <title>W9 Cafe</title>
+                    <link rel="preconnect" href="https://fonts.googleapis.com" />
+                    <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
+                </Head>
+
+                {/* Wallpaper */}
                 <div style={{
-                    minHeight: '100vh',
-                    background: '#F5F0EB',
-                    display: 'flex', flexDirection: 'column',
+                    position: 'fixed', inset: 0,
+                    zIndex: 0, pointerEvents: 'none',
+                }}>
+                    <img src="/images/wallpaper-menu.jpg" alt=""
+                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+                </div>
+
+                <div style={{
+                    position: 'relative', zIndex: 1,
+                    minHeight: '100vh', display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
-                    padding: '40px 28px',
-                    fontFamily: F,
-                    textAlign: 'center',
+                    padding: '40px 28px', fontFamily: F, textAlign: 'center',
+                    background: 'rgba(247,245,242,0.85)', backdropFilter: 'blur(4px)',
                 }}>
                     <div style={{
-                        width: 72, height: 72, borderRadius: 18,
-                        overflow: 'hidden',
-                        boxShadow: '0 8px 24px rgba(0,0,0,0.18)',
-                        marginBottom: 20,
+                        width: 96, height: 96, borderRadius: 20,
+                        overflow: 'hidden', background: C.headerDark,
+                        boxShadow: '0 8px 24px rgba(0,0,0,0.25)', marginBottom: 24,
                     }}>
                         <img src="/images/logo.jpg" alt="W9 Cafe"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            onError={e => { e.target.style.display = 'none'; e.target.parentElement.style.background = '#1B3A4B'; }} />
+                            onError={e => { e.target.style.display = 'none'; }} />
                     </div>
-                    <h1 style={{ fontSize: 22, fontWeight: 800, color: '#1A1814', margin: '0 0 10px', fontFamily: F }}>
+                    <h1 style={{ fontSize: 22, fontWeight: 700, color: C.textPrimary, margin: '0 0 10px', fontFamily: F }}>
                         Scan QR Meja
                     </h1>
-                    <p style={{ fontSize: 14, color: '#8C7B6B', lineHeight: 1.6, margin: '0 0 6px', fontFamily: F }}>
+                    <p style={{ fontSize: 14, color: C.textSecond, lineHeight: 1.6, margin: '0 0 6px', fontFamily: F }}>
                         Silakan scan QR code yang ada di meja Anda untuk mulai memesan.
                     </p>
-                    <p style={{ fontSize: 12, color: '#B5A898', fontFamily: F }}>
+                    <p style={{ fontSize: 12, color: C.textMuted, fontFamily: F }}>
                         Hubungi kasir jika membutuhkan bantuan.
                     </p>
                 </div>
@@ -104,207 +119,248 @@ export default function Identitas({ table }) {
         );
     }
 
+    /* ── Main form ── */
     return (
         <CustomerLayout activeTab="menu" showBottomNav={false}>
+            <Head>
+                <title>Selamat Datang — W9 Cafe</title>
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
+                <style>{`
+                    html, body { background: ${C.bg}; }
+                    .w9id-input { outline: none; transition: border-color 0.15s; }
+                    .w9id-input:focus { border-color: ${C.accent} !important; }
+                    .w9id-btn:active { background: ${C.accentHover} !important; }
+                `}</style>
+            </Head>
+
+            {/* Wallpaper */}
             <div style={{
-                minHeight: '100vh',
-                background: '#F5F0EB',
-                fontFamily: F,
-                display: 'flex',
-                flexDirection: 'column',
+                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: '100%', maxWidth: 430, height: '100vh',
+                zIndex: 0, pointerEvents: 'none', overflow: 'hidden',
+            }}>
+                <img src="/images/wallpaper-identitas.png" alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+            </div>
+
+            {/* Page */}
+            <div style={{
+                position: 'relative', zIndex: 1,
+                minHeight: '100vh', display: 'flex', flexDirection: 'column',
+                maxWidth: 430, margin: '0 auto',
             }}>
 
-                {/* ── Hero Section ── */}
-                <div style={{
-                    background: 'radial-gradient(ellipse 140% 140% at 50% 30%, #2A4F5F 0%, #1B3A4B 100%)',
-                    height: 240,
-                    position: 'relative',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    overflow: 'hidden',
+                {/* ── Branding header ── */}
+                <header style={{
+                    background: C.headerBg,
+                    paddingTop: 48, paddingBottom: 32,
+                    borderRadius: '0 0 36px 36px',
+                    display: 'flex', flexDirection: 'column', alignItems: 'center',
                     flexShrink: 0,
                 }}>
-                    {/* Deco circles */}
-                    <div style={{ position:'absolute', width:180, height:180, borderRadius:'50%', background:'#FFFFFF06', top:-40, left:-60 }}/>
-                    <div style={{ position:'absolute', width:100, height:100, borderRadius:'50%', background:'#FFFFFF04', top:20, right:-10 }}/>
-
-                    {/* Logo */}
                     <div style={{
-                        width: 110, height: 110,
-                        borderRadius: 22,
-                        overflow: 'hidden',
-                        boxShadow: '0 8px 30px rgba(0,0,0,0.40)',
-                        zIndex: 1,
+                        width: 96, height: 96, borderRadius: 20,
+                        overflow: 'hidden', background: C.headerDark,
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.35)',
+                        border: '1px solid rgba(255,255,255,0.10)',
                     }}>
-                        <img
-                            src="/images/logo.jpg"
-                            alt="W9 Cafe"
+                        <img src="/images/logo.jpg" alt="W9 Cafe"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            onError={e => {
-                                e.target.style.display = 'none';
-                                e.target.parentElement.style.background = '#2A4F5F';
-                                e.target.parentElement.style.display = 'flex';
-                                e.target.parentElement.style.alignItems = 'center';
-                                e.target.parentElement.style.justifyContent = 'center';
-                                e.target.parentElement.innerHTML = '<span style="color:white;font-size:32px;font-style:italic;font-weight:700">w9</span>';
-                            }}
-                        />
+                            onError={e => { e.target.style.display = 'none'; }} />
                     </div>
 
-                    {/* Curved bottom */}
+                    {/* Divider dekoratif bawah header */}
                     <div style={{
-                        position: 'absolute', bottom: -1, left: 0, right: 0,
-                        height: 36,
-                        background: '#F5F0EB',
-                        borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
-                    }}/>
-                </div>
+                        display: 'flex', alignItems: 'center', gap: 6,
+                        marginTop: 24,
+                    }}>
+                        <div style={{ width: 32, height: 1, background: 'rgba(255,255,255,0.20)' }} />
+                        <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.40)' }} />
+                        <div style={{ width: 24, height: 2, borderRadius: 1, background: 'rgba(255,255,255,0.70)' }} />
+                        <div style={{ width: 5, height: 5, borderRadius: '50%', background: 'rgba(255,255,255,0.40)' }} />
+                        <div style={{ width: 32, height: 1, background: 'rgba(255,255,255,0.20)' }} />
+                    </div>
+                </header>
 
-                {/* ── Content ── */}
-                <div style={{ padding: '24px 20px 40px', flex: 1 }}>
+                {/* ── Main content ── */}
+                <main style={{
+                    flex: 1,
+                    background: 'transparent',
+                    padding: '32px 24px 48px',
+                    overflowY: 'auto',
+                }}>
 
-                    {/* Heading */}
-                    <div style={{ textAlign: 'center', marginBottom: 24 }}>
+                    {/* Welcome + table pill */}
+                    <div style={{ textAlign: 'center', marginBottom: 32 }}>
                         <h1 style={{
-                            fontSize: 26, fontWeight: 800, color: '#1A1814',
-                            margin: '0 0 8px', fontFamily: F, letterSpacing: -0.5,
+                            fontSize: 32, fontWeight: 700, color: C.accent,
+                            textTransform: 'uppercase', letterSpacing: '-0.02em',
+                            fontFamily: F, margin: '0 0 12px',
                         }}>
                             Selamat Datang!
                         </h1>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
-                            <MapPin size={13} color="#C4956A" />
-                            <span style={{ fontSize: 13, color: '#8C7B6B', fontFamily: F }}>
-                                Meja No. <strong style={{ color: '#1A1814' }}>{table.table_number}</strong>
+                        <div style={{
+                            display: 'inline-flex', alignItems: 'center', gap: 6,
+                            background: C.accent, color: '#FFFFFF',
+                            borderRadius: 999, padding: '6px 16px',
+                            boxShadow: '0 2px 8px rgba(68,64,60,0.25)',
+                        }}>
+                            <MapPin size={12} color="#FFFFFF" strokeWidth={2.5} />
+                            <span style={{
+                                fontSize: 11, fontWeight: 700,
+                                letterSpacing: '0.10em', textTransform: 'uppercase',
+                                fontFamily: F,
+                            }}>
+                                Meja No. {table.table_number}
                             </span>
                         </div>
                     </div>
 
                     {/* Form card */}
-                    <div style={{
-                        background: '#FFFFFF',
-                        borderRadius: 20,
-                        padding: '22px 18px',
-                        boxShadow: '0 2px 12px rgba(26,24,20,0.07)',
-                        display: 'flex', flexDirection: 'column', gap: 16,
+                    <section style={{
+                        background: C.surface,
+                        borderRadius: 12, padding: 24,
+                        border: `1px solid ${C.border}`,
+                        boxShadow: '0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03)',
+                        position: 'relative', overflow: 'hidden',
+                        display: 'flex', flexDirection: 'column', gap: 20,
                     }}>
+                        {/* Decorative corners */}
+                        <div style={{
+                            position: 'absolute', top: 0, right: 0,
+                            width: 64, height: 64,
+                            borderTop: `2px solid rgba(226,222,216,0.40)`,
+                            borderRight: `2px solid rgba(226,222,216,0.40)`,
+                            borderRadius: '0 12px 0 0',
+                        }}/>
+                        <div style={{
+                            position: 'absolute', bottom: 0, left: 0,
+                            width: 64, height: 64,
+                            borderBottom: `2px solid rgba(226,222,216,0.40)`,
+                            borderLeft: `2px solid rgba(226,222,216,0.40)`,
+                            borderRadius: '0 0 0 12px',
+                        }}/>
 
-                        {/* Nama */}
+                        {/* ── Nama ── */}
                         <div>
-                            <label style={{ fontSize: 13, fontWeight: 700, color: '#1A1814', display: 'block', marginBottom: 8, fontFamily: F }}>
+                            <label style={{
+                                display: 'block', fontSize: 13, fontWeight: 700,
+                                color: C.textPrimary, marginBottom: 8, fontFamily: F,
+                            }}>
                                 Nama
                             </label>
                             <div style={{ position: 'relative' }}>
-                                <User size={18} color="#C4B5A5" style={{
-                                    position: 'absolute', left: 14, top: '50%',
+                                <User size={18} color={C.textMuted} style={{
+                                    position: 'absolute', left: 12, top: '50%',
                                     transform: 'translateY(-50%)', pointerEvents: 'none',
-                                }}/>
+                                }} />
                                 <input
                                     type="text"
                                     value={name}
                                     onChange={e => setName(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && handleLanjut()}
-                                    placeholder=""
+                                    placeholder="Masukkan nama lengkap"
                                     maxLength={100}
+                                    className="w9id-input"
                                     style={{
-                                        width: '100%', height: 50,
-                                        border: `1.5px solid ${nameError ? '#DC3545' : '#EDE8E2'}`,
-                                        borderRadius: 12,
-                                        padding: '0 14px 0 44px',
-                                        fontSize: 14, color: '#1A1814',
-                                        background: '#FAFAF8', outline: 'none',
-                                        boxSizing: 'border-box',
-                                        fontFamily: F,
+                                        width: '100%', height: 48, boxSizing: 'border-box',
+                                        border: `1px solid ${nameError ? '#DC3545' : C.border}`,
+                                        borderRadius: 8, paddingLeft: 40, paddingRight: 12,
+                                        fontSize: 13, color: C.textPrimary,
+                                        background: C.bg, fontFamily: F,
                                     }}
                                 />
                             </div>
-                            {nameError && <p style={{ color: '#DC3545', fontSize: 12, margin: '5px 0 0', fontFamily: F }}>{nameError}</p>}
+                            {nameError && (
+                                <p style={{ color: '#DC3545', fontSize: 12, margin: '5px 0 0', fontFamily: F }}>
+                                    {nameError}
+                                </p>
+                            )}
                         </div>
 
-                        {/* Telepon */}
+                        {/* ── Nomor Telepon ── */}
                         <div>
-                            <label style={{ fontSize: 13, fontWeight: 700, color: '#1A1814', display: 'block', marginBottom: 8, fontFamily: F }}>
+                            <label style={{
+                                display: 'block', fontSize: 13, fontWeight: 700,
+                                color: C.textPrimary, marginBottom: 8, fontFamily: F,
+                            }}>
                                 Nomor Telepon
                             </label>
                             <div style={{ position: 'relative' }}>
-                                <Phone size={18} color="#C4B5A5" style={{
-                                    position: 'absolute', left: 14, top: '50%',
+                                <Phone size={18} color={C.textMuted} style={{
+                                    position: 'absolute', left: 12, top: '50%',
                                     transform: 'translateY(-50%)', pointerEvents: 'none',
-                                }}/>
+                                }} />
                                 <input
                                     type="tel"
                                     value={phone}
                                     onChange={e => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
                                     onKeyDown={e => e.key === 'Enter' && handleLanjut()}
-                                    placeholder=""
+                                    placeholder="0812 3456 7890"
                                     maxLength={15}
+                                    className="w9id-input"
                                     style={{
-                                        width: '100%', height: 50,
-                                        border: `1.5px solid ${phoneError ? '#DC3545' : '#EDE8E2'}`,
-                                        borderRadius: 12,
-                                        padding: '0 14px 0 44px',
-                                        fontSize: 14, color: '#1A1814',
-                                        background: '#FAFAF8', outline: 'none',
-                                        boxSizing: 'border-box',
-                                        fontFamily: F,
+                                        width: '100%', height: 48, boxSizing: 'border-box',
+                                        border: `1px solid ${phoneError ? '#DC3545' : C.border}`,
+                                        borderRadius: 8, paddingLeft: 40, paddingRight: 12,
+                                        fontSize: 13, color: C.textPrimary,
+                                        background: C.bg, fontFamily: F,
                                     }}
                                 />
                             </div>
-                            {phoneError && <p style={{ color: '#DC3545', fontSize: 12, margin: '5px 0 0', fontFamily: F }}>{phoneError}</p>}
+                            {phoneError && (
+                                <p style={{ color: '#DC3545', fontSize: 12, margin: '5px 0 0', fontFamily: F }}>
+                                    {phoneError}
+                                </p>
+                            )}
                         </div>
 
-                        {/* Mahasiswa checkbox */}
+                        {/* ── Mahasiswa checkbox ── */}
                         <div
                             onClick={() => setIsMahasiswa(p => !p)}
-                            style={{
-                                background: isMahasiswa ? '#FFF5EF' : '#FFFFFF',
-                                borderRadius: 12,
-                                border: `1.5px solid ${isMahasiswa ? '#E8763A' : 'transparent'}`,
-                                padding: '12px 14px',
-                                display: 'flex', alignItems: 'center', gap: 12,
-                                cursor: 'pointer',
-                                transition: 'all 0.15s',
-                            }}
+                            style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer' }}
                         >
                             <div style={{
-                                width: 22, height: 22, borderRadius: 6, flexShrink: 0,
-                                border: `2px solid ${isMahasiswa ? '#E8763A' : '#D6CFC8'}`,
-                                background: isMahasiswa ? '#E8763A' : '#FFFFFF',
+                                width: 20, height: 20, borderRadius: 4, flexShrink: 0, marginTop: 1,
+                                border: `1.5px solid ${isMahasiswa ? C.accent : C.border}`,
+                                background: isMahasiswa ? C.accent : C.surface,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 transition: 'all 0.15s',
                             }}>
-                                {isMahasiswa && <Check size={13} color="#FFFFFF" strokeWidth={2.5} />}
+                                {isMahasiswa && <Check size={12} color="#FFFFFF" strokeWidth={2.5} />}
                             </div>
                             <div>
-                                <div style={{ fontSize: 13, fontWeight: 600, color: '#1A1814', fontFamily: F }}>
+                                <p style={{ fontSize: 13, fontWeight: 600, color: C.textPrimary, margin: 0, fontFamily: F }}>
                                     Saya adalah mahasiswa STIE Totalwin Semarang
-                                </div>
-                                <div style={{ fontSize: 11, color: '#A8998A', marginTop: 2, fontFamily: F }}>
+                                </p>
+                                <p style={{ fontSize: 11, color: C.textMuted, margin: '2px 0 0', fontFamily: F }}>
                                     Opsional
-                                </div>
+                                </p>
                             </div>
                         </div>
 
-                        {/* CTA Button */}
-                        <button
-                            onClick={handleLanjut}
-                            style={{
-                                width: '100%', height: 52,
-                                background: '#E8763A', color: '#FFFFFF',
-                                border: 'none', borderRadius: 50,
-                                fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                                marginTop: 4,
-                                boxShadow: '0 6px 20px rgba(232,118,58,0.35)',
-                                fontFamily: F,
-                                letterSpacing: -0.2,
-                            }}
-                        >
-                            Masuk
-                        </button>
-                    </div>
-                </div>
+                        {/* ── CTA Button ── */}
+                        <div style={{ paddingTop: 4 }}>
+                            <button
+                                onClick={handleLanjut}
+                                className="w9id-btn"
+                                style={{
+                                    width: '100%', height: 52,
+                                    background: C.accent, color: '#FFFFFF',
+                                    border: 'none', borderRadius: 8,
+                                    fontSize: 15, fontWeight: 700, cursor: 'pointer',
+                                    fontFamily: F, transition: 'background 0.15s',
+                                    boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                                }}
+                            >
+                                Masuk
+                            </button>
+                        </div>
+                    </section>
+                </main>
+
             </div>
         </CustomerLayout>
     );

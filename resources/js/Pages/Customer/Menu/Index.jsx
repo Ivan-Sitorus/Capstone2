@@ -5,108 +5,181 @@ import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
 import { formatRupiah } from '@/helpers';
 
-const F = '"Plus Jakarta Sans", system-ui, sans-serif';
+const F = '"Inter", system-ui, sans-serif';
 
-/* ── Inline menu item card (2-col grid, vertical) ───────────────────── */
+const C = {
+    bg:          '#F7F5F2',
+    surface:     '#FFFFFF',
+    surfaceAlt:  '#EFEDE9',
+    border:      '#E2DED8',
+    accent:      '#44403C',
+    accentHover: '#1C1917',
+    textPrimary: '#1C1917',
+    textSecond:  '#78716C',
+    textMuted:   '#A8A29E',
+    success:     '#16A34A',
+    warning:     '#FBBF24',
+    shadow:      '0 4px 20px -2px rgba(0,0,0,0.05)',
+    shadowLift:  '0 8px 24px -2px rgba(0,0,0,0.10)',
+};
+
+/* ── Menu card ─────────────────────────────────────────────────── */
 function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false, isMahasiswa = false }) {
     const cashback = Number(menu.cashback ?? 0);
 
     return (
-        <div style={{
-            background: '#FFFFFF',
-            borderRadius: 16,
-            overflow: 'hidden',
-            boxShadow: '0 1px 8px rgba(26,24,20,0.07)',
-            display: 'flex',
+        <article className="w9-card" style={{
+            background:    'rgba(255,255,255,0.90)',
+            backdropFilter: 'blur(6px)',
+            borderRadius:  12,
+            overflow:      'hidden',
+            border:        `1px solid rgba(226,222,216,0.60)`,
+            boxShadow:     C.shadow,
+            display:       'flex',
             flexDirection: 'column',
         }}>
-            {/* Image */}
+            {/* Image — square aspect */}
             <div style={{
-                width: '100%', aspectRatio: '4/3',
-                background: 'linear-gradient(135deg, #C4956A 0%, #A67B55 100%)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                overflow: 'hidden',
+                width:          '100%',
+                aspectRatio:    '1 / 1',
+                background:     'rgba(193,154,107,0.15)',
+                display:        'flex',
+                alignItems:     'center',
+                justifyContent: 'center',
+                overflow:       'hidden',
             }}>
                 {menu.image
                     ? <img src={menu.image} alt={menu.name}
-                           loading={priority ? 'eager' : 'lazy'}
-                           decoding={priority ? 'sync' : 'async'}
-                           style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <Coffee size={36} color="#FFFFFF" strokeWidth={1.5} />
+                        loading={priority ? 'eager' : 'lazy'}
+                        decoding={priority ? 'sync' : 'async'}
+                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      />
+                    : <Coffee size={28} color="rgba(193,154,107,0.70)" strokeWidth={1.5} />
                 }
             </div>
 
             {/* Info */}
-            <div style={{ padding: '10px 12px 12px', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <div style={{
-                    fontSize: 13, fontWeight: 700, color: '#1A1814',
-                    fontFamily: F, lineHeight: 1.3, marginBottom: 4,
+            <div style={{
+                padding:       '14px 14px 14px',
+                flex:          1,
+                display:       'flex',
+                flexDirection: 'column',
+                gap:           4,
+            }}>
+                <h3 style={{
+                    fontSize:      13,
+                    fontWeight:    700,
+                    color:         C.textPrimary,
+                    fontFamily:    F,
+                    lineHeight:    1.3,
+                    letterSpacing: '-0.01em',
+                    margin:        0,
                 }}>
                     {menu.name}
-                </div>
-                <div style={{
-                    fontSize: 13, fontWeight: 600, color: '#E8763A',
-                    fontFamily: F, marginBottom: cashback > 0 ? 4 : 8,
+                </h3>
+
+                {/* Price — brand-primary color sesuai Stitch */}
+                <p style={{
+                    fontSize:   13,
+                    fontWeight: 600,
+                    color:      C.accent,
+                    fontFamily: F,
+                    margin:     0,
                 }}>
                     {formatRupiah(Number(menu.price))}
-                </div>
+                </p>
+
+                {/* Cashback badge */}
                 {isMahasiswa && cashback > 0 && (
-                    <div style={{
-                        fontSize: 10, color: '#16A34A', fontFamily: F,
-                        display: 'flex', alignItems: 'center', gap: 3,
-                        marginBottom: 8,
+                    <p style={{
+                        fontSize:   10,
+                        fontWeight: 500,
+                        color:      C.success,
+                        fontFamily: F,
+                        display:    'flex',
+                        alignItems: 'center',
+                        gap:        4,
+                        margin:     0,
                     }}>
-                        <span style={{ fontSize: 6, lineHeight: 1 }}>●</span>
+                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.success, flexShrink: 0 }} />
                         Cashback {formatRupiah(cashback)}
-                    </div>
+                    </p>
                 )}
 
                 {/* Action */}
-                <div style={{ marginTop: 'auto' }}>
+                <div style={{ marginTop: 'auto', paddingTop: 10 }}>
                     {cartItem ? (
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                        <div style={{
+                            display:        'flex',
+                            alignItems:     'center',
+                            justifyContent: 'space-between',
+                            background:     'rgba(247,245,242,0.70)',
+                            borderRadius:   8,
+                            padding:        '3px',
+                        }}>
                             <button onClick={onDecrement} style={{
-                                width: 30, height: 30, borderRadius: 8,
-                                background: '#F5F0EB', border: 'none', cursor: 'pointer',
-                                fontSize: 18, fontWeight: 500, color: '#6B5E52',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                fontFamily: F,
+                                width:          28, height: 28,
+                                borderRadius:   6,
+                                background:     C.surface,
+                                border:         'none',
+                                cursor:         'pointer',
+                                fontSize:       16, fontWeight: 500,
+                                color:          C.accent,
+                                display:        'flex',
+                                alignItems:     'center',
+                                justifyContent: 'center',
+                                boxShadow:      '0 1px 3px rgba(0,0,0,0.08)',
                             }}>−</button>
+
                             <span style={{
-                                fontSize: 15, fontWeight: 700, color: '#1A1814',
-                                minWidth: 20, textAlign: 'center', fontFamily: F,
+                                fontSize:   12, fontWeight: 700,
+                                color:      C.textPrimary,
+                                minWidth:   20,
+                                textAlign:  'center',
+                                fontFamily: F,
+                                padding:    '0 6px',
                             }}>
                                 {cartItem.quantity}
                             </span>
+
                             <button onClick={onIncrement} style={{
-                                width: 30, height: 30, borderRadius: 8,
-                                background: '#E8763A', border: 'none', cursor: 'pointer',
-                                fontSize: 18, fontWeight: 600, color: '#FFFFFF',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                boxShadow: '0 3px 10px rgba(232,118,58,0.32)',
-                                fontFamily: F,
+                                width:          28, height: 28,
+                                borderRadius:   6,
+                                background:     C.accent,
+                                border:         'none',
+                                cursor:         'pointer',
+                                fontSize:       16, fontWeight: 600,
+                                color:          C.surface,
+                                display:        'flex',
+                                alignItems:     'center',
+                                justifyContent: 'center',
+                                boxShadow:      '0 1px 3px rgba(0,0,0,0.12)',
                             }}>+</button>
                         </div>
                     ) : (
-                        <button onClick={onAdd} style={{
-                            width: '100%',
-                            background: '#E8763A', color: '#FFFFFF',
-                            border: 'none', borderRadius: 50,
-                            padding: '8px 0',
-                            fontSize: 12, fontWeight: 700,
-                            fontFamily: F, cursor: 'pointer',
-                            boxShadow: '0 3px 10px rgba(232,118,58,0.28)',
+                        <button onClick={onAdd} className="w9-add-btn" style={{
+                            width:         '100%',
+                            background:    C.accent,
+                            color:         C.surface,
+                            border:        'none',
+                            borderRadius:  8,
+                            padding:       '8px 0',
+                            fontSize:      12,
+                            fontWeight:    700,
+                            fontFamily:    F,
+                            cursor:        'pointer',
+                            letterSpacing: '0.01em',
                         }}>
                             + Tambah
                         </button>
                     )}
                 </div>
             </div>
-        </div>
+        </article>
     );
 }
 
-/* ── Main page ─────────────────────────────────────────────────────── */
+/* ── Main page ─────────────────────────────────────────────────── */
 export default function CustomerMenu({ categories, table }) {
     const [activeCategory, setActiveCategory] = useState('all');
     const [search,         setSearch]         = useState('');
@@ -115,7 +188,6 @@ export default function CustomerMenu({ categories, table }) {
 
     const { items, addItem, updateQty, setTable, total, count } = useCart();
 
-    /* Auth guard — jalankan sebelum render konten */
     useEffect(() => {
         try {
             const saved = sessionStorage.getItem('w9_customer');
@@ -144,20 +216,17 @@ export default function CustomerMenu({ categories, table }) {
         }
     }, [table?.id]);
 
-    /* Cart lookup map */
     const cartMap = useMemo(() => {
         const m = {};
         items.forEach(i => { m[i.menuId] = i; });
         return m;
     }, [items]);
 
-    /* Flatten menus */
     const allMenus = useMemo(
         () => categories.flatMap(c => c.menus.map(m => ({ ...m, categoryName: c.name }))),
         [categories]
     );
 
-    /* Filtered menus */
     const filtered = useMemo(() => {
         let list = activeCategory === 'all'
             ? allMenus
@@ -169,11 +238,8 @@ export default function CustomerMenu({ categories, table }) {
         return list;
     }, [allMenus, activeCategory, search]);
 
-    /* Group by category */
     const grouped = useMemo(() => {
-        if (activeCategory !== 'all') {
-            return [{ label: activeCategory, menus: filtered }];
-        }
+        if (activeCategory !== 'all') return [{ label: activeCategory, menus: filtered }];
         const map = {};
         filtered.forEach(m => {
             if (!map[m.categoryName]) map[m.categoryName] = [];
@@ -188,207 +254,242 @@ export default function CustomerMenu({ categories, table }) {
         <CustomerLayout activeTab="menu">
             <Head>
                 <title>Menu — W9 Cafe</title>
-                <meta name="description" content="Pesan makanan dan minuman favorit Anda di W9 Cafe STIE Totalwin." />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" />
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+                <style>{`
+                    html, body { background: #F7F5F2; }
+                    .w9-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+                    .w9-card:hover { box-shadow: ${C.shadowLift} !important; transform: translateY(-2px); }
+                    .w9-add-btn { transition: background 0.15s ease; }
+                    .w9-add-btn:hover { background: ${C.accentHover} !important; }
+                    .w9-chip { transition: background 0.15s, color 0.15s; }
+                    .w9-search:focus { outline: none; box-shadow: 0 0 0 2px rgba(68,64,60,0.20) !important; }
+                    .w9-chips::-webkit-scrollbar { display: none; }
+                    .w9-scroll::-webkit-scrollbar { display: none; }
+                    .w9-wallpaper {
+                        position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+                        width: 100%; max-width: 430px; height: 100vh;
+                        z-index: 0; pointer-events: none; overflow: hidden; background: #F2EFE9;
+                    }
+                `}</style>
             </Head>
 
-            {/* ── Header ── */}
-            <div style={{ background: '#FFFFFF', padding: '20px 20px 16px' }}>
-                {/* Logo + Greeting row */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
-                    {/* Logo */}
-                    <div style={{
-                        width: 52, height: 52, borderRadius: 14, overflow: 'hidden', flexShrink: 0,
-                        background: 'radial-gradient(ellipse 140% 140% at 50% 30%, #2A4F5F 0%, #1B3A4B 100%)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        boxShadow: '0 4px 14px rgba(0,0,0,0.18)',
-                    }}>
-                        <img
-                            src="/images/logo.jpg"
-                            alt="W9 Cafe"
-                            fetchPriority="high"
-                            loading="eager"
-                            width="52"
-                            height="52"
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                            onError={e => { e.target.style.display = 'none'; }}
+            {/* Wallpaper */}
+            <div className="w9-wallpaper" aria-hidden="true">
+                <img src="/images/wallpaper-menu.jpg" alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
+                />
+            </div>
+
+            {/* Fixed flex-column container */}
+            <div style={{
+                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: '100%', maxWidth: 430, height: '100vh',
+                display: 'flex', flexDirection: 'column', zIndex: 1,
+            }}>
+
+                {/* ── Header ── */}
+                <header style={{ padding: '24px 20px 14px', flexShrink: 0, background: 'transparent' }}>
+
+                    {/* Logo + greeting row */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
+
+                        {/* Logo — rounded-xl dark bg sesuai Stitch */}
+                        <div style={{
+                            width: 48, height: 48, borderRadius: 14,
+                            background: C.accent,
+                            overflow: 'hidden', flexShrink: 0,
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            boxShadow: '0 2px 8px rgba(68,64,60,0.25)',
+                        }}>
+                            <img
+                                src="/images/logo.jpg" alt="W9 Cafe"
+                                fetchPriority="high" loading="eager"
+                                style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.90 }}
+                                onError={e => {
+                                    e.target.style.display = 'none';
+                                    e.target.parentElement.innerHTML = '<span style="color:#fff;font-size:16px;font-style:italic;font-weight:700">w9</span>';
+                                }}
+                            />
+                        </div>
+
+                        {/* Greeting + name inline */}
+                        <div style={{ flex: 1 }}>
+                            <p style={{
+                                fontSize: 10, fontWeight: 500, color: C.textSecond,
+                                fontFamily: F, textTransform: 'uppercase',
+                                letterSpacing: '0.10em', margin: '0 0 3px',
+                            }}>
+                                Selamat datang,
+                            </p>
+                            <h1 style={{
+                                fontSize: 19, fontWeight: 700, color: C.textPrimary,
+                                fontFamily: F, letterSpacing: '-0.02em',
+                                margin: 0, lineHeight: 1.2,
+                            }}>
+                                {customer?.name ?? 'Pelanggan'}
+                                <span style={{
+                                    fontSize: 13, fontWeight: 400, color: C.textMuted,
+                                    marginLeft: 6, letterSpacing: 0,
+                                }}>
+                                    • Meja {table?.table_number ?? customer?.tableNumber ?? '—'}
+                                </span>
+                            </h1>
+                        </div>
+
+                    </div>
+
+                    {/* Search — no border, rounded-12, backdrop-blur sesuai Stitch */}
+                    <div style={{ position: 'relative' }}>
+                        <Search size={18} color={C.textMuted} strokeWidth={2}
+                            style={{
+                                position: 'absolute', left: 14,
+                                top: '50%', transform: 'translateY(-50%)',
+                                pointerEvents: 'none',
+                            }}
+                        />
+                        <input
+                            type="text"
+                            value={search}
+                            onChange={e => setSearch(e.target.value)}
+                            placeholder="Cari menu favoritmu..."
+                            className="w9-search"
+                            style={{
+                                width: '100%', height: 46,
+                                background: 'rgba(255,255,255,0.90)',
+                                backdropFilter: 'blur(6px)',
+                                border: 'none',
+                                borderRadius: 12,
+                                padding: '0 16px 0 42px',
+                                fontSize: 14, fontWeight: 400,
+                                color: C.textPrimary, fontFamily: F,
+                                outline: 'none', boxSizing: 'border-box',
+                                boxShadow: C.shadow,
+                            }}
                         />
                     </div>
+                </header>
 
-                    {/* Text */}
-                    <div>
-                        <div style={{
-                            fontSize: 12, color: '#A8998A',
-                            fontFamily: F, marginBottom: 1,
-                        }}>
-                            Selamat datang,
-                        </div>
-                        <div style={{
-                            fontSize: 20, fontWeight: 800, color: '#1A1814',
-                            fontFamily: F, letterSpacing: -0.4, lineHeight: 1.2,
-                        }}>
-                            {customer?.name ?? 'Pelanggan'}
-                        </div>
-                        <div style={{
-                            fontSize: 11, color: '#A8998A', fontFamily: F, marginTop: 1,
-                        }}>
-                            Meja {table?.table_number ?? customer?.tableNumber ?? '-'}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Search */}
-                <div style={{ position: 'relative' }}>
-                    <Search size={17} style={{
-                        position: 'absolute', left: 16, top: '50%',
-                        transform: 'translateY(-50%)',
-                        color: '#C4B5A5', pointerEvents: 'none',
-                    }} />
-                    <input
-                        type="text"
-                        value={search}
-                        onChange={e => setSearch(e.target.value)}
-                        placeholder="Cari menu favoritmu..."
-                        style={{
-                            width: '100%', height: 46,
-                            background: '#F5F0EB',
-                            border: 'none', borderRadius: 50,
-                            padding: '0 20px 0 44px',
-                            fontSize: 14, color: '#1A1814',
-                            fontFamily: F, outline: 'none',
-                            boxSizing: 'border-box',
-                        }}
-                    />
-                </div>
-            </div>
-
-            {/* ── Category chips ── */}
-            <div style={{
-                background: '#FFFFFF',
-                borderBottom: '1px solid #F5F0EB',
-            }}>
-                <div style={{
-                    display: 'flex', gap: 8,
-                    overflowX: 'auto', scrollbarWidth: 'none',
-                    padding: '12px 20px 14px',
-                }}>
-                    {[{ id: 'all', name: 'Semua' }, ...categories].map(c => {
-                        const active = activeCategory === (c.id === 'all' ? 'all' : c.name);
-                        return (
-                            <button
-                                key={c.id}
-                                onClick={() => setActiveCategory(c.id === 'all' ? 'all' : c.name)}
-                                style={{
-                                    flexShrink: 0,
-                                    background: active ? '#E8763A' : '#F5F0EB',
-                                    borderRadius: 50, border: 'none',
-                                    padding: '8px 18px',
-                                    fontSize: 13,
-                                    fontWeight: active ? 700 : 500,
-                                    color: active ? '#FFFFFF' : '#8C7B6B',
-                                    fontFamily: F, cursor: 'pointer',
-                                    whiteSpace: 'nowrap',
-                                    transition: 'background 0.15s, color 0.15s',
-                                    boxShadow: active ? '0 3px 10px rgba(232,118,58,0.28)' : 'none',
-                                }}
-                            >
-                                {c.name}
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* ── Menu list ── */}
-            <div style={{
-                padding: '16px 20px',
-                paddingBottom: count > 0 ? 90 : 32,
-                background: '#F5F0EB',
-                minHeight: 'calc(100vh - 180px)',
-            }}>
-                {filtered.length === 0 ? (
-                    <div style={{
-                        textAlign: 'center', color: '#B5A898',
-                        padding: '56px 0', fontSize: 14, fontFamily: F,
+                {/* ── Category chips — rounded-12 sesuai Stitch ── */}
+                <div style={{ flexShrink: 0 }}>
+                    <div className="w9-chips" style={{
+                        display: 'flex', gap: 8, overflowX: 'auto',
+                        scrollbarWidth: 'none', padding: '4px 20px 14px',
                     }}>
-                        Tidak ada menu ditemukan
+                        {[{ id: 'all', name: 'Semua' }, ...categories].map(c => {
+                            const active = activeCategory === (c.id === 'all' ? 'all' : c.name);
+                            return (
+                                <button
+                                    key={c.id}
+                                    onClick={() => setActiveCategory(c.id === 'all' ? 'all' : c.name)}
+                                    className="w9-chip"
+                                    style={{
+                                        flexShrink:     0,
+                                        background:     active ? C.accent : 'rgba(255,255,255,0.90)',
+                                        backdropFilter: active ? 'none' : 'blur(6px)',
+                                        borderRadius:   12,
+                                        border:         active ? 'none' : '1px solid rgba(255,255,255,0.20)',
+                                        padding:        '8px 20px',
+                                        fontSize:       13,
+                                        fontWeight:     active ? 600 : 500,
+                                        color:          active ? C.surface : C.textSecond,
+                                        fontFamily:     F,
+                                        cursor:         'pointer',
+                                        whiteSpace:     'nowrap',
+                                        boxShadow:      active ? '0 2px 8px rgba(68,64,60,0.25)' : C.shadow,
+                                    }}
+                                >
+                                    {c.name}
+                                </button>
+                            );
+                        })}
                     </div>
-                ) : activeCategory === 'all' ? (
-                    /* Flat list saat "Semua" — jarak seragam */
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                        {filtered.map((menu, idx) => (
-                            <MenuItemCard
-                                key={menu.id}
-                                menu={menu}
-                                priority={idx < 4}
-                                cartItem={cartMap[menu.id]}
-                                isMahasiswa={!!customer?.isMahasiswa}
-                                onAdd={() => addItem(menu)}
-                                onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
-                                onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    /* Grouped dengan section header saat kategori tertentu dipilih */
-                    grouped.map(group => (
-                        <div key={group.label} style={{ marginBottom: 22 }}>
-                            <div style={{
-                                display: 'flex', justifyContent: 'space-between',
-                                alignItems: 'center', marginBottom: 12,
-                            }}>
-                                <span style={{
-                                    fontSize: 16, fontWeight: 700,
-                                    color: '#1A1814', fontFamily: F,
-                                }}>
-                                    {group.label}
-                                </span>
-                                <span style={{
-                                    fontSize: 12, color: '#A8998A', fontFamily: F,
-                                }}>
-                                    {group.menus.length} menu
-                                </span>
-                            </div>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                                {group.menus.map(menu => (
-                                    <MenuItemCard
-                                        key={menu.id}
-                                        menu={menu}
-                                        cartItem={cartMap[menu.id]}
-                                        isMahasiswa={!!customer?.isMahasiswa}
-                                        onAdd={() => addItem(menu)}
-                                        onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
-                                        onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    ))
-                )}
-            </div>
+                </div>
 
-            {/* ── Fixed cart bar ── */}
+                {/* ── Menu scroll area ── */}
+                <div className="w9-scroll" style={{
+                    flex: 1, overflowY: 'auto',
+                    padding: '4px 16px',
+                    paddingBottom: count > 0 ? 140 : 80,
+                    scrollbarWidth: 'none',
+                    WebkitOverflowScrolling: 'touch',
+                }}>
+                    {filtered.length === 0 ? (
+                        <div style={{
+                            textAlign: 'center', color: C.textMuted,
+                            padding: '64px 0', fontSize: 14,
+                            fontFamily: F, lineHeight: 1.6,
+                        }}>
+                            Tidak ada menu ditemukan
+                        </div>
+
+                    ) : activeCategory === 'all' ? (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                            {filtered.map((menu, idx) => (
+                                <MenuItemCard
+                                    key={menu.id} menu={menu} priority={idx < 4}
+                                    cartItem={cartMap[menu.id]}
+                                    isMahasiswa={!!customer?.isMahasiswa}
+                                    onAdd={() => addItem(menu)}
+                                    onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
+                                    onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
+                                />
+                            ))}
+                        </div>
+
+                    ) : (
+                        grouped.map(group => (
+                            <div key={group.label} style={{ marginBottom: 24 }}>
+                                <div style={{
+                                    display: 'flex', justifyContent: 'space-between',
+                                    alignItems: 'center', marginBottom: 12,
+                                }}>
+                                    <span style={{
+                                        fontSize: 11, fontWeight: 600, color: C.textMuted,
+                                        fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.08em',
+                                    }}>
+                                        {group.label}
+                                    </span>
+                                    <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F }}>
+                                        {group.menus.length} menu
+                                    </span>
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                                    {group.menus.map(menu => (
+                                        <MenuItemCard
+                                            key={menu.id} menu={menu}
+                                            cartItem={cartMap[menu.id]}
+                                            isMahasiswa={!!customer?.isMahasiswa}
+                                            onAdd={() => addItem(menu)}
+                                            onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
+                                            onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+
+            </div>{/* end fixed container */}
+
+            {/* ── Cart bar ── */}
             {count > 0 && (
                 <div style={{
-                    position: 'fixed', bottom: 0,
-                    left: '50%', transform: 'translateX(-50%)',
+                    position: 'fixed', bottom: 64, left: '50%', transform: 'translateX(-50%)',
                     width: '100%', maxWidth: 430,
-                    background: '#1A1814',
+                    background: C.textPrimary,
                     padding: '12px 16px',
-                    display: 'flex', alignItems: 'center',
-                    justifyContent: 'space-between',
+                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     zIndex: 100,
-                    boxShadow: '0 -4px 24px rgba(0,0,0,0.22)',
                 }}>
-                    {/* Left */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{ position: 'relative', flexShrink: 0 }}>
-                            <ShoppingBag size={22} color="#FFFFFF" />
+                            <ShoppingBag size={22} color={C.surface} />
                             <span style={{
-                                position: 'absolute', top: -7, right: -7,
-                                background: '#E8763A', color: '#FFFFFF',
+                                position: 'absolute', top: -6, right: -6,
+                                background: C.warning, color: C.textPrimary,
                                 borderRadius: '50%', width: 18, height: 18,
                                 fontSize: 10, fontWeight: 700, fontFamily: F,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -396,31 +497,23 @@ export default function CustomerMenu({ categories, table }) {
                                 {count}
                             </span>
                         </div>
-                        <div>
-                            <div style={{ fontSize: 11, color: '#A8998A', fontFamily: F }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+                            <span style={{ fontSize: 11, color: C.textSecond, fontFamily: F }}>
                                 {count} item di keranjang
-                            </div>
-                            <div style={{
-                                fontSize: 14, fontWeight: 700, color: '#FFFFFF',
-                                fontFamily: F, letterSpacing: -0.2,
-                            }}>
+                            </span>
+                            <span style={{ fontSize: 15, fontWeight: 700, color: C.surface, fontFamily: F, letterSpacing: '-0.02em' }}>
                                 {formatRupiah(total)}
-                            </div>
+                            </span>
                         </div>
                     </div>
-
-                    {/* Right */}
                     <button
                         onClick={() => router.visit('/customer/cart')}
                         style={{
-                            background: '#E8763A', color: '#FFFFFF',
-                            border: 'none', borderRadius: 12,
-                            padding: '10px 18px',
-                            fontSize: 13, fontWeight: 700,
-                            fontFamily: F, cursor: 'pointer',
-                            whiteSpace: 'nowrap',
-                            boxShadow: '0 4px 14px rgba(232,118,58,0.35)',
-                            letterSpacing: -0.1,
+                            background: C.surface, color: C.textPrimary,
+                            border: 'none', borderRadius: 8,
+                            padding: '9px 16px', fontSize: 13, fontWeight: 600,
+                            fontFamily: F, cursor: 'pointer', whiteSpace: 'nowrap',
+                            letterSpacing: '-0.01em',
                         }}
                     >
                         Lihat Keranjang →

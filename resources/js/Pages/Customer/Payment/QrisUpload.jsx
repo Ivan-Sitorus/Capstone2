@@ -1,10 +1,23 @@
 import { useState } from 'react';
-import { router } from '@inertiajs/react';
+import { router, Head } from '@inertiajs/react';
 import axios from 'axios';
 import { ChevronLeft, Camera, Send, CheckCircle } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
 import useCart from '@/Hooks/useCart';
+
+const F = '"Inter", system-ui, sans-serif';
+const C = {
+    bg:         '#F7F5F2',
+    surface:    '#FFFFFF',
+    alt:        '#EFEDE9',
+    border:     '#E7E5E4',
+    accent:     '#44403C',
+    textHead:   '#1C1917',
+    textSecond: '#78716C',
+    textMuted:  '#A8A29E',
+    shadow:     '0 4px 20px -2px rgba(0,0,0,0.05)',
+};
 
 export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, rejectedMessage }) {
     const [file,      setFile]      = useState(null);
@@ -53,142 +66,191 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
 
     return (
         <CustomerLayout activeTab="cart">
-            {/* ── Header ── */}
+            <Head>
+                <title>Pembayaran QRIS — W9 Cafe</title>
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+                <style>{`
+                    html, body { background: #F7F5F2; }
+                    .w9q-upload { transition: background 0.15s; }
+                    .w9q-upload:hover { background: rgba(239,237,233,0.60) !important; }
+                    .w9q-btn { transition: background 0.15s, transform 0.1s; }
+                    .w9q-btn:active { transform: scale(0.98); }
+                `}</style>
+            </Head>
+
+            {/* Wallpaper */}
             <div style={{
-                background: '#FFFFFF',
-                borderBottom: '1px solid #F0EBE5',
-                padding: '22px 24px 16px',
+                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: '100%', maxWidth: 430, height: '100vh',
+                zIndex: 0, pointerEvents: 'none', overflow: 'hidden', background: C.bg,
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <img src="/images/wallpaper-menu.jpg" alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+                />
+            </div>
+
+            {/* Fixed full-height container — NO scroll */}
+            <div style={{
+                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: '100%', maxWidth: 430,
+                height: '100vh',
+                display: 'flex', flexDirection: 'column',
+                zIndex: 1,
+                paddingBottom: 64, /* ruang BottomNav */
+                boxSizing: 'border-box',
+            }}>
+
+                {/* ── Header ── */}
+                <header style={{
+                    padding: '28px 20px 12px',
+                    display: 'flex', alignItems: 'center', gap: 14,
+                    flexShrink: 0,
+                }}>
                     <button
-                        onClick={() => router.visit(`/customer/payment/${order.order_code}/choose`)}
+                        onClick={() => router.visit(`/customer/payment/${order.id}/choose`)}
                         style={{
-                            width: 36, height: 36, borderRadius: 12,
-                            background: '#F0EBE5', border: 'none', cursor: 'pointer',
+                            width: 38, height: 38, borderRadius: 11,
+                            background: 'rgba(255,255,255,0.90)',
+                            backdropFilter: 'blur(6px)',
+                            border: `1px solid rgba(231,229,228,0.50)`,
+                            boxShadow: C.shadow,
+                            cursor: 'pointer',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             flexShrink: 0,
                         }}
                     >
-                        <ChevronLeft size={20} color="#2D2016" />
+                        <ChevronLeft size={18} color={C.textHead} strokeWidth={2} />
                     </button>
                     <div>
-                        <div style={{ fontSize: 20, fontWeight: 700, color: '#2D2016', fontFamily: '"DM Sans", system-ui' }}>
+                        <h1 style={{
+                            fontSize: 17, fontWeight: 700, color: C.textHead,
+                            fontFamily: F, letterSpacing: '-0.02em', margin: 0,
+                        }}>
                             Pembayaran QRIS
-                        </div>
-                        <div style={{ fontSize: 12, color: '#8C7B6B', fontFamily: 'Outfit, system-ui' }}>
-                            #{order.order_code}
-                        </div>
+                        </h1>
+                        {order.order_code && (
+                            <span style={{ fontSize: 11, fontWeight: 500, color: C.textSecond, fontFamily: F }}>
+                                #{order.order_code}
+                            </span>
+                        )}
                     </div>
-                </div>
-            </div>
-
-            {/* ── Content ── */}
-            <div style={{ padding: '0 24px 20px', display: 'flex', flexDirection: 'column', gap: 14 }}>
-
-                {/* Rejection banner */}
-                {rejectedMessage && !uploaded && (
-                    <div style={{
-                        background: '#FEF2F2', border: '1px solid #FECACA',
-                        borderRadius: 14, padding: 14, marginTop: 14,
-                    }}>
-                        <div style={{ fontSize: 13, fontWeight: 700, color: '#DC2626', marginBottom: 4, fontFamily: 'Outfit, system-ui' }}>
-                            Bukti Ditolak Kasir
-                        </div>
-                        <div style={{ fontSize: 13, color: '#5C4A3A', fontFamily: 'Outfit, system-ui' }}>{rejectedMessage}</div>
-                        <div style={{ fontSize: 12, color: '#8C7B6B', marginTop: 6, fontFamily: 'Outfit, system-ui' }}>
-                            Silakan upload ulang bukti pembayaran yang valid.
-                        </div>
-                    </div>
-                )}
+                </header>
 
                 {!uploaded ? (
                     <>
-                        {/* QR card */}
-                        <div style={{
-                            background: '#FFFFFF', borderRadius: 20,
-                            border: '1px solid #EDE8E2',
-                            boxShadow: '0 3px 14px rgba(45,32,22,0.05)',
-                            padding: '18px 20px 14px',
-                            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10,
-                            marginTop: rejectedMessage ? 0 : 14,
-                        }}>
-                            {/* QR image */}
+                        {/* ── Rejection banner (compact) ── */}
+                        {rejectedMessage && (
                             <div style={{
-                                width: 170, height: 170, borderRadius: 14,
-                                overflow: 'hidden',
-                                boxShadow: '0 2px 8px rgba(45,32,22,0.10)',
-                                background: '#F5F0EB',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                margin: '0 20px 8px',
+                                background: '#FEF2F2', border: '1px solid #FECACA',
+                                borderRadius: 10, padding: '8px 12px', flexShrink: 0,
                             }}>
-                                <img
-                                    src={qrisImage}
-                                    alt="QRIS W9 Cafe"
-                                    style={{ width: '100%', height: '100%', objectFit: 'contain' }}
-                                    onError={e => { e.target.src = '/images/logo.jpg'; }}
-                                />
+                                <p style={{ fontSize: 12, fontWeight: 700, color: '#DC2626', margin: '0 0 2px', fontFamily: F }}>
+                                    Bukti Ditolak Kasir
+                                </p>
+                                <p style={{ fontSize: 12, color: C.textSecond, margin: 0, fontFamily: F }}>{rejectedMessage}</p>
+                            </div>
+                        )}
+
+                        {/* ── Main card — flex: 1, semua muat ── */}
+                        <div style={{
+                            flex: 1,
+                            margin: '0 20px',
+                            background: 'rgba(255,255,255,0.90)',
+                            backdropFilter: 'blur(8px)',
+                            borderRadius: 16,
+                            border: `1px solid rgba(231,229,228,0.30)`,
+                            boxShadow: C.shadow,
+                            padding: '16px 20px',
+                            display: 'flex', flexDirection: 'column',
+                            overflow: 'hidden',
+                            minHeight: 0,
+                        }}>
+                            {/* QR image — flex: 1, tumbuh proporsional */}
+                            <div style={{
+                                flex: 1,
+                                display: 'flex', justifyContent: 'center', alignItems: 'center',
+                                minHeight: 0,
+                                marginBottom: 10,
+                            }}>
+                                <div style={{
+                                    background: C.surface,
+                                    padding: 6, borderRadius: 14,
+                                    border: `1px solid rgba(231,229,228,0.50)`,
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                                    overflow: 'hidden',
+                                    maxWidth: 200, width: '100%',
+                                    maxHeight: '100%',
+                                }}>
+                                    <img
+                                        src={qrisImage} alt="QRIS W9 Cafe"
+                                        style={{ width: '100%', height: 'auto', borderRadius: 10, display: 'block' }}
+                                        onError={e => { e.target.src = '/images/logo.jpg'; }}
+                                    />
+                                </div>
                             </div>
 
-                            <span style={{ fontSize: 14, fontWeight: 500, color: '#8C7B6B', fontFamily: 'Outfit, system-ui' }}>
-                                {qrisName || 'W9 Cafe STIE Totalwin'}
-                            </span>
-
-                            <span style={{
-                                fontSize: 24, fontWeight: 700, color: '#E8763A',
-                                fontFamily: '"DM Sans", system-ui', letterSpacing: -0.5,
-                            }}>
-                                {formatRupiah(totalAmount)}
-                            </span>
-
-                            <span style={{
-                                fontSize: 11, color: '#B5A898', textAlign: 'center',
-                                maxWidth: 260, fontFamily: 'Outfit, system-ui',
-                            }}>
-                                Scan QR menggunakan aplikasi dompet digital Anda
-                            </span>
+                            {/* Merchant + amount (kompak) */}
+                            <div style={{ textAlign: 'center', flexShrink: 0, marginBottom: 12 }}>
+                                <p style={{ fontSize: 12, fontWeight: 500, color: C.textSecond, fontFamily: F, margin: '0 0 4px' }}>
+                                    {qrisName || 'W9 Cafe STIE Totalwin'}
+                                </p>
+                                <p style={{ fontSize: 26, fontWeight: 700, color: C.textHead, fontFamily: F, letterSpacing: '-0.03em', margin: 0 }}>
+                                    {formatRupiah(totalAmount)}
+                                </p>
+                                <p style={{ fontSize: 10, color: C.textMuted, fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 6 }}>
+                                    Scan QR dengan aplikasi dompet digital
+                                </p>
+                            </div>
 
                             {/* Divider */}
-                            <div style={{ width: '100%', height: 1, background: '#F0EBE5' }} />
+                            <div style={{ height: 1, background: C.alt, flexShrink: 0, marginBottom: 12 }} />
 
-                            {/* Upload section */}
-                            <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
-                                <div style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 4 }}>
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: '#2D2016', fontFamily: 'Outfit, system-ui' }}>
-                                        Upload Bukti Pembayaran
-                                    </span>
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: '#E8763A' }}>*</span>
-                                </div>
+                            {/* Upload section (kompak) */}
+                            <div style={{ flexShrink: 0 }}>
+                                <label style={{ fontSize: 13, fontWeight: 600, color: C.textHead, fontFamily: F, display: 'block', marginBottom: 8 }}>
+                                    Upload Bukti Pembayaran <span style={{ color: '#F87171' }}>*</span>
+                                </label>
 
-                                <label htmlFor="proof-upload" style={{ width: '100%', cursor: 'pointer' }}>
-                                    <div style={{
-                                        width: '100%', height: preview ? 'auto' : 80,
-                                        background: '#FAF8F5',
-                                        borderRadius: 14,
-                                        border: `1px solid ${file ? '#E8763A' : '#D6CFC6'}`,
-                                        display: 'flex', flexDirection: 'column',
-                                        alignItems: 'center', justifyContent: 'center', gap: 6,
-                                        overflow: 'hidden',
-                                        padding: preview ? 0 : undefined,
+                                <label htmlFor="proof-upload" style={{ cursor: 'pointer', display: 'block' }}>
+                                    <div className="w9q-upload" style={{
+                                        border: `2px dashed ${file ? C.accent : C.border}`,
+                                        background: file ? 'rgba(239,237,233,0.40)' : 'rgba(239,237,233,0.30)',
+                                        borderRadius: 12,
+                                        padding: preview ? 0 : '14px 16px',
+                                        display: 'flex', flexDirection: preview ? 'column' : 'row',
+                                        alignItems: 'center', justifyContent: 'center',
+                                        gap: 10, overflow: 'hidden',
                                     }}>
                                         {preview ? (
-                                            <img
-                                                src={preview}
-                                                alt="preview"
-                                                style={{ width: '100%', maxHeight: 200, objectFit: 'contain' }}
+                                            <img src={preview} alt="preview"
+                                                style={{ width: '100%', maxHeight: 80, objectFit: 'contain', borderRadius: 10, display: 'block' }}
                                             />
                                         ) : (
                                             <>
-                                                <Camera size={24} color="#B5A898" />
-                                                <span style={{ fontSize: 13, fontWeight: 600, color: '#2D2016', fontFamily: 'Outfit, system-ui' }}>
-                                                    Pilih atau Foto Bukti Bayar
-                                                </span>
-                                                <span style={{ fontSize: 11, color: '#B5A898', fontFamily: 'Outfit, system-ui' }}>
-                                                    JPG, PNG, max 5MB
-                                                </span>
+                                                <div style={{
+                                                    width: 36, height: 36, borderRadius: '50%',
+                                                    background: C.surface,
+                                                    boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
+                                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                    flexShrink: 0,
+                                                }}>
+                                                    <Camera size={18} color={C.textSecond} strokeWidth={1.5} />
+                                                </div>
+                                                <div>
+                                                    <p style={{ fontSize: 13, fontWeight: 700, color: C.textHead, fontFamily: F, margin: 0 }}>
+                                                        Pilih atau Foto Bukti Bayar
+                                                    </p>
+                                                    <p style={{ fontSize: 11, color: C.textSecond, fontFamily: F, margin: 0 }}>
+                                                        JPG, PNG, max 5MB
+                                                    </p>
+                                                </div>
                                             </>
                                         )}
                                     </div>
-                                    <input
-                                        id="proof-upload" type="file"
+                                    <input id="proof-upload" type="file"
                                         accept="image/jpeg,image/png,image/jpg,image/webp"
                                         style={{ display: 'none' }}
                                         onChange={handleFileChange}
@@ -197,71 +259,87 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                 </label>
 
                                 {error && (
-                                    <p style={{ color: '#DC2626', fontSize: 12, margin: '2px 0 0', fontFamily: 'Outfit, system-ui', alignSelf: 'flex-start' }}>
+                                    <p style={{ color: '#DC2626', fontSize: 12, fontFamily: F, margin: '6px 0 0' }}>
                                         {error}
                                     </p>
                                 )}
                             </div>
                         </div>
 
-                        {/* Spacer */}
-                        <div style={{ flex: 1 }} />
-
-                        {/* CTA */}
-                        <button
-                            onClick={handleUpload}
-                            disabled={!file || uploading}
-                            style={{
-                                width: '100%', height: 54,
-                                background: !file ? '#EDE8E2' : '#E8763A',
-                                color: !file ? '#9AA3AF' : '#FFFFFF',
-                                border: 'none', borderRadius: 18,
-                                fontSize: 16, fontWeight: 700,
-                                cursor: !file ? 'default' : 'pointer',
-                                boxShadow: !file ? 'none' : '0 4px 16px rgba(232,118,58,0.30)',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                                fontFamily: '"DM Sans", system-ui',
-                            }}
-                        >
-                            <Send size={18} />
-                            {uploading ? 'Mengupload...' : 'Kirim Bukti Pembayaran'}
-                        </button>
+                        {/* ── Submit button ── */}
+                        <div style={{ padding: '12px 20px 8px', flexShrink: 0 }}>
+                            <button
+                                onClick={handleUpload}
+                                disabled={!file || uploading}
+                                className="w9q-btn"
+                                style={{
+                                    width: '100%', padding: '14px 0',
+                                    background: !file || uploading ? C.border : C.accent,
+                                    color: !file || uploading ? C.textSecond : C.surface,
+                                    border: 'none', borderRadius: 12,
+                                    fontSize: 15, fontWeight: 700,
+                                    cursor: !file || uploading ? 'not-allowed' : 'pointer',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+                                    fontFamily: F,
+                                    boxShadow: !file || uploading ? 'none' : '0 4px 16px rgba(68,64,60,0.30)',
+                                }}
+                            >
+                                <Send size={17} />
+                                {uploading ? 'Mengupload...' : 'Kirim Bukti Pembayaran'}
+                            </button>
+                        </div>
                     </>
+
                 ) : (
-                    /* Setelah upload berhasil */
-                    <div style={{ textAlign: 'center', padding: '40px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-                        <CheckCircle size={72} color="#28A745" />
-                        <h2 style={{ fontSize: 22, fontWeight: 700, color: '#2D2016', margin: 0, fontFamily: '"DM Sans", system-ui' }}>
-                            Bukti Dikirim!
-                        </h2>
-                        <p style={{ fontSize: 14, color: '#8C7B6B', margin: 0, lineHeight: 1.6, fontFamily: 'Outfit, system-ui' }}>
-                            Kasir sedang memverifikasi pembayaran Anda.<br/>
-                            Harap tunggu konfirmasi.
-                        </p>
+                    /* ── Success state — centered ── */
+                    <div style={{
+                        flex: 1,
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center',
+                        gap: 16, padding: '0 24px', textAlign: 'center',
+                    }}>
                         <div style={{
-                            width: '100%', background: '#F5F0EB',
-                            borderRadius: 12, padding: '10px 14px',
-                            textAlign: 'left',
+                            width: 72, height: 72, borderRadius: 18,
+                            background: 'rgba(74,222,128,0.12)',
+                            border: '1px solid rgba(74,222,128,0.25)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>
-                            <span style={{ fontSize: 12, color: '#6B5E52', lineHeight: 1.5, fontFamily: 'Outfit, system-ui' }}>
-                                Pantau status pesananmu di tab{' '}
-                                <strong style={{ color: '#E8763A' }}>Riwayat</strong>
-                                {' '}untuk melihat update dari kasir.
+                            <CheckCircle size={36} color="#4ADE80" strokeWidth={1.75} />
+                        </div>
+                        <div>
+                            <h2 style={{ fontSize: 20, fontWeight: 700, color: C.textHead, fontFamily: F, margin: '0 0 8px' }}>
+                                Bukti Dikirim!
+                            </h2>
+                            <p style={{ fontSize: 13, color: C.textSecond, fontFamily: F, margin: 0, lineHeight: 1.6 }}>
+                                Kasir sedang memverifikasi pembayaran Anda.<br/>Harap tunggu konfirmasi.
+                            </p>
+                        </div>
+                        <div style={{
+                            width: '100%', background: 'rgba(255,255,255,0.90)',
+                            backdropFilter: 'blur(6px)',
+                            borderRadius: 12, border: `1px solid ${C.border}`,
+                            padding: '12px 16px', textAlign: 'left',
+                        }}>
+                            <span style={{ fontSize: 13, color: C.textSecond, lineHeight: 1.5, fontFamily: F }}>
+                                Pantau status di tab <strong style={{ color: C.accent }}>Riwayat</strong> untuk update dari kasir.
                             </span>
                         </div>
                         <button
                             onClick={() => router.visit('/customer/riwayat')}
+                            className="w9q-btn"
                             style={{
-                                width: '100%', height: 52, background: '#E8763A', color: 'white',
-                                border: 'none', borderRadius: 18, fontSize: 15, fontWeight: 700,
-                                cursor: 'pointer', fontFamily: '"DM Sans", system-ui',
-                                boxShadow: '0 4px 16px rgba(232,118,58,0.30)',
+                                width: '100%', padding: '14px 0',
+                                background: C.accent, color: C.surface,
+                                border: 'none', borderRadius: 12,
+                                fontSize: 15, fontWeight: 700, cursor: 'pointer',
+                                fontFamily: F, boxShadow: '0 4px 16px rgba(68,64,60,0.30)',
                             }}
                         >
                             Cek Status Pesanan
                         </button>
                     </div>
                 )}
+
             </div>
         </CustomerLayout>
     );

@@ -1,6 +1,8 @@
 import { Link } from '@inertiajs/react';
-import { Coffee, ShoppingCart, Clock } from 'lucide-react';
+import { Home, ShoppingCart, Clock } from 'lucide-react';
 import useCart from '@/Hooks/useCart';
+
+const F = '"Inter", system-ui, sans-serif';
 
 function getRiwayatHref() {
     try {
@@ -17,74 +19,105 @@ export default function BottomNav({ activeTab }) {
     const { count } = useCart();
 
     const TABS = [
-        { key: 'menu',    label: 'Menu',      Icon: Coffee,       href: '/customer/menu' },
+        { key: 'menu',    label: 'Menu',      Icon: Home,         href: '/customer/menu' },
         { key: 'cart',    label: 'Keranjang', Icon: ShoppingCart, href: '/customer/cart' },
         { key: 'riwayat', label: 'Riwayat',   Icon: Clock,        href: getRiwayatHref() },
     ];
 
     return (
         <div style={{
-            position: 'fixed', bottom: 0,
-            left: '50%', transform: 'translateX(-50%)',
-            width: '100%', maxWidth: 430,
-            padding: '10px 18px 18px',
-            background: '#FAF8F5',
-            zIndex: 100,
+            position:        'fixed',
+            bottom:          0,
+            left:            '50%',
+            transform:       'translateX(-50%)',
+            width:           '100%',
+            maxWidth:        430,
+            background:      '#FFFFFF',
+            borderRadius:    '20px 20px 0 0',
+            boxShadow:       '0 -2px 16px rgba(28,25,23,0.08)',
+            zIndex:          100,
+            paddingBottom:   'env(safe-area-inset-bottom, 0px)',
         }}>
-            <nav style={{
-                background: '#FFFFFF',
-                borderRadius: 22,
-                height: 64,
-                padding: 4,
-                border: '1px solid #EDE8E2',
-                boxShadow: '0 -2px 12px rgba(45,32,22,0.06)',
-                display: 'flex',
+            <div style={{
+                display:        'flex',
+                alignItems:     'center',
+                height:         64,
+                padding:        '0 8px',
             }}>
                 {TABS.map(({ key, label, Icon, href }) => {
-                    const active = activeTab === key;
+                    const active    = activeTab === key;
                     const showBadge = key === 'cart' && count > 0;
+
                     return (
                         <Link
                             key={key}
                             href={href}
                             style={{
-                                flex: 1,
-                                display: 'flex', flexDirection: 'column',
-                                alignItems: 'center', justifyContent: 'center',
-                                gap: 2,
-                                borderRadius: 18,
+                                flex:           1,
+                                display:        'flex',
+                                flexDirection:  'column',
+                                alignItems:     'center',
+                                justifyContent: 'center',
+                                gap:            4,
                                 textDecoration: 'none',
-                                color: active ? '#E8763A' : '#B5A898',
-                                background: active ? 'rgba(232,118,58,0.08)' : 'transparent',
-                                transition: 'color 0.15s, background 0.15s',
-                                position: 'relative',
+                                fontFamily:     F,
+                                position:       'relative',
                             }}
                         >
-                            <div style={{ position: 'relative' }}>
-                                <Icon size={22} />
+                            {/* Icon box */}
+                            <div style={{
+                                width:           active ? 44 : 32,
+                                height:          active ? 32 : 32,
+                                borderRadius:    10,
+                                background:      active ? '#2C2A27' : 'transparent',
+                                display:         'flex',
+                                alignItems:      'center',
+                                justifyContent:  'center',
+                                transition:      'background 0.2s ease, width 0.2s ease',
+                                position:        'relative',
+                            }}>
+                                <Icon
+                                    size={18}
+                                    color={active ? '#FFFFFF' : '#A8A29E'}
+                                    strokeWidth={active ? 2.2 : 1.75}
+                                />
                                 {showBadge && (
                                     <span style={{
-                                        position: 'absolute', top: -6, right: -8,
-                                        background: '#E8363A', color: '#FFFFFF',
-                                        borderRadius: '50%', width: 17, height: 17,
-                                        fontSize: 10, fontWeight: 700,
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        border: '1.5px solid #FAF8F5',
+                                        position:       'absolute',
+                                        top:            -4,
+                                        right:          -4,
+                                        background:     '#D97706',
+                                        color:          '#FFFFFF',
+                                        borderRadius:   '50%',
+                                        width:          15,
+                                        height:         15,
+                                        fontSize:       8,
+                                        fontWeight:     700,
+                                        fontFamily:     F,
+                                        display:        'flex',
+                                        alignItems:     'center',
+                                        justifyContent: 'center',
+                                        border:         '1.5px solid #FFFFFF',
                                     }}>
                                         {count > 9 ? '9+' : count}
                                     </span>
                                 )}
                             </div>
+
+                            {/* Label */}
                             <span style={{
-                                fontSize: 11,
-                                fontWeight: active ? 700 : 500,
+                                fontSize:      10,
+                                fontWeight:    active ? 600 : 400,
+                                color:         active ? '#2C2A27' : '#A8A29E',
+                                letterSpacing: '0.01em',
+                                lineHeight:    1,
                             }}>
                                 {label}
                             </span>
                         </Link>
                     );
                 })}
-            </nav>
+            </div>
         </div>
     );
 }

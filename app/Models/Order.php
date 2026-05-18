@@ -15,9 +15,20 @@ class Order extends Model
         parent::boot();
 
         static::creating(function ($order) {
-            $order->order_code ??= 'ORD-' . date('Ymd') . '-' .
-                str_pad(Order::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+            // QR orders: code assigned later when customer picks payment method
+            if ($order->order_type === 'cashier') {
+                $order->order_code ??= static::generateCode();
+            }
         });
+    }
+
+    public static function generateCode(): string
+    {
+        $today = today();
+        $count = static::whereDate('created_at', $today)
+            ->whereNotNull('order_code')
+            ->count();
+        return 'ORD-' . $today->format('Ymd') . '-' . str_pad($count + 1, 4, '0', STR_PAD_LEFT);
     }
 
     protected $fillable = [

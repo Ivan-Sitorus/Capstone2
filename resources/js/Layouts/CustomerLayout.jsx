@@ -32,9 +32,9 @@ export default function CustomerLayout({ children, activeTab = 'menu', showBotto
             maxWidth: 430,
             margin: '0 auto',
             minHeight: '100vh',
-            background: '#FAF8F5',
+            background: 'transparent',
             position: 'relative',
-            paddingBottom: showBottomNav ? 92 : 0,
+            paddingBottom: showBottomNav ? 80 : 0,
         }}>
             {children}
             {showBottomNav && <BottomNav activeTab={activeTab} />}

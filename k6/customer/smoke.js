@@ -63,24 +63,24 @@ export default function () {
         { headers: jsonHeaders(), redirects: 5 }
     );
     var orderOk = check(resOrder, {
-        '[Smoke] Buat Pesanan -- status 201':     function (r) { return r.status === 201; },
-        '[Smoke] Buat Pesanan -- ada order_code': function (r) {
-            try { return !!JSON.parse(r.body).order_code; } catch (e) { return false; }
+        '[Smoke] Buat Pesanan -- status 201':    function (r) { return r.status === 201; },
+        '[Smoke] Buat Pesanan -- ada order_id':  function (r) {
+            try { return !!JSON.parse(r.body).order_id; } catch (e) { return false; }
         },
-        '[Smoke] Buat Pesanan -- response < 5s':  function (r) { return r.timings.duration < 5000; },
+        '[Smoke] Buat Pesanan -- response < 5s': function (r) { return r.timings.duration < 5000; },
     });
     sleep(0.5);
 
-    // 4. Status pesanan
+    // 4. Halaman pilih pembayaran
     if (orderOk) {
-        var orderCode = JSON.parse(resOrder.body).order_code;
+        var orderId = JSON.parse(resOrder.body).order_id;
         var resStatus = http.get(
-            BASE_URL + '/customer/order/' + orderCode + '/status',
+            BASE_URL + '/customer/payment/' + orderId + '/choose',
             { headers: webHeaders(), redirects: 5 }
         );
         check(resStatus, {
-            '[Smoke] Status Pesanan -- status 200':    function (r) { return r.status === 200; },
-            '[Smoke] Status Pesanan -- response < 3s': function (r) { return r.timings.duration < 3000; },
+            '[Smoke] Pilih Pembayaran -- status 200':    function (r) { return r.status === 200; },
+            '[Smoke] Pilih Pembayaran -- response < 3s': function (r) { return r.timings.duration < 3000; },
         });
         sleep(0.5);
     }

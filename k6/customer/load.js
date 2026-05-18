@@ -31,8 +31,8 @@ var orderSuccessRate = new Rate('order_success_rate');
 
 export var options = {
     stages: [
-        { duration: '30s', target: 10 },
-        { duration: '3m',  target: 10 },
+        { duration: '30s', target: 30 },
+        { duration: '3m',  target: 30 },
         { duration: '30s', target: 0  },
     ],
     thresholds: {
@@ -68,7 +68,7 @@ export default function () {
     sleep(1);
 
     // Buat Pesanan
-    var orderCode = null;
+    var orderId = null;
     group('Buat Pesanan', function () {
         var res = http.post(
             BASE_URL + '/api/order',
@@ -76,30 +76,30 @@ export default function () {
             { headers: jsonHeaders(), redirects: 5 }
         );
         var ok = check(res, {
-            'Order: status 201':     function (r) { return r.status === 201; },
-            'Order: ada order_code': function (r) {
-                try { return !!JSON.parse(r.body).order_code; } catch (e) { return false; }
+            'Order: status 201':    function (r) { return r.status === 201; },
+            'Order: ada order_id':  function (r) {
+                try { return !!JSON.parse(r.body).order_id; } catch (e) { return false; }
             },
             'Order: response < 10s': function (r) { return r.timings.duration < 10000; },
         });
         orderTrend.add(res.timings.duration);
         orderSuccessRate.add(ok);
         if (!ok) { errorCounter.add(1); return; }
-        try { orderCode = JSON.parse(res.body).order_code; } catch (e) {}
+        try { orderId = JSON.parse(res.body).order_id; } catch (e) {}
     });
     sleep(1);
 
-    // Status Pesanan
-    if (orderCode) {
-        group('Status Pesanan', function () {
+    // Halaman Pilih Pembayaran
+    if (orderId) {
+        group('Pilih Pembayaran', function () {
             var res = http.get(
-                BASE_URL + '/customer/order/' + orderCode + '/status',
+                BASE_URL + '/customer/payment/' + orderId + '/choose',
                 { headers: webHeaders(), redirects: 5 }
             );
             var ok = check(res, {
-                'Status: status 200':    function (r) { return r.status === 200; },
-                'Status: tidak 500':     function (r) { return r.status !== 500; },
-                'Status: response < 7s': function (r) { return r.timings.duration < 7000; },
+                'Payment Choose: status 200':    function (r) { return r.status === 200; },
+                'Payment Choose: tidak 500':     function (r) { return r.status !== 500; },
+                'Payment Choose: response < 7s': function (r) { return r.timings.duration < 7000; },
             });
             statusTrend.add(res.timings.duration);
             successRate.add(ok);

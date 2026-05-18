@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import {
     LayoutDashboard,
     ShoppingCart,

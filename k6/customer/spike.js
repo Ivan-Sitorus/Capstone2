@@ -74,9 +74,9 @@ export default function () {
             { headers: jsonHeaders(), redirects: 5 }
         );
         var ok = check(res, {
-            'Spike -- Order: status 201':     function (r) { return r.status === 201; },
-            'Spike -- Order: ada order_code': function (r) {
-                try { return !!JSON.parse(r.body).order_code; } catch (e) { return false; }
+            'Spike -- Order: status 201':    function (r) { return r.status === 201; },
+            'Spike -- Order: ada order_id':  function (r) {
+                try { return !!JSON.parse(r.body).order_id; } catch (e) { return false; }
             },
             'Spike -- Order: < 10s': function (r) { return r.timings.duration < 10000; },
         });

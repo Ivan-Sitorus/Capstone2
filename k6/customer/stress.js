@@ -70,7 +70,7 @@ export default function () {
     sleep(0.5);
 
     // 2. Buat Pesanan
-    var orderCode = null;
+    var orderId = null;
     group('Stress -- Buat Pesanan', function () {
         var res = http.post(
             BASE_URL + '/api/order',
@@ -78,9 +78,9 @@ export default function () {
             { headers: jsonHeaders(), redirects: 5 }
         );
         var ok = check(res, {
-            'Stress -- Order: status 201':     function (r) { return r.status === 201; },
-            'Stress -- Order: ada order_code': function (r) {
-                try { return !!JSON.parse(r.body).order_code; } catch (e) { return false; }
+            'Stress -- Order: status 201':    function (r) { return r.status === 201; },
+            'Stress -- Order: ada order_id':  function (r) {
+                try { return !!JSON.parse(r.body).order_id; } catch (e) { return false; }
             },
             'Stress -- Order: < 8s': function (r) { return r.timings.duration < 8000; },
         });
@@ -89,21 +89,21 @@ export default function () {
         errorRate.add(!ok);
         if (ok) {
             totalOrders.add(1);
-            try { orderCode = JSON.parse(res.body).order_code; } catch (e) {}
+            try { orderId = JSON.parse(res.body).order_id; } catch (e) {}
         }
     });
     sleep(0.5);
 
-    // 3. Status Pesanan
-    if (orderCode) {
-        group('Stress -- Status Pesanan', function () {
+    // 3. Halaman Pilih Pembayaran
+    if (orderId) {
+        group('Stress -- Pilih Pembayaran', function () {
             var res = http.get(
-                BASE_URL + '/customer/order/' + orderCode + '/status',
+                BASE_URL + '/customer/payment/' + orderId + '/choose',
                 { headers: webHeaders(), redirects: 5 }
             );
             var ok = check(res, {
-                'Stress -- Status: status OK': function (r) { return r.status === 200; },
-                'Stress -- Status: < 5s':      function (r) { return r.timings.duration < 5000; },
+                'Stress -- Payment Choose: status OK': function (r) { return r.status === 200; },
+                'Stress -- Payment Choose: < 5s':      function (r) { return r.timings.duration < 5000; },
             });
             statusTrend.add(res.timings.duration);
             errorRate.add(!ok);

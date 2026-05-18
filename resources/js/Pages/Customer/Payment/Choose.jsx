@@ -1,16 +1,47 @@
 import { useState } from 'react';
-import { router } from '@inertiajs/react';
+import { router, Head } from '@inertiajs/react';
 import axios from 'axios';
 import useCart from '@/Hooks/useCart';
 import { ChevronLeft, Banknote, QrCode, MapPin, Wallet } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
 
+const F = '"Inter", system-ui, sans-serif';
+
+/* stone-minimalist tokens — sesuai Stitch */
+const C = {
+    surface:    '#FFFFFF',
+    bg:         '#F7F5F2',   /* stone-bg */
+    border:     '#F3F4F6',   /* gray-100 */
+    borderMd:   '#E5E7EB',   /* gray-200 */
+    accent:     '#44403C',   /* stone-primary */
+    accentDark: '#1C1917',   /* stone-heading / hover */
+    textHead:   '#1C1917',
+    textSecond: '#78716C',
+    shadow:     '0 2px 8px -2px rgba(0,0,0,0.05)',
+};
+
+const METHODS = [
+    {
+        key:   'cash',
+        title: 'Bayar ke Kasir (Cash)',
+        desc:  'Bayar langsung di kasir setelah pesanan dikonfirmasi',
+        Icon:  Banknote,
+    },
+    {
+        key:   'qris',
+        title: 'QRIS',
+        desc:  'Scan QR code & upload bukti pembayaran',
+        Icon:  QrCode,
+    },
+];
+
 export default function PaymentChoose({ order, items, table_number }) {
-    const [selected,   setSelected]   = useState(null);
-    const [loading,    setLoading]    = useState(false);
-    const [error,      setError]      = useState('');
+    const [selected,      setSelected]      = useState(null);
+    const [loading,       setLoading]       = useState(false);
+    const [error,         setError]         = useState('');
     const [showCashModal, setShowCashModal] = useState(false);
+    const [cashOrderCode, setCashOrderCode] = useState('');
     const { clearCart } = useCart();
 
     async function handleLanjut() {
@@ -19,12 +50,13 @@ export default function PaymentChoose({ order, items, table_number }) {
         setError('');
         try {
             if (selected === 'cash') {
-                await axios.post(`/api/order/${order.id}/pay/cash`);
+                const res = await axios.post(`/api/order/${order.id}/pay/cash`);
+                setCashOrderCode(res.data.order_code ?? '');
                 clearCart();
-                setShowCashModal(true);          // tampilkan modal C5b
+                setShowCashModal(true);
             } else {
                 await axios.post(`/api/order/${order.id}/pay/qris`);
-                router.visit(`/customer/payment/${order.order_code}/qris`);
+                router.visit(`/customer/payment/${order.id}/qris`);
             }
         } catch (err) {
             setError(err.response?.data?.message ?? 'Terjadi kesalahan. Coba lagi.');
@@ -34,7 +66,6 @@ export default function PaymentChoose({ order, items, table_number }) {
     }
 
     function handleMengerti() {
-        // Kembali ke menu, bawa tableId dari sessionStorage
         let tableId = null;
         try {
             const saved = sessionStorage.getItem('w9_customer');
@@ -43,285 +74,353 @@ export default function PaymentChoose({ order, items, table_number }) {
         router.visit(tableId ? `/customer/menu?table=${tableId}` : '/customer/menu');
     }
 
-    const METHODS = [
-        {
-            key:   'cash',
-            title: 'Bayar ke Kasir (Cash)',
-            desc:  'Bayar langsung di kasir setelah pesanan dikonfirmasi',
-            Icon:  Banknote,
-            iconBg: '#FEF3EC',
-            iconColor: '#E8763A',
-        },
-        {
-            key:   'qris',
-            title: 'QRIS',
-            desc:  'Scan QR code & upload bukti pembayaran',
-            Icon:  QrCode,
-            iconBg: '#F5F0EB',
-            iconColor: '#8C7B6B',
-        },
-    ];
-
     return (
         <CustomerLayout activeTab="cart">
-            {/* ── Header ── */}
+            <Head>
+                <title>Pilih Pembayaran — W9 Cafe</title>
+                <link rel="preconnect" href="https://fonts.googleapis.com" />
+                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+                <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+                <style>{`
+                    html, body { background: #F7F5F2; }
+                    .w9p-scroll::-webkit-scrollbar { display: none; }
+                    .w9p-btn-back { transition: background 0.15s; }
+                    .w9p-btn-back:hover { background: #F3F4F6 !important; }
+                    .w9p-method { transition: border-color 0.2s, box-shadow 0.2s; }
+                    .w9p-confirm {
+                        transition: background 0.15s, transform 0.1s;
+                    }
+                    .w9p-confirm:active { transform: scale(0.98); }
+                    .w9p-confirm:hover:not(:disabled) { background: ${C.accentDark} !important; }
+                `}</style>
+            </Head>
+
+            {/* ── Wallpaper ── */}
             <div style={{
-                background: '#FFFFFF',
-                borderBottom: '1px solid #F0EBE5',
-                padding: '22px 24px 16px',
-                display: 'flex', flexDirection: 'column', gap: 4,
+                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: '100%', maxWidth: 430, height: '100vh',
+                zIndex: 0, pointerEvents: 'none', overflow: 'hidden', background: C.bg,
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                <img src="/images/wallpaper-menu.jpg" alt=""
+                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
+                />
+            </div>
+
+            {/* ── Fixed flex-column container ── */}
+            <div style={{
+                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
+                width: '100%', maxWidth: 430, height: '100vh',
+                display: 'flex', flexDirection: 'column', zIndex: 1,
+                background: 'rgba(247,245,242,0.60)',
+                backdropFilter: 'blur(2px)',
+            }}>
+
+                {/* ── Header ── */}
+                <header style={{
+                    padding: '32px 24px 16px',
+                    display: 'flex', alignItems: 'flex-start', gap: 16,
+                    flexShrink: 0,
+                }}>
                     <button
                         onClick={() => router.visit('/customer/cart')}
+                        className="w9p-btn-back"
                         style={{
-                            width: 36, height: 36, borderRadius: 12,
-                            background: '#F0EBE5', border: 'none', cursor: 'pointer',
+                            marginTop: 2,
+                            width: 36, height: 36, borderRadius: '50%',
+                            background: C.surface,
+                            border: `1px solid ${C.border}`,
+                            boxShadow: C.shadow,
+                            cursor: 'pointer',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             flexShrink: 0,
                         }}
                     >
-                        <ChevronLeft size={20} color="#2D2016" />
+                        <ChevronLeft size={20} color={C.accent} strokeWidth={2} />
                     </button>
-                    <div>
-                        <div style={{ fontSize: 20, fontWeight: 700, color: '#2D2016', fontFamily: '"DM Sans", system-ui' }}>
+
+                    <div style={{ flex: 1 }}>
+                        <h1 style={{
+                            fontSize: 20, fontWeight: 700, color: C.textHead,
+                            fontFamily: F, letterSpacing: '-0.02em', margin: 0,
+                        }}>
                             Pilih Cara Bayar
-                        </div>
-                        <div style={{ fontSize: 12, color: '#8C7B6B', fontFamily: 'Outfit, system-ui' }}>
+                        </h1>
+                        <p style={{
+                            fontSize: 12, fontWeight: 500, color: C.textSecond,
+                            fontFamily: F, marginTop: 4,
+                        }}>
                             Pesanan #{order.order_code}
-                        </div>
-                    </div>
-                </div>
-                {table_number && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 50 }}>
-                        <MapPin size={12} color="#B5A898" />
-                        <span style={{ fontSize: 12, fontWeight: 500, color: '#B5A898', fontFamily: 'Outfit, system-ui' }}>
-                            Meja {table_number}
-                        </span>
-                    </div>
-                )}
-            </div>
-
-            {/* ── Content ── */}
-            <div style={{
-                padding: '0 24px 24px',
-                display: 'flex', flexDirection: 'column', gap: 18,
-            }}>
-
-                {/* Ringkasan label */}
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#8C7B6B', letterSpacing: 0.5, fontFamily: 'Outfit, system-ui', paddingTop: 18 }}>
-                    RINGKASAN PESANAN
-                </div>
-
-                {/* Order summary card */}
-                <div style={{
-                    background: '#FFFFFF', borderRadius: 20,
-                    border: '1px solid #EDE8E2',
-                    boxShadow: '0 3px 12px rgba(45,32,22,0.05)',
-                    overflow: 'hidden',
-                }}>
-                    {items.map((item, idx) => (
-                        <div
-                            key={idx}
-                            style={{
-                                display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                                padding: '14px 18px',
-                                borderBottom: idx < items.length - 1 ? '1px solid #F5F0EB' : 'none',
-                            }}
-                        >
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                <div style={{
-                                    width: 26, height: 26, borderRadius: 8,
-                                    background: '#FEF3EC',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    flexShrink: 0,
-                                }}>
-                                    <span style={{ fontSize: 11, fontWeight: 700, color: '#E8763A', fontFamily: 'Outfit, system-ui' }}>
-                                        {item.qty}x
-                                    </span>
-                                </div>
-                                <span style={{ fontSize: 14, fontWeight: 500, color: '#2D2016', fontFamily: 'Outfit, system-ui' }}>
-                                    {item.name}
+                        </p>
+                        {table_number && (
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
+                                <MapPin size={12} color={C.textSecond} strokeWidth={2} />
+                                <span style={{ fontSize: 12, color: C.textSecond, fontFamily: F }}>
+                                    Meja {table_number}
                                 </span>
                             </div>
-                            <span style={{ fontSize: 14, fontWeight: 600, color: '#2D2016', fontFamily: 'Outfit, system-ui' }}>
-                                {formatRupiah(item.subtotal)}
-                            </span>
-                        </div>
-                    ))}
-                    {/* Divider */}
-                    <div style={{ height: 1, background: '#EDE8E2' }} />
-                    {/* Total row */}
-                    <div style={{
-                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                        padding: '10px 18px 16px',
-                    }}>
-                        <span style={{ fontSize: 16, fontWeight: 700, color: '#2D2016', fontFamily: '"DM Sans", system-ui' }}>
-                            Total
-                        </span>
-                        <span style={{ fontSize: 18, fontWeight: 700, color: '#E8763A', fontFamily: '"DM Sans", system-ui' }}>
-                            {formatRupiah(order.total_amount)}
-                        </span>
+                        )}
                     </div>
-                </div>
+                </header>
 
-                {/* Metode label */}
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#8C7B6B', letterSpacing: 0.5, fontFamily: 'Outfit, system-ui' }}>
-                    METODE PEMBAYARAN
-                </div>
+                {/* ── Scroll area ── */}
+                <div className="w9p-scroll" style={{
+                    flex: 1, overflowY: 'auto',
+                    scrollbarWidth: 'none',
+                    WebkitOverflowScrolling: 'touch',
+                    padding: '0 0 24px',
+                    display: 'flex', flexDirection: 'column',
+                }}>
 
-                {/* Payment methods */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                    {METHODS.map(({ key, title, desc, Icon, iconBg, iconColor }) => {
-                        const active = selected === key;
-                        return (
-                            <div
-                                key={key}
-                                onClick={() => setSelected(key)}
-                                style={{
-                                    background: active ? '#FFFBF8' : '#FFFFFF',
-                                    borderRadius: 16,
-                                    border: `${active ? 2 : 1}px solid ${active ? '#E8763A' : '#EDE8E2'}`,
-                                    boxShadow: active ? '0 2px 10px rgba(232,118,58,0.12)' : 'none',
-                                    padding: '16px 18px 16px 16px',
-                                    display: 'flex', alignItems: 'center', gap: 14,
-                                    cursor: 'pointer', transition: 'all 0.15s',
-                                }}
-                            >
-                                <div style={{
-                                    width: 42, height: 42, borderRadius: 12,
-                                    background: active ? '#FEF3EC' : iconBg,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    flexShrink: 0,
+                    {/* ── Order Summary ── */}
+                    <section style={{ padding: '0 24px', marginTop: 8 }}>
+                        <h2 style={{
+                            fontSize: 10, fontWeight: 700, color: C.textSecond,
+                            textTransform: 'uppercase', letterSpacing: '0.12em',
+                            fontFamily: F, marginBottom: 12,
+                        }}>
+                            Ringkasan Pesanan
+                        </h2>
+
+                        <div style={{
+                            background: C.surface,
+                            borderRadius: 12,
+                            border: `1px solid ${C.border}`,
+                            boxShadow: C.shadow,
+                            overflow: 'hidden',
+                        }}>
+                            {/* Item rows */}
+                            {items.map((item, idx) => (
+                                <div key={idx} style={{
+                                    padding: '14px 16px',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                    borderBottom: idx < items.length - 1 ? `1px solid ${C.border}` : 'none',
                                 }}>
-                                    {key === 'qris'
-                                        ? <img src="/images/logo-qris.png" alt="QRIS" style={{ width: 28, height: 28, objectFit: 'contain' }} />
-                                        : <Icon size={22} color={active ? '#E8763A' : iconColor} />
-                                    }
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ fontSize: 15, fontWeight: 600, color: '#2D2016', fontFamily: 'Outfit, system-ui' }}>
-                                        {title}
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        {/* Qty badge — rectangular, sesuai Stitch */}
+                                        <span style={{
+                                            background: C.bg,
+                                            color: C.accent,
+                                            fontSize: 10, fontWeight: 700,
+                                            padding: '3px 7px', borderRadius: 4,
+                                            fontFamily: F, flexShrink: 0,
+                                        }}>
+                                            {item.qty}x
+                                        </span>
+                                        <span style={{ fontSize: 14, fontWeight: 500, color: C.textHead, fontFamily: F }}>
+                                            {item.name}
+                                        </span>
                                     </div>
-                                    <div style={{ fontSize: 12, color: '#8C7B6B', marginTop: 2, fontFamily: 'Outfit, system-ui' }}>
-                                        {desc}
-                                    </div>
+                                    <span style={{ fontSize: 14, fontWeight: 600, color: C.textHead, fontFamily: F }}>
+                                        {formatRupiah(item.subtotal)}
+                                    </span>
                                 </div>
-                                {/* Radio */}
-                                <div style={{
-                                    width: 22, height: 22, borderRadius: '50%', flexShrink: 0,
-                                    border: `${active ? 2 : 1.5}px solid ${active ? '#E8763A' : '#D6CFC6'}`,
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                }}>
-                                    {active && (
-                                        <div style={{ width: 12, height: 12, borderRadius: '50%', background: '#E8763A' }} />
-                                    )}
-                                </div>
+                            ))}
+
+                            {/* Total row */}
+                            <div style={{
+                                padding: '14px 16px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                                borderTop: `1px solid ${C.border}`,
+                                background: 'rgba(247,245,242,0.5)',
+                            }}>
+                                <span style={{ fontSize: 15, fontWeight: 700, color: C.textHead, fontFamily: F }}>
+                                    Total
+                                </span>
+                                <span style={{ fontSize: 18, fontWeight: 700, color: C.textHead, fontFamily: F }}>
+                                    {formatRupiah(order.total_amount)}
+                                </span>
                             </div>
-                        );
-                    })}
+                        </div>
+                    </section>
+
+                    {/* ── Payment Methods ── */}
+                    <section style={{ padding: '0 24px', marginTop: 24 }}>
+                        <h2 style={{
+                            fontSize: 10, fontWeight: 700, color: C.textSecond,
+                            textTransform: 'uppercase', letterSpacing: '0.12em',
+                            fontFamily: F, marginBottom: 12,
+                        }}>
+                            Metode Pembayaran
+                        </h2>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                            {METHODS.map(({ key, title, desc, Icon }) => {
+                                const active = selected === key;
+                                return (
+                                    <div
+                                        key={key}
+                                        onClick={() => setSelected(key)}
+                                        className="w9p-method"
+                                        style={{
+                                            background: C.surface,
+                                            borderRadius: 12,
+                                            border: `1px solid ${active ? C.accent : C.border}`,
+                                            boxShadow: active
+                                                ? `0 0 0 1px ${C.accent}, ${C.shadow}`
+                                                : C.shadow,
+                                            padding: '14px 16px',
+                                            display: 'flex', alignItems: 'center', gap: 14,
+                                            cursor: 'pointer',
+                                        }}
+                                    >
+                                        {/* Icon box — bg tetap stone-bg, tidak berubah saat aktif */}
+                                        <div style={{
+                                            width: 40, height: 40, borderRadius: 10,
+                                            background: C.bg,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            flexShrink: 0,
+                                        }}>
+                                            {key === 'qris'
+                                                ? <img src="/images/logo-qris.png" alt="QRIS"
+                                                    style={{ width: 24, height: 24, objectFit: 'contain' }} />
+                                                : <Icon size={20} color={C.accent} strokeWidth={2} />
+                                            }
+                                        </div>
+
+                                        {/* Labels */}
+                                        <div style={{ flex: 1 }}>
+                                            <p style={{
+                                                fontSize: 14, fontWeight: 700, color: C.textHead,
+                                                fontFamily: F, margin: 0, lineHeight: 1,
+                                            }}>
+                                                {title}
+                                            </p>
+                                            <p style={{
+                                                fontSize: 11, color: C.textSecond,
+                                                fontFamily: F, marginTop: 5, lineHeight: 1.4,
+                                            }}>
+                                                {desc}
+                                            </p>
+                                        </div>
+
+                                        {/* Radio indicator */}
+                                        <div style={{
+                                            width: 20, height: 20, borderRadius: '50%',
+                                            border: `2px solid ${active ? C.accent : C.borderMd}`,
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            flexShrink: 0,
+                                            transition: 'border-color 0.2s',
+                                        }}>
+                                            <div style={{
+                                                width: 10, height: 10, borderRadius: '50%',
+                                                background: C.accent,
+                                                opacity: active ? 1 : 0,
+                                                transition: 'opacity 0.2s',
+                                            }} />
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </section>
+
+                </div>{/* end scroll */}
+
+                {/* ── Confirm Button — fixed footer, selalu terlihat ── */}
+                <div style={{
+                    padding: '12px 24px 84px',
+                    flexShrink: 0,
+                    background: 'transparent',
+                }}>
+                    {error && (
+                        <div style={{
+                            marginBottom: 10,
+                            background: '#FEF2F2', border: '1px solid #FECACA',
+                            borderRadius: 10, padding: '10px 14px',
+                            fontSize: 13, color: '#DC2626', fontFamily: F,
+                        }}>
+                            {error}
+                        </div>
+                    )}
+                    <button
+                        onClick={handleLanjut}
+                        disabled={!selected || loading}
+                        className="w9p-confirm"
+                        style={{
+                            width: '100%',
+                            padding: '16px 0',
+                            background: !selected || loading ? '#D6D3D1' : C.accent,
+                            color: '#FFFFFF',
+                            border: 'none', borderRadius: 12,
+                            fontSize: 15, fontWeight: 700,
+                            cursor: !selected || loading ? 'not-allowed' : 'pointer',
+                            boxShadow: !selected || loading
+                                ? 'none'
+                                : '0 4px 16px rgba(68,64,60,0.30)',
+                            fontFamily: F, letterSpacing: '-0.01em',
+                        }}
+                    >
+                        {loading ? 'Memproses...' : 'Konfirmasi Pembayaran'}
+                    </button>
                 </div>
 
-                {/* Spacer */}
-                <div style={{ flex: 1 }} />
+            </div>{/* end fixed container */}
 
-                {error && (
-                    <div style={{
-                        background: '#FEF2F2', border: '1px solid #FECACA',
-                        borderRadius: 10, padding: '10px 14px',
-                        fontSize: 13, color: '#DC2626', fontFamily: 'Outfit, system-ui',
-                    }}>
-                        {error}
-                    </div>
-                )}
-
-                {/* CTA */}
-                <button
-                    onClick={handleLanjut}
-                    disabled={!selected || loading}
-                    style={{
-                        width: '100%', height: 54,
-                        background: !selected ? '#EDE8E2' : '#E8763A',
-                        color: !selected ? '#9AA3AF' : '#FFFFFF',
-                        border: 'none', borderRadius: 18,
-                        fontSize: 16, fontWeight: 700,
-                        cursor: !selected ? 'default' : 'pointer',
-                        boxShadow: !selected ? 'none' : '0 4px 16px rgba(232,118,58,0.30)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                        fontFamily: '"DM Sans", system-ui',
-                        transition: 'all 0.15s',
-                    }}
-                >
-                    {loading ? 'Memproses...' : 'Konfirmasi Pembayaran'}
-                </button>
-            </div>
-
-            {/* ── C5b Modal: Notif Tunai ── */}
+            {/* ── Cash Modal (C5b) ── */}
             {showCashModal && (
                 <div style={{
                     position: 'fixed', inset: 0,
-                    background: 'rgba(0,0,0,0.50)',
+                    background: 'rgba(28,25,23,0.55)',
                     zIndex: 200,
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     padding: '0 24px',
                 }}>
                     <div style={{
-                        background: '#FFFFFF',
-                        borderRadius: 24,
-                        width: '100%', maxWidth: 300,
+                        background: C.surface,
+                        borderRadius: 20,
+                        width: '100%', maxWidth: 320,
                         padding: '28px 24px 24px',
                         display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', gap: 16,
-                        boxShadow: '0 8px 30px rgba(45,32,22,0.20)',
+                        alignItems: 'center', gap: 14,
+                        boxShadow: '0 12px 40px rgba(28,25,23,0.20)',
                     }}>
-                        {/* Icon circle */}
+                        {/* Icon */}
                         <div style={{
-                            width: 72, height: 72, borderRadius: '50%',
-                            background: '#FEF3EC',
+                            width: 64, height: 64, borderRadius: 16,
+                            background: C.bg, border: `1px solid ${C.border}`,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>
-                            <Wallet size={36} color="#E8763A" />
+                            <Wallet size={30} color={C.accent} strokeWidth={1.75} />
                         </div>
 
-                        {/* Title */}
-                        <span style={{
-                            fontSize: 18, fontWeight: 700, color: '#2D2016',
-                            fontFamily: '"DM Sans", system-ui', textAlign: 'center',
+                        <div style={{
+                            fontSize: 17, fontWeight: 700, color: C.textHead,
+                            fontFamily: F, textAlign: 'center',
                         }}>
                             Bayar di Kasir
-                        </span>
+                        </div>
 
-                        {/* Desc */}
-                        <span style={{
-                            fontSize: 13, color: '#8C7B6B', lineHeight: 1.5,
-                            fontFamily: 'Outfit, system-ui', textAlign: 'center',
+                        <div style={{
+                            fontSize: 13, color: C.textSecond, lineHeight: 1.6,
+                            fontFamily: F, textAlign: 'center',
                         }}>
                             Silakan tunjukkan pesanan ini ke kasir dan lakukan pembayaran tunai.
-                        </span>
+                        </div>
 
-                        {/* Amount box */}
+                        {/* Order info box */}
                         <div style={{
-                            width: '100%', background: '#FEF8F4',
-                            borderRadius: 14, padding: '12px 16px',
+                            width: '100%',
+                            background: C.bg, borderRadius: 12,
+                            border: `1px solid ${C.border}`,
+                            padding: '14px 16px',
                             display: 'flex', flexDirection: 'column',
-                            alignItems: 'center', gap: 2,
+                            alignItems: 'center', gap: 3,
                         }}>
-                            <span style={{ fontSize: 11, fontWeight: 500, color: '#B5A898', fontFamily: 'Outfit, system-ui' }}>
+                            <span style={{ fontSize: 10, color: C.textSecond, fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                                 No. Pesanan
                             </span>
                             <span style={{
-                                fontSize: 15, fontWeight: 700, color: '#2D2016',
-                                fontFamily: '"DM Sans", system-ui', letterSpacing: 0.3,
-                                marginBottom: 6,
+                                fontSize: 15, fontWeight: 700, color: C.textHead,
+                                fontFamily: F, letterSpacing: '0.02em', marginBottom: 8,
                             }}>
-                                #{order.order_code}
+                                #{cashOrderCode}
                             </span>
-                            <span style={{ fontSize: 11, fontWeight: 500, color: '#B5A898', fontFamily: 'Outfit, system-ui' }}>
+                            <span style={{ fontSize: 10, color: C.textSecond, fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                                 Total Pembayaran
                             </span>
                             <span style={{
-                                fontSize: 22, fontWeight: 700, color: '#E8763A',
-                                fontFamily: '"DM Sans", system-ui', letterSpacing: -0.5,
+                                fontSize: 22, fontWeight: 700, color: C.textHead,
+                                fontFamily: F, letterSpacing: '-0.02em',
                             }}>
                                 {formatRupiah(order.total_amount)}
                             </span>
@@ -329,32 +428,28 @@ export default function PaymentChoose({ order, items, table_number }) {
 
                         {/* Info riwayat */}
                         <div style={{
-                            width: '100%',
-                            background: '#F5F0EB',
-                            borderRadius: 12,
+                            width: '100%', background: C.bg,
+                            borderRadius: 10, border: `1px solid ${C.border}`,
                             padding: '10px 14px',
-                            display: 'flex', alignItems: 'flex-start', gap: 8,
                         }}>
-                            <span style={{
-                                fontSize: 12, color: '#6B5E52', lineHeight: 1.5,
-                                fontFamily: 'Outfit, system-ui',
-                            }}>
+                            <span style={{ fontSize: 12, color: C.textSecond, lineHeight: 1.5, fontFamily: F }}>
                                 Pantau status pesananmu di tab{' '}
-                                <strong style={{ color: '#E8763A' }}>Riwayat</strong>
+                                <strong style={{ color: C.accent }}>Riwayat</strong>
                                 {' '}untuk melihat update dari kasir.
                             </span>
                         </div>
 
-                        {/* Mengerti button */}
+                        {/* Button */}
                         <button
                             onClick={handleMengerti}
+                            className="w9p-confirm"
                             style={{
-                                width: '100%', height: 46,
-                                background: '#E8763A', color: '#FFFFFF',
-                                border: 'none', borderRadius: 14,
+                                width: '100%', padding: '13px 0',
+                                background: C.accent, color: '#FFFFFF',
+                                border: 'none', borderRadius: 12,
                                 fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                                fontFamily: '"DM Sans", system-ui',
-                                boxShadow: '0 3px 10px rgba(232,118,58,0.25)',
+                                fontFamily: F,
+                                boxShadow: '0 4px 16px rgba(68,64,60,0.25)',
                             }}
                         >
                             Mengerti
