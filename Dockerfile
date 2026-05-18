@@ -113,6 +113,14 @@ RUN printf '%s\n' \
     'stderr_logfile=/dev/stderr' \
     'stderr_logfile_maxbytes=0' \
     '' \
+    '[program:reverb]' \
+    'command=/usr/bin/php /var/www/html/artisan reverb:start --host=0.0.0.0 --port=8083' \
+    'stdout_logfile=/dev/stdout' \
+    'stdout_logfile_maxbytes=0' \
+    'stderr_logfile=/dev/stderr' \
+    'stderr_logfile_maxbytes=0' \
+    'autorestart=true' \
+    '' \
     '[program:nginx]' \
     'command=/usr/sbin/nginx -g "daemon off;"' \
     'stdout_logfile=/dev/stdout' \
