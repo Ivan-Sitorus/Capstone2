@@ -114,7 +114,7 @@ RUN printf '%s\n' \
     'stderr_logfile_maxbytes=0' \
     '' \
     '[program:reverb]' \
-    'command=/usr/bin/php /var/www/html/artisan reverb:start --host=0.0.0.0 --port=8083' \
+    'command=/usr/local/bin/php /var/www/html/artisan reverb:start --host=0.0.0.0 --port=8083' \
     'stdout_logfile=/dev/stdout' \
     'stdout_logfile_maxbytes=0' \
     'stderr_logfile=/dev/stderr' \
@@ -133,7 +133,16 @@ RUN printf '%s\n' \
 RUN apk del $PHPIZE_DEPS linux-headers && \
     rm -rf /tmp/* /var/cache/apk/*
 
+# ── Startup script (fixes storage permissions at runtime for volume mounts) ─
+RUN printf '%s\n' \
+    '#!/bin/sh' \
+    'chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null' \
+    'chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null' \
+    'exec /usr/bin/supervisord -c /etc/supervisord.conf' \
+    > /usr/local/bin/startup.sh && \
+    chmod +x /usr/local/bin/startup.sh
+
 # ── Final ────────────────────────────────────────────────────────────
 WORKDIR /var/www/html
 EXPOSE 80
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+CMD ["/usr/local/bin/startup.sh"]
