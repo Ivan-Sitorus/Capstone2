@@ -89,8 +89,14 @@ class PrediksiMenu extends Page
             $this->chartPerMenu           = $charts['per_menu']           ?? [];
 
             $this->hasResult = true;
-            $this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
+$this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
 
+// Simpan ke cache agar bisa dibaca PrediksiRingMenu
+\Illuminate\Support\Facades\Cache::put(
+    'prediksi_menu_last_result',
+    array_merge($data, ['last_run_at' => $this->lastRunAt]),
+    now()->addDays(7)
+);
             Notification::make()
                 ->title('Prediksi selesai!')
                 ->body("Berhasil memprediksi {$this->totalMenu} menu untuk {$this->forecastDays} hari ke depan.")

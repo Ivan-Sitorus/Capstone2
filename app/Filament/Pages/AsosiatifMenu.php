@@ -86,11 +86,18 @@ class AsosiatifMenu extends Page
             $this->chartTopRules     = $data['charts']['top_rules'] ?? null;
             $this->chartFreqItem     = $data['charts']['freq_item'] ?? null;
 
-            $this->hasResult = true;
-            $this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
+           $this->hasResult = true;
+$this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
 
-            Notification::make()
-                ->title('Association Rule selesai!')
+// Simpan ke cache agar bisa dibaca RingkasanAsosiatif
+\Illuminate\Support\Facades\Cache::put(
+    'asosiatif_menu_last_result',
+    array_merge($data, ['last_run_at' => $this->lastRunAt]),
+    now()->addDays(7)
+);
+
+Notification::make()
+    ->title('Association Rule selesai!')
                 ->body("Ditemukan {$this->totalRules} rules dari {$this->totalTransactions} transaksi.")
                 ->success()
                 ->send();

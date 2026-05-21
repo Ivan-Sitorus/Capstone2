@@ -67,10 +67,10 @@
         <thead>
             <tr style="background-color:#7d7d7d;">
                 <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#d5d5d5; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100; width:56px;">No</th>
-                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#d5d5d5; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Nama Item</th>
-                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#d5d5d5; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Jumlah Terjual</th>
-                <th style="padding:10px 20px; text-align:center;font-size:0.75rem; font-weight:600; color:#d5d5d5; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Klaster</th>
-                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#d5d5d5; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Kategori</th>
+                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#487fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Nama Item</th>
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#487fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Jumlah Terjual</th>
+                <th style="padding:10px 20px; text-align:center;font-size:0.75rem; font-weight:600; color:#487fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Klaster</th>
+                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#487fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Kategori</th>
             </tr>
         </thead>
         <tbody>

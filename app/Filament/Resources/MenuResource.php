@@ -17,7 +17,9 @@ use App\Filament\Resources\MenuResource\Pages\CreateMenu;
 use App\Filament\Resources\MenuResource\Pages\EditMenu;
 use App\Filament\Resources\MenuResource\Pages;
 use App\Filament\Resources\MenuResource\RelationManagers;
+use App\Models\Ingredient;
 use App\Models\Menu;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
@@ -83,8 +85,37 @@ class MenuResource extends Resource
             Toggle::make('is_stock_calculated')
                 ->label('Stok Otomatis dari Resep')
                 ->dehydrated(false)
-                ->disabled()
+                ->live()
+                ->inline(false)
                 ->helperText('Nilai ini otomatis aktif jika menu memiliki resep bahan.'),
+
+            Repeater::make('menu_ingredients_create')
+                ->label('Resep Bahan Baku')
+                ->helperText('Tambahkan bahan baku yang digunakan untuk membuat menu ini.')
+                ->schema([
+                    Select::make('ingredient_id')
+                        ->label('Bahan')
+                        ->options(fn () => Ingredient::orderBy('name')
+                            ->get()
+                            ->mapWithKeys(fn ($i) => [$i->id => "{$i->name} ({$i->unit})"]))
+                        ->required()
+                        ->searchable()
+                        ->columnSpan(2),
+                    TextInput::make('quantity_used')
+                        ->label('Jumlah per Porsi')
+                        ->required()
+                        ->numeric()
+                        ->minValue(0.01)
+                        ->step(0.01)
+                        ->columnSpan(1),
+                ])
+                ->columns(3)
+                ->addActionLabel('+ Tambah Bahan')
+                ->defaultItems(0)
+                ->dehydrated(false)
+                ->visible(fn ($get, string $operation): bool =>
+                    $operation === 'create' && (bool) $get('is_stock_calculated')
+                ),
         ]);
     }
 

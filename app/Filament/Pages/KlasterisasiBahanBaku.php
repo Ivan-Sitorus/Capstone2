@@ -6,7 +6,7 @@ use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Illuminate\Support\Facades\Http;
-
+  // ← tambahkan ini
 class KlasterisasiBahanBaku extends Page
 {
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-beaker';
@@ -77,10 +77,17 @@ class KlasterisasiBahanBaku extends Page
             $this->preprocessLogs   = $data['preprocessing_logs'] ?? [];
             $this->chartBar         = $data['charts']['bar']        ?? null;
             $this->chartElbow       = $data['charts']['elbow']      ?? null;
-            $this->chartSilhouette  = $data['charts']['silhouette'] ?? null;
+            $this->chartSilhouette = $data['charts']['silhouette']  ?? null;
 
-            $this->hasResult = true;
-            $this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
+$this->hasResult = true;
+$this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
+
+// Simpan ke cache agar bisa dibaca RingkasanClusteringBahanBaku
+\Illuminate\Support\Facades\Cache::put(
+    'klasterisasi_bahan_baku_last_result',
+    array_merge($data, ['last_run_at' => $this->lastRunAt]),
+    now()->addDays(7)
+);
 
             Notification::make()
                 ->title('Clustering Bahan Baku selesai!')

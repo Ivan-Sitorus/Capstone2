@@ -82,9 +82,15 @@ class KlasterisasiMenu extends Page
             $this->chartElbow      = $data['charts']['elbow']      ?? null;
             $this->chartSilhouette = $data['charts']['silhouette']  ?? null;
 
-            $this->hasResult = true;
-            $this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
+$this->hasResult = true;
+$this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
 
+// Simpan ke cache agar bisa dibaca RingkasanMenu
+\Illuminate\Support\Facades\Cache::put(
+    'klasterisasi_menu_last_result',
+    array_merge($data, ['last_run_at' => $this->lastRunAt]),
+    now()->addDays(7)   // cache berlaku 7 hari
+);
             Notification::make()
                 ->title('Clustering selesai!')
                 ->body("K-Means berhasil. K optimal = {$this->bestK}, Silhouette = {$this->silhouetteScore}")

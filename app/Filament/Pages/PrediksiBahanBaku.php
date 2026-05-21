@@ -88,8 +88,14 @@ class PrediksiBahanBaku extends Page
             $this->chartPerIngredient     = $charts['per_ingredient']     ?? [];
 
             $this->hasResult = true;
-            $this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
+$this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
 
+// Simpan ke cache agar bisa dibaca PredictionRingBahanBaku
+\Illuminate\Support\Facades\Cache::put(
+    'prediksi_bahan_baku_last_result',
+    array_merge($data, ['last_run_at' => $this->lastRunAt]),
+    now()->addDays(7)
+);
             Notification::make()
                 ->title('Prediksi Bahan Baku selesai!')
                 ->body("Berhasil memprediksi {$this->totalIngredients} bahan baku untuk {$this->forecastDays} hari ke depan.")
