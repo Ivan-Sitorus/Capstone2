@@ -491,4 +491,3 @@ def prediction_bahan_baku():
     except Exception as e:
         import traceback
         return {"status": "error", "message": str(e), "trace": traceback.format_exc()}
-

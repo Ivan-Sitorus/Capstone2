@@ -62,47 +62,44 @@
                     Diurutkan berdasarkan jumlah penjualan — data {{ $dateFrom }} s/d {{ $dateTo }}
                 </p>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm border-collapse">
-                    <thead>
-                        <tr class="bg-gray-50 dark:bg-gray-700/50">
-                            <th class="py-3 px-5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wide w-14 border border-gray-200 dark:border-gray-600">No</th>
-                            <th class="py-3 px-5 text-left   text-xs font-semibold text-gray-400 uppercase tracking-wide border border-gray-200 dark:border-gray-600">Nama Item</th>
-                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-400 uppercase tracking-wide border border-gray-200 dark:border-gray-600">Jumlah Terjual</th>
-                            <th class="py-3 px-5 text-center text-xs font-semibold text-gray-400 uppercase tracking-wide border border-gray-200 dark:border-gray-600">Klaster</th>
-                            <th class="py-3 px-5 text-left   text-xs font-semibold text-gray-400 uppercase tracking-wide border border-gray-200 dark:border-gray-600">Kategori</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @php
-                            $badge = [
-                                'Sangat Laris' => 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
-                                'Laris'        => 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
-                                'Cukup Laris'  => 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300',
-                                'Kurang Laris' => 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300',
-                                'Tidak Laris'  => 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
-                            ];
-                        @endphp
-                        @foreach($tableRows as $i => $row)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors">
-                                <td class="py-3 px-5 text-right text-gray-400 dark:text-gray-500 tabular-nums border border-gray-200 dark:border-gray-600">{{ $i }}</td>
-                                <td class="py-3 px-5 font-medium text-gray-700 dark:text-gray-200 border border-gray-200 dark:border-gray-600">{{ $row['Nama Item'] }}</td>
-                                <td class="py-3 px-5 text-right text-gray-600 dark:text-gray-300 tabular-nums font-medium border border-gray-200 dark:border-gray-600">
-                                    {{ number_format($row['Jumlah'], 1) }}
-                                </td>
-                                <td class="py-3 px-5 text-center text-gray-500 dark:text-gray-400 tabular-nums border border-gray-200 dark:border-gray-600">
-                                    {{ $row['Klaster'] }}
-                                </td>
-                                <td class="py-3 px-5 border border-gray-200 dark:border-gray-600">
-                                    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $badge[$row['Kategori']] ?? '' }}">
-                                        {{ $row['Kategori'] }}
-                                    </span>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+               <div class="overflow-x-auto">
+    <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+        <thead>
+            <tr style="background-color:#7d7d7d;">
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#d5d5d5; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100; width:56px;">No</th>
+                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#d5d5d5; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Nama Item</th>
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#d5d5d5; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Jumlah Terjual</th>
+                <th style="padding:10px 20px; text-align:center;font-size:0.75rem; font-weight:600; color:#d5d5d5; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Klaster</th>
+                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#d5d5d5; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #aed100;">Kategori</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php
+                $badge = [
+                    'Sangat Laris' => 'background-color:#dcfce7; color:#15803d;',
+                    'Laris'        => 'background-color:#dbeafe; color:#1d4ed8;',
+                    'Cukup Laris'  => 'background-color:#fef9c3; color:#b45309;',
+                    'Kurang Laris' => 'background-color:#fee2e2; color:#dc2626;',
+                    'Tidak Laris'  => 'background-color:#f3f4f6; color:#6b7280;',
+                ];
+            @endphp
+            @foreach($tableRows as $i => $row)
+                <tr style="border-bottom:1px solid #aed100;">
+                    <td style="padding:10px 20px; text-align:right;  color:#487fff; border:1px solid #aed100;">{{ $i }}</td>
+                    <td style="padding:10px 20px; text-align:left;   color:#487fff; font-weight:500; border:1px solid #aed100;">{{ $row['Nama Item'] }}</td>
+                    <td style="padding:10px 20px; text-align:right;  color:#487fff; font-weight:500; border:1px solid #aed100;">{{ number_format($row['Jumlah'], 1) }}</td>
+                    <td style="padding:10px 20px; text-align:center; color:#487fff; border:1px solid #aed100;">{{ $row['Klaster'] }}</td>
+                    <td style="padding:10px 20px; border:1px solid #aed100;">
+                        <span style="display:inline-block; padding:2px 12px; border-radius:9999px; font-size:0.75rem; font-weight:600; {{ $badge[$row['Kategori']] ?? '' }}">
+                            {{ $row['Kategori'] }}
+                        </span>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+                               
         </div>
         @endif
 

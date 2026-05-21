@@ -69,51 +69,44 @@
                 </div>
 
                 {{-- Tabel forecast harian --}}
-                @if(count($pred['forecast'] ?? []))
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-100 dark:border-gray-700">
-                                <th class="py-2.5 px-5 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tanggal</th>
-                                <th class="py-2.5 px-5 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Hari</th>
-                                <th class="py-2.5 px-5 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tipe</th>
-                                <th class="py-2.5 px-5 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Prediksi</th>
-                                <th class="py-2.5 px-5 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Batas Bawah</th>
-                                <th class="py-2.5 px-5 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Batas Atas</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50 dark:divide-gray-700/30">
-                            @foreach($pred['forecast'] as $f)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors">
-                                <td class="py-3 px-5 font-mono text-sm text-gray-700 dark:text-gray-200">{{ $f['tanggal'] ?? '-' }}</td>
-                                <td class="py-3 px-5 text-gray-700 dark:text-gray-200">{{ $f['hari'] ?? '-' }}</td>
-                                <td class="py-3 px-5">
-                                    @if(($f['day_type'] ?? '') === 'Weekend')
-                                        <span class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-2 min-w-[theme(spacing.6)] py-1 fi-color-custom"
-                                              style="background-color: rgb(254 243 199); color: rgb(146 64 14); --tw-ring-color: rgb(253 230 138);">
-                                            Weekend
-                                        </span>
-                                    @else
-                                        <span class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-2 min-w-[theme(spacing.6)] py-1 fi-color-custom"
-                                              style="background-color: rgb(219 234 254); color: rgb(29 78 216); --tw-ring-color: rgb(191 219 254);">
-                                            Weekday
-                                        </span>
-                                    @endif
-                                </td>
-                                <td class="py-3 px-5 text-right">
-                                    <span class="fi-badge flex items-center justify-center gap-x-1 rounded-md text-xs font-medium ring-1 ring-inset px-2 min-w-[theme(spacing.6)] py-1 fi-color-primary tabular-nums ml-auto w-fit"
-                                          style="background-color: rgb(224 231 255); color: rgb(67 56 202); --tw-ring-color: rgb(199 210 254);">
-                                        {{ $f['prediksi'] ?? 0 }}
-                                    </span>
-                                </td>
-                                <td class="py-3 px-5 text-right tabular-nums text-gray-500 dark:text-gray-400">{{ $f['batas_bawah'] ?? '-' }}</td>
-                                <td class="py-3 px-5 text-right tabular-nums text-gray-500 dark:text-gray-400">{{ $f['batas_atas'] ?? '-' }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                @endif
+@if(count($pred['forecast'] ?? []))
+<div class="overflow-x-auto">
+    <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+        <thead>
+            <tr style="background-color:#9f9f9f;">
+                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#545454; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">Tanggal</th>
+                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#545454; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">Hari</th>
+                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#545454; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">Tipe</th>
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#545454; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">Prediksi</th>
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#545454; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">Batas Bawah</th>
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#545454; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">Batas Atas</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($pred['forecast'] as $f)
+            <tr>
+                <td style="padding:10px 20px; text-align:left;  color:#75aaff; font-family:monospace; border:1px solid #ffe100;">{{ $f['tanggal'] ?? '-' }}</td>
+                <td style="padding:10px 20px; text-align:left;  color:#75aaff; border:1px solid #ffe100;">{{ $f['hari'] ?? '-' }}</td>
+                <td style="padding:10px 20px; border:1px solid #ffe100;">
+                    @if(($f['day_type'] ?? '') === 'Weekend')
+                        <span style="display:inline-block; background-color:#fef9c3; color:#92400e; padding:2px 10px; border-radius:9999px; font-size:0.75rem; font-weight:600;">Weekend</span>
+                    @else
+                        <span style="display:inline-block; background-color:#dbeafe; color:#1d4ed8; padding:2px 10px; border-radius:9999px; font-size:0.75rem; font-weight:600;">Weekday</span>
+                    @endif
+                </td>
+                <td style="padding:10px 20px; text-align:right; border:1px solid #ffe100;">
+                    <span style="display:inline-block; background-color:#e0e7ff; color:#4338ca; padding:2px 10px; border-radius:9999px; font-size:0.75rem; font-weight:700;">{{ $f['prediksi'] ?? 0 }}</span>
+                </td>
+                <td style="padding:10px 20px; text-align:right; color:#75aaff; border:1px solid #ffe100;">{{ $f['batas_bawah'] ?? '-' }}</td>
+                <td style="padding:10px 20px; text-align:right; color:#75aaff; border:1px solid #ffe100;">{{ $f['batas_atas'] ?? '-' }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+@endif
+                
+                
 
             </div>
             @endforeach
@@ -133,38 +126,38 @@
             </div>
 
             <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/40">
-                            <th class="py-3 px-5 text-left  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Item</th>
-                            <th class="py-3 px-5 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">MAE</th>
-                            <th class="py-3 px-5 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">RMSE</th>
-                            <th class="py-3 px-5 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">MAPE (%)</th>
-                            <th class="py-3 px-5 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">SMAPE (%)</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700/30">
-                        @foreach($summaryTable as $row)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors">
-                            <td class="py-3 px-5 font-semibold text-gray-800 dark:text-white">{{ $row['nama_menu'] }}</td>
-                            <td class="py-3 px-5 text-right tabular-nums text-gray-600 dark:text-gray-300">
-                                {{ isset($row['mae']) ? number_format($row['mae'], 2) : '-' }}
-                            </td>
-                            <td class="py-3 px-5 text-right tabular-nums text-gray-600 dark:text-gray-300">
-                                {{ isset($row['rmse']) ? number_format($row['rmse'], 2) : '-' }}
-                            </td>
-                            <td class="py-3 px-5 text-right tabular-nums font-semibold
-                                {{ isset($row['mape']) ? ($row['mape'] <= 20 ? 'text-success-600 dark:text-success-400' : ($row['mape'] <= 50 ? 'text-warning-600 dark:text-warning-400' : 'text-danger-600 dark:text-danger-400')) : 'text-gray-400' }}">
-                                {{ isset($row['mape']) ? number_format($row['mape'], 2) . '%' : '-' }}
-                            </td>
-                            <td class="py-3 px-5 text-right tabular-nums text-gray-600 dark:text-gray-300">
-                                {{ isset($row['smape']) ? number_format($row['smape'], 2) . '%' : '-' }}
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+    <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+        <thead>
+            <tr style="background-color:#6c6c6c;">
+                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">Item</th>
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">MAE</th>
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">RMSE</th>
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">MAPE (%)</th>
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffe100;">SMAPE (%)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($summaryTable as $row)
+            @php
+                $mapeColor = 'color:#374151;';
+                if (isset($row['mape'])) {
+                    if ($row['mape'] <= 20)      $mapeColor = 'color:#16a34a; font-weight:700;';
+                    elseif ($row['mape'] <= 50)  $mapeColor = 'color:#d97706; font-weight:700;';
+                    else                         $mapeColor = 'color:#dc2626; font-weight:700;';
+                }
+            @endphp
+            <tr>
+                <td style="padding:10px 20px; text-align:left;  color:#75aaff; font-weight:600; border:1px solid #ffe100;">{{ $row['nama_menu'] }}</td>
+                <td style="padding:10px 20px; text-align:right; color:#75aaff; border:1px solid #ffe100;">{{ isset($row['mae'])   ? number_format($row['mae'],   2) : '-' }}</td>
+                <td style="padding:10px 20px; text-align:right; color:#75aaff; border:1px solid #ffe100;">{{ isset($row['rmse'])  ? number_format($row['rmse'],  2) : '-' }}</td>
+                <td style="padding:10px 20px; text-align:right; border:1px solid #ffe100; {{ $mapeColor }}">{{ isset($row['mape'])  ? number_format($row['mape'],  2) . '%' : '-' }}</td>
+                <td style="padding:10px 20px; text-align:right; color:#75aaff; border:1px solid #ffe100;">{{ isset($row['smape']) ? number_format($row['smape'], 2) . '%' : '-' }}</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+                            
 
             <div class="px-6 py-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/20 flex flex-wrap gap-x-6 gap-y-1 text-xs text-gray-400">
                 <span><span class="font-semibold text-gray-500 dark:text-gray-300">MAE</span> — rata-rata error absolut</span>

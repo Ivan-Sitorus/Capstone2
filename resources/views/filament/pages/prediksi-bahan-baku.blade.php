@@ -91,50 +91,48 @@
                 </p>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/40">
-                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide w-12">No</th>
-                            <th class="py-3 px-5 text-left   text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Nama Bahan Baku</th>
-                            <th class="py-3 px-5 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Satuan</th>
-                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Prediksi</th>
-                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Rata-rata/Hari</th>
-                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">MAE</th>
-                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">RMSE</th>
-                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">MAPE (%)</th>
-                            <th class="py-3 px-5 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Model</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700/30">
-                        @foreach($summaryTable as $i => $row)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors">
-                            <td class="py-3 px-5 text-right tabular-nums text-gray-400 text-xs">{{ $i + 1 }}</td>
-                            <td class="py-3 px-5 font-semibold text-gray-800 dark:text-gray-100">{{ $row['nama_bahan_baku'] }}</td>
-                            <td class="py-3 px-5 text-center text-xs text-gray-500 dark:text-gray-400">{{ $row['satuan'] ?? '-' }}</td>
-                            <td class="py-3 px-5 text-right tabular-nums font-bold text-primary-600 dark:text-primary-400">
-                                {{ number_format($row['total_forecast'] ?? 0, 1) }}
-                            </td>
-                            <td class="py-3 px-5 text-right tabular-nums text-gray-600 dark:text-gray-300">
-                                {{ number_format($row['avg_per_day'] ?? 0, 1) }}
-                            </td>
-                            <td class="py-3 px-5 text-right tabular-nums text-gray-500 dark:text-gray-400 text-xs">{{ number_format($row['mae'] ?? 0, 2) }}</td>
-                            <td class="py-3 px-5 text-right tabular-nums text-gray-500 dark:text-gray-400 text-xs">{{ number_format($row['rmse'] ?? 0, 2) }}</td>
-                            <td class="py-3 px-5 text-right tabular-nums text-xs">
-                                @php $mape = $row['mape'] ?? 0; @endphp
-                                <span class="{{ $mape <= 10 ? 'text-green-600 dark:text-green-400' : ($mape <= 25 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-500 dark:text-red-400') }} font-semibold">
-                                    {{ number_format($mape, 2) }}%
-                                </span>
-                            </td>
-                            <td class="py-3 px-5 text-center">
-                                <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300">
-                                    {{ $row['model'] ?? 'Prophet' }}
-                                </span>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+    <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+        <thead>
+            <tr style="background-color:#515151;">
+                <th style="padding:10px 20px; text-align:right;  font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00; width:48px;">No</th>
+                <th style="padding:10px 20px; text-align:left;   font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Nama Bahan Baku</th>
+                <th style="padding:10px 20px; text-align:center; font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Satuan</th>
+                <th style="padding:10px 20px; text-align:right;  font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Total Prediksi</th>
+                <th style="padding:10px 20px; text-align:right;  font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Rata-rata/Hari</th>
+                <th style="padding:10px 20px; text-align:right;  font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">MAE</th>
+                <th style="padding:10px 20px; text-align:right;  font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">RMSE</th>
+                <th style="padding:10px 20px; text-align:right;  font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">MAPE (%)</th>
+                <th style="padding:10px 20px; text-align:center; font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Model</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($summaryTable as $i => $row)
+            @php
+                $mape = $row['mape'] ?? 0;
+                $mapeColor = $mape <= 10
+                    ? 'color:#16a34a; font-weight:700;'
+                    : ($mape <= 25 ? 'color:#d97706; font-weight:700;' : 'color:#dc2626; font-weight:700;');
+            @endphp
+            <tr>
+                <td style="padding:10px 20px; text-align:right;  color:#626b78; font-size:0.75rem; border:1px solid #ffcc00;">{{ $i + 1 }}</td>
+                <td style="padding:10px 20px; text-align:left;   color:#626b78; font-weight:600; border:1px solid #ffcc00;">{{ $row['nama_bahan_baku'] }}</td>
+                <td style="padding:10px 20px; text-align:center; color:#626b78; font-size:0.75rem; border:1px solid #ffcc00;">{{ $row['satuan'] ?? '-' }}</td>
+                <td style="padding:10px 20px; text-align:right;  color:#4338ca; font-weight:700; border:1px solid #ffcc00;">{{ number_format($row['total_forecast'] ?? 0, 1) }}</td>
+                <td style="padding:10px 20px; text-align:right;  color:#626b78; border:1px solid #ffcc00;">{{ number_format($row['avg_per_day'] ?? 0, 1) }}</td>
+                <td style="padding:10px 20px; text-align:right;  color:#626b78; font-size:0.75rem; border:1px solid #ffcc00;">{{ number_format($row['mae'] ?? 0, 2) }}</td>
+                <td style="padding:10px 20px; text-align:right;  color:#626b78; font-size:0.75rem; border:1px solid #ffcc00;">{{ number_format($row['rmse'] ?? 0, 2) }}</td>
+                <td style="padding:10px 20px; text-align:right;  font-size:0.75rem; border:1px solid #ffcc00; {{ $mapeColor }}">{{ number_format($mape, 2) }}%</td>
+                <td style="padding:10px 20px; text-align:center; border:1px solid #ffcc00;">
+                    <span style="display:inline-block; background-color:#f3e8ff; color:#7e22ce; padding:2px 10px; border-radius:9999px; font-size:0.75rem; font-weight:600;">
+                        {{ $row['model'] ?? 'Prophet' }}
+                    </span>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+</div>
+                    
         </div>
         @endif
 
@@ -164,79 +162,77 @@
                     Periode: <span class="font-medium">{{ $dateForecastFrom }}</span> s/d <span class="font-medium">{{ $dateForecastTo }}</span>
                 </p>
             </div>
+@foreach($predictions as $pred)
+<div style="border-bottom:1px solid #ffcc00;">
 
-            @foreach($predictions as $pred)
-            <div class="border-b border-gray-100 dark:border-gray-700/60 last:border-0">
+    {{-- Sub-header per bahan baku --}}
+    <div style="padding:10px 24px; background-color:#a8a8a8; display:flex; flex-wrap:wrap; align-items:center; gap:12px; border-bottom:1px solid #ffcc00;">
+        <span style="font-weight:700; font-size:0.875rem; color:#626b78;">{{ $pred['nama_bahan_baku'] }}</span>
+        @if(!empty($pred['satuan']))
+            <span style="display:inline-block; background-color:#515151; color:#b1b1b1; padding:1px 8px; border-radius:9999px; font-size:0.75rem;">
+                {{ $pred['satuan'] }}
+            </span>
+        @endif
+        <span style="font-size:0.75rem; color:#393939;">
+            Total:
+            <span style="font-weight:600; color:#393939;">
+                {{ number_format($pred['total_forecast'] ?? 0, 1) }} {{ $pred['satuan'] ?? '' }}
+            </span>
+        </span>
+        <span style="margin-left:auto; display:flex; gap:16px; font-size:0.75rem; color:#4d4d4d;">
+            <span>MAPE:
+                @php $mape = $pred['mape'] ?? 0; @endphp
+                <span style="{{ $mape <= 10 ? 'color:#16a34a;' : ($mape <= 25 ? 'color:#d97706;' : 'color:#dc2626;') }} font-weight:600;">
+                    {{ number_format($mape, 2) }}%
+                </span>
+            </span>
+            <span>MAE: <span style="font-weight:600; color:#374151;">{{ number_format($pred['mae'] ?? 0, 2) }}</span></span>
+        </span>
+    </div>
 
-                {{-- Sub-header per bahan baku --}}
-                <div class="px-6 py-2.5 bg-gray-50 dark:bg-gray-700/40 flex flex-wrap items-center gap-3">
-                    <span class="font-bold text-sm text-gray-800 dark:text-white">{{ $pred['nama_bahan_baku'] }}</span>
-                    @if(!empty($pred['satuan']))
-                        <span class="inline-block px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400">
-                            {{ $pred['satuan'] }}
+    {{-- Tabel forecast harian --}}
+    @if(count($pred['forecast'] ?? []))
+    <div class="overflow-x-auto">
+        <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
+            <thead>
+                <tr style="background-color:#565656;">
+                    <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Tanggal</th>
+                    <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Hari</th>
+                    <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Tipe</th>
+                    <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Prediksi</th>
+                    <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Batas Bawah</th>
+                    <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffcc00;">Batas Atas</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($pred['forecast'] as $day)
+                <tr>
+                    <td style="padding:10px 20px; text-align:left;  color:#9ca3af; font-family:monospace; border:1px solid #ffcc00;">{{ $day['tanggal'] }}</td>
+                    <td style="padding:10px 20px; text-align:left;  color:#9ca3af; border:1px solid #ffcc00;">{{ $day['hari'] }}</td>
+                    <td style="padding:10px 20px; border:1px solid #ffcc00;">
+                        @if(($day['day_type'] ?? '') === 'Weekend')
+                            <span style="display:inline-block; background-color:#fef9c3; color:#92400e; padding:2px 10px; border-radius:9999px; font-size:0.75rem; font-weight:600;">Weekend</span>
+                        @else
+                            <span style="display:inline-block; background-color:#dbeafe; color:#1d4ed8; padding:2px 10px; border-radius:9999px; font-size:0.75rem; font-weight:600;">Weekday</span>
+                        @endif
+                    </td>
+                    <td style="padding:10px 20px; text-align:right; border:1px solid #ffcc00;">
+                        <span style="display:inline-block; background-color:#e0e7ff; color:#4338ca; padding:2px 10px; border-radius:9999px; font-size:0.75rem; font-weight:700;">
+                            {{ number_format($day['prediksi'] ?? 0, 1) }}
                         </span>
-                    @endif
-                    <span class="text-xs text-gray-400">
-                        Total: <span class="font-semibold text-gray-700 dark:text-gray-200">
-                            {{ number_format($pred['total_forecast'] ?? 0, 1) }} {{ $pred['satuan'] ?? '' }}
-                        </span>
-                    </span>
-                    <span class="ml-auto flex items-center gap-3 text-xs text-gray-400">
-                        <span>MAPE:
-                            @php $mape = $pred['mape'] ?? 0; @endphp
-                            <span class="font-semibold {{ $mape <= 10 ? 'text-green-600' : ($mape <= 25 ? 'text-yellow-600' : 'text-red-500') }}">
-                                {{ number_format($mape, 2) }}%
-                            </span>
-                        </span>
-                        <span>MAE: <span class="font-semibold text-gray-600 dark:text-gray-300">{{ number_format($pred['mae'] ?? 0, 2) }}</span></span>
-                    </span>
-                </div>
+                    </td>
+                    <td style="padding:10px 20px; text-align:right; color:#6b7280; border:1px solid #ffcc00;">{{ number_format($day['batas_bawah'] ?? 0, 1) }}</td>
+                    <td style="padding:10px 20px; text-align:right; color:#6b7280; border:1px solid #ffcc00;">{{ number_format($day['batas_atas'] ?? 0, 1) }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
 
-                {{-- Tabel forecast harian --}}
-                @if(count($pred['forecast'] ?? []))
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead>
-                            <tr class="border-b border-gray-100 dark:border-gray-700">
-                                <th class="py-2.5 px-5 text-left   text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tanggal</th>
-                                <th class="py-2.5 px-5 text-left   text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Hari</th>
-                                <th class="py-2.5 px-5 text-left   text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Tipe</th>
-                                <th class="py-2.5 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Prediksi</th>
-                                <th class="py-2.5 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Batas Bawah</th>
-                                <th class="py-2.5 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Batas Atas</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50 dark:divide-gray-700/30">
-                            @foreach($pred['forecast'] as $day)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors">
-                                <td class="py-2.5 px-5 tabular-nums text-gray-700 dark:text-gray-300">{{ $day['tanggal'] }}</td>
-                                <td class="py-2.5 px-5 text-gray-600 dark:text-gray-400">{{ $day['hari'] }}</td>
-                                <td class="py-2.5 px-5">
-                                    <span class="inline-block px-2.5 py-0.5 rounded-full text-xs font-medium
-                                        {{ ($day['day_type'] ?? '') === 'Weekend'
-                                            ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300'
-                                            : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300' }}">
-                                        {{ $day['day_type'] ?? '-' }}
-                                    </span>
-                                </td>
-                                <td class="py-2.5 px-5 text-right tabular-nums font-bold text-primary-600 dark:text-primary-400">
-                                    {{ number_format($day['prediksi'] ?? 0, 1) }}
-                                </td>
-                                <td class="py-2.5 px-5 text-right tabular-nums text-gray-400 dark:text-gray-500 text-xs">
-                                    {{ number_format($day['batas_bawah'] ?? 0, 1) }}
-                                </td>
-                                <td class="py-2.5 px-5 text-right tabular-nums text-gray-400 dark:text-gray-500 text-xs">
-                                    {{ number_format($day['batas_atas'] ?? 0, 1) }}
-                                </td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-                @endif
-
-            </div>
-            @endforeach
+</div>
+@endforeach
+                               
         </div>
         @endif
 

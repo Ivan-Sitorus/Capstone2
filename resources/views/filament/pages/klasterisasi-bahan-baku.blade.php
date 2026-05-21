@@ -129,49 +129,41 @@
                 </p>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-sm">
+                <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
                     <thead>
-                        <tr class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/40">
-                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide w-14">No</th>
-                            <th class="py-3 px-5 text-left   text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Nama Bahan Baku</th>
-                            <th class="py-3 px-5 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Satuan</th>
-                            <th class="py-3 px-5 text-right  text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Total Penggunaan</th>
-                            <th class="py-3 px-5 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Klaster</th>
-                            <th class="py-3 px-5 text-left   text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">Kategori</th>
-                        </tr>
+                        <tr style="background-color:#9c9c9c;">
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#5a5a5a; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #afb800; width:56px;">No</th>
+                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#5a5a5a; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #afb800;">Nama Bahan Baku</th>
+               <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#5a5a5a; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #afb800;">Satuan</th>
+                <th style="padding:10px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#5a5a5a; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #afb800;">Total Penggunaan</th>
+                <th style="padding:10px 20px; text-align:center;font-size:0.75rem; font-weight:600; color:#5a5a5a; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #afb800;">Klaster</th>
+                <th style="padding:10px 20px; text-align:left;  font-size:0.75rem; font-weight:600; color:#5a5a5a; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #afb800;">Kategori</th>
+            </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700/30">
-                        @php
-                            $badgeMap = [
-                                'Sangat Banyak Digunakan'  => 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300',
-                                'Banyak Digunakan'         => 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
-                                'Cukup Digunakan'          => 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300',
-                                'Sedikit Digunakan'        => 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
-                                'Paling Sedikit Digunakan' => 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
-                            ];
-                        @endphp
+                    <tbody>
+            @php
+                $badge = [
+                    'Sangat Banyak Digunakan' => 'background-color:#dcfce7; color:#15803d;',
+                    'Banyak Digunakan'        => 'background-color:#dbeafe; color:#1d4ed8;',
+                    'Cukup Digunakan'  => 'background-color:#fef9c3; color:#b45309;',
+                    'Sedikit Digunakan' => 'background-color:#fee2e2; color:#c2410c;',
+                    'Paling Sedikit Digunakan'  => 'background-color:#f3f4f6; color:#6b7280;',
+                ];
+            @endphp
                         @foreach($tableRows as $i => $row)
-                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors">
-                            <td class="py-3 px-5 text-right tabular-nums text-gray-400 dark:text-gray-500 text-xs">{{ $i + 1 }}</td>
-                            <td class="py-3 px-5 font-medium text-gray-700 dark:text-gray-200">
-                                {{ $row['Nama Bahan Baku'] }}
-                            </td>
-                            <td class="py-3 px-5 text-center text-gray-500 dark:text-gray-400 text-xs">
-                                {{ $row['Satuan'] ?? '-' }}
-                            </td>
-                            <td class="py-3 px-5 text-right tabular-nums font-semibold text-gray-700 dark:text-gray-200">
-                                {{ number_format($row['Total Penggunaan'], 1) }}
-                            </td>
-                            <td class="py-3 px-5 text-center tabular-nums text-gray-500 dark:text-gray-400 text-xs">
-                                {{ $row['Klaster'] }}
-                            </td>
-                            <td class="py-3 px-5">
-                                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold {{ $badgeMap[$row['Kategori']] ?? 'bg-gray-100 text-gray-500' }}">
-                                    {{ $row['Kategori'] }}
-                                </span>
-                            </td>
-                        </tr>
-                        @endforeach
+<tr>
+    <td style="padding:10px 20px; text-align:right;  color:#9ca3af; border:1px solid #e5e7eb;">{{ $i + 1 }}</td>
+    <td style="padding:10px 20px; text-align:left;   color:#374151; font-weight:500; border:1px solid #e5e7eb;">{{ $row['Nama Bahan Baku'] }}</td>
+    <td style="padding:10px 20px; text-align:left;   color:#6b7280; border:1px solid #e5e7eb;">{{ $row['Satuan'] ?? '-' }}</td>
+    <td style="padding:10px 20px; text-align:right;  color:#374151; font-weight:500; border:1px solid #e5e7eb;">{{ number_format($row['Total Penggunaan'], 2) }}</td>
+    <td style="padding:10px 20px; text-align:center; color:#6b7280; border:1px solid #e5e7eb;">{{ $row['Klaster'] }}</td>
+    <td style="padding:10px 20px; border:1px solid #e5e7eb;">
+        <span style="display:inline-block; padding:2px 12px; border-radius:9999px; font-size:0.75rem; font-weight:600; {{ $badge[$row['Kategori']] ?? 'background-color:#f3f4f6; color:#6b7280;' }}">
+            {{ $row['Kategori'] }}
+        </span>
+    </td>
+</tr>
+@endforeach
                     </tbody>
                 </table>
             </div>
@@ -182,16 +174,14 @@
         {{-- VISUALISASI BAR CHART                                       --}}
         {{-- ══════════════════════════════════════════════════════════ --}}
         @if($chartBar)
-        <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-                <h2 class="text-base font-bold text-gray-900 dark:text-white">Visualisasi Clustering Penggunaan Bahan Baku</h2>
-                <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    Setiap batang mewakili total penggunaan bahan baku, dikelompokkan per kategori klaster
-                </p>
+        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-8 overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
+                <h2 class="text-base font-semibold text-gray-800 dark:text-gray-100">Visualisasi Clustering Penggunaan Bahan Baku</h2>
+                <p class="text-xs text-gray-400 mt-0.5">Setiap batang mewakili total penggunaan bahan baku, dikelompokkan per kategori klaster</p>
             </div>
             <div class="p-4">
                 <img src="data:image/png;base64,{{ $chartBar }}"
-                     alt="Clustering Bahan Baku Bar Chart"
+                     alt="Clustering Bar Chart"
                      class="w-full rounded"/>
             </div>
         </div>

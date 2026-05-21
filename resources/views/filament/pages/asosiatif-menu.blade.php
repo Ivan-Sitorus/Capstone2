@@ -57,10 +57,10 @@
         {{-- ── Stat bar ──────────────────────────────────────────────── --}}
         <div class="grid grid-cols-4 gap-4 mb-8">
             @foreach([
-                ['label' => 'Total Rules',        'value' => $totalRules],
-                ['label' => 'Total Transaksi',    'value' => $totalTransactions],
-                ['label' => 'Min Support',        'value' => number_format($minSupport * 100, 1) . '%'],
-                ['label' => 'Min Confidence',     'value' => number_format($minConfidence * 100, 1) . '%'],
+                ['label' => 'Total Rules',     'value' => $totalRules],
+                ['label' => 'Total Transaksi', 'value' => $totalTransactions],
+                ['label' => 'Min Support',     'value' => number_format($minSupport * 100, 1) . '%'],
+                ['label' => 'Min Confidence',  'value' => number_format($minConfidence * 100, 1) . '%'],
             ] as $s)
                 <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-5">
                     <p class="text-xs text-gray-400 uppercase tracking-widest mb-2">{{ $s['label'] }}</p>
@@ -70,7 +70,7 @@
         </div>
 
         {{-- ══════════════════════════════════════════════════════════ --}}
-        {{-- TABEL ASSOCIATION RULES (TOP 8 by Lift)                    --}}
+        {{-- TABEL TOP 8 ASSOCIATION RULES                              --}}
         {{-- ══════════════════════════════════════════════════════════ --}}
         @if(count($rules))
         <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-8 overflow-hidden">
@@ -81,62 +81,58 @@
                 </p>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-sm">
+                <table style="width:100%; border-collapse:collapse; font-size:0.875rem;">
                     <thead>
-                        <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                            <th class="py-3 px-4 text-right  text-xs font-semibold text-gray-400 uppercase tracking-wide w-10">No</th>
-                            <th class="py-3 px-4 text-left   text-xs font-semibold text-gray-400 uppercase tracking-wide">Jika Pesan</th>
-                            <th class="py-3 px-4 text-left   text-xs font-semibold text-gray-400 uppercase tracking-wide">Maka Pesan</th>
-                            <th class="py-3 px-4 text-right  text-xs font-semibold text-gray-400 uppercase tracking-wide">Jml A</th>
-                            <th class="py-3 px-4 text-right  text-xs font-semibold text-gray-400 uppercase tracking-wide">Jml B</th>
-                            <th class="py-3 px-4 text-right  text-xs font-semibold text-gray-400 uppercase tracking-wide">Bersama</th>
-                            <th class="py-3 px-4 text-right  text-xs font-semibold text-gray-400 uppercase tracking-wide">Support</th>
-                            <th class="py-3 px-4 text-right  text-xs font-semibold text-gray-400 uppercase tracking-wide">Confidence</th>
-                            <th class="py-3 px-4 text-right  text-xs font-semibold text-gray-400 uppercase tracking-wide">Lift</th>
+                        <tr style="background-color:#1381ef;">
+                            <th style="padding:10px 16px; text-align:right;  font-size:0.75rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffd000; width:48px;">No</th>
+                            <th style="padding:10px 16px; text-align:left;   font-size:0.75rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffd000;">Jika Pesan</th>
+                            <th style="padding:10px 16px; text-align:left;   font-size:0.75rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffd000;">Maka Pesan</th>
+                            <th style="padding:10px 16px; text-align:right;  font-size:0.75rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffd000;">Jml A</th>
+                            <th style="padding:10px 16px; text-align:right;  font-size:0.75rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffd000;">Jml B</th>
+                            <th style="padding:10px 16px; text-align:right;  font-size:0.75rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffd000;">Bersama</th>
+                            <th style="padding:10px 16px; text-align:right;  font-size:0.75rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffd000;">Support</th>
+                            <th style="padding:10px 16px; text-align:right;  font-size:0.75rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffd000;">Confidence</th>
+                            <th style="padding:10px 16px; text-align:right;  font-size:0.75rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #ffd000;">Lift</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50 dark:divide-gray-700/40">
+                    <tbody>
                         @foreach($rules as $i => $rule)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20 transition-colors">
-                                <td class="py-3 px-4 text-right text-gray-400 tabular-nums">{{ $i + 1 }}</td>
-                                <td class="py-3 px-4">
-                                    <span class="inline-block bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 px-2.5 py-1 rounded text-xs font-medium">
+                            @php
+                                $liftColor = $rule['lift'] >= 2
+                                    ? 'color:#16a34a; font-weight:700;'
+                                    : ($rule['lift'] >= 1
+                                        ? 'color:#d97706; font-weight:700;'
+                                        : 'color:#dc2626; font-weight:700;');
+                            @endphp
+
+                            {{-- Baris data utama --}}
+                            <tr>
+                                <td style="padding:10px 16px; text-align:right;  color:#008910; border:1px solid #ffd000;">{{ $i + 1 }}</td>
+                                <td style="padding:10px 16px; text-align:left;   border:1px solid #ffd000;">
+                                    <span style="display:inline-block; background-color:#ffd000; color:#000000; padding:2px 10px; border-radius:4px; font-size:0.75rem; font-weight:600;">
                                         {{ $rule['menu_pertama'] }}
                                     </span>
                                 </td>
-                                <td class="py-3 px-4">
-                                    <span class="inline-block bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 px-2.5 py-1 rounded text-xs font-medium">
+                                <td style="padding:10px 16px; text-align:left;   border:1px solid #ffd000;">
+                                    <span style="display:inline-block; background-color:#dcfce7; color:#15803d; padding:2px 10px; border-radius:4px; font-size:0.75rem; font-weight:600;">
                                         {{ $rule['menu_kedua'] }}
                                     </span>
                                 </td>
-                                <td class="py-3 px-4 text-right tabular-nums text-gray-500 dark:text-gray-400 text-xs">
-                                    {{ $rule['jumlah_menu_pertama'] }}
-                                </td>
-                                <td class="py-3 px-4 text-right tabular-nums text-gray-500 dark:text-gray-400 text-xs">
-                                    {{ $rule['jumlah_menu_kedua'] }}
-                                </td>
-                                <td class="py-3 px-4 text-right tabular-nums text-gray-600 dark:text-gray-300 text-xs font-medium">
-                                    {{ $rule['jumlah_bersamaan'] }}
-                                </td>
-                                <td class="py-3 px-4 text-right tabular-nums text-gray-600 dark:text-gray-300">
-                                    {{ number_format($rule['support'] * 100, 2) }}%
-                                </td>
-                                <td class="py-3 px-4 text-right tabular-nums font-medium text-gray-700 dark:text-gray-200">
-                                    {{ number_format($rule['confidence'] * 100, 2) }}%
-                                </td>
-                                <td class="py-3 px-4 text-right tabular-nums">
-                                    <span class="font-bold {{ $rule['lift'] >= 2 ? 'text-green-600 dark:text-green-400' : ($rule['lift'] >= 1 ? 'text-yellow-600 dark:text-yellow-400' : 'text-red-500') }}">
-                                        {{ number_format($rule['lift'], 2) }}
-                                    </span>
-                                </td>
+                                <td style="padding:10px 16px; text-align:right;  color:#008910; font-size:0.75rem; border:1px solid #ffd000;">{{ $rule['jumlah_menu_pertama'] }}</td>
+                                <td style="padding:10px 16px; text-align:right;  color:#008910; font-size:0.75rem; border:1px solid #ffd000;">{{ $rule['jumlah_menu_kedua'] }}</td>
+                                <td style="padding:10px 16px; text-align:right;  color:#008910; font-weight:600; font-size:0.75rem; border:1px solid #ffd000;">{{ $rule['jumlah_bersamaan'] }}</td>
+                                <td style="padding:10px 16px; text-align:right;  color:#008910; border:1px solid #ffd000;">{{ number_format($rule['support'] * 100, 2) }}%</td>
+                                <td style="padding:10px 16px; text-align:right;  color:#008910; font-weight:500; border:1px solid #ffd000;">{{ number_format($rule['confidence'] * 100, 2) }}%</td>
+                                <td style="padding:10px 16px; text-align:right;  border:1px solid #ffd000; {{ $liftColor }}">{{ number_format($rule['lift'], 2) }}</td>
                             </tr>
+
                             {{-- Baris interpretasi --}}
-                            <tr class="bg-gray-50/60 dark:bg-gray-700/10">
-                                <td></td>
-                                <td colspan="8" class="px-4 pb-3 pt-1">
-                                    <p class="text-xs text-gray-500 dark:text-gray-400 italic">
-                                        {{ $rule['interpretasi'] }}
-                                    </p>
+                            <tr style="background-color:#c7c7c7;">
+                                <td style="border:1px solid #ffd000; border-bottom:2px solid #ffd000;"></td>
+                                <td colspan="8" style="padding:8px 16px; border:1px solid #ffd000; border-bottom:2px solid #ffd000;">
+                                    <span style="font-size:0.75rem; color:#41454c; font-style:italic; line-height:1.6;">
+                                        💡 {{ $rule['interpretasi'] }}
+                                    </span>
                                 </td>
                             </tr>
                         @endforeach
@@ -150,7 +146,6 @@
         {{-- VISUALISASI                                                  --}}
         {{-- ══════════════════════════════════════════════════════════ --}}
 
-        {{-- Top Rules by Lift (full width) --}}
         @if($chartTopRules)
         <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
             <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
@@ -163,7 +158,6 @@
         </div>
         @endif
 
-        {{-- Support vs Confidence + Frequent 1-Itemsets (2 kolom) --}}
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             @if($chartSupConf)
             <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
@@ -194,7 +188,7 @@
         {{-- ══════════════════════════════════════════════════════════ --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-            {{-- Frequent 1-Itemsets --}}
+            {{-- ── Frequent 1-Itemsets ──────────────────────────────── --}}
             @if(count($freq1Itemsets))
             <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
                 <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
@@ -202,20 +196,20 @@
                     <p class="text-xs text-gray-400 mt-0.5">Menu yang sering muncul sendiri</p>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-xs">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
                         <thead>
-                            <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                                <th class="py-2 px-4 text-left  font-semibold text-gray-400 uppercase tracking-wide">Menu</th>
-                                <th class="py-2 px-4 text-right font-semibold text-gray-400 uppercase tracking-wide">Support</th>
-                                <th class="py-2 px-4 text-right font-semibold text-gray-400 uppercase tracking-wide">Jumlah</th>
+                            <tr style="background-color:#6c6c6c;">
+                                <th style="padding:8px 16px; text-align:left;  font-size:0.7rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #e5e7eb;">Menu</th>
+                                <th style="padding:8px 16px; text-align:right; font-size:0.7rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #e5e7eb;">Support</th>
+                                <th style="padding:8px 16px; text-align:right; font-size:0.7rem; font-weight:600; color:#000000; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #e5e7eb;">Jumlah</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-50 dark:divide-gray-700/40">
+                        <tbody>
                             @foreach($freq1Itemsets as $fi)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20">
-                                <td class="py-2 px-4 text-gray-700 dark:text-gray-200">{{ $fi['item'] }}</td>
-                                <td class="py-2 px-4 text-right tabular-nums text-gray-500 dark:text-gray-400">{{ number_format($fi['support'] * 100, 2) }}%</td>
-                                <td class="py-2 px-4 text-right tabular-nums font-medium text-gray-700 dark:text-gray-200">{{ $fi['jumlah_kemunculan'] }}</td>
+                            <tr>
+                                <td style="padding:8px 16px; text-align:left;  color:#0082be; font-weight:500; border:1px solid #b8c200;">{{ $fi['item'] }}</td>
+                                <td style="padding:8px 16px; text-align:right; color:#0082be; border:1px solid #b8c200;">{{ number_format($fi['support'] * 100, 2) }}%</td>
+                                <td style="padding:8px 16px; text-align:right; color:#0082be; font-weight:600; border:1px solid #b8c200;">{{ $fi['jumlah_kemunculan'] }}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -224,7 +218,7 @@
             </div>
             @endif
 
-            {{-- Frequent 2-Itemsets --}}
+            {{-- ── Frequent 2-Itemsets ──────────────────────────────── --}}
             @if(count($freq2Itemsets))
             <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
                 <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
@@ -232,20 +226,20 @@
                     <p class="text-xs text-gray-400 mt-0.5">Pasangan menu yang sering dipesan bersamaan</p>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-xs">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
                         <thead>
-                            <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                                <th class="py-2 px-4 text-left  font-semibold text-gray-400 uppercase tracking-wide">Pasangan Menu</th>
-                                <th class="py-2 px-4 text-right font-semibold text-gray-400 uppercase tracking-wide">Support</th>
-                                <th class="py-2 px-4 text-right font-semibold text-gray-400 uppercase tracking-wide">Jumlah</th>
+                            <tr style="background-color:#6c6c6c;">
+                                <th style="padding:8px 16px; text-align:left;  font-size:0.7rem; font-weight:600; color:#6200ff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #b8c200;">Pasangan Menu</th>
+                                <th style="padding:8px 16px; text-align:right; font-size:0.7rem; font-weight:600; color:#6200ff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #b8c200;">Support</th>
+                                <th style="padding:8px 16px; text-align:right; font-size:0.7rem; font-weight:600; color:#6200ff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #b8c200;">Jumlah</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-50 dark:divide-gray-700/40">
+                        <tbody>
                             @foreach($freq2Itemsets as $fi)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20">
-                                <td class="py-2 px-4 text-gray-700 dark:text-gray-200">{{ $fi['items'] }}</td>
-                                <td class="py-2 px-4 text-right tabular-nums text-gray-500 dark:text-gray-400">{{ number_format($fi['support'] * 100, 2) }}%</td>
-                                <td class="py-2 px-4 text-right tabular-nums font-medium text-gray-700 dark:text-gray-200">{{ $fi['jumlah_kemunculan'] }}</td>
+                            <tr>
+                                <td style="padding:8px 16px; text-align:left;  color:#0082be; font-weight:500; border:1px solid #b8c200;">{{ $fi['items'] }}</td>
+                                <td style="padding:8px 16px; text-align:right; color:#0082be; border:1px solid #b8c200;">{{ number_format($fi['support'] * 100, 2) }}%</td>
+                                <td style="padding:8px 16px; text-align:right; color:#0082be; font-weight:600; border:1px solid #b8c200;">{{ $fi['jumlah_kemunculan'] }}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -254,7 +248,7 @@
             </div>
             @endif
 
-            {{-- Frequent 3-Itemsets --}}
+            {{-- ── Frequent 3-Itemsets ──────────────────────────────── --}}
             @if(count($freq3Itemsets))
             <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
                 <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
@@ -262,20 +256,20 @@
                     <p class="text-xs text-gray-400 mt-0.5">Triplet menu yang sering dipesan bersamaan</p>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-xs">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
                         <thead>
-                            <tr class="bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
-                                <th class="py-2 px-4 text-left  font-semibold text-gray-400 uppercase tracking-wide">Kombinasi Menu</th>
-                                <th class="py-2 px-4 text-right font-semibold text-gray-400 uppercase tracking-wide">Support</th>
-                                <th class="py-2 px-4 text-right font-semibold text-gray-400 uppercase tracking-wide">Jumlah</th>
+                            <tr style="background-color:#f9fafb;">
+                                <th style="padding:8px 16px; text-align:left;  font-size:0.7rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #e5e7eb;">Kombinasi Menu</th>
+                                <th style="padding:8px 16px; text-align:right; font-size:0.7rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #e5e7eb;">Support</th>
+                                <th style="padding:8px 16px; text-align:right; font-size:0.7rem; font-weight:600; color:#9ca3af; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #e5e7eb;">Jumlah</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-50 dark:divide-gray-700/40">
+                        <tbody>
                             @foreach($freq3Itemsets as $fi)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/20">
-                                <td class="py-2 px-4 text-gray-700 dark:text-gray-200">{{ $fi['items'] }}</td>
-                                <td class="py-2 px-4 text-right tabular-nums text-gray-500 dark:text-gray-400">{{ number_format($fi['support'] * 100, 2) }}%</td>
-                                <td class="py-2 px-4 text-right tabular-nums font-medium text-gray-700 dark:text-gray-200">{{ $fi['jumlah_kemunculan'] }}</td>
+                            <tr>
+                                <td style="padding:8px 16px; text-align:left;  color:#374151; font-weight:500; border:1px solid #e5e7eb;">{{ $fi['items'] }}</td>
+                                <td style="padding:8px 16px; text-align:right; color:#6b7280; border:1px solid #e5e7eb;">{{ number_format($fi['support'] * 100, 2) }}%</td>
+                                <td style="padding:8px 16px; text-align:right; color:#374151; font-weight:600; border:1px solid #e5e7eb;">{{ $fi['jumlah_kemunculan'] }}</td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -283,7 +277,6 @@
                 </div>
             </div>
             @elseif(count($freq2Itemsets))
-            {{-- placeholder jika 3-itemset kosong --}}
             <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 overflow-hidden">
                 <div class="px-5 py-4 border-b border-gray-100 dark:border-gray-700">
                     <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Frequent 3-Itemsets</h2>

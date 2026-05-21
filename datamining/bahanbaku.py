@@ -12,6 +12,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
+from matplotlib.patches import Patch
 
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import KMeans
@@ -180,9 +181,7 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
             "message": (
                 f"Data tidak cukup untuk clustering. "
                 f"Hanya ditemukan {n_items} bahan baku unik. "
-                "Minimal diperlukan 2 bahan baku. "
-                "Jalankan seeder data pemakaian bahan baku terlebih dahulu: "
-                "php artisan db:seed --class=IngredientUsageSeeder"
+                "Minimal diperlukan 2 bahan baku."
             ),
         }
 
@@ -194,33 +193,34 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
         silhouette_scores.append(silhouette_score(x_train, labels))
 
     if not silhouette_scores:
-        # Hanya 2 bahan baku → paksa k=2
-        best_k  = 2
-        km      = KMeans(n_clusters=best_k, random_state=42, n_init=10)
-        labels  = km.fit_predict(x_train)
+        best_k   = 2
+        km       = KMeans(n_clusters=best_k, random_state=42, n_init=10)
+        labels   = km.fit_predict(x_train)
         best_sil = float(silhouette_score(x_train, labels))
         silhouette_scores = [best_sil]
-        k_range = range(2, 3)
+        k_range  = range(2, 3)
     else:
         best_k   = list(k_range)[int(np.argmax(silhouette_scores))]
         best_sil = float(max(silhouette_scores))
+
     logs.append({
         "tahap":  "Penentuan K Optimal (Silhouette)",
         "detail": f"K terbaik: {best_k} (Silhouette Score: {best_sil:.4f}). Range K: 2–{max(k_range)}.",
     })
 
-    # ── Cell 37: Elbow — hitung inertia ───────────────────────────────
+    # ── Elbow — hitung inertia ─────────────────────────────────────────
     inertias  = []
-    k_range_e = range(1, len(x_train) + 1)
+    k_range_e = range(2, min(10, n_items))
     for k in k_range_e:
-        km = KMeans(n_clusters=k, random_state=42, n_init=10).fit(x_train)
+        km = KMeans(n_clusters=k, random_state=42, n_init=10)
+        km.fit(x_train)
         inertias.append(km.inertia_)
 
-    # ── Cells 29-31: K-Means fit ───────────────────────────────────────
+    # ── K-Means fit ────────────────────────────────────────────────────
     kmean = KMeans(n_clusters=best_k, random_state=42, n_init=10)
     df_capped2["Klaster"] = kmean.fit_predict(x_train)
 
-    # ── Cells 32-34: Label otomatis berdasarkan rata-rata per klaster ──
+    # ── Label otomatis berdasarkan rata-rata per klaster ───────────────
     cluster_avg = (
         df_capped2.groupby("Klaster")["Jumlah_Digunakan"]
         .mean()
@@ -236,10 +236,8 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
         "detail": "Pemetaan: " + ", ".join([f"Klaster {k} → {v}" for k, v in cluster_label.items()]),
     })
 
-    # ── Cell 41: sort by Jumlah_Digunakan ─────────────────────────────
-    df_baku = df_capped2.sort_values("Jumlah_Digunakan").reset_index(drop=True)
-
-    # ── Cell 43: df_result ─────────────────────────────────────────────
+    # ── Sort by Jumlah_Digunakan ───────────────────────────────────────
+    df_baku   = df_capped2.sort_values("Jumlah_Digunakan").reset_index(drop=True)
     df_result = df_baku[["Bahan_Baku", "Jumlah_Digunakan", "Klaster", "Kategori"]].copy()
 
     # ── Susun output per klaster ───────────────────────────────────────
@@ -281,20 +279,25 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
             "Kategori":         row["Kategori"],
         })
 
-    # ── Style global ───────────────────────────────────────────────────
+    # ── Style global matplotlib ────────────────────────────────────────
     plt.rcParams.update({
-        "font.family":       "DejaVu Sans",
-        "axes.spines.top":   False,
-        "axes.spines.right": False,
-        "axes.titlesize":    13,
-        "axes.titleweight":  "bold",
-        "axes.titlepad":     14,
-        "axes.labelsize":    11,
-        "figure.facecolor":  "white",
-        "axes.facecolor":    "#fafafa",
-        "axes.grid":         True,
-        "grid.color":        "#e5e7eb",
-        "grid.linewidth":    0.8,
+        "font.family":        "DejaVu Sans",
+        "axes.spines.top":    False,
+        "axes.spines.right":  False,
+        "axes.titlesize":     14,
+        "axes.titleweight":   "bold",
+        "axes.titlepad":      16,
+        "axes.labelsize":     12,
+        "axes.labelpad":      8,
+        "xtick.labelsize":    10,
+        "ytick.labelsize":    10,
+        "legend.fontsize":    10,
+        "legend.title_fontsize": 11,
+        "figure.facecolor":   "white",
+        "axes.facecolor":     "#fafafa",
+        "axes.grid":          True,
+        "grid.color":         "#e5e7eb",
+        "grid.linewidth":     0.8,
     })
 
     palette_map = {
@@ -304,61 +307,71 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
         "Sedikit Digunakan":       "#ea580c",
         "Paling Sedikit Digunakan":"#9ca3af",
     }
-    present_cats    = [c for c in LABELS_LIST if c in df_baku["Kategori"].unique()]
-    palette_ordered = [palette_map[c] for c in present_cats]
+    present_cats = [c for c in LABELS_LIST if c in df_baku["Kategori"].unique()]
 
-    # ── Cell 42: Bar Chart (Visualisasi Clustering) ────────────────────
-    n_items = len(df_baku)
-    fig_w   = max(10, n_items * 0.9)
-    fig1, ax1 = plt.subplots(figsize=(fig_w, 6))
-    sns.barplot(
-        data=df_baku,
-        x="Bahan_Baku",
-        y="Jumlah_Digunakan",
-        hue="Kategori",
-        hue_order=present_cats,
-        palette=palette_ordered,
-        ax=ax1,
-        dodge=False,
+    # ── VISUALISASI 1: Bar Chart ───────────────────────────────────────
+    n_baku = len(df_baku)
+    fig_w  = max(14, n_baku * 0.85)
+    fig1, ax1 = plt.subplots(figsize=(fig_w, 7))
+
+    # Warna per bar langsung — hindari konflik hue/dodge seaborn
+    colors = [palette_map.get(k, "#9ca3af") for k in df_baku["Kategori"]]
+    bars   = ax1.bar(
+        df_baku["Bahan_Baku"],
+        df_baku["Jumlah_Digunakan"],
+        color=colors,
         width=0.6,
+        edgecolor="white",
+        linewidth=0.8,
     )
-    for bar in ax1.patches:
+
+    # Label nilai di atas bar — offset proporsional
+    max_val = df_baku["Jumlah_Digunakan"].max()
+    for bar in bars:
         h = bar.get_height()
         if h > 0:
             ax1.text(
                 bar.get_x() + bar.get_width() / 2,
-                h + max(h * 0.01, 500),
-                f"{h:,.0f}",
+                h + max_val * 0.02,
+                f"{h:,.1f}",
                 ha="center", va="bottom",
-                fontsize=8, color="#374151",
+                fontsize=9, color="#374151",
             )
-    ax1.set_title("Visualisasi Clustering Penggunaan Bahan Baku")
-    ax1.set_xlabel("Nama Bahan Baku", labelpad=8)
-    ax1.set_ylabel("Jumlah Penggunaan", labelpad=8)
-    ax1.tick_params(axis="x", rotation=35)
+
+    # Legend manual
+    legend_elements = [
+        Patch(facecolor=palette_map[c], label=c)
+        for c in present_cats
+    ]
+    ax1.legend(handles=legend_elements, title="Kategori", loc="upper left",
+               framealpha=0.9, edgecolor="#e5e7eb", fancybox=False)
+
+    ax1.set_title("Visualisasi Clustering Penggunaan Bahan Baku", pad=18)
+    ax1.set_xlabel("Nama Bahan Baku", labelpad=10)
+    ax1.set_ylabel("Total Penggunaan", labelpad=10)
+    ax1.tick_params(axis="x", rotation=40)
     ax1.set_xticklabels(ax1.get_xticklabels(), ha="right")
-    ax1.legend(title="Kategori", loc="upper left", framealpha=0.9, edgecolor="#e5e7eb", fancybox=False)
+    ax1.set_ylim(0, max_val * 1.15)
     ax1.yaxis.grid(True)
     ax1.xaxis.grid(False)
     fig1.tight_layout(pad=2)
     chart_bar = _to_b64(fig1)
 
-    # ── Cell 39: Elbow Curve ───────────────────────────────────────────
-    fig2, ax2 = plt.subplots(figsize=(8, 5))
+    # ── VISUALISASI 2: Elbow Curve ─────────────────────────────────────
+    fig2, ax2 = plt.subplots(figsize=(9, 5))
     ax2.plot(list(k_range_e), inertias,
-             marker="o", markersize=7, color="#6366f1",
+             marker="o", markersize=8, color="#6366f1",
              linewidth=2.5, markerfacecolor="white", markeredgewidth=2)
     ax2.axvline(x=best_k, color="#ef4444", linestyle="--",
                 linewidth=1.8, alpha=0.8, label=f"K optimal = {best_k}")
-    if best_k <= len(inertias):
-        best_inertia = inertias[best_k - 1]
-        ax2.annotate(
-            f"  K={best_k}\n  Inertia={best_inertia:.4f}",
-            xy=(best_k, best_inertia),
-            xytext=(best_k + 0.5, best_inertia + (max(inertias) - min(inertias)) * 0.05),
-            fontsize=9, color="#ef4444",
-            arrowprops=dict(arrowstyle="->", color="#ef4444", lw=1.2),
-        )
+    best_inertia = inertias[list(k_range_e).index(best_k)]
+    ax2.annotate(
+        f"  K={best_k}\n  Inertia={best_inertia:.4f}",
+        xy=(best_k, best_inertia),
+        xytext=(best_k + 0.4, best_inertia + (max(inertias) - min(inertias)) * 0.08),
+        fontsize=9, color="#ef4444",
+        arrowprops=dict(arrowstyle="->", color="#ef4444", lw=1.2),
+    )
     ax2.set_xlabel("Jumlah Klaster (K)")
     ax2.set_ylabel("Inertia (Sum of Squared Error)")
     ax2.set_title("Elbow Method — Penentuan Jumlah Klaster Optimal")
@@ -367,10 +380,10 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
     fig2.tight_layout(pad=2)
     chart_elbow = _to_b64(fig2)
 
-    # ── Silhouette Score per K ─────────────────────────────────────────
-    fig3, ax3 = plt.subplots(figsize=(8, 5))
+    # ── VISUALISASI 3: Silhouette Score per K ─────────────────────────
+    fig3, ax3 = plt.subplots(figsize=(9, 5))
     ax3.plot(list(k_range), silhouette_scores,
-             marker="s", markersize=7, color="#059669",
+             marker="s", markersize=8, color="#059669",
              linewidth=2.5, markerfacecolor="white", markeredgewidth=2)
     ax3.axvline(x=best_k, color="#ef4444", linestyle="--",
                 linewidth=1.8, alpha=0.8, label=f"K optimal = {best_k}")
