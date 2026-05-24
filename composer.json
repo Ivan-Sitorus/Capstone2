@@ -82,9 +82,7 @@
       "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
     ],
     "vercel": [
-      "@php artisan filament:assets --ansi --force",
-      "@php artisan storage:link --ansi",
-      "@php artisan icon:cache --ansi"
+      "@php artisan filament:assets --ansi --force 2>/dev/null || true"
     ]
   },
   "extra": {
