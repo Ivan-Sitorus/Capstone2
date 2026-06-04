@@ -148,6 +148,9 @@ class CashierPesananBaruController extends Controller
                 ->with('success', 'Pesanan berhasil dibuat')
                 ->with('order_id', $orderModel?->id)
                 ->with('order_code', $orderModel?->order_code);
+        } catch (\Exception $e) {
+            return back()
+                ->with('error', 'Gagal memproses pesanan: '.$e->getMessage());
         }
     }
 }

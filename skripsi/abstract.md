@@ -1,0 +1,9 @@
+# ABSTRACT
+
+*Inventory management is a critical aspect of cafe operations that affects raw material availability, production continuity, and customer satisfaction. In practice, many cafes still record stock manually using paper notes or spreadsheets, which are prone to recording errors, delayed stock information, and difficulty in tracking stock movement history. This study aims to design and implement an inventory management system for the W9 Cafe Point of Sale using Laravel and Filament that can manage two parallel stock tracks: recipe-based raw materials and finished product menu stock.*
+
+*The system was developed using the Laravel 13 framework with the Model-View-Controller (MVC) architecture pattern and Service Layer to separate business logic from the presentation layer. The administration panel was built using Filament, which provides intuitive CRUD interfaces and batch management. The system implements two batch deduction modes: FEFO (First-Expiry-First-Out) and FIFO (First-In-First-Out), with pessimistic locking to prevent race conditions in concurrent transactions. Integration with the cashier transaction module is achieved through multiple entry points where stock deduction occurs as a side effect of order processing.*
+
+*Testing was conducted using black box, white box, and performance testing methods. Black box testing across 6 modules showed all 15 scenarios passed. White box testing validated FIFO and FEFO algorithms, immutable audit trail, idempotency, and transaction rollback. Performance testing confirmed the system handles concurrent transactions without deadlock. All stock deduction mechanisms, movement recording, and daily usage aggregation functioned as designed.*
+
+*Keywords: Inventory management system, Point of Sale, Laravel, Filament, FEFO, FIFO, batch tracking.*

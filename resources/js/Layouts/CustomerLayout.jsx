@@ -5,11 +5,17 @@ import BottomNav from '@/Components/Pelanggan/BottomNav';
 export default function CustomerLayout({ children, activeTab = 'menu', showBottomNav = true }) {
     const { flash } = usePage().props;
     const [info, setInfo] = useState(null);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (flash?.info) {
             setInfo(flash.info);
             const t = setTimeout(() => setInfo(null), 5000);
+            return () => clearTimeout(t);
+        }
+        if (flash?.error) {
+            setError(flash.error);
+            const t = setTimeout(() => setError(null), 5000);
             return () => clearTimeout(t);
         }
     }, [flash]);
@@ -35,6 +41,13 @@ export default function CustomerLayout({ children, activeTab = 'menu', showBotto
                 <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-[9999] w-[calc(100%-2rem)] max-w-md rounded-xl border border-primary/20 bg-accent px-4 py-3 text-sm text-accent-foreground text-center leading-relaxed shadow-floating">
                     <span className="mr-1.5 opacity-70">⏳</span>
                     {info}
+                </div>
+            )}
+
+            {error && (
+                <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-[9999] w-[calc(100%-2rem)] max-w-md rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700 text-center leading-relaxed shadow-floating">
+                    <span className="mr-1.5">&#x2716;</span>
+                    {error}
                 </div>
             )}
         </div>

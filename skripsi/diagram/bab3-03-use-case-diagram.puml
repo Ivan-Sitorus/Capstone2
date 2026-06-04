@@ -1,0 +1,40 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+skinparam usecaseFontSize 12
+
+actor "Admin" as Admin
+actor "Sistem" as Sistem
+
+rectangle "Sistem Manajemen Inventori" {
+  usecase "Mengelola Bahan Baku" as UC1
+  usecase "Mengelola Batch Stok" as UC2
+  usecase "Menyesuaikan Stok Manual" as UC3
+  usecase "Atur Resep Menu" as UC4
+  usecase "Mengelola Stok Menu" as UC5
+  usecase "Melihat Laporan Harian" as UC7
+  usecase "Melihat Riwayat Stok" as UC8
+}
+
+rectangle "Otomatis" {
+  usecase "Deduksi Stok Otomatis" as UC6
+  usecase "Buat MenuStock Otomatis" as UC9
+}
+
+Admin --> UC1
+Admin --> UC2
+Admin --> UC3
+Admin --> UC4
+Admin --> UC5
+Admin --> UC7
+Admin --> UC8
+
+Sistem --> UC6
+Sistem --> UC9
+
+UC3 ..> UC2 : <<include>>
+UC4 ..> UC1 : <<include>>
+UC5 ..> UC9 : <<include>>
+UC9 ..> UC6 : <<extend>>
+
+@enduml

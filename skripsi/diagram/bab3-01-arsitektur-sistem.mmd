@@ -1,0 +1,63 @@
+%%{init: {"flowchart": {"nodeSpacing": 15, "rankSpacing": 20, "padding": 4}}}%%
+graph TB
+    subgraph Client["Layer Klien"]
+        direction TB
+        CS["Kasir (Desktop)"]
+        CUST["Pelanggan (Mobile PWA)"]
+        ADMIN["Admin (Desktop Filament)"]
+    end
+
+    subgraph Server["Layer Aplikasi (Laravel)"]
+        direction TB
+        INERTIA["Inertia.js v2"]
+        
+        subgraph Controllers["Controllers"]
+            ADMC["Admin Panel (Filament)"]
+            KASIRC["Cashier Controllers"]
+            CUSTC["Customer Controllers"]
+        end
+        
+        subgraph Services["Service Layer"]
+            INVSVC["InventoryService
+                stock deduction engine"]
+            MNSVC["MenuStockService
+                product stock deduction"]
+            RECSVC["StockReconciliationService
+                manual stock adjustment"]
+            MNRECSVC["MenuStockReconciliationService
+                menu stock adjustment"]
+        end
+        
+        subgraph Observers["Observers"]
+            MNOBS["MenuObserver
+                auto MenuStock lifecycle"]
+            MNOBS2["MenuIngredientObserver
+                sync stock flag"]
+        end
+
+        subgraph Models["Eloquent ORM"]
+            ELOQ["Models: Ingredient, StockMovement,
+                MenuStock, MenuStockMovement, dll"]
+        end
+    end
+
+    subgraph Database["Layer Data (PostgreSQL)"]
+        ING["ingredients"]
+        INGB["ingredient_batches"]
+        MI["menu_ingredients"]
+        SM["stock_movements (immutable)"]
+        SA["stock_adjustments"]
+        DIU["daily_ingredient_usages"]
+        MS["menu_stocks"]
+        MSB["menu_stock_batches"]
+        MSM["menu_stock_movements (immutable)"]
+        MSA["menu_stock_adjustments"]
+    end
+
+    Client -->|HTTP| INERTIA
+    INERTIA --> Controllers
+    Controllers --> Services
+    Services --> Observers
+    Services --> Models
+    Observers --> Models
+    Models --> Database

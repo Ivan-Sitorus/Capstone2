@@ -1,0 +1,43 @@
+%%{init: {"flowchart": {"nodeSpacing": 25, "rankSpacing": 25, "padding": 8}}}%%
+graph TB
+    subgraph Actors["Aktor"]
+        KASIR["Kasir"]
+        ADMIN["Admin"]
+    end
+
+    subgraph System["Sistem Manajemen Inventori"]
+        UC1["Mengelola Bahan Baku
+            (CRUD Ingredient)"]
+        UC2["Mengelola Batch Stok
+            (Tambah/Edit Batch)"]
+        UC3["Melihat Riwayat Stok
+            (Stock Movements)"]
+        UC4["Menyesuaikan Stok
+            (Stock Adjustment)"]
+        UC5["Mengelola Stok Menu
+            (CRUD MenuStock)"]
+        UC6["Atur Resep Menu
+            (Menu Ingredients)"]
+        UC7["Melihat Laporan Harian
+            (Daily Usage)"]
+        UC8["Menyetujui Laporan Stok
+            (Stock Report Approval)"]
+        UC9["Deteksi Stok Menipis
+            (Low Stock Alert)"]
+        UC10["Deduksi Stok Otomatis
+            (via Pesanan)"]
+    end
+
+    KASIR --> UC1
+    KASIR --> UC2
+    KASIR --> UC3
+    KASIR --> UC4
+    KASIR --> UC5
+    KASIR --> UC6
+    KASIR --> UC7
+    KASIR --> UC8
+    ADMIN --> UC1
+    ADMIN --> UC2
+    ADMIN --> UC5
+    ADMIN --> UC6
+    System --> UC10

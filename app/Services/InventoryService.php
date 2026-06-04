@@ -6,9 +6,7 @@ use App\Models\DailyIngredientUsage;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
 use App\Models\Menu;
-use App\Models\MenuStockBatch;
 use App\Models\Order;
-use App\Events\StockUpdated;
 use App\Models\StockMovement;
 use App\Services\MenuStockService;
 use Exception;
@@ -77,7 +75,9 @@ class InventoryService
                 $quantity = (int) ($item['quantity'] ?? 0);
 
                 if ($quantity <= 0) {
-                    continue;
+                    throw new \InvalidArgumentException(
+                        "Jumlah pesanan tidak valid untuk menu '{$menu->name}': quantity harus lebih dari 0"
+                    );
                 }
 
                 $itemContext = [
@@ -96,26 +96,6 @@ class InventoryService
                         $ingredient = $menuIngredient->ingredient;
                         $requiredQuantity = (float) $menuIngredient->quantity_used * $quantity;
 
-                        // Lock IngredientBatch rows before deduction to prevent race
-                        // conditions. ORDER BY id ASC ensures consistent lock ordering
-                        // across concurrent transactions, preventing deadlocks.
-                        $lockedIngredientBatches = IngredientBatch::where('ingredient_id', $ingredient->id)
-                            ->where('quantity', '>', 0)
-                            ->orderBy('id', 'asc')
-                            ->lockForUpdate()
-                            ->get();
-
-                        // Re-validate stock after acquiring lock: another transaction may
-                        // have deducted stock while we were waiting for the lock.
-                        $availableIngredient = (float) $lockedIngredientBatches->sum('quantity');
-                        if ($availableIngredient < $requiredQuantity) {
-                            throw new Exception(
-                                "Stok tidak mencukupi untuk bahan '{$ingredient->name}'. " .
-                                "Dibutuhkan: {$requiredQuantity} {$ingredient->unit}, " .
-                                "Tersedia: {$availableIngredient} {$ingredient->unit}"
-                            );
-                        }
-
                         $deduction = $this->deductIngredientStock(
                             ingredientId: (int) $ingredient->id,
                             requiredQuantity: $requiredQuantity,
@@ -133,27 +113,6 @@ class InventoryService
                         ];
                     }
                 } elseif ($menu->menuStock) {
-                    // Lock MenuStockBatch rows before deduction to prevent race conditions.
-                    // ORDER BY id ASC ensures consistent lock ordering across concurrent transactions,
-                    // preventing deadlocks.
-                    $lockedMenuStockBatches = MenuStockBatch::where('menu_stock_id', $menu->menuStock->id)
-                        ->where('quantity', '>', 0)
-                        ->orderBy('id', 'asc')
-                        ->lockForUpdate()
-                        ->get();
-
-                    // Re-validate stock after acquiring lock: another transaction may have
-                    // deducted stock while we were waiting for the lock.
-                    $availableMenuStock = (float) $lockedMenuStockBatches->sum('quantity');
-                    $requiredMenuStock = (float) $quantity;
-                    if ($availableMenuStock < $requiredMenuStock) {
-                        throw new Exception(
-                            "Stok menu tidak mencukupi untuk '{$menu->name}'. " .
-                            "Dibutuhkan: {$requiredMenuStock}, " .
-                            "Tersedia: {$availableMenuStock}"
-                        );
-                    }
-
                     $menuStockResult = app(MenuStockService::class)->deductMenuStockBatch(
                         menuStockId: $menu->menuStock->id,
                         requiredQuantity: (float) $quantity,
@@ -167,22 +126,6 @@ class InventoryService
                         'unit' => $menu->menuStock->unit,
                         'batches' => $menuStockResult['batch_changes'],
                     ];
-
-                    // Broadcast stock update after transaction commit (absolute stock value)
-                    $menuId = $menu->id;
-                    $menuName = $menu->name;
-                    $menuStockUnit = $menu->menuStock->unit;
-                    $remainingStock = (float) MenuStockBatch::where('menu_stock_id', $menu->menuStock->id)->sum('quantity');
-
-                    DB::afterCommit(function () use ($menuId, $remainingStock, $menuStockUnit, $menuName) {
-                        broadcast(new StockUpdated(
-                            menu_id: $menuId,
-                            stock: $remainingStock,
-                            unit: $menuStockUnit,
-                            menu_name: $menuName,
-                            timestamp: now(),
-                        ));
-                    });
                 }
             }
 
@@ -210,7 +153,9 @@ class InventoryService
             $quantity = (int) ($item['quantity'] ?? 0);
 
             if ($quantity <= 0) {
-                continue;
+                throw new \InvalidArgumentException(
+                    "Jumlah pesanan tidak valid untuk menu '{$menu->name}': quantity harus lebih dari 0"
+                );
             }
 
             if ($menu->menuIngredients->isNotEmpty()) {
@@ -254,7 +199,9 @@ class InventoryService
         $ingredient = Ingredient::findOrFail($ingredientId);
 
         $query = IngredientBatch::where('ingredient_id', $ingredientId)
-            ->where('quantity', '>', 0);
+            ->where('quantity', '>', 0)
+            ->orderBy('id', 'asc')
+            ->lockForUpdate();
 
         match ($ingredient->batch_mode) {
             Ingredient::BATCH_MODE_FIFO => $query

@@ -4,7 +4,9 @@ namespace Tests\Unit\Inventory;
 
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
+use App\Models\StockMovement;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use LogicException;
 use Tests\TestCase;
 
 class IngredientModelTest extends TestCase
@@ -56,5 +58,47 @@ class IngredientModelTest extends TestCase
         ]);
 
         $this->assertCount(1, Ingredient::active()->get());
+    }
+
+    public function test_stock_movement_is_immutable_on_update(): void
+    {
+        $ingredient = Ingredient::create([
+            'name' => 'Test',
+            'unit' => 'gram',
+        ]);
+
+        $movement = StockMovement::create([
+            'ingredient_id' => $ingredient->id,
+            'movement_type' => 'purchase',
+            'quantity_before' => 0,
+            'quantity_change' => 100,
+            'quantity_after' => 100,
+        ]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Stock movements are immutable');
+
+        $movement->update(['notes' => 'should fail']);
+    }
+
+    public function test_stock_movement_is_immutable_on_delete(): void
+    {
+        $ingredient = Ingredient::create([
+            'name' => 'Test',
+            'unit' => 'gram',
+        ]);
+
+        $movement = StockMovement::create([
+            'ingredient_id' => $ingredient->id,
+            'movement_type' => 'purchase',
+            'quantity_before' => 0,
+            'quantity_change' => 100,
+            'quantity_after' => 100,
+        ]);
+
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage('Stock movements are immutable');
+
+        $movement->delete();
     }
 }

@@ -1,0 +1,24 @@
+flowchart TD
+    S([Mulai]) --> A[Input Pesanan]
+    A --> B{isOnline?}
+    B -->|true| C[router.post via Inertia]
+    C --> D[Controller]
+    D --> E[PostgreSQL]
+    E --> F1([Selesai])
+    
+    B -->|false| G[saveOrder to Dexie]
+    G --> H[offlineOrders store]
+    H --> I[status: pending_sync]
+    I --> J((Koneksi Pulih))
+    J --> K[getPendingOrders]
+    K --> L[calcChunkSize]
+    L --> M{Ada chunk tersisa?}
+    M -->|ya| N[POST /sync-orders]
+    N --> O{Response?}
+    O -->|success| P[markSynced]
+    P --> M
+    O -->|fail| Q[markFailed + retry]
+    Q --> N
+    M -->|tidak| R[clearSynced]
+    R --> T[router.reload]
+    T --> F2([Selesai])

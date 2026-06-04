@@ -22,7 +22,8 @@ class MenuStockService
         $menuStock = MenuStock::with('menu')->findOrFail($menuStockId);
 
         $query = MenuStockBatch::where('menu_stock_id', $menuStockId)
-            ->where('quantity', '>', 0);
+            ->where('quantity', '>', 0)
+            ->lockForUpdate();
 
         switch ($menuStock->batch_mode) {
             case MenuStock::BATCH_MODE_FIFO:

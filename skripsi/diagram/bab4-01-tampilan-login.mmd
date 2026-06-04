@@ -1,0 +1,12 @@
+%%{init: {"flowchart": {"nodeSpacing": 25, "rankSpacing": 25, "padding": 8}}}%%
+graph TB
+    subgraph HalamanLogin["Halaman Login Admin"]
+        FORM[Form Login: Email + Password]
+        SUBMIT[Tombol Masuk]
+    end
+    subgraph Proses["Proses Autentikasi"]
+        VALIDASI[Validasi Kredensial]
+        SESSION[Buat Session Sanctum]
+        REDIRECT[Redirect ke Dashboard]
+    end
+    FORM --> SUBMIT --> VALIDASI --> SESSION --> REDIRECT

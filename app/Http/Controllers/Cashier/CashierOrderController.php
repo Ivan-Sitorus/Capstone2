@@ -75,13 +75,17 @@ class CashierOrderController extends Controller
             }
         }
 
-        DB::transaction(function () use ($request, $order, $inventoryService) {
-            $order->update(['status' => $request->status, 'cashier_id' => Auth::id()]);
+        try {
+            DB::transaction(function () use ($request, $order, $inventoryService) {
+                $order->update(['status' => $request->status, 'cashier_id' => Auth::id()]);
 
-            if ($request->status === Order::STATUS_DIPROSES) {
-                $inventoryService->processSaleForOrder($order, Auth::id());
-            }
-        });
+                if ($request->status === Order::STATUS_DIPROSES) {
+                    $inventoryService->processSaleForOrder($order, Auth::id());
+                }
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
+        }
 
         BroadcastPendingCount::dispatch();
 
@@ -121,14 +125,18 @@ class CashierOrderController extends Controller
             return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
         }
 
-        DB::transaction(function () use ($order, $inventoryService) {
-            $order->update([
-                'status' => Order::STATUS_DIPROSES,
-                'cashier_id' => Auth::id(),
-            ]);
+        try {
+            DB::transaction(function () use ($order, $inventoryService) {
+                $order->update([
+                    'status' => Order::STATUS_DIPROSES,
+                    'cashier_id' => Auth::id(),
+                ]);
 
-            $inventoryService->processSaleForOrder($order, Auth::id());
-        });
+                $inventoryService->processSaleForOrder($order, Auth::id());
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
+        }
 
         BroadcastPendingCount::dispatch();
 
@@ -151,20 +159,24 @@ class CashierOrderController extends Controller
             return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
         }
 
-        DB::transaction(function () use ($order, $inventoryService) {
-            // Hapus file bukti setelah dikonfirmasi
-            if ($order->payment_proof) {
-                Storage::disk('public')->delete($order->payment_proof);
-            }
+        try {
+            DB::transaction(function () use ($order, $inventoryService) {
+                // Hapus file bukti setelah dikonfirmasi
+                if ($order->payment_proof) {
+                    Storage::disk('public')->delete($order->payment_proof);
+                }
 
-            $order->update([
-                'status' => Order::STATUS_DIPROSES,
-                'cashier_id' => Auth::id(),
-                'payment_proof' => null,
-            ]);
+                $order->update([
+                    'status' => Order::STATUS_DIPROSES,
+                    'cashier_id' => Auth::id(),
+                    'payment_proof' => null,
+                ]);
 
-            $inventoryService->processSaleForOrder($order, Auth::id());
-        });
+                $inventoryService->processSaleForOrder($order, Auth::id());
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
+        }
 
         BroadcastPendingCount::dispatch();
 
@@ -213,20 +225,24 @@ class CashierOrderController extends Controller
             return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
         }
 
-        DB::transaction(function () use ($order, $inventoryService) {
-            if ($order->payment_proof) {
-                Storage::disk('public')->delete($order->payment_proof);
-            }
+        try {
+            DB::transaction(function () use ($order, $inventoryService) {
+                if ($order->payment_proof) {
+                    Storage::disk('public')->delete($order->payment_proof);
+                }
 
-            $order->update([
-                'qris_status'   => 'accepted',
-                'status'        => Order::STATUS_DIPROSES,
-                'cashier_id'    => Auth::id(),
-                'payment_proof' => null,
-            ]);
+                $order->update([
+                    'qris_status'   => 'accepted',
+                    'status'        => Order::STATUS_DIPROSES,
+                    'cashier_id'    => Auth::id(),
+                    'payment_proof' => null,
+                ]);
 
-            $inventoryService->processSaleForOrder($order, Auth::id());
-        });
+                $inventoryService->processSaleForOrder($order, Auth::id());
+            });
+        } catch (\Exception $e) {
+            return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
+        }
 
         broadcast(new OrderQrisReviewed($order, 'accepted', null));
 

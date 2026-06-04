@@ -1,0 +1,9 @@
+# ABSTRAK
+
+Manajemen inventori merupakan aspek kritis dalam operasional kafe yang mempengaruhi ketersediaan bahan baku, kelancaran produksi, dan kepuasan pelanggan. Pada praktiknya, banyak kafe masih melakukan pencatatan stok secara manual menggunakan nota kertas atau spreadsheet, yang rentan terhadap kesalahan pencatatan, keterlambatan informasi stok, serta sulitnya melacak riwayat pergerakan stok. Penelitian ini bertujuan merancang dan mengimplementasikan sistem manajemen inventori pada *Point of Sale* W9 Cafe menggunakan Laravel dan Filament yang mampu mengelola dua jalur stok secara paralel, yaitu bahan baku berbasis resep dan stok menu produk jadi.
+
+Sistem dikembangkan menggunakan kerangka kerja Laravel 13 dengan pola arsitektur *Model-View-Controller* (MVC) dan *Service Layer* untuk memisahkan logika bisnis dari lapisan presentasi. Panel administrasi dibangun menggunakan Filament yang menyediakan antarmuka *CRUD* dan manajemen batch secara intuitif. Sistem mengimplementasikan dua mode deduksi batch yaitu FEFO (*First-Expiry-First-Out*) dan FIFO (*First-In-First-Out*), dengan *pessimistic locking* untuk mencegah *race condition* pada transaksi konkuren. Integrasi dengan modul transaksi kasir dilakukan melalui beberapa titik masuk (*entry point*) di mana deduksi stok terjadi sebagai efek samping (*side effect*) dari pemrosesan pesanan.
+
+Pengujian dilakukan dengan metode *black box*, *white box*, dan pengujian performa. Hasil pengujian *black box* terhadap 6 modul menunjukkan seluruh 15 skenario berhasil. Pengujian *white box* memvalidasi kebenaran algoritma FIFO, FEFO, *immutable audit trail*, idempotensi, dan rollback transaksi. Pengujian performa membuktikan sistem mampu menangani transaksi konkuren tanpa deadlock. Seluruh mekanisme deduksi stok, pencatatan pergerakan, dan agregasi pemakaian harian berjalan sesuai perancangan.
+
+Kata kunci: Sistem manajemen inventori, *Point of Sale*, Laravel, Filament, FEFO, FIFO, *batch tracking*.

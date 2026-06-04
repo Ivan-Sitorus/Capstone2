@@ -88,7 +88,6 @@ class ReceivableResource extends Resource
                 ->type('text')
                 ->prefix('Rp')
                 ->disabled()
-                ->dehydrated(false)
                 ->extraInputAttributes(NumberInputHelper::decimal())
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
             DatePicker::make('invoice_date')

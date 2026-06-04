@@ -32,3 +32,4 @@ Thumbs.db
 /datamining/.venv/
 /supervisord.pid
 /.sisyphus/
+.vercel

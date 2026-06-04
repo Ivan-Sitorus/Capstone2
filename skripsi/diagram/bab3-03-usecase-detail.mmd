@@ -1,0 +1,126 @@
+%%{init: {"flowchart": {"nodeSpacing": 25, "rankSpacing": 25, "padding": 8}}}%%
+flowchart LR
+    %% Aktor
+    A(["Admin"])
+
+    %% System Boundary
+    subgraph SISTEM["Sistem Manajemen Inventori"]
+        direction TB
+
+        %% Login & Autentikasi
+        Login([Login])
+        Autentikasi([Autentikasi])
+        Validasi([Validasi Role])
+        CreateSession([Create Session])
+        CekSession([Cek Session])
+
+        %% Dashboard
+        Dashboard([Dashboard])
+
+        %% Kelola Bahan Baku
+        KelolaBB([Kelola Bahan Baku])
+        BB_tambah([Tambah Bahan Baku])
+        BB_edit([Edit Bahan Baku])
+        BB_hapus([Hapus Bahan Baku])
+
+        %% Kelola Batch Stok
+        KelolaBatch([Kelola Batch Stok])
+        Batch_tambah([Tambah Batch])
+        Batch_edit([Edit Batch])
+
+        %% Atur Resep Menu
+        AturResep([Atur Resep Menu])
+        Resep_tambah([Tambah Bahan ke Resep])
+        Resep_edit([Edit Jumlah Bahan])
+        Resep_hapus([Hapus Bahan dari Resep])
+
+        %% Kelola Stok Menu
+        KelolaSM([Kelola Stok Menu])
+        SM_tambah([Tambah Batch Menu])
+        SM_edit([Edit Batch Menu])
+        SM_hapus([Hapus Batch Menu])
+
+        %% Penyesuaian Stok
+        Penyesuaian([Penyesuaian Stok])
+        Inc([Increase Stok])
+        Dec([Decrease Stok])
+
+        %% Kelola Menu (dengan Auto-create MenuStock)
+        KelolaMenu([Kelola Menu])
+        Menu_tambah([Tambah Menu])
+        Menu_edit([Edit Menu])
+        AutoSM([Auto-create MenuStock])
+
+        %% Kelola Kategori
+        KelolaKat([Kelola Kategori])
+        Kat_tambah([Tambah Kategori])
+        Kat_edit([Edit Kategori])
+
+        %% Laporan
+        Laporan([Laporan Pemakaian Harian])
+    end
+
+    %% Relasi Aktor ke Use Case Utama
+    A --- Login
+    A --- Dashboard
+    A --- KelolaBB
+    A --- KelolaBatch
+    A --- AturResep
+    A --- KelolaSM
+    A --- Penyesuaian
+    A --- KelolaMenu
+    A --- KelolaKat
+    A --- Laporan
+
+    %% Sub Login
+    Login -. "include" .-> Autentikasi
+    Autentikasi -. "include" .-> Validasi
+    Login -. "extend" .-> CreateSession
+
+    %% CekSession di setiap fitur utama
+    Login -. "include" .-> CekSession
+    Dashboard -. "include" .-> CekSession
+    KelolaBB -. "include" .-> CekSession
+    KelolaBatch -. "include" .-> CekSession
+    AturResep -. "include" .-> CekSession
+    KelolaSM -. "include" .-> CekSession
+    Penyesuaian -. "include" .-> CekSession
+    KelolaMenu -. "include" .-> CekSession
+    KelolaKat -. "include" .-> CekSession
+    Laporan -. "include" .-> CekSession
+
+    %% Sub Kelola Bahan Baku
+    KelolaBB -. "extend" .-> BB_tambah
+    KelolaBB -. "extend" .-> BB_edit
+    BB_edit -. "extend" .-> BB_hapus
+
+    %% Sub Kelola Batch Stok
+    KelolaBatch -. "extend" .-> Batch_tambah
+    KelolaBatch -. "extend" .-> Batch_edit
+
+    %% Sub Atur Resep Menu
+    AturResep -. "extend" .-> Resep_tambah
+    AturResep -. "extend" .-> Resep_edit
+    Resep_edit -. "extend" .-> Resep_hapus
+
+    %% Sub Kelola Stok Menu
+    KelolaSM -. "extend" .-> SM_tambah
+    KelolaSM -. "extend" .-> SM_edit
+    SM_edit -. "extend" .-> SM_hapus
+
+    %% Sub Penyesuaian Stok
+    Penyesuaian -. "extend" .-> Inc
+    Penyesuaian -. "extend" .-> Dec
+
+    %% Sub Kelola Menu
+    KelolaMenu -. "extend" .-> Menu_tambah
+    KelolaMenu -. "extend" .-> Menu_edit
+    Menu_tambah -. "extend" .-> AutoSM
+
+    %% Sub Kelola Kategori
+    KelolaKat -. "extend" .-> Kat_tambah
+    KelolaKat -. "extend" .-> Kat_edit
+
+    %% Styling
+    classDef actor fill:transparent,stroke:none,font-weight:bold,color:#000;
+    class A actor;

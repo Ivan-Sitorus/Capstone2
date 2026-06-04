@@ -1,0 +1,22 @@
+%%{init: {"flowchart": {"nodeSpacing": 25, "rankSpacing": 25, "padding": 8}}}%%
+graph TB
+    subgraph Filament["Panel Admin Filament"]
+        LOGIN[Halaman Login]
+        DASHBOARD[Halaman Dashboard]
+        subgraph Inventori["Grup Inventori"]
+            STOK[StokPage]
+            ADJ[AdjustmentsPage]
+            STOCKRES[StockResource]
+            STOCKADJRES[StockAdjustmentResource]
+        end
+        subgraph Master["Grup Master Data"]
+            MENURES[MenuResource]
+            CATRES[CategoryResource]
+        end
+        subgraph Admin["Grup Admin"]
+            USERMAN[Manajemen Akun]
+        end
+    end
+    LOGIN --> DASHBOARD
+    DASHBOARD --> STOK
+    DASHBOARD --> MENURES

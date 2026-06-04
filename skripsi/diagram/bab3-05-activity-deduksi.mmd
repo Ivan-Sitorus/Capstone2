@@ -1,0 +1,40 @@
+%%{init: {"flowchart": {"nodeSpacing": 20, "rankSpacing": 25, "padding": 8}}}%%
+flowchart TB
+    START(["Pesanan Diproses"]) --> CEK[Pemeriksaan Idempotensi]
+    CEK --> SUDAH{StockMovement\nsudah ada?}
+    SUDAH -->|Ya| SKIP[Proses dilewati\nreturn skipped]
+    SUDAH -->|Tidak| LOAD[Muat data order\n& menu items]
+    LOAD --> ITEMS{Items\ntidak kosong?}
+    ITEMS -->|Kosong| SKIP2[return skipped]
+    ITEMS -->|Ada| TRANS[Mulai transaksi database]
+    TRANS --> PRELOAD[Pre-load semua menu\n+ ingredients + menuStock]
+    PRELOAD --> LOOP{Ada item\nberikutnya?}
+    LOOP -->|Tidak| COMMIT[Commit transaksi]
+    COMMIT --> SUCCESS([Stok berhasil dikurangi])
+    
+    LOOP -->|Ya| CEK_MENU{Menu punya\nresep?}
+    CEK_MENU -->|Ya| HITUNG[Hitung quantity_used\nx jumlah pesanan]
+    HITUNG --> LOCK_ING[Lock IngredientBatch\nlockForUpdate]
+    LOCK_ING --> VALID_ING[Re-validasi stok\nsetelah lock]
+    VALID_ING --> CUKUP_ING{Stok\nmencukupi?}
+    CUKUP_ING -->|Tidak| THROW[Throw Exception\nRollback transaksi]
+    CUKUP_ING -->|Ya| SORT[Urutkan batch\nsesuai batch_mode]
+    SORT --> DEDUCT_LOOP{Loop setiap\nbatch}
+    DEDUCT_LOOP -->|Masih perlu| DEDUCT[Hitung jumlah\ndedukasi]
+    DEDUCT --> UPDATE_BATCH[Update quantity batch\nbatch->save]
+    UPDATE_BATCH --> CREATE_SM[Buat StockMovement\nimmutable]
+    CREATE_SM --> DEDUCT_LOOP
+    DEDUCT_LOOP -->|Selesai| RECORD[RecordDailyIngredientUsage\nupsert]
+
+    CEK_MENU -->|Tidak punya MenuStock| LOCK_MS[Lock MenuStockBatch\nlockForUpdate]
+    LOCK_MS --> VALID_MS[Re-validasi stok\nsetelah lock]
+    VALID_MS --> CUKUP_MS{Stok\nmencukupi?}
+    CUKUP_MS -->|Tidak| THROW2[Throw Exception\nRollback transaksi]
+    CUKUP_MS -->|Ya|     DEDUCT_MS[MenuStockService::\ndeductMenuStockBatch]
+    DEDUCT_MS --> BROADCAST[dB::afterCommit\nbroadcast StockUpdated]
+    BROADCAST --> LOOP
+    RECORD --> LOOP
+
+    %% Style
+    classDef start fill:#000,color:#fff;
+    class START,SUCCESS start;

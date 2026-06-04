@@ -1,0 +1,10 @@
+%%{init: {"flowchart": {"nodeSpacing": 25, "rankSpacing": 25, "padding": 8}}}%%
+graph TB
+    A[Perencanaan] --> B[Analisis Kebutuhan]
+    B --> C[Perancangan]
+    C --> D[Implementasi]
+    D --> E[Pengujian]
+    E --> F{Evaluasi}
+    F -->|Ada revisi| A
+    F -->|Selesai| G[Iterasi Selesai]
+    G --> H[Iterasi Berikutnya]

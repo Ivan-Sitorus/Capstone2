@@ -38,11 +38,11 @@ class DailyIngredientUsageAggregationTest extends TestCase
         $orderTwo = $this->createPendingCashOrder($menu->id, 2);
 
         $this->actingAs($cashier)
-            ->patchJson("/cashier/order/{$orderOne->id}/confirm-cash")
+            ->patchJson("/kasir/pesanan/{$orderOne->id}/konfirmasi-tunai")
             ->assertOk();
 
         $this->actingAs($cashier)
-            ->patchJson("/cashier/order/{$orderTwo->id}/confirm-cash")
+            ->patchJson("/kasir/pesanan/{$orderTwo->id}/konfirmasi-tunai")
             ->assertOk();
 
         $dailyUsageRows = DailyIngredientUsage::query()
@@ -111,7 +111,8 @@ class DailyIngredientUsageAggregationTest extends TestCase
         ]);
 
         $this->actingAs($cashier)
-            ->post('/cashier/pesanan-baru', [
+            ->postJson('/kasir/pesanan-baru', [
+                'uuid' => (string) \Illuminate\Support\Str::uuid7(),
                 'payment_method' => 'cash',
                 'customer_name' => 'Walk In Test',
                 'items' => [
@@ -122,7 +123,7 @@ class DailyIngredientUsageAggregationTest extends TestCase
 
         $order = Order::latest('id')->firstOrFail();
 
-        $this->assertSame(Order::STATUS_DIPROSES, $order->status);
+        $this->assertSame(Order::STATUS_PENDING, $order->status);
 
         $dailyUsage = DailyIngredientUsage::query()
             ->where('ingredient_id', $ingredient->id)
@@ -178,6 +179,7 @@ class DailyIngredientUsageAggregationTest extends TestCase
     private function createPendingCashOrder(int $menuId, int $quantity): Order
     {
         $order = Order::create([
+            'uuid' => (string) \Illuminate\Support\Str::uuid7(),
             'customer_name' => 'Customer Mining',
             'customer_phone' => '081234567890',
             'order_type' => 'qr',
