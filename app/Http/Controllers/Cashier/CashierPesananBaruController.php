@@ -22,42 +22,13 @@ class CashierPesananBaruController extends Controller
     public function index()
     {
         // Cache 5 menit — menu jarang berubah, admin bisa clear cache jika update menu
-        $categories = Cache::remember('menu_categories_active', 300, fn () => Category::with([
+        $categories = Cache::remember('menu_categories_cashier', 300, fn () => Category::with([
             'menus' => fn ($q) => $q->where('is_available', true)
-                ->with('menuIngredients.ingredient.batches')
                 ->orderBy('name'),
         ])
-            
             ->orderBy('name')
             ->get()
         );
-
-        // Compute stock per menu (tidak di-cache agar stok real-time)
-        $categories->each(function ($category) {
-            $category->menus->each(function ($menu) {
-                if ($menu->menuIngredients->isNotEmpty()) {
-                    // Recipe-based: find bottleneck ingredient
-                    $stock = PHP_INT_MAX;
-                    foreach ($menu->menuIngredients as $mi) {
-                        $ingredient = $mi->ingredient;
-                        if (! $ingredient) {
-                            continue;
-                        }
-                        $ingredientStock = (float) $ingredient->batches->sum('quantity');
-                        $needed = (float) $mi->quantity_used;
-                        if ($needed <= 0) {
-                            continue;
-                        }
-                        $possible = (int) floor($ingredientStock / $needed);
-                        $stock = min($stock, $possible);
-                    }
-                    $menu->stock = $stock;
-                } else {
-                    // No recipe — should not happen (all menus have ingredients via MenuObserver)
-                    $menu->stock = PHP_INT_MAX;
-                }
-            });
-        });
 
         return Inertia::render('Kasir/PesananBaru', compact('categories'));
     }

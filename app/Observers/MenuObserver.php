@@ -3,66 +3,39 @@
 namespace App\Observers;
 
 use App\Models\Menu;
-use App\Models\MenuStock;
+use App\Models\MenuIngredient;
+use App\Models\Ingredient;
+use Illuminate\Support\Facades\Cache;
 
 class MenuObserver
 {
     /**
-     * Auto-create MenuStock when a non-recipe menu is created.
+     * Auto-create ingredient + recipe for new menus without recipe.
      */
     public function created(Menu $menu): void
     {
-        if (! $menu->is_stock_calculated && ! $menu->menuStock()->exists()) {
-            MenuStock::create([
-                'menu_id' => $menu->id,
+        if (! $menu->menuIngredients()->exists()) {
+            $ingredient = Ingredient::create([
+                'name' => $menu->name,
                 'unit' => 'pcs',
-                'batch_mode' => MenuStock::BATCH_MODE_FEFO,
+                'low_stock_threshold' => 0,
+                'batch_mode' => 'fefo',
+            ]);
+
+            MenuIngredient::create([
+                'menu_id' => $menu->id,
+                'ingredient_id' => $ingredient->id,
+                'quantity_used' => 1,
             ]);
         }
     }
 
-    /**
-     * Handle is_stock_calculated toggle (true → false) and serve
-     * as an idempotent safety net for MenuStock creation.
-     */
     public function saved(Menu $menu): void
     {
-        // When ingredients are removed (is_stock_calculated flips to false),
-        // auto-create a MenuStock record if one doesn't exist.
-        if ($menu->wasChanged('is_stock_calculated')
-            && ! $menu->is_stock_calculated
-            && ! $menu->menuStock()->exists()) {
-            MenuStock::create([
-                'menu_id' => $menu->id,
-                'unit' => 'pcs',
-                'batch_mode' => MenuStock::BATCH_MODE_FEFO,
-            ]);
-        }
+        Cache::forget('customer_menu_v1');
+        Cache::forget('menu_categories_cashier');
     }
 
-    /**
-     * Cascade soft-delete to MenuStock when Menu is soft-deleted.
-     */
-    public function deleting(Menu $menu): void
-    {
-        if (! $menu->isForceDeleting()) {
-            $menuStock = $menu->menuStock;
-
-            if ($menuStock) {
-                $menuStock->delete();
-            }
-        }
-    }
-
-    /**
-     * Restore MenuStock when Menu is restored.
-     */
-    public function restored(Menu $menu): void
-    {
-        $menuStock = $menu->menuStock()->withTrashed()->first();
-
-        if ($menuStock && $menuStock->trashed()) {
-            $menuStock->restore();
-        }
-    }
+    public function deleting(Menu $menu): void {}
+    public function restored(Menu $menu): void {}
 }
