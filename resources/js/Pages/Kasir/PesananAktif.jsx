@@ -98,6 +98,17 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         }
     }
 
+    async function handleConfirmPayment(orderId, paymentMethod) {
+        if (processing) return;
+        setProcessing(true);
+        try {
+            await axios.patch(`/kasir/pesanan/${orderId}/konfirmasi-bayar`, { payment_method: paymentMethod });
+            router.reload({ only: ['orders', 'counts'] });
+        } finally {
+            setProcessing(false);
+        }
+    }
+
     return (
         <><Head title="Pesanan Aktif | W9 Cafe" /><CashierLayout title="Pesanan Aktif" fullscreen>
             <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 32, background: '#F8FAFC', minWidth: 0 }}>
