@@ -24,10 +24,10 @@ class CashierPesananBaruController extends Controller
         // Cache 5 menit — menu jarang berubah, admin bisa clear cache jika update menu
         $categories = Cache::remember('menu_categories_active', 300, fn () => Category::with([
             'menus' => fn ($q) => $q->where('is_available', true)
-                ->with(['menuStock.batches', 'menuIngredients.ingredient.batches'])
+                ->with('menuIngredients.ingredient.batches')
                 ->orderBy('name'),
         ])
-            ->where('is_active', true)
+            
             ->orderBy('name')
             ->get()
         );
@@ -53,10 +53,8 @@ class CashierPesananBaruController extends Controller
                     }
                     $menu->stock = $stock;
                 } else {
-                    // No recipe: use direct MenuStock total
-                    $menu->stock = $menu->menuStock
-                        ? (float) $menu->menuStock->batches->sum('quantity')
-                        : PHP_INT_MAX;
+                    // No recipe — should not happen (all menus have ingredients via MenuObserver)
+                    $menu->stock = PHP_INT_MAX;
                 }
             });
         });
@@ -74,7 +72,6 @@ class CashierPesananBaruController extends Controller
 
         $attempt = function () use ($request, $orderPromotionService, $inventoryService, &$uuid, &$orderModel) {
             DB::transaction(function () use ($request, $orderPromotionService, $inventoryService, &$uuid, &$orderModel) {
-                $isBayarNanti = $request->payment_method === 'bayar_nanti';
                 $selectedPromotionIds = $request->input('promotion_ids', []);
 
                 $order = Order::create([
@@ -84,7 +81,7 @@ class CashierPesananBaruController extends Controller
                     'payment_method' => $request->payment_method,
                     'customer_name' => $request->customer_name,
                     'status' => Order::STATUS_PENDING,
-                    'is_paid' => ! $isBayarNanti,
+                    'is_paid' => true,
                     'total_amount' => 0,
                 ]);
 
