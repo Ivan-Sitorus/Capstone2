@@ -120,7 +120,7 @@ class CustomerOrderController extends Controller
                 'total_amount' => $order->total_amount,
                 'order_id'     => $order->id,
             ], 201);
-        });
+        }, 3);
     }
 
     public function riwayat(Request $request)
@@ -130,21 +130,16 @@ class CustomerOrderController extends Controller
 
         $orders = $phone
             ? Order::with([
-                'items' => fn($q) => $q->select(['id', 'order_id', 'menu_id', 'quantity', 'subtotal']),
+                'items'      => fn($q) => $q->select(['id', 'order_id', 'menu_id', 'quantity', 'subtotal']),
                 'items.menu' => fn($q) => $q->select(['id', 'name']),
             ])
                 ->select(['id', 'order_code', 'status', 'total_amount', 'created_at', 'payment_method', 'customer_name', 'customer_phone', 'payment_proof'])
                 ->where('customer_phone', $phone)
-                ->where(function ($q) {
-                    $q->where('payment_method', 'cash')
-                      ->orWhere(function ($q2) {
-                          $q2->where('payment_method', 'qris')
-                             ->where(function ($q3) {
-                                 // Tampil saat bukti dikirim (pending) ATAU sudah dikonfirmasi kasir (proof dihapus)
-                                 $q3->whereNotNull('payment_proof')
-                                    ->orWhereIn('status', [Order::STATUS_DIPROSES, Order::STATUS_SELESAI]);
-                             });
-                      });
+                ->whereNot(function ($q) {
+                    // Sembunyikan QRIS yang belum ada bukti & belum dikonfirmasi kasir
+                    $q->where('payment_method', 'qris')
+                      ->whereNull('payment_proof')
+                      ->whereNotIn('status', [Order::STATUS_DIPROSES, Order::STATUS_SELESAI]);
                 })
                 ->latest()
                 ->limit(50)

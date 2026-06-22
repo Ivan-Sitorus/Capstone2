@@ -63,6 +63,16 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
         };
     }, []);
 
+    // Ambil pending count fresh setiap halaman dibuka — hindari angka stale
+    // dari cache prefetch Inertia saat berpindah menu
+    useEffect(() => {
+        let cancelled = false;
+        window.axios?.get('/cashier/pending-count')
+            .then(res => { if (!cancelled) setPendingCount(res.data.count); })
+            .catch(() => {});
+        return () => { cancelled = true; };
+    }, []);
+
     useEffect(() => {
         if (typeof window === 'undefined') return;
         window.localStorage.setItem('cashier-sidebar-collapsed', String(isSidebarCollapsed));

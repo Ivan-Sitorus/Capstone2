@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { router, Link, Head } from '@inertiajs/react';
 import { Search, Calendar, CreditCard, ChevronDown } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
@@ -6,7 +6,7 @@ import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
 const METHOD_LABELS = { cash: 'Tunai', qris: 'QRIS', bayar_nanti: 'Bayar Nanti' };
-const TODAY = new Date().toISOString().split('T')[0];
+const TODAY = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
 // Cashier blue theme
 const T = {
@@ -44,6 +44,11 @@ export default function RiwayatPesanan({ orders, filters }) {
     const [date,   setDate]   = useState(filters.date    ?? TODAY);
     const [method, setMethod] = useState(filters.method  ?? '');
     const searchTimer = useRef(null);
+
+    // Ambil data fresh saat halaman dibuka — hindari snapshot stale dari cache prefetch
+    useEffect(() => {
+        router.reload({ only: ['orders'] });
+    }, []);
 
     function apply(overrides = {}) {
         const params = { search, date, method, ...overrides };

@@ -8,6 +8,7 @@
 
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+import { Trend } from 'k6/metrics';
 import {
     BASE_URL,
     randomTable,
@@ -17,6 +18,11 @@ import {
     webHeaders,
     buildOrderPayload,
 } from './helpers.js';
+
+var menuTrend    = new Trend('menu_duration',    true);
+var orderTrend   = new Trend('order_duration',   true);
+var riwayatTrend = new Trend('riwayat_duration', true);
+var statusTrend  = new Trend('status_duration',  true);
 
 export var options = {
     vus:      1,
@@ -54,6 +60,7 @@ export default function () {
         '[Smoke] Menu -- bukan 500':     function (r) { return r.status !== 500; },
         '[Smoke] Menu -- response < 3s': function (r) { return r.timings.duration < 3000; },
     });
+    menuTrend.add(resMenu.timings.duration);
     sleep(0.5);
 
     // 3. Buat pesanan via API
@@ -69,6 +76,7 @@ export default function () {
         },
         '[Smoke] Buat Pesanan -- response < 5s': function (r) { return r.timings.duration < 5000; },
     });
+    orderTrend.add(resOrder.timings.duration);
     sleep(0.5);
 
     // 4. Halaman pilih pembayaran
@@ -82,6 +90,7 @@ export default function () {
             '[Smoke] Pilih Pembayaran -- status 200':    function (r) { return r.status === 200; },
             '[Smoke] Pilih Pembayaran -- response < 3s': function (r) { return r.timings.duration < 3000; },
         });
+        statusTrend.add(resStatus.timings.duration);
         sleep(0.5);
     }
 
@@ -95,6 +104,7 @@ export default function () {
         '[Smoke] Riwayat -- bukan 500':     function (r) { return r.status !== 500; },
         '[Smoke] Riwayat -- response < 3s': function (r) { return r.timings.duration < 3000; },
     });
+    riwayatTrend.add(resRiwayat.timings.duration);
 
     sleep(1);
 }

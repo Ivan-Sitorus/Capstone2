@@ -13,6 +13,10 @@ import { check, sleep, group } from 'k6';
 import { Trend, Counter, Rate } from 'k6/metrics';
 import { ensureLoggedIn, h, BASE_URL } from './auth.js';
 
+// ID pesanan yang pasti ada di DB untuk menguji halaman detail.
+// Override saat run: k6 run -e ORDER_ID=123 k6/cashier/load.js
+const SAMPLE_ORDER_ID = __ENV.ORDER_ID || 37891;
+
 const dashboardTrend    = new Trend('dashboard_duration',     true);
 const pesananBaruTrend  = new Trend('pesanan_baru_duration',  true);
 const pesananAktifTrend = new Trend('pesanan_aktif_duration', true);
@@ -95,7 +99,7 @@ export default function () {
     sleep(1);
 
     group('Detail Pesanan', () => {
-        const res = http.get(`${BASE_URL}/cashier/order/7396`, { headers: h(), redirects: 5 });
+        const res = http.get(`${BASE_URL}/cashier/order/${SAMPLE_ORDER_ID}`, { headers: h(), redirects: 5 });
         const ok = check(res, {
             'Detail Pesanan: status 200':    (r) => r.status === 200,
             'Detail Pesanan: tidak 500':     (r) => r.status !== 500,

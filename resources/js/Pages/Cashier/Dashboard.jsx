@@ -13,6 +13,11 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
         return () => clearInterval(timer);
     }, []);
 
+    // Ambil data fresh saat halaman dibuka — hindari snapshot stale dari cache prefetch
+    useEffect(() => {
+        router.reload({ only: ['totalPenjualan', 'jumlahTransaksi', 'pesananAktif', 'cashPending', 'qrisPending', 'transaksiTerbaru'] });
+    }, []);
+
     return (
         <><Head title="Dashboard | W9 Cafe" /><CashierLayout title="Dashboard" fullscreen>
             <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: '#F8FAFC' }}>

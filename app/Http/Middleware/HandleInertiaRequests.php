@@ -4,7 +4,6 @@ namespace App\Http\Middleware;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -51,17 +50,10 @@ class HandleInertiaRequests extends Middleware
                 'success' => fn() => session('success'),
                 'error'   => fn() => session('error'),
             ],
-            // Lazy closure — only resolves when Inertia actually needs it
+            // Lazy closure — dihitung langsung tanpa cache agar badge selalu
+            // akurat setiap navigasi (query COUNT ringan, satu sumber kebenaran)
             'pendingOrderCount' => fn() => $user && in_array($user->role, ['cashier', 'admin'])
-                ? Cache::remember('pending_order_count', 30, fn() => Order::where('status', Order::STATUS_PENDING)
-                    ->where(function ($q) {
-                        $q->where('payment_method', 'cash')
-                          ->orWhere(function ($q2) {
-                              $q2->where('payment_method', 'qris')
-                                 ->whereNotNull('payment_proof');
-                          });
-                    })
-                    ->count())
+                ? Order::cashierPendingCount()
                 : 0,
         ]);
     }

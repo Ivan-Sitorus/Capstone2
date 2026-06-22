@@ -31,9 +31,10 @@ var orderSuccessRate = new Rate('order_success_rate');
 
 export var options = {
     stages: [
-        { duration: '30s', target: 30 },
-        { duration: '3m',  target: 30 },
-        { duration: '30s', target: 0  },
+        { duration: '30s', target: 5  }, // warm-up
+        { duration: '30s', target: 30 }, // ramp-up
+        { duration: '3m',  target: 30 }, // steady state
+        { duration: '30s', target: 0  }, // ramp-down
     ],
     thresholds: {
         http_req_failed:        ['rate<0.25'],
@@ -84,7 +85,10 @@ export default function () {
         });
         orderTrend.add(res.timings.duration);
         orderSuccessRate.add(ok);
-        if (!ok) { errorCounter.add(1); return; }
+        if (!ok) {
+            errorCounter.add(1);
+            return;
+        }
         try { orderId = JSON.parse(res.body).order_id; } catch (e) {}
     });
     sleep(1);

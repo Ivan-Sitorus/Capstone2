@@ -11,6 +11,8 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
     const [activeTab,    setActiveTab]    = useState('all');
     const [qrisOrder,    setQrisOrder]    = useState(null);
     const [rejectNote,   setRejectNote]   = useState('');
+    const [cancelTarget, setCancelTarget] = useState(null);
+    const [cancelReason, setCancelReason] = useState('');
     const [processing,   setProcessing]   = useState(false);
     const [localOrders,  setLocalOrders]  = useState(initialOrders ?? []);
     const pendingRemoveRef = useRef(new Set());
@@ -34,6 +36,10 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
             if (document.visibilityState === 'hidden') return;
             router.reload({ only: ['orders', 'counts'] });
         };
+
+        // Ambil data fresh segera saat halaman dibuka — hindari data stale dari
+        // cache prefetch Inertia (mis. buka dari Dashboard saat ada pesanan baru)
+        reload();
 
         // WebSocket (Reverb) — update instan saat ada event broadcast
         if (window.Echo) {
@@ -139,6 +145,32 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         }
     }
 
+    async function handleCancelOrder() {
+        if (processing || !cancelTarget) return;
+        const orderId = cancelTarget.id;
+        const reason  = cancelReason.trim();
+        setProcessing(true);
+
+        // Optimistic: hapus card dari daftar aktif
+        pendingRemoveRef.current.add(orderId);
+        setLocalOrders(prev => prev.filter(o => o.id !== orderId));
+        setCancelTarget(null);
+        setCancelReason('');
+
+        try {
+            await axios.patch(`/cashier/order/${orderId}/cancel`, { reason: reason || null });
+            router.reload({
+                only: ['orders', 'counts'],
+                onFinish: () => pendingRemoveRef.current.delete(orderId),
+            });
+        } catch (_) {
+            pendingRemoveRef.current.delete(orderId);
+            router.reload({ only: ['orders', 'counts'] });
+        } finally {
+            setProcessing(false);
+        }
+    }
+
     async function handleConfirmPayment(orderId, paymentMethod) {
         if (processing) return;
         setProcessing(true);
@@ -213,8 +245,81 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                             onOpenQrisModal={o => { setQrisOrder(o); setRejectNote(''); }}
                             onMarkDone={handleMarkDone}
                             onConfirmPayment={handleConfirmPayment}
+                            onCancel={o => { setCancelTarget(o); setCancelReason(''); }}
                         />
                     ))}
+                </div>
+            )}
+
+            {/* ── Modal Konfirmasi Pembatalan ── */}
+            {cancelTarget && (
+                <div style={{
+                    position: 'fixed', inset: 0,
+                    background: 'rgba(0,0,0,0.40)',
+                    zIndex: 300,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    padding: 16,
+                }}>
+                    <div style={{
+                        background: '#FFFFFF', borderRadius: 18,
+                        width: '100%', maxWidth: 400,
+                        boxShadow: '0 12px 40px rgba(15,23,42,0.18)',
+                        overflow: 'hidden',
+                    }}>
+                        <div style={{ padding: '20px 22px 14px' }}>
+                            <h3 style={{
+                                margin: '0 0 6px', fontSize: 17, fontWeight: 700,
+                                color: '#0F172A', fontFamily: '"DM Sans", system-ui',
+                            }}>
+                                Batalkan Pesanan?
+                            </h3>
+                            <p style={{ margin: 0, fontSize: 13, color: '#64748B', fontFamily: 'Outfit, system-ui', lineHeight: 1.5 }}>
+                                Pesanan <strong style={{ color: '#0F172A' }}>#{cancelTarget.order_code}</strong>{cancelTarget.table_number ? ` · Meja ${cancelTarget.table_number}` : ''} akan dibatalkan. Tindakan ini tidak dapat dibatalkan kembali.
+                            </p>
+
+                            <label style={{ display: 'block', margin: '16px 0 6px', fontSize: 12, fontWeight: 600, color: '#475569', fontFamily: 'Outfit, system-ui' }}>
+                                Alasan pembatalan (opsional)
+                            </label>
+                            <textarea
+                                value={cancelReason}
+                                onChange={e => setCancelReason(e.target.value)}
+                                placeholder="Mis. menu habis, pelanggan batal..."
+                                rows={2}
+                                maxLength={255}
+                                style={{
+                                    width: '100%', boxSizing: 'border-box',
+                                    border: '1px solid #E2E8F0', borderRadius: 10,
+                                    padding: '10px 12px', fontSize: 13, color: '#0F172A',
+                                    fontFamily: 'Outfit, system-ui', resize: 'none', outline: 'none',
+                                }}
+                            />
+                        </div>
+                        <div style={{ display: 'flex', gap: 10, padding: '0 22px 20px' }}>
+                            <button
+                                onClick={() => { setCancelTarget(null); setCancelReason(''); }}
+                                disabled={processing}
+                                style={{
+                                    flex: 1, height: 42, background: '#F1F5F9', color: '#475569',
+                                    border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600,
+                                    fontFamily: 'Outfit, system-ui', cursor: processing ? 'not-allowed' : 'pointer',
+                                }}
+                            >
+                                Kembali
+                            </button>
+                            <button
+                                onClick={handleCancelOrder}
+                                disabled={processing}
+                                style={{
+                                    flex: 1, height: 42, background: processing ? '#E8A898' : '#DC2626',
+                                    color: '#FFFFFF', border: 'none', borderRadius: 10,
+                                    fontSize: 13, fontWeight: 700, fontFamily: '"DM Sans", system-ui',
+                                    cursor: processing ? 'not-allowed' : 'pointer',
+                                }}
+                            >
+                                {processing ? 'Membatalkan...' : 'Ya, Batalkan'}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             )}
 

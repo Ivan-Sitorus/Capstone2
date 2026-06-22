@@ -28,6 +28,7 @@ Route::prefix('cashier')->middleware(['auth', 'role:cashier,admin'])->group(func
     Route::get('/riwayat',       [CashierRiwayatController::class, 'index'])->name('cashier.riwayat');
     Route::get('/order/{order}',              [CashierOrderController::class, 'show'])->name('cashier.order.show');
     Route::patch('/order/{order}/status',     [CashierOrderController::class, 'updateStatus'])->name('cashier.order.status');
+    Route::patch('/order/{order}/cancel',          [CashierOrderController::class, 'cancel'])->name('cashier.order.cancel');
     Route::patch('/order/{order}/confirm-cash',    [CashierOrderController::class, 'confirmCash'])->name('cashier.order.confirm-cash');
     Route::patch('/order/{order}/confirm-payment', [CashierOrderController::class, 'confirmPayment'])->name('cashier.order.confirm-payment');
     Route::patch('/order/{order}/confirm-qris', [CashierOrderController::class, 'confirmQris'])->name('cashier.order.confirm-qris');

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MoreVertical, Banknote, QrCode, Check, Clock } from 'lucide-react';
+import { MoreVertical, Banknote, QrCode, Check, Clock, Ban } from 'lucide-react';
 
 const METHOD_META = {
     cash:        { label: 'Tunai',       bg: '#FEF9EC', color: '#B45309', Icon: Banknote },
@@ -17,7 +17,7 @@ const STATUS_META = {
     selesai:  { dot: '#4D9B6A', label: 'Selesai'  },
 };
 
-export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone, onConfirmPayment }) {
+export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone, onConfirmPayment, onCancel }) {
     const [menuOpen,    setMenuOpen]    = useState(false);
     const [payPopover,  setPayPopover]  = useState(false);
     const menuRef    = useRef(null);
@@ -193,6 +193,29 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                             </button>
                                         );
                                     })}
+
+                                    {/* Divider + Batalkan Pesanan */}
+                                    <div style={{ height: 1, background: '#EFEEEB', margin: '4px 6px' }} />
+                                    <button
+                                        onClick={() => { setMenuOpen(false); onCancel?.(order); }}
+                                        style={{
+                                            display: 'flex', alignItems: 'center', gap: 10,
+                                            width: '100%', padding: 10,
+                                            borderRadius: 8, border: 'none',
+                                            background: 'transparent', cursor: 'pointer',
+                                            textAlign: 'left', transition: 'background 0.1s',
+                                        }}
+                                        onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
+                                        onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                                    >
+                                        <Ban size={15} color="#DC2626" strokeWidth={2.2} />
+                                        <span style={{
+                                            fontSize: 13, fontWeight: 600, color: '#DC2626',
+                                            fontFamily: 'Outfit, system-ui',
+                                        }}>
+                                            Batalkan Pesanan
+                                        </span>
+                                    </button>
                                 </div>
                             )}
                         </div>

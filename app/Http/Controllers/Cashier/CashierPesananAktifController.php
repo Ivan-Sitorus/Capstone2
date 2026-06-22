@@ -12,7 +12,7 @@ class CashierPesananAktifController extends Controller
     public function index()
     {
         $orders = Order::with(['items.menu', 'cafeTable', 'cashier'])
-            ->where('status', '!=', Order::STATUS_SELESAI)
+            ->whereNotIn('status', [Order::STATUS_SELESAI, Order::STATUS_DIBATALKAN])
             ->where(function ($q) {
                 // Order dari kasir: selalu tampil
                 $q->where('order_type', 'cashier')

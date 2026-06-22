@@ -11,12 +11,18 @@ use Inertia\Inertia;
 
 class CustomerMenuController extends Controller
 {
+    private function findTable(?string $tableId): ?CafeTable
+    {
+        if (!$tableId) return null;
+
+        return Cache::remember("cafe_table_{$tableId}", 600, fn() =>
+            CafeTable::select(['id', 'table_number'])->find($tableId)
+        );
+    }
+
     public function showIdentitas(Request $request)
     {
-        $tableId = $request->query('table');
-        $table   = $tableId
-            ? CafeTable::select(['id', 'table_number'])->find($tableId)
-            : null;
+        $table = $this->findTable($request->query('table'));
 
         if ($table && $table->table_number > 10) {
             abort(404);
@@ -27,11 +33,13 @@ class CustomerMenuController extends Controller
 
     public function index(Request $request)
     {
-        $categories = Cache::remember('customer_menu_v1', 300, function () {
+        $categories = Cache::remember('customer_menu_v2', 300, function () {
             return Category::with([
+                // Tetap kirim menu yang habis (is_available = false) agar
+                // ditampilkan dengan label "Stok Habis", bukan disembunyikan.
                 'menus' => fn($q) => $q
-                    ->where('is_available', true)
-                    ->select(['id', 'category_id', 'name', 'price', 'cashback', 'image'])
+                    ->select(['id', 'category_id', 'name', 'price', 'cashback', 'image', 'is_available'])
+                    ->orderBy('is_available', 'desc')
                     ->orderBy('name'),
             ])->where('is_active', true)
               ->select(['id', 'name', 'slug'])
@@ -39,9 +47,7 @@ class CustomerMenuController extends Controller
               ->get();
         });
 
-        $table = $request->query('table')
-            ? CafeTable::select(['id', 'table_number'])->find($request->query('table'))
-            : null;
+        $table = $this->findTable($request->query('table'));
 
         if ($table && $table->table_number > 10) {
             abort(404);

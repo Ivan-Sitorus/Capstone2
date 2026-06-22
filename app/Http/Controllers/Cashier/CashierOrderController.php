@@ -75,6 +75,31 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Status diperbarui.']);
     }
 
+    /**
+     * Batalkan pesanan (soft cancellation).
+     * Status diubah menjadi 'dibatalkan' — data pesanan tetap tersimpan
+     * untuk laporan & audit, tidak dihapus dari database. Hanya kasir.
+     * Catatan: pengembalian stok adalah tanggung jawab modul Inventori.
+     */
+    public function cancel(Request $request, Order $order)
+    {
+        if (in_array($order->status, [Order::STATUS_SELESAI, Order::STATUS_DIBATALKAN])) {
+            return response()->json(['message' => 'Pesanan ini tidak dapat dibatalkan.'], 409);
+        }
+
+        $request->validate(['reason' => 'nullable|string|max:255']);
+
+        $order->update([
+            'status'         => Order::STATUS_DIBATALKAN,
+            'rejection_note' => $request->reason,
+            'cashier_id'     => Auth::id(),
+        ]);
+
+        BroadcastPendingCount::dispatch();
+
+        return response()->json(['message' => 'Pesanan dibatalkan.']);
+    }
+
     public function confirmPayment(Request $request, Order $order)
     {
         if ($order->is_paid) {

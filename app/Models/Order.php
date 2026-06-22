@@ -6,9 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    const STATUS_PENDING  = 'pending';
-    const STATUS_DIPROSES = 'diproses';
-    const STATUS_SELESAI  = 'selesai';
+    const STATUS_PENDING    = 'pending';
+    const STATUS_DIPROSES   = 'diproses';
+    const STATUS_SELESAI    = 'selesai';
+    const STATUS_DIBATALKAN = 'dibatalkan';
 
     protected static function boot(): void
     {
@@ -87,6 +88,26 @@ class Order extends Model
 
     public function isActive(): bool
     {
-        return $this->status !== self::STATUS_SELESAI;
+        return !in_array($this->status, [self::STATUS_SELESAI, self::STATUS_DIBATALKAN]);
+    }
+
+    /**
+     * Jumlah pesanan pending yang perlu ditangani kasir.
+     * Satu sumber kebenaran — dipakai badge sidebar, broadcast, & endpoint count
+     * agar angka selalu konsisten di semua tempat.
+     */
+    public static function cashierPendingCount(): int
+    {
+        return static::where('status', self::STATUS_PENDING)
+            ->where(fn($q) =>
+                $q->where('order_type', 'cashier')
+                  ->orWhere(fn($q2) =>
+                      $q2->where('order_type', 'qr')
+                         ->where(fn($q3) =>
+                             $q3->where('payment_method', 'cash')
+                                ->orWhere(fn($q4) => $q4->where('payment_method', 'qris')->whereNotNull('payment_proof'))
+                         )
+                  )
+            )->count();
     }
 }

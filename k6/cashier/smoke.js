@@ -10,6 +10,10 @@ import http from 'k6/http';
 import { check, sleep } from 'k6';
 import { ensureLoggedIn, h, BASE_URL } from './auth.js';
 
+// ID pesanan yang pasti ada di DB untuk menguji halaman detail.
+// Override saat run: k6 run -e ORDER_ID=123 k6/cashier/smoke.js
+const SAMPLE_ORDER_ID = __ENV.ORDER_ID || 37891;
+
 export const options = {
     vus:      1,
     duration: '1m',
@@ -29,7 +33,7 @@ export default function () {
         { name: 'Pesanan Aktif',  url: `${BASE_URL}/cashier/pesanan-aktif` },
         { name: 'Riwayat',        url: `${BASE_URL}/cashier/riwayat` },
         { name: 'Profil',         url: `${BASE_URL}/cashier/profil` },
-        { name: 'Detail Pesanan', url: `${BASE_URL}/cashier/order/7396` },
+        { name: 'Detail Pesanan', url: `${BASE_URL}/cashier/order/${SAMPLE_ORDER_ID}` },
     ];
 
     for (const ep of endpoints) {

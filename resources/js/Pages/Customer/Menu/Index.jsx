@@ -26,6 +26,7 @@ const C = {
 /* ── Menu card ─────────────────────────────────────────────────── */
 function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false, isMahasiswa = false }) {
     const cashback = Number(menu.cashback ?? 0);
+    const soldOut  = menu.is_available === false;
 
     return (
         <article className="w9-card" style={{
@@ -37,9 +38,11 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
             boxShadow:     C.shadow,
             display:       'flex',
             flexDirection: 'column',
+            opacity:       soldOut ? 0.75 : 1,
         }}>
             {/* Image — square aspect */}
             <div style={{
+                position:       'relative',
                 width:          '100%',
                 aspectRatio:    '1 / 1',
                 background:     'rgba(193,154,107,0.15)',
@@ -56,6 +59,31 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                       />
                     : <Coffee size={28} color="rgba(193,154,107,0.70)" strokeWidth={1.5} />
                 }
+                {soldOut && (
+                    <div style={{
+                        position:       'absolute',
+                        inset:          0,
+                        display:        'flex',
+                        alignItems:     'center',
+                        justifyContent: 'center',
+                        background:     'rgba(0,0,0,0.20)',
+                        backdropFilter: 'blur(1px)',
+                    }}>
+                        <span style={{
+                            background:    'rgba(68,64,60,0.90)',
+                            color:         '#FFFFFF',
+                            fontSize:      10,
+                            fontWeight:    700,
+                            fontFamily:    F,
+                            letterSpacing: '0.05em',
+                            textTransform: 'uppercase',
+                            padding:       '4px 12px',
+                            borderRadius:  999,
+                        }}>
+                            Stok Habis
+                        </span>
+                    </div>
+                )}
             </div>
 
             {/* Info */}
@@ -108,7 +136,22 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
 
                 {/* Action */}
                 <div style={{ marginTop: 'auto', paddingTop: 10 }}>
-                    {cartItem ? (
+                    {soldOut ? (
+                        <button disabled style={{
+                            width:        '100%',
+                            background:   '#E5E1DB',
+                            color:        C.textMuted,
+                            border:       'none',
+                            borderRadius: 8,
+                            padding:      '8px 0',
+                            fontSize:     12,
+                            fontWeight:   700,
+                            fontFamily:   F,
+                            cursor:       'not-allowed',
+                        }}>
+                            Stok Habis
+                        </button>
+                    ) : cartItem ? (
                         <div style={{
                             display:        'flex',
                             alignItems:     'center',

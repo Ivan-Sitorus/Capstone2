@@ -121,6 +121,10 @@ export default function PesananBaru({ categories }) {
             '/cashier/pesanan-baru',
             { items: cartItems.map(i => ({ menu_id: i.menuId, quantity: i.quantity })), payment_method: method, customer_name: customerName.trim() || null, is_mahasiswa: isMahasiswa },
             {
+                // Pertahankan state komponen agar popup sukses muncul (tanpa ini
+                // komponen remount → setShowSuccess gagal → popup tak muncul)
+                preserveState: true,
+                preserveScroll: true,
                 onSuccess: () => {
                     setProcessing(false);
                     setShowPayModal(false);
@@ -133,11 +137,14 @@ export default function PesananBaru({ categories }) {
     }
 
     function handleSuccessOk() {
+        // Tetap di halaman Pesanan Baru — kosongkan keranjang agar kasir
+        // langsung bisa membuat pesanan berikutnya. Kasir berpindah ke
+        // Pesanan Aktif secara manual lewat sidebar bila perlu.
         setShowSuccess(false);
         setCartItems([]);
         setCustomerName('');
         setPayMethod('cash');
-        router.visit('/cashier/pesanan-aktif');
+        setIsMahasiswa(false);
     }
 
     /* ── Design tokens ── */
@@ -458,7 +465,7 @@ export default function PesananBaru({ categories }) {
                         </span>
 
                         <span style={{ fontSize: 13, color: '#64748B', fontFamily: 'Outfit, system-ui', textAlign: 'center', lineHeight: 1.5, width: '100%' }}>
-                            Pesanan berhasil dibuat dan siap diproses. Anda akan diarahkan ke Pesanan Aktif.
+                            Pesanan berhasil dibuat dan siap diproses. Anda bisa langsung membuat pesanan berikutnya.
                         </span>
 
                         <div style={{

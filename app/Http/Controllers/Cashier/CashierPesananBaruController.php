@@ -20,8 +20,9 @@ class CashierPesananBaruController extends Controller
 {
     public function index()
     {
-        // Cache 5 menit — menu jarang berubah, admin bisa clear cache jika update menu
-        $categories = Cache::remember('menu_categories_active', 300, fn() =>
+        // Kasir hanya melihat menu yang tersedia — menu yang habis disembunyikan
+        // dari POS. Pengaturan ketersediaan menu dilakukan di panel admin.
+        $categories = Cache::remember('menu_categories_cashier', 300, fn() =>
             Category::with([
                 'menus' => fn($q) => $q->where('is_available', true)->orderBy('name'),
             ])

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { router, Link } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { ArrowLeft, X, CircleCheck } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
@@ -41,6 +41,16 @@ export default function OrderShow({ order }) {
         }
     }
 
+    // Kembali ke halaman asal (Riwayat atau Pesanan Aktif) sesuai jejak navigasi.
+    // Fallback ke Pesanan Aktif bila tidak ada history (mis. buka link langsung).
+    function handleBack() {
+        if (typeof window !== 'undefined' && window.history.length > 1) {
+            window.history.back();
+        } else {
+            router.visit('/cashier/pesanan-aktif');
+        }
+    }
+
     function handleAdvance()      { handleAction(`/cashier/order/${order.id}/status`, { status: 'selesai' }); }
     function handleConfirmCash()  { handleAction(`/cashier/order/${order.id}/confirm-cash`); }
     function handleConfirmQris()  { handleAction(`/cashier/order/${order.id}/confirm-qris`); setShowRejectModal(false); }
@@ -54,15 +64,15 @@ export default function OrderShow({ order }) {
             {/* ── Header ── */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-                    <Link href="/cashier/pesanan-aktif" style={{
+                    <button onClick={handleBack} aria-label="Kembali" style={{
                         width: 36, height: 36, borderRadius: 8, flexShrink: 0,
                         background: T.surface, border: `1px solid ${T.border}`,
-                        boxShadow: T.shadowSm, textDecoration: 'none',
+                        boxShadow: T.shadowSm, cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: T.textPri,
                     }}>
                         <ArrowLeft size={18} />
-                    </Link>
+                    </button>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         <h1 style={{
                             fontSize: 24, fontWeight: 700, color: T.textPri,
@@ -98,26 +108,14 @@ export default function OrderShow({ order }) {
                 </div>
             </div>
 
-            {/* ── Cash Confirmation Banner ── */}
+            {/* ── Cash Confirmation Button ── */}
             {isCashPending && (
-                <div style={{
-                    background: '#FFF8E1', border: '1px solid #FFE082', borderRadius: 12,
-                    padding: '16px 20px', marginBottom: 20,
-                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: '#B8860B', fontFamily: '"DM Sans", system-ui' }}>
-                            Pelanggan Akan Bayar Tunai
-                        </span>
-                        <span style={{ fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
-                            Total: <strong style={{ color: T.textPri }}>{formatRupiah(order.total_amount)}</strong> — Konfirmasi setelah uang diterima
-                        </span>
-                    </div>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 20 }}>
                     <button
                         onClick={handleConfirmCash}
                         disabled={processing}
                         style={{
-                            height: 40, padding: '0 20px', flexShrink: 0,
+                            height: 40, padding: '0 20px',
                             background: processing ? '#93AEDF' : T.accent, color: '#FFFFFF',
                             border: 'none', borderRadius: 8,
                             fontSize: 13, fontWeight: 700,
@@ -125,7 +123,7 @@ export default function OrderShow({ order }) {
                             cursor: processing ? 'not-allowed' : 'pointer',
                         }}
                     >
-                        ✓ Konfirmasi Pembayaran
+                        Konfirmasi Pembayaran
                     </button>
                 </div>
             )}

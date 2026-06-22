@@ -13,7 +13,7 @@
 import http from 'k6/http';
 import { check, fail } from 'k6';
 
-export const BASE_URL = __ENV.BASE_URL || 'http://localhost:8000';
+export const BASE_URL = __ENV.BASE_URL || 'https://pos-cafe-prototype-main.test';
 
 // State per-VU (direset setiap VU baru)
 let _loggedIn = false;
@@ -84,5 +84,23 @@ export function ensureLoggedIn(
 export function h() {
     return {
         'Accept': 'text/html,application/xhtml+xml',
+    };
+}
+
+/**
+ * Headers untuk POST JSON ke endpoint kasir (mis. buat pesanan).
+ * Menyertakan X-XSRF-TOKEN dari cookie jar VU agar lolos proteksi CSRF.
+ */
+export function jsonHeaders() {
+    const jar     = http.cookieJar();
+    const cookies = jar.cookiesForURL(BASE_URL);
+    const raw     = cookies['XSRF-TOKEN'];
+    const token   = raw ? urlDecode(Array.isArray(raw) ? raw[0] : raw) : '';
+
+    return {
+        'Content-Type':     'application/json',
+        'Accept':           'application/json',
+        'X-XSRF-TOKEN':     token,
+        'X-Requested-With': 'XMLHttpRequest',
     };
 }

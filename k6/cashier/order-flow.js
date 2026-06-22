@@ -10,7 +10,7 @@
 import http from 'k6/http';
 import { check, sleep, group } from 'k6';
 import { Trend, Counter, Rate } from 'k6/metrics';
-import { loginAsCashier, BASE_URL } from './auth.js';
+import { ensureLoggedIn, jsonHeaders, h, BASE_URL } from './auth.js';
 
 const orderCreateTrend  = new Trend('order_create_duration',  true);
 const orderStatusTrend  = new Trend('order_status_duration',  true);
@@ -41,7 +41,8 @@ const MENU_ITEMS = [
 ];
 
 function randomItems() {
-    const shuffled = MENU_ITEMS.sort(() => Math.random() - 0.5);
+    // Salin dulu agar tidak mengubah urutan array sumber
+    const shuffled = [...MENU_ITEMS].sort(() => Math.random() - 0.5);
     return shuffled.slice(0, Math.floor(Math.random() * 3) + 1);
 }
 
@@ -50,48 +51,22 @@ function randomPaymentMethod() {
     return methods[Math.floor(Math.random() * methods.length)];
 }
 
-export function setup() {
-    const cookies = loginAsCashier();
-
-    // Ambil CSRF token dari halaman pesanan baru
-    const page = http.get(`${BASE_URL}/cashier/pesanan-baru`, {
-        headers: { 'Accept': 'text/html' },
-        cookies,
-    });
-
-    const match = page.body.match(/name="_token"\s+value="([^"]+)"/);
-    const csrfToken = match ? match[1] : '';
-
-    return { cookies, csrfToken };
-}
-
-export default function (data) {
-    const { cookies, csrfToken } = data;
+export default function () {
+    // Login sekali per VU — cookie jar (termasuk XSRF-TOKEN) tersimpan untuk VU ini
+    ensureLoggedIn();
 
     // ── 1. Buat Pesanan Baru ─────────────────────────────────────────────
-    let newOrderId = null;
-
     group('Buat Pesanan Baru', () => {
         const payload = JSON.stringify({
             items:          randomItems(),
             payment_method: randomPaymentMethod(),
             customer_name:  `Test User ${__VU}`,
-            _token:         csrfToken,
         });
 
         const res = http.post(
             `${BASE_URL}/cashier/pesanan-baru`,
             payload,
-            {
-                headers: {
-                    'Content-Type':     'application/json',
-                    'Accept':           'application/json',
-                    'X-CSRF-TOKEN':     csrfToken,
-                    'X-Inertia':        'true',
-                    'X-Inertia-Version': '1',
-                },
-                cookies,
-            }
+            { headers: jsonHeaders(), redirects: 5 }
         );
 
         const ok = check(res, {
@@ -104,24 +79,14 @@ export default function (data) {
         orderCreateTrend.add(res.timings.duration);
         orderErrorRate.add(!ok);
 
-        if (ok) {
-            orderCreatedCount.add(1);
-            // Coba ekstrak ID dari response jika ada
-            try {
-                const body = JSON.parse(res.body);
-                if (body?.order?.id) newOrderId = body.order.id;
-            } catch (_) { }
-        }
+        if (ok) orderCreatedCount.add(1);
     });
 
     sleep(1);
 
     // ── 2. Cek Pesanan Aktif setelah membuat pesanan ──────────────────────
     group('Cek Pesanan Aktif', () => {
-        const res = http.get(`${BASE_URL}/cashier/pesanan-aktif`, {
-            headers: { 'Accept': 'text/html', 'X-Inertia': 'true' },
-            cookies,
-        });
+        const res = http.get(`${BASE_URL}/cashier/pesanan-aktif`, { headers: h(), redirects: 5 });
 
         check(res, {
             'Pesanan Aktif: status 200': (r) => r.status === 200,
