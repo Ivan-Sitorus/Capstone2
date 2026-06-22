@@ -89,7 +89,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         setQrisOrder(null);
 
         try {
-            await axios.patch(`/kasir/order/${orderId}/confirm-qris`);
+            await axios.patch(`/kasir/pesanan/${orderId}/confirm-qris`);
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => pendingStatusRef.current.delete(orderId),
@@ -106,7 +106,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         if (processing || !qrisOrder) return;
         setProcessing(true);
         try {
-            await axios.patch(`/kasir/order/${qrisOrder.id}/reject-qris`, { note: rejectNote });
+            await axios.patch(`/kasir/pesanan/${qrisOrder.id}/reject-qris`, { note: rejectNote });
             setQrisOrder(null);
             setRejectNote('');
             router.reload({ only: ['orders', 'counts'] });
@@ -128,7 +128,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         }
 
         try {
-            await axios.patch(`/kasir/order/${orderId}/status`, { status: targetStatus });
+            await axios.patch(`/kasir/pesanan/${orderId}/status`, { status: targetStatus });
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => {
@@ -158,7 +158,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         setCancelReason('');
 
         try {
-            await axios.patch(`/kasir/order/${orderId}/cancel`, { reason: reason || null });
+            await axios.patch(`/kasir/pesanan/${orderId}/cancel`, { reason: reason || null });
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => pendingRemoveRef.current.delete(orderId),
@@ -175,7 +175,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         if (processing) return;
         setProcessing(true);
         try {
-            await axios.patch(`/kasir/order/${orderId}/confirm-payment`, { payment_method: paymentMethod });
+            await axios.patch(`/kasir/pesanan/${orderId}/confirm-payment`, { payment_method: paymentMethod });
             router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);
@@ -241,7 +241,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                         <OrderCard
                             key={order.id}
                             order={order}
-                            onDetail={id => router.visit(`/kasir/order/${id}`)}
+                            onDetail={id => router.visit(`/kasir/pesanan/${id}`)}
                             onOpenQrisModal={o => { setQrisOrder(o); setRejectNote(''); }}
                             onMarkDone={handleMarkDone}
                             onConfirmPayment={handleConfirmPayment}
