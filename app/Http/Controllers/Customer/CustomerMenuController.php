@@ -35,14 +35,11 @@ class CustomerMenuController extends Controller
     {
         $categories = Cache::remember('customer_menu_v2', 300, function () {
             return Category::with([
-                // Tetap kirim menu yang habis (is_available = false) agar
-                // ditampilkan dengan label "Stok Habis", bukan disembunyikan.
                 'menus' => fn($q) => $q
-                    ->select(['id', 'category_id', 'name', 'price', 'cashback', 'image', 'is_available'])
-                    ->orderBy('is_available', 'desc')
+                    ->select(['id', 'category_id', 'name', 'price', 'image'])
                     ->orderBy('name'),
-            ])->where('is_active', true)
-              ->select(['id', 'name', 'slug'])
+            ])
+              ->select(['id', 'name'])
               ->orderBy('name')
               ->get();
         });
