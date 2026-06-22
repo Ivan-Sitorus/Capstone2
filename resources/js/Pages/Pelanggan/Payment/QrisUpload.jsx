@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { ChevronLeft, Camera, Send, CheckCircle } from 'lucide-react';
-import CustomerLayout from '@/Layouts/CustomerLayout';
+import PelangganLayout from '@/Layouts/PelangganLayout';
 import { formatRupiah } from '@/helpers';
 import useCart from '@/Hooks/useCart';
 import { cn } from '@/lib/utils';
@@ -53,7 +53,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
     }
 
     return (
-        <CustomerLayout activeTab="cart">
+        <PelangganLayout activeTab="cart">
             <div className="bg-card border-b border-border px-6 pb-4 pt-[22px]">
                 <div className="flex items-center gap-[14px]">
                     <button
@@ -210,6 +210,6 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                     </div>
                 )}
             </div>
-        </CustomerLayout>
+        </PelangganLayout>
     );
 }

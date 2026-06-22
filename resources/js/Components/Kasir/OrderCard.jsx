@@ -56,7 +56,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
         <Card
             size="sm"
             className={cn(
-                'relative min-w-0 transition-all duration-200',
+                'relative min-w-0 transition-all duration-200 overflow-visible',
                 belumBayar && 'border-destructive shadow-[0_4px_14px_rgba(239,68,68,0.10)]',
             )}
         >

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { router } from '@inertiajs/react';
-import CustomerLayout from '@/Layouts/CustomerLayout';
+import PelangganLayout from '@/Layouts/PelangganLayout';
 import { formatRupiah } from '@/helpers';
 
 const STEPS = [
@@ -19,7 +19,7 @@ export default function CashStatus({ order }) {
     }, [order.status]);
 
     return (
-        <CustomerLayout>
+        <PelangganLayout>
             <div className="px-6 py-6 mx-auto w-full max-w-[430px] min-h-screen bg-background flex flex-col items-center justify-center">
                 <div className="w-20 h-20 rounded-full bg-secondary flex items-center justify-center text-4xl mb-5">
                     💵
@@ -83,6 +83,6 @@ export default function CashStatus({ order }) {
                     </button>
                 )}
             </div>
-        </CustomerLayout>
+        </PelangganLayout>
     );
 }
