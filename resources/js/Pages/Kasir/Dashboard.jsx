@@ -94,7 +94,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                 </button>
 
                 <button
-                    onClick={() => router.visit('/kasir/riwayat')}
+                    onClick={() => router.visit('/kasir/riwayat-pesanan')}
                     style={{
                         display: 'flex', alignItems: 'center', gap: 8,
                         height: 44, padding: '0 20px',
@@ -117,7 +117,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                         Transaksi Terbaru
                     </h2>
                     <Link
-                        href="/kasir/riwayat"
+                        href="/kasir/riwayat-pesanan"
                         style={{ fontSize: 13, fontWeight: 500, color: '#3B6FD4', textDecoration: 'none' }}
                     >
                         Lihat Semua →

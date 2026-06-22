@@ -17,7 +17,7 @@ const navItems = [
     { label: 'Dashboard',       href: '/kasir/dashboard',     icon: LayoutDashboard },
     { label: 'Pesanan Baru',    href: '/kasir/pesanan-baru',  icon: ShoppingCart },
     { label: 'Pesanan Aktif',   href: '/kasir/pesanan-aktif', icon: ClipboardList },
-    { label: 'Riwayat Pesanan', href: '/kasir/riwayat',       icon: History },
+    { label: 'Riwayat Pesanan', href: '/kasir/riwayat-pesanan', icon: History },
     { label: 'Profil',          href: '/kasir/profil',        icon: User },
 ];
 
