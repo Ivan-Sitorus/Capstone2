@@ -44,6 +44,25 @@ class CashierOrderController extends Controller
         ]);
     }
 
+    public function cancel(Request $request, Order $order)
+    {
+        if (in_array($order->status, [Order::STATUS_SELESAI, Order::STATUS_DIBATALKAN])) {
+            return response()->json(['message' => 'Pesanan ini tidak dapat dibatalkan.'], 409);
+        }
+
+        $request->validate(['reason' => 'nullable|string|max:255']);
+
+        $order->update([
+            'status'         => Order::STATUS_DIBATALKAN,
+            'rejection_note' => $request->reason,
+            'cashier_id'     => Auth::id(),
+        ]);
+
+        BroadcastPendingCount::dispatch();
+
+        return response()->json(['message' => 'Pesanan dibatalkan.']);
+    }
+
     public function updateStatus(Request $request, Order $order, InventoryService $inventoryService)
     {
         $request->validate(['status' => 'required|string|in:diproses,selesai']);
