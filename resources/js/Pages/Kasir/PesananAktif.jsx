@@ -89,93 +89,9 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         setQrisOrder(null);
 
         try {
-            await axios.patch(`/kasir/pesanan/${orderId}/confirm-qris`);
-            router.reload({
-                only: ['orders', 'counts'],
-                onFinish: () => pendingStatusRef.current.delete(orderId),
-            });
-        } catch (_) {
-            pendingStatusRef.current.delete(orderId);
-            router.reload({ only: ['orders', 'counts'] });
-        } finally {
-            setProcessing(false);
-        }
-    }
-
-    async function handleRejectQris() {
-        if (processing || !qrisOrder) return;
-        setProcessing(true);
-        try {
-            await axios.patch(`/kasir/pesanan/${qrisOrder.id}/reject-qris`, { note: rejectNote });
-            setQrisOrder(null);
-            setRejectNote('');
-            router.reload({ only: ['orders', 'counts'] });
-        } finally {
-            setProcessing(false);
-        }
-    }
-
-    async function handleMarkDone(orderId, targetStatus) {
-        if (processing) return;
-        setProcessing(true);
-
-        if (targetStatus === 'selesai') {
-            pendingRemoveRef.current.add(orderId);
-            setLocalOrders(prev => prev.filter(o => o.id !== orderId));
-        } else {
-            pendingStatusRef.current.set(orderId, targetStatus);
-            setLocalOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: targetStatus } : o));
-        }
-
-        try {
-            await axios.patch(`/kasir/pesanan/${orderId}/status`, { status: targetStatus });
-            router.reload({
-                only: ['orders', 'counts'],
-                onFinish: () => {
-                    pendingRemoveRef.current.delete(orderId);
-                    pendingStatusRef.current.delete(orderId);
-                },
-            });
-        } catch (_) {
-            pendingRemoveRef.current.delete(orderId);
-            pendingStatusRef.current.delete(orderId);
-            router.reload({ only: ['orders', 'counts'] });
-        } finally {
-            setProcessing(false);
-        }
-    }
-
-    async function handleCancelOrder() {
-        if (processing || !cancelTarget) return;
-        const orderId = cancelTarget.id;
-        const reason  = cancelReason.trim();
-        setProcessing(true);
-
-        // Optimistic: hapus card dari daftar aktif
-        pendingRemoveRef.current.add(orderId);
-        setLocalOrders(prev => prev.filter(o => o.id !== orderId));
-        setCancelTarget(null);
-        setCancelReason('');
-
-        try {
-            await axios.patch(`/kasir/pesanan/${orderId}/cancel`, { reason: reason || null });
-            router.reload({
-                only: ['orders', 'counts'],
-                onFinish: () => pendingRemoveRef.current.delete(orderId),
-            });
-        } catch (_) {
-            pendingRemoveRef.current.delete(orderId);
-            router.reload({ only: ['orders', 'counts'] });
-        } finally {
-            setProcessing(false);
-        }
-    }
-
-    async function handleConfirmPayment(orderId, paymentMethod) {
-        if (processing) return;
-        setProcessing(true);
-        try {
-            await axios.patch(`/kasir/pesanan/${orderId}/confirm-payment`, { payment_method: paymentMethod });
+            await axios.patch(`/kasir/pesanan/${orderId}/konfirmasi-qris`);
+            await axios.patch(`/kasir/pesanan/${qrisOrder.id}/tolak-qris`, { note: rejectNote });
+            await axios.patch(`/kasir/pesanan/${orderId}/konfirmasi-bayar`, { payment_method: paymentMethod });
             router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);
