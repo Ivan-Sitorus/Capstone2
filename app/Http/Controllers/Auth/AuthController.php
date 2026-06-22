@@ -24,30 +24,12 @@ class AuthController extends Controller
 
     public function showCustomerLogin()
     {
-        return Inertia::render('Pelanggan/Auth/Login');
+        return redirect()->route('customer.menu');
     }
 
     public function customerLogin(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'nim' => 'required|string',
-        ]);
-
-        $user = \App\Models\User::where('nim', $request->nim)
-            ->where('name', $request->name)
-            ->where('role', 'customer')
-            ->first();
-
-        if (! $user) {
-            return back()->withErrors([
-                'name' => 'Nama atau NIM tidak sesuai.',
-            ]);
-        }
-
-        Auth::guard('web')->login($user, true);
-
-        return redirect()->intended(route('customer.menu'));
+        return redirect()->route('customer.menu');
     }
 
     public function login(Request $request)
