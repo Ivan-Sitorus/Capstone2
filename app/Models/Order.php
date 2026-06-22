@@ -16,6 +16,8 @@ class Order extends Model
 
     const STATUS_SELESAI = 'selesai';
 
+    const STATUS_DIBATALKAN = 'dibatalkan';
+
     protected static function boot(): void
     {
         parent::boot();
@@ -119,7 +121,7 @@ class Order extends Model
 
     public function isActive(): bool
     {
-        return $this->status !== self::STATUS_SELESAI;
+        return $this->status !== self::STATUS_SELESAI && $this->status !== self::STATUS_DIBATALKAN;
     }
 
     public function scopeByUuid(Builder $query, string $uuid): Builder
