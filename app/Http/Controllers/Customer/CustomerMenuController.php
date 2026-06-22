@@ -11,45 +11,46 @@ use Inertia\Inertia;
 
 class CustomerMenuController extends Controller
 {
+    private function findTable(?string $tableId): ?CafeTable
+    {
+        if (!$tableId) return null;
+
+        return Cache::remember("cafe_table_{$tableId}", 600, fn() =>
+            CafeTable::select(['id', 'table_number'])->find($tableId)
+        );
+    }
+
     public function showIdentitas(Request $request)
     {
-        $tableId = $request->query('table');
+        $table = $this->findTable($request->query('table'));
 
-        if (! $tableId) {
-            return redirect()->route('pelanggan.menu');
+        if ($table && $table->table_number > 10) {
+            abort(404);
         }
 
-        return redirect()->route('pelanggan.menu', ['table' => $tableId]);
+        return Inertia::render('Pelanggan/Identitas', ['table' => $table]);
     }
 
     public function index(Request $request)
     {
-        $categories = Cache::remember('customer_menu_v1', 300, function () {
+        $categories = Cache::remember('customer_menu_v2', 300, function () {
             return Category::with([
-                'menus' => fn ($q) => $q
-                    ->where('is_available', true)
-                    ->select(['id', 'category_id', 'name', 'price', 'cashback', 'image'])
+                // Tetap kirim menu yang habis (is_available = false) agar
+                // ditampilkan dengan label "Stok Habis", bukan disembunyikan.
+                'menus' => fn($q) => $q
+                    ->select(['id', 'category_id', 'name', 'price', 'cashback', 'image', 'is_available'])
+                    ->orderBy('is_available', 'desc')
                     ->orderBy('name'),
             ])->where('is_active', true)
-                ->select(['id', 'name', 'slug'])
-                ->orderBy('name')
-                ->get();
+              ->select(['id', 'name', 'slug'])
+              ->orderBy('name')
+              ->get();
         });
 
-        $tableNumber = $request->query('table');
+        $table = $this->findTable($request->query('table'));
 
-        if (! $tableNumber || ! is_numeric($tableNumber) || (int) $tableNumber > 2147483647) {
-            return Inertia::render('Errors/404', ['status' => 404, 'message' => 'Nomor meja tidak valid'])
-                ->toResponse($request)
-                ->setStatusCode(404);
-        }
-
-        $table = CafeTable::where('table_number', (int) $tableNumber)->first();
-
-        if (! $table) {
-            return Inertia::render('Errors/404', ['status' => 404, 'message' => 'Meja tidak ditemukan'])
-                ->toResponse($request)
-                ->setStatusCode(404);
+        if ($table && $table->table_number > 10) {
+            abort(404);
         }
 
         return Inertia::render('Pelanggan/Menu/Index', compact('categories', 'table'));
