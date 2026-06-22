@@ -5,6 +5,7 @@ use App\Http\Controllers\Cashier\CashierOrderController;
 use App\Http\Controllers\Cashier\CashierPendingCountController;
 use App\Http\Controllers\Cashier\CashierPesananAktifController;
 use App\Http\Controllers\Cashier\CashierPesananBaruController;
+use App\Http\Controllers\Cashier\CashierDashboardController;
 use App\Http\Controllers\Cashier\CashierRiwayatController;
 use App\Http\Controllers\Customer\CustomerMenuController;
 use App\Http\Controllers\Customer\CustomerOrderController;
@@ -36,6 +37,10 @@ Route::prefix('kasir')->middleware(['auth:web', 'role:cashier,admin'])->group(fu
     Route::post('/pesanan/{order}/qris/reject', [CashierOrderController::class, 'rejectQrisProof'])->name('kasir.pesanan.qris.reject');
     Route::post('/pesanan/{order}/qris/resubmit', [CashierOrderController::class, 'requestQrisResubmit'])->name('kasir.pesanan.qris.resubmit');
 
+    Route::get('/dashboard', [CashierDashboardController::class, 'index'])->name('kasir.dashboard');
+    Route::patch('/pesanan/{order}/cancel', [CashierOrderController::class, 'cancel'])->name('kasir.pesanan.cancel');
+    Route::get('/profil', function () { return Inertia::render('Cashier/Profil', ['user' => auth()->user()]); })->name('kasir.profil');
+
     Route::get('/pesanan-menunggu', CashierPendingCountController::class)->name('kasir.pesanan-menunggu');
 });
 
@@ -64,6 +69,25 @@ Route::prefix('pelanggan')->group(function () {
     Route::get('/bayar/{orderCode}/tunai-status', [CustomerPaymentController::class, 'showCashStatus'])->name('pelanggan.bayar.tunai-status');
     Route::get('/bayar/{orderCode}/qris', [CustomerPaymentController::class, 'showQrisUpload'])->name('pelanggan.bayar.qris-upload');
     Route::get('/bayar/{orderCode}/qris-status', [CustomerPaymentController::class, 'showQrisStatus'])->name('pelanggan.bayar.qris-status');
+});
+
+// Customer routes
+Route::prefix('customer')->group(function () {
+    Route::get('/login', [AuthController::class, 'showCustomerLogin'])->name('customer.login');
+    Route::post('/login', [AuthController::class, 'customerLogin'])->name('customer.login.attempt');
+});
+
+Route::prefix('customer')->middleware('auth:web')->group(function () {
+    Route::get('/menu', [CustomerMenuController::class, 'index'])->name('customer.menu');
+    Route::get('/identitas', [CustomerMenuController::class, 'showIdentitas'])->name('customer.identitas');
+    Route::post('/identitas', [CustomerMenuController::class, 'submitIdentitas'])->name('customer.identitas.submit');
+    Route::post('/order/store', [CustomerOrderController::class, 'store'])->name('customer.order.store');
+    Route::get('/order/{order}/payment', [CustomerPaymentController::class, 'showChoose'])->name('customer.payment.choose');
+    Route::post('/order/{order}/payment/choose', [CustomerPaymentController::class, 'choose'])->name('customer.payment.choose.post');
+    Route::get('/order/{order}/payment/qris', [CustomerPaymentController::class, 'showQris'])->name('customer.payment.qris');
+    Route::post('/order/{order}/payment/qris', [CustomerPaymentController::class, 'uploadQris'])->name('customer.payment.qris.upload');
+    Route::get('/order/{order}/status', [CustomerOrderController::class, 'showStatus'])->name('customer.order.status');
+    Route::get('/riwayat', [CustomerOrderController::class, 'riwayat'])->name('customer.riwayat');
 });
 
 // Receipt (public — no auth required)
