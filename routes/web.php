@@ -39,7 +39,7 @@ Route::prefix('kasir')->middleware(['auth:web', 'role:cashier,admin'])->group(fu
 
     Route::get('/dashboard', [CashierDashboardController::class, 'index'])->name('kasir.dashboard');
     Route::patch('/pesanan/{order}/cancel', [CashierOrderController::class, 'cancel'])->name('kasir.pesanan.cancel');
-    Route::get('/profil', function () { return Inertia::render('Cashier/Profil', ['user' => auth()->user()]); })->name('kasir.profil');
+    Route::get('/profil', function () { return Inertia::render('Kasir/Profil', ['user' => auth()->user()]); })->name('kasir.profil');
 
     Route::get('/pesanan-menunggu', CashierPendingCountController::class)->name('kasir.pesanan-menunggu');
 });
