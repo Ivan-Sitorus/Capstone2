@@ -67,7 +67,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
     // dari cache prefetch Inertia saat berpindah menu
     useEffect(() => {
         let cancelled = false;
-        window.axios?.get('/kasir/pending-count')
+        window.axios?.get('/kasir/pesanan-menunggu')
             .then(res => { if (!cancelled) setPendingCount(res.data.count); })
             .catch(() => {});
         return () => { cancelled = true; };

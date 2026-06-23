@@ -90,7 +90,7 @@ class CashierOrderController extends Controller
             if (! $fulfillment['can_fulfill']) {
                 $first = $fulfillment['insufficient_ingredients'][0];
                 $name = $first['ingredient_name'] ?? $first['menu_name'] ?? 'item';
-                return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
+                return response()->json(['message' => "Stok '{$name}' tidak mencukupi."], 409);
             }
         }
 
