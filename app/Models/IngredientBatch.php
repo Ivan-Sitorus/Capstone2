@@ -8,13 +8,18 @@ class IngredientBatch extends Model
 {
     public $timestamps = false;
 
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_INACTIVE = 'inactive';
+
     protected $fillable = [
+        'batch_code',
         'ingredient_id',
         'quantity',
         'expiry_date',
         'received_at',
         'cost_per_unit',
         'custom_order',
+        'status',
     ];
 
     protected function casts(): array
@@ -25,7 +30,18 @@ class IngredientBatch extends Model
             'quantity' => 'decimal:2',
             'cost_per_unit' => 'decimal:2',
             'custom_order' => 'integer',
+            'status' => 'string',
         ];
+    }
+
+    public function isActive(): bool
+    {
+        return $this->status === self::STATUS_ACTIVE;
+    }
+
+    public function isInactive(): bool
+    {
+        return $this->status === self::STATUS_INACTIVE;
     }
 
     public function ingredient()

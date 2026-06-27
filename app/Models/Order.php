@@ -23,8 +23,8 @@ class Order extends Model
         parent::boot();
 
         static::creating(function ($order) {
-            $order->order_code ??= 'ORD-'.date('Ymd').'-'.
-                str_pad(Order::whereDate('created_at', today())->count() + 1, 4, '0', STR_PAD_LEFT);
+            $order->order_code ??= 'ORD-'.date('dmy').'-'.
+                (Order::whereDate('created_at', today())->count() + 1);
         });
     }
 
@@ -76,6 +76,9 @@ class Order extends Model
             'is_paid' => 'boolean',
             'resubmit_count' => 'integer',
             'qris_status' => 'string',
+            'processed_at' => 'datetime',
+            'completed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
         ];
     }
 
@@ -122,6 +125,22 @@ class Order extends Model
     public function isActive(): bool
     {
         return $this->status !== self::STATUS_SELESAI && $this->status !== self::STATUS_DIBATALKAN;
+    }
+
+    /**
+     * Jumlah pesanan pending yang perlu ditangani kasir.
+     * Satu sumber kebenaran — dipakai badge sidebar, broadcast, & endpoint count.
+     */
+    public static function cashierPendingCount(): int
+    {
+        return static::where('status', self::STATUS_PENDING)
+            ->where(fn ($q) => $q->where('order_type', 'cashier')
+                ->orWhere(fn ($q2) => $q2->where('order_type', 'qr')
+                    ->where(fn ($q3) => $q3->where('payment_method', 'cash')
+                        ->orWhere(fn ($q4) => $q4->where('payment_method', 'qris')->whereNotNull('payment_proof'))
+                    )
+                )
+            )->count();
     }
 
     public function scopeByUuid(Builder $query, string $uuid): Builder
