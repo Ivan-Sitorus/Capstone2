@@ -7,11 +7,10 @@ use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
@@ -49,26 +48,28 @@ class ManageBatches extends Page implements HasTable
         return $table
             ->query(IngredientBatch::where('ingredient_id', $this->record->id))
             ->columns([
+                TextColumn::make('batch_code')
+                    ->label('Kode Batch')
+                    ->default('-'),
                 TextColumn::make('id')
-                    ->label('Batch ID')
+                    ->label('ID Batch')
                     ->sortable(),
                 TextColumn::make('quantity')
-                    ->label('Quantity')
-                    ->numeric(decimalPlaces: 2)
-                    ->suffix(' '.$unit)
+                    ->label('Jumlah')
+                    ->formatStateUsing(fn ($state) => number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.').' '.$unit)
                     ->sortable(),
                 TextColumn::make('expiry_date')
-                    ->label('Expiry Date')
+                    ->label('Tanggal Kedaluwarsa')
                     ->date()
                     ->sortable()
-                    ->color(fn ($record) => ! $record->expiry_date ? 'gray' : ($record->expiry_date->isPast() ? 'danger' : ($record->expiry_date->diffInDays(now()) < 7 ? 'warning' : 'success'))),
+                    ->color(fn ($record) => $record->expiry_date && $record->expiry_date->isPast() ? 'danger' : null),
                 TextColumn::make('received_at')
-                    ->label('Received At')
+                    ->label('Tanggal Diterima')
                     ->dateTime()
                     ->sortable(),
                 TextColumn::make('cost_per_unit')
-                    ->label('Cost/Unit')
-                    ->money('IDR')
+                    ->label('Harga/Unit')
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
             ])
             ->headerActions([
@@ -76,7 +77,7 @@ class ManageBatches extends Page implements HasTable
                     ->model(IngredientBatch::class)
                     ->form([
                         TextInput::make('quantity')
-                            ->label('Quantity')
+                            ->label('Jumlah')
                             ->required()
                             ->minValue(0)
                             ->step(0.1)
@@ -86,19 +87,19 @@ class ManageBatches extends Page implements HasTable
                             ->extraInputAttributes(NumberInputHelper::decimal())
                             ->suffix(fn () => ' '.$this->record->unit),
                         DatePicker::make('expiry_date')
-                            ->label('Expiry Date')
+                            ->label('Tanggal Kedaluwarsa')
                             ->native(false)
                             ->required(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO)
                             ->helperText(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO
-                                ? 'Required for FEFO mode'
+                                ? 'Wajib untuk mode FEFO'
                                 : null),
                         DateTimePicker::make('received_at')
-                            ->label('Received At')
+                            ->label('Tanggal Diterima')
                             ->required()
                             ->default(now())
                             ->native(false),
                         TextInput::make('cost_per_unit')
-                            ->label('Cost per Unit')
+                            ->label('Harga per Unit')
                             ->required()
                             ->numeric()
                             ->minValue(0)
@@ -115,7 +116,7 @@ class ManageBatches extends Page implements HasTable
                 EditAction::make()
                     ->form([
                         TextInput::make('quantity')
-                            ->label('Quantity')
+                            ->label('Jumlah')
                             ->required()
                             ->minValue(0)
                             ->step(0.1)
@@ -125,19 +126,19 @@ class ManageBatches extends Page implements HasTable
                             ->extraInputAttributes(NumberInputHelper::decimal())
                             ->suffix(fn () => ' '.$this->record->unit),
                         DatePicker::make('expiry_date')
-                            ->label('Expiry Date')
+                            ->label('Tanggal Kedaluwarsa')
                             ->native(false)
                             ->required(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO)
                             ->helperText(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO
-                                ? 'Required for FEFO mode'
+                                ? 'Wajib untuk mode FEFO'
                                 : null),
                         DateTimePicker::make('received_at')
-                            ->label('Received At')
+                            ->label('Tanggal Diterima')
                             ->required()
                             ->default(now())
                             ->native(false),
                         TextInput::make('cost_per_unit')
-                            ->label('Cost per Unit')
+                            ->label('Harga per Unit')
                             ->required()
                             ->numeric()
                             ->minValue(0)
@@ -146,13 +147,21 @@ class ManageBatches extends Page implements HasTable
                             ->extraInputAttributes(NumberInputHelper::integer())
                             ->prefix('Rp'),
                     ]),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, IngredientBatch $record) {
+                        if ($record->stockMovements()->exists()) {
+                            Notification::make()
+                                ->warning()
+                                ->title('Batch tidak dapat dihapus')
+                                ->body('Batch ini memiliki riwayat pemakaian. Batch telah dinonaktifkan.')
+                                ->send();
+                            
+                            $record->update(['quantity' => 0, 'status' => IngredientBatch::STATUS_INACTIVE]);
+                            $action->cancel();
+                        }
+                    }),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ])
+            ->toolbarActions([])
             ->defaultSort('expiry_date', 'asc');
     }
 
