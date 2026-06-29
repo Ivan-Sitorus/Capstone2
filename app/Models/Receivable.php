@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Receivable extends Model
 {
@@ -118,5 +119,10 @@ class Receivable extends Model
     public function order()
     {
         return $this->belongsTo(Order::class);
+    }
+
+    public function payments(): HasMany
+    {
+        return $this->hasMany(ReceivablePayment::class);
     }
 }

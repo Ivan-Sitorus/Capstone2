@@ -31,7 +31,7 @@ class Order extends Model
     protected static function booted(): void
     {
         static::created(function (self $order) {
-            if ($order->payment_method === 'bayar_nanti' && ! $order->is_paid) {
+            if ($order->payment_method === 'bayar_nanti') {
                 if (! $order->receivable()->exists()) {
                     Receivable::create([
                         'customer_name' => $order->customer_name ?? 'Event Customer',
@@ -59,7 +59,6 @@ class Order extends Model
         'payment_method',
         'payment_proof',
         'rejection_note',
-        'is_paid',
         'total_amount',
         'notes',
         'processed_by',
@@ -73,7 +72,6 @@ class Order extends Model
     {
         return [
             'total_amount' => 'integer',
-            'is_paid' => 'boolean',
             'resubmit_count' => 'integer',
             'qris_status' => 'string',
             'processed_at' => 'datetime',
