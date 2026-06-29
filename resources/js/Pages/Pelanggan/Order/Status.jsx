@@ -83,7 +83,7 @@ export default function OrderStatus({ order }) {
                 </div>
 
                 <button
-                    onClick={() => router.visit('/customer/menu')}
+                    onClick={() => router.visit('/pelanggan/menu')}
                     style={{
                         background: '#E8763A', color: '#FFFFFF',
                         border: 'none', borderRadius: 50,

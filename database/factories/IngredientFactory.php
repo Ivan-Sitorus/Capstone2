@@ -24,7 +24,6 @@ class IngredientFactory extends Factory
             'name' => fake()->randomElement($names),
             'unit' => fake()->randomElement(['gram', 'kg', 'ml', 'liter', 'pcs', 'sachet', 'sdm', 'sdt']),
             'low_stock_threshold' => fake()->randomFloat(2, 0, 50),
-            'is_active' => fake()->boolean(90),
         ];
     }
 }

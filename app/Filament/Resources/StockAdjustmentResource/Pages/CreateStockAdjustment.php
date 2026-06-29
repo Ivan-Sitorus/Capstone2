@@ -22,10 +22,8 @@ class CreateStockAdjustment extends CreateRecord
             quantity: (float) $data['quantity'],
             adjustmentType: (string) $data['adjustment_type'],
             reason: (string) $data['reason'],
-            recordedBy: Auth::id(),
-            reference: $data['reference'] ?? null,
-            approvedBy: $data['approved_by'] ?? null,
-            ingredientBatchId: $data['ingredient_batch_id'] ?? null,
+            reportedBy: Auth::id(),
+            adjustedAt: now(),
         );
     }
 }

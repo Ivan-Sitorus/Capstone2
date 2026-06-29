@@ -10,7 +10,7 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        User::insert([
+        User::insertOrIgnore([
             [
                 'name' => 'Admin W9',
                 'email' => 'admin@w9cafe.com',
@@ -23,6 +23,24 @@ class UserSeeder extends Seeder
             [
                 'name' => 'Ahmad Kasir',
                 'email' => 'kasir@w9cafe.com',
+                'password' => Hash::make('password'),
+                'role' => 'cashier',
+                'phone' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Siti Kasir',
+                'email' => 'siti@w9cafe.com',
+                'password' => Hash::make('password'),
+                'role' => 'cashier',
+                'phone' => null,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'name' => 'Budi Kasir',
+                'email' => 'budi@w9cafe.com',
                 'password' => Hash::make('password'),
                 'role' => 'cashier',
                 'phone' => null,

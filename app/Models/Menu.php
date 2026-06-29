@@ -6,7 +6,6 @@ use App\Services\MenuImageService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Str;
 
 class Menu extends Model
 {
@@ -14,14 +13,14 @@ class Menu extends Model
     protected $fillable = [
         'category_id',
         'name',
-        'slug',
+        'description',
         'price',
         'cashback',
         'image',
         'is_available',
-        'is_stock_calculated',
         'is_student_discount',
         'student_price',
+        'unit',
     ];
 
     protected $appends = ['image_url'];
@@ -33,19 +32,12 @@ class Menu extends Model
             'cashback' => 'integer',
             'student_price' => 'integer',
             'is_available' => 'boolean',
-            'is_stock_calculated' => 'boolean',
             'is_student_discount' => 'boolean',
         ];
     }
 
     protected static function booted(): void
     {
-        static::creating(function (self $menu): void {
-            if (blank($menu->slug)) {
-                $menu->slug = Str::slug($menu->name);
-            }
-        });
-
         static::deleting(function (self $menu): void {
             app(MenuImageService::class)->delete($menu->image);
         });
@@ -100,31 +92,13 @@ class Menu extends Model
         return round($totalCost, 2);
     }
 
-    public function menuStock()
-    {
-        return $this->hasOne(MenuStock::class);
-    }
-
     public function hasRecipe(): bool
     {
-        return $this->menuIngredients()->exists();
-    }
-
-    public function refreshStockCalculatedFlag(): void
-    {
-        $hasRecipe = $this->menuIngredients()->exists();
-
-        if ($this->is_stock_calculated !== $hasRecipe) {
-            $this->forceFill([
-                'is_stock_calculated' => $hasRecipe,
-            ])->saveQuietly();
-        }
+        return true;
     }
 
     public function getEffectivePriceAttribute(): string
     {
-        return ($this->is_student_discount && $this->student_price)
-            ? $this->student_price
-            : $this->price;
+        return $this->student_price ?: $this->price;
     }
 }

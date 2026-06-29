@@ -12,12 +12,10 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->enum('unit', ['gram', 'kg', 'ml', 'liter', 'pcs', 'sachet', 'sdm', 'sdt']);
-            $table->integer('low_stock_threshold')->default(0);
-            $table->boolean('is_active')->default(true);
+            $table->decimal('low_stock_threshold', 12, 2)->default(0);
+            $table->string('batch_mode')->default('fefo');
             $table->timestamps();
             $table->softDeletes();
-
-            $table->index('is_active');
         });
     }
 

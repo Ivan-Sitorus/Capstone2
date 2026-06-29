@@ -28,10 +28,10 @@ class ItemsRelationManager extends RelationManager
                     ->label('Qty'),
                 TextColumn::make('unit_price')
                     ->label('Harga Satuan')
-                    ->money('IDR'),
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
                 TextColumn::make('subtotal')
                     ->label('Subtotal')
-                    ->money('IDR'),
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
             ])
             ->paginated(false);
     }

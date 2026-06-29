@@ -14,13 +14,11 @@ class CafeTable extends Model
 {
     protected $table = 'cafe_tables';
 
-    protected $fillable = ['table_number', 'qr_code', 'is_available'];
+    protected $fillable = ['table_number', 'qr_code'];
 
     protected function casts(): array
     {
-        return [
-            'is_available' => 'boolean',
-        ];
+        return [];
     }
 
     public function orders()

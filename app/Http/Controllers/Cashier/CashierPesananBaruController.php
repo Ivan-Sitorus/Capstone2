@@ -38,7 +38,7 @@ class CashierPesananBaruController extends Controller
         OrderPromotionService $orderPromotionService,
         InventoryService $inventoryService,
     ) {
-        $uuid = $request->uuid;
+        $uuid = $request->uuid ?? (string) Uuid::uuid7();
         $orderModel = null;
 
         $attempt = function () use ($request, $orderPromotionService, $inventoryService, &$uuid, &$orderModel) {
@@ -108,6 +108,7 @@ class CashierPesananBaruController extends Controller
             return back()
                 ->with('success', 'Pesanan berhasil dibuat')
                 ->with('order_id', $orderModel?->id)
+                ->with('order_total', $orderModel?->total_amount)
                 ->with('order_code', $orderModel?->order_code);
         } catch (UniqueConstraintViolationException) {
             $uuid = (string) Uuid::uuid7();
@@ -115,6 +116,7 @@ class CashierPesananBaruController extends Controller
             return back()
                 ->with('success', 'Pesanan berhasil dibuat')
                 ->with('order_id', $orderModel?->id)
+                ->with('order_total', $orderModel?->total_amount)
                 ->with('order_code', $orderModel?->order_code);
         } catch (\Exception $e) {
             return back()

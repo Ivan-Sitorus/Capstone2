@@ -7,15 +7,13 @@ use App\Filament\Resources\CafeTableResource\Pages\ListCafeTables;
 use App\Models\CafeTable;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
+use Filament\Notifications\Notification;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -23,13 +21,17 @@ class CafeTableResource extends Resource
 {
     protected static ?string $model = CafeTable::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-table-cells';
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-qr-code';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Data Master';
+    protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
 
-    protected static ?string $navigationLabel = 'Nomor Meja';
+    protected static ?string $navigationLabel = 'QR Code Meja';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?string $pluralLabel = 'QR Code Meja';
+
+    protected static ?string $label = 'QR Code Meja';
+
+    protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
     {
@@ -44,24 +46,17 @@ class CafeTableResource extends Resource
                 ->extraAttributes(
                     NumberInputHelper::integer(99)
                 ),
-            Toggle::make('is_available')
-                ->label('Tersedia')
-                ->default(true)
-                ->inline(false),
         ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->searchPlaceholder('Cari Nomor Meja')
             ->columns([
                 TextColumn::make('table_number')
                     ->label('Nomor Meja')
                     ->searchable()
-                    ->sortable(),
-                IconColumn::make('is_available')
-                    ->label('Tersedia')
-                    ->boolean()
                     ->sortable(),
                 TextColumn::make('qr_code_svg')
                     ->label('QR Code')
@@ -127,12 +122,18 @@ class CafeTableResource extends Resource
                 DeleteAction::make()
                     ->requiresConfirmation()
                     ->modalHeading(fn (CafeTable $record) => 'Hapus Meja '.$record->table_number)
+                    ->before(function (DeleteAction $action, CafeTable $record) {
+                        if ($record->orders()->whereIn('status', ['pending', 'diproses'])->exists()) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Meja tidak dapat dihapus')
+                                ->body('Meja ini masih memiliki pesanan aktif. Silakan tunggu pesanan selesai terlebih dahulu.')
+                                ->send();
+
+                            $action->cancel();
+                        }
+                    })
                     ->modalWidth('md'),
-            ])
-            ->toolbarActions([])
-            ->bulkActions([
-                DeleteBulkAction::make()
-                    ->modalHeading('Hapus meja terpilih'),
             ]);
     }
 

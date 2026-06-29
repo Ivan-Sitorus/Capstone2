@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('menu_ingredients', function (Blueprint $table) {
             $table->id();
             $table->foreignId('menu_id')->constrained('menus')->cascadeOnDelete();
-            $table->foreignId('ingredient_id')->constrained('ingredients')->cascadeOnDelete();
+            $table->foreignId('ingredient_id')->nullable()->constrained('ingredients')->nullOnDelete();
             $table->decimal('quantity_used', 12, 2);
 
             $table->unique(['menu_id', 'ingredient_id']);

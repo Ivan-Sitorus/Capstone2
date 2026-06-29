@@ -56,6 +56,7 @@ class CashierOrderController extends Controller
             'status'         => Order::STATUS_DIBATALKAN,
             'rejection_note' => $request->reason,
             'cashier_id'     => Auth::id(),
+            'cancelled_at'   => now(),
         ]);
 
         BroadcastPendingCount::dispatch();
@@ -96,7 +97,15 @@ class CashierOrderController extends Controller
 
         try {
             DB::transaction(function () use ($request, $order, $inventoryService) {
-                $order->update(['status' => $request->status, 'cashier_id' => Auth::id()]);
+                $data = ['status' => $request->status, 'cashier_id' => Auth::id()];
+
+                if ($request->status === Order::STATUS_DIPROSES) {
+                    $data['processed_at'] = now();
+                } elseif ($request->status === Order::STATUS_SELESAI) {
+                    $data['completed_at'] = now();
+                }
+
+                $order->update($data);
 
                 if ($request->status === Order::STATUS_DIPROSES) {
                     $inventoryService->processSaleForOrder($order, Auth::id());
@@ -149,6 +158,7 @@ class CashierOrderController extends Controller
                 $order->update([
                     'status' => Order::STATUS_DIPROSES,
                     'cashier_id' => Auth::id(),
+                    'processed_at' => now(),
                 ]);
 
                 $inventoryService->processSaleForOrder($order, Auth::id());
@@ -189,6 +199,7 @@ class CashierOrderController extends Controller
                     'status' => Order::STATUS_DIPROSES,
                     'cashier_id' => Auth::id(),
                     'payment_proof' => null,
+                    'processed_at' => now(),
                 ]);
 
                 $inventoryService->processSaleForOrder($order, Auth::id());
@@ -255,6 +266,7 @@ class CashierOrderController extends Controller
                     'status'        => Order::STATUS_DIPROSES,
                     'cashier_id'    => Auth::id(),
                     'payment_proof' => null,
+                    'processed_at'  => now(),
                 ]);
 
                 $inventoryService->processSaleForOrder($order, Auth::id());

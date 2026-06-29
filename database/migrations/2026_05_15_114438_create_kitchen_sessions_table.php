@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('kitchen_sessions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->foreignId('user_id')->constrained()->nullOnDelete();
+            $table->string('session_id', 255)->nullable();
             $table->timestamp('started_at');
             $table->timestamp('ended_at')->nullable();
             $table->timestamp('last_activity_at')->useCurrent();
@@ -22,6 +23,7 @@ return new class extends Migration
 
             $table->index(['user_id', 'is_active']);
             $table->index(['is_active', 'last_activity_at']);
+            $table->index('session_id');
         });
     }
 

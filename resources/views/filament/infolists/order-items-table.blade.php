@@ -3,7 +3,7 @@
         <thead>
             <tr class="bg-gray-50 dark:bg-white/5">
                 <th class="fi-ta-header-cell px-3 py-3.5 text-sm font-semibold text-gray-950 dark:text-white text-start">Menu</th>
-                <th class="fi-ta-header-cell px-3 py-3.5 text-sm font-semibold text-gray-950 dark:text-white text-center">Qty</th>
+                <th class="fi-ta-header-cell px-3 py-3.5 text-sm font-semibold text-gray-950 dark:text-white text-center">Jumlah</th>
                 <th class="fi-ta-header-cell px-3 py-3.5 text-sm font-semibold text-gray-950 dark:text-white text-end">Harga</th>
                 <th class="fi-ta-header-cell px-3 py-3.5 text-sm font-semibold text-gray-950 dark:text-white text-end">Subtotal</th>
             </tr>

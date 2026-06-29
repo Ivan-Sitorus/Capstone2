@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ingredient_id')->constrained('ingredients')->cascadeOnDelete();
             $table->enum('adjustment_type', ['increase', 'decrease']);
+            $table->string('waste_category')->nullable();
             $table->decimal('quantity', 12, 2);
             $table->decimal('quantity_before', 12, 2);
             $table->decimal('quantity_after', 12, 2);
@@ -22,6 +23,7 @@ return new class extends Migration
 
             $table->index(['ingredient_id', 'adjusted_at']);
             $table->index(['adjustment_type', 'adjusted_at']);
+            $table->index(['waste_category', 'adjusted_at']);
         });
     }
 

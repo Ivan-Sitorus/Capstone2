@@ -19,7 +19,6 @@ class CafeTableFactory extends Factory
         return [
             'table_number' => $number,
             'qr_code' => fake()->url().'/table/'.$number,
-            'is_available' => fake()->boolean(80),
         ];
     }
 }

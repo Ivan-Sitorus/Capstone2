@@ -19,8 +19,8 @@ export default function BottomNav({ activeTab }) {
     const { count } = useCart();
 
     const TABS = [
-        { key: 'menu',    label: 'Menu',      Icon: Home,         href: '/customer/menu' },
-        { key: 'cart',    label: 'Keranjang', Icon: ShoppingCart, href: '/customer/cart' },
+        { key: 'menu',    label: 'Menu',      Icon: Home,         href: '/pelanggan/menu' },
+        { key: 'cart',    label: 'Keranjang', Icon: ShoppingCart, href: '/pelanggan/keranjang' },
         { key: 'riwayat', label: 'Riwayat',   Icon: Clock,        href: getRiwayatHref() },
     ];
 

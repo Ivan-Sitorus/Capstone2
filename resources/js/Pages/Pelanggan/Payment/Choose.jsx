@@ -70,7 +70,7 @@ export default function PaymentChoose({ order, items, table_number }) {
             const saved = sessionStorage.getItem('w9_customer');
             if (saved) tableId = JSON.parse(saved)?.tableId;
         } catch (_) {}
-        router.visit(tableId ? `/customer/menu?table=${tableId}` : '/customer/menu');
+        router.visit(tableId ? `/pelanggan/menu?table=${tableId}` : '/pelanggan/menu');
     }
 
     return (
@@ -118,7 +118,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                     flexShrink: 0,
                 }}>
                     <button
-                        onClick={() => router.visit('/customer/cart')}
+                        onClick={() => router.visit('/pelanggan/keranjang')}
                         className="w9p-btn-back"
                         style={{
                             marginTop: 2,

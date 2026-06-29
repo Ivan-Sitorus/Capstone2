@@ -13,7 +13,6 @@ class CafeTableSeeder extends Seeder
             CafeTable::create([
                 'table_number' => $n,
                 'qr_code' => "http://localhost/order?table={$n}",
-                'is_available' => true,
             ]);
         }
     }

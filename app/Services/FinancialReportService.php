@@ -552,11 +552,10 @@ class FinancialReportService
 
         if ($menuCatIds !== null) {
             $incCategoryNames = Category::whereIn('id', $menuCatIds)
-                ->where('is_active', true)
                 ->pluck('name')
                 ->toArray();
         } else {
-            $incCategoryNames = Category::where('is_active', true)->pluck('name')->toArray();
+            $incCategoryNames = Category::pluck('name')->toArray();
         }
 
         $keyed = [];

@@ -135,7 +135,7 @@ class StaffSessionDetail extends Page implements HasTable
                     }),
                 TextColumn::make('total_amount')
                     ->label('Total')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Waktu')

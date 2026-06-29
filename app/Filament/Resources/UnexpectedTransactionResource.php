@@ -67,7 +67,7 @@ class UnexpectedTransactionResource extends Resource
                     ->formatStateUsing(fn (string $state): string => ucfirst($state)),
                 TextColumn::make('nominal')
                     ->label('Nominal')
-                    ->formatStateUsing(fn (float $state): string => 'Rp '.number_format($state, 0, ',', '.').',-')
+                    ->formatStateUsing(fn (float $state): string => 'Rp'.number_format($state, 0, ',', '.').',-')
                     ->color(fn (UnexpectedTransaction $record): string => $record->jenis === 'pemasukan' ? 'success' : 'danger'),
                 TextColumn::make('deskripsi')
                     ->label('Deskripsi')

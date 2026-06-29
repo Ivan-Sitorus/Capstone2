@@ -13,7 +13,9 @@ class ListMenus extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()->modal()->modalWidth('2xl'),
+            CreateAction::make()
+                ->createAnother(false)
+                ->modal(),
         ];
     }
 }

@@ -14,7 +14,6 @@ class MenuStockSeeder extends Seeder
     {
         $category = Category::first() ?? Category::create([
             'name' => 'Minuman',
-            'slug' => 'minuman',
             'is_active' => true,
         ]);
 

@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { router, Head } from '@inertiajs/react';
+import { router, Head, usePage } from '@inertiajs/react';
 import { Search, X, Banknote, QrCode, ShieldCheck, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
 import MenuGridItem from '@/Components/Kasir/MenuGridItem';
@@ -7,6 +7,7 @@ import KeranjangItem from '@/Components/Kasir/KeranjangItem';
 import { formatRupiah } from '@/helpers';
 
 export default function PesananBaru({ categories }) {
+    const { flash } = usePage().props;
     const [cartItems,      setCartItems]     = useState([]);
     const [activeCategory, setActiveCategory] = useState('Semua');
     const [search,         setSearch]         = useState('');
@@ -80,6 +81,15 @@ export default function PesananBaru({ categories }) {
         return () => window.removeEventListener('cashier-sidebar-toggle', onSidebarToggle);
     }, []);
 
+    // Deteksi pesanan berhasil dari flash (lebih andal daripada onSuccess preserveState)
+    useEffect(() => {
+        if (flash?.order_id) {
+            setSuccessTotal(flash.order_total ?? 0);
+            setShowPayModal(false);
+            setShowSuccess(true);
+        }
+    }, [flash?.order_id]);
+
     /* ── Cart actions ── */
     function addToCart(menu) {
         setCartItems(prev => {
@@ -115,36 +125,30 @@ export default function PesananBaru({ categories }) {
 
     /* ── Submit ── */
     function submitOrder(method) {
-        const orderTotal = grandTotal;
         setProcessing(true);
         router.post(
             '/kasir/pesanan-baru',
-            { items: cartItems.map(i => ({ menu_id: i.menuId, quantity: i.quantity })), payment_method: method, customer_name: customerName.trim() || null, is_mahasiswa: isMahasiswa },
             {
-                // Pertahankan state komponen agar popup sukses muncul (tanpa ini
-                // komponen remount → setShowSuccess gagal → popup tak muncul)
-                preserveState: true,
-                preserveScroll: true,
-                onSuccess: () => {
+                uuid: crypto.randomUUID(),
+                items: cartItems.map(i => ({ menu_id: i.menuId, quantity: i.quantity })),
+                payment_method: method,
+                customer_name: customerName.trim() || null,
+                is_mahasiswa: isMahasiswa,
+            },
+            {
+                // Tanpa preserveState — komponen remount setelah redirect,
+                // popup sukses ditrigger oleh flash.order_id via useEffect
+                onError: (errors) => {
                     setProcessing(false);
-                    setShowPayModal(false);
-                    setSuccessTotal(orderTotal);
-                    setShowSuccess(true);
+                    const firstError = Object.values(errors)[0];
+                    if (firstError) alert(firstError);
                 },
-                onError: () => setProcessing(false),
             }
         );
     }
 
     function handleSuccessOk() {
-        // Tetap di halaman Pesanan Baru — kosongkan keranjang agar kasir
-        // langsung bisa membuat pesanan berikutnya. Kasir berpindah ke
-        // Pesanan Aktif secara manual lewat sidebar bila perlu.
         setShowSuccess(false);
-        setCartItems([]);
-        setCustomerName('');
-        setPayMethod('cash');
-        setIsMahasiswa(false);
     }
 
     /* ── Design tokens ── */

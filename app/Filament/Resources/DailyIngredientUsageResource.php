@@ -14,6 +14,7 @@ use Filament\Tables\Table;
 
 class DailyIngredientUsageResource extends Resource
 {
+    protected static bool $shouldRegisterNavigation = false;
     protected static ?string $model = DailyIngredientUsage::class;
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
@@ -22,7 +23,7 @@ class DailyIngredientUsageResource extends Resource
 
     protected static ?string $navigationLabel = 'Pemakaian Bahan Harian';
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 3;
 
     public static function form(Schema $schema): Schema
     {
@@ -51,7 +52,7 @@ class DailyIngredientUsageResource extends Resource
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Dicatat')
-                    ->dateTime('d M Y H:i')
+                    ->dateTime('d M Y, H:i:s')
                     ->toggleable(isToggledHiddenByDefault: true)
                     ->sortable(),
             ])

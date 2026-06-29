@@ -10,9 +10,8 @@ return new class extends Migration
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('categories')->restrictOnDelete();
             $table->string('name');
-            $table->string('slug')->unique();
             $table->text('description')->nullable();
             $table->unsignedBigInteger('price')->default(0);
             $table->string('image')->nullable();
@@ -20,8 +19,8 @@ return new class extends Migration
             $table->boolean('is_student_discount')->default(false);
             $table->unsignedBigInteger('student_price')->nullable();
             $table->unsignedBigInteger('cashback')->nullable();
-            $table->boolean('is_stock_calculated')->default(false);
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('category_id');
             $table->index('is_available');

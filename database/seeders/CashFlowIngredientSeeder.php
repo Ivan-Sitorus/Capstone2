@@ -34,7 +34,7 @@ class CashFlowIngredientSeeder extends Seeder
         foreach ($ingredients as $ing) {
             $saved[$ing['name']] = Ingredient::firstOrCreate(
                 ['name' => $ing['name']],
-                ['unit' => $ing['unit'], 'low_stock_threshold' => $ing['threshold'], 'is_active' => true]
+                ['unit' => $ing['unit'], 'low_stock_threshold' => $ing['threshold']]
             );
         }
 

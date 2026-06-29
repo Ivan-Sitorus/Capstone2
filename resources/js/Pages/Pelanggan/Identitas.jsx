@@ -32,7 +32,7 @@ export default function Identitas({ table }) {
             if (saved) {
                 const data = JSON.parse(saved);
                 if (data.name && data.phone && data.tableId === table.id) {
-                    router.visit(`/customer/menu?table=${table.id}`);
+                    router.visit(`/pelanggan/menu?table=${table.id}`);
                 }
             }
         } catch (_) {}
@@ -66,7 +66,7 @@ export default function Identitas({ table }) {
             tableNumber: table?.table_number ?? null,
         }));
 
-        router.visit(table ? `/customer/menu?table=${table.id}` : '/customer/menu');
+        router.visit(table ? `/pelanggan/menu?table=${table.id}` : '/pelanggan/menu');
     }
 
     /* ── No table state ── */

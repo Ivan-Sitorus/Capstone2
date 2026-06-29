@@ -20,6 +20,7 @@ class IngredientBatch extends Model
         'cost_per_unit',
         'custom_order',
         'status',
+        'allow_expired_usage',
     ];
 
     protected function casts(): array
@@ -31,6 +32,7 @@ class IngredientBatch extends Model
             'cost_per_unit' => 'decimal:2',
             'custom_order' => 'integer',
             'status' => 'string',
+            'allow_expired_usage' => 'boolean',
         ];
     }
 

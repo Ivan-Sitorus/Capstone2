@@ -17,6 +17,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('role', 20)->default('cashier');
             $table->string('phone', 20)->nullable();
+            $table->string('nim', 20)->nullable();
+            $table->boolean('is_student_verified')->default(false);
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();

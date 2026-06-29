@@ -534,7 +534,7 @@ export default function CustomerMenu({ categories, table }) {
                         </div>
                     </div>
                     <button
-                        onClick={() => router.visit('/customer/cart')}
+                        onClick={() => router.visit('/pelanggan/keranjang')}
                         style={{
                             background: C.surface, color: C.textPrimary,
                             border: 'none', borderRadius: 8,

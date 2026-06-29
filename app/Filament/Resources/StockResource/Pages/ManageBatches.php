@@ -6,6 +6,10 @@ use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
+use App\Models\StockAdjustment;
+use App\Models\StockMovement;
+use App\Filament\Resources\StockAdjustmentResource;
+use App\Services\StockReconciliationService;
 use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -14,12 +18,15 @@ use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Resources\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Facades\Auth;
 
 class ManageBatches extends Page implements HasTable
 {
@@ -30,6 +37,8 @@ class ManageBatches extends Page implements HasTable
     protected string $view = 'filament.pages.manage-batches';
 
     public Ingredient $record;
+
+    public bool $showDepleted = false;
 
     public function mount(Ingredient $record): void
     {
@@ -46,7 +55,8 @@ class ManageBatches extends Page implements HasTable
         $unit = $this->record->unit;
 
         return $table
-            ->query(IngredientBatch::where('ingredient_id', $this->record->id))
+            ->query(fn () => IngredientBatch::where('ingredient_id', $this->record->id)
+                ->when(!$this->showDepleted, fn ($q) => $q->where('quantity', '>', 0)))
             ->columns([
                 TextColumn::make('batch_code')
                     ->label('Kode Batch')
@@ -60,19 +70,28 @@ class ManageBatches extends Page implements HasTable
                     ->sortable(),
                 TextColumn::make('expiry_date')
                     ->label('Tanggal Kedaluwarsa')
-                    ->date()
+                    ->date('d M Y')
                     ->sortable()
                     ->color(fn ($record) => $record->expiry_date && $record->expiry_date->isPast() ? 'danger' : null),
                 TextColumn::make('received_at')
-                    ->label('Tanggal Diterima')
-                    ->dateTime()
+                    ->label('Waktu Diterima')
+                    ->dateTime('d M Y, H:i:s')
                     ->sortable(),
                 TextColumn::make('cost_per_unit')
                     ->label('Harga/Unit')
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
+                TextColumn::make('allow_expired_usage')
+                    ->label('')
+                    ->default('')
+                    ->state(fn ($record) => $record->allow_expired_usage && $record->expiry_date && $record->expiry_date->isPast() ? '⚠️ Abaikan Kedaluwarsa' : '')
+                    ->color('warning'),
             ])
             ->headerActions([
+                Action::make('toggle_depleted')
+                    ->label(fn () => $this->showDepleted ? 'Sembunyikan Batch Habis' : 'Tampilkan Batch Habis')
+                    ->color(fn () => $this->showDepleted ? 'gray' : 'info')
+                    ->action(fn () => $this->showDepleted = !$this->showDepleted),
                 CreateAction::make()
                     ->model(IngredientBatch::class)
                     ->form([
@@ -94,7 +113,7 @@ class ManageBatches extends Page implements HasTable
                                 ? 'Wajib untuk mode FEFO'
                                 : null),
                         DateTimePicker::make('received_at')
-                            ->label('Tanggal Diterima')
+                            ->label('Waktu Diterima')
                             ->required()
                             ->default(now())
                             ->native(false),
@@ -107,6 +126,11 @@ class ManageBatches extends Page implements HasTable
                             ->stripCharacters('.')
                             ->extraInputAttributes(NumberInputHelper::integer())
                             ->prefix('Rp'),
+                        Toggle::make('allow_expired_usage')
+                            ->label('Bisa dipakai meskipun kedaluwarsa')
+                            ->helperText('Batch ini tetap bisa dipakai FEFO walau sudah kedaluwarsa')
+                            ->visible(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO)
+                            ->default(false),
                     ])
                     ->using(function (array $data): IngredientBatch {
                         return $this->record->batches()->create($data);
@@ -133,7 +157,7 @@ class ManageBatches extends Page implements HasTable
                                 ? 'Wajib untuk mode FEFO'
                                 : null),
                         DateTimePicker::make('received_at')
-                            ->label('Tanggal Diterima')
+                            ->label('Waktu Diterima')
                             ->required()
                             ->default(now())
                             ->native(false),
@@ -146,7 +170,45 @@ class ManageBatches extends Page implements HasTable
                             ->stripCharacters('.')
                             ->extraInputAttributes(NumberInputHelper::integer())
                             ->prefix('Rp'),
-                    ]),
+                        Toggle::make('allow_expired_usage')
+                            ->label('Bisa dipakai meskipun kedaluwarsa')
+                            ->helperText('Batch ini tetap bisa dipakai FEFO walau sudah kedaluwarsa'),
+                    ])
+                    ->before(function (EditAction $action, IngredientBatch $record) {
+                        $data = $action->getData();
+                        $rawQty = $data['quantity'] ?? null;
+                        if ($rawQty === null) return;
+                        $newQty = (float) str_replace(',', '.', $rawQty);
+                        $oldQty = (float) $record->quantity;
+                        if (abs($oldQty - $newQty) < 0.001) return;
+
+                        $diff = $newQty - $oldQty;
+                        $unit = $record->ingredient?->unit ?? '';
+                        $batchCode = $record->batch_code ?? '#'.$record->id;
+                        $adjType = $diff > 0 ? StockAdjustment::TYPE_INCREASE : StockAdjustment::TYPE_DECREASE;
+                        $note = "Batch {$batchCode}: qty {$oldQty} → {$newQty} {$unit}";
+
+                        StockAdjustment::create([
+                            'code' => StockReconciliationService::generateAdjustmentCode(),
+                            'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT,
+                            'ingredient_id' => $record->ingredient_id,
+                            'adjustment_type' => $adjType,
+                            'category' => StockAdjustment::CAT_CORRECTION,
+                            'quantity' => abs($diff),
+                            'quantity_before' => $oldQty,
+                            'quantity_after' => $newQty,
+                            'reason' => $note,
+                            'reported_by' => Auth::id(),
+                            'adjusted_at' => now(),
+                            'status' => StockAdjustment::STATUS_ACTIVE,
+                        ]);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Penyesuaian stok otomatis tercatat')
+                            ->body($note)
+                            ->send();
+                    }),
                 DeleteAction::make()
                     ->before(function (DeleteAction $action, IngredientBatch $record) {
                         if ($record->stockMovements()->exists()) {
@@ -158,7 +220,90 @@ class ManageBatches extends Page implements HasTable
                             
                             $record->update(['quantity' => 0, 'status' => IngredientBatch::STATUS_INACTIVE]);
                             $action->cancel();
+                            return;
                         }
+
+                        if ((float) $record->quantity > 0) {
+                            $unit = $record->ingredient?->unit ?? '';
+                            $batchCode = $record->batch_code ?? '#'.$record->id;
+                            $note = "Hapus batch {$batchCode}: sisa {$record->quantity} {$unit}";
+
+                            StockAdjustment::create([
+                                'code' => StockReconciliationService::generateAdjustmentCode(),
+                                'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT,
+                                'ingredient_id' => $record->ingredient_id,
+                                'adjustment_type' => StockAdjustment::TYPE_DECREASE,
+                                'category' => StockAdjustment::CAT_CORRECTION,
+                                'quantity' => (float) $record->quantity,
+                                'quantity_before' => (float) $record->quantity,
+                                'quantity_after' => 0,
+                                'reason' => $note,
+                                'reported_by' => Auth::id(),
+                                'adjusted_at' => now(),
+                                'status' => StockAdjustment::STATUS_ACTIVE,
+                            ]);
+                        }
+                    }),
+                Action::make('mark_expired')
+                    ->label('Tandai Kedaluwarsa')
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->visible(fn (IngredientBatch $record): bool =>
+                        $record->expiry_date
+                        && $record->expiry_date->isPast()
+                        && (float) $record->quantity > 0
+                    )
+                    ->requiresConfirmation()
+                    ->modalHeading('Tandai Batch Kedaluwarsa')
+                    ->modalDescription(fn (IngredientBatch $record): string =>
+                        "Batch {$record->batch_code} sudah kedaluwarsa sejak "
+                        . $record->expiry_date->format('d M Y')
+                        . ". Stok sisa {$record->quantity} " . ($record->ingredient?->unit ?? '')
+                        . " akan dihapus dan dicatat sebagai waste."
+                    )
+                    ->modalSubmitActionLabel('Ya, Tandai')
+                    ->action(function (IngredientBatch $record) {
+                        $unit = $record->ingredient?->unit ?? '';
+                        $batchCode = $record->batch_code ?? '#'.$record->id;
+                        $qty = (float) $record->quantity;
+
+                        $adjustment = StockAdjustment::create([
+                            'code' => StockReconciliationService::generateAdjustmentCode(),
+                            'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT,
+                            'ingredient_id' => $record->ingredient_id,
+                            'adjustment_type' => StockAdjustment::TYPE_DECREASE,
+                            'category' => StockAdjustment::CAT_EXPIRED,
+                            'quantity' => $qty,
+                            'quantity_before' => $qty,
+                            'quantity_after' => 0,
+                            'reason' => "Batch {$batchCode} kedaluwarsa: {$qty} {$unit}",
+                            'reported_by' => Auth::id(),
+                            'adjusted_at' => now(),
+                            'status' => StockAdjustment::STATUS_ACTIVE,
+                        ]);
+
+                        StockMovement::create([
+                            'ingredient_id' => $record->ingredient_id,
+                            'ingredient_batch_id' => $record->id,
+                            'stock_adjustment_id' => $adjustment->id,
+                            'movement_type' => 'waste',
+                            'source_type' => 'stock_adjustment',
+                            'source_id' => (string) $adjustment->id,
+                            'quantity_before' => $qty,
+                            'quantity_change' => -$qty,
+                            'quantity_after' => 0,
+                            'unit_cost' => $record->cost_per_unit,
+                            'notes' => "Batch {$batchCode} kedaluwarsa",
+                            'recorded_by' => Auth::id(),
+                        ]);
+
+                        $record->update(['quantity' => 0, 'status' => IngredientBatch::STATUS_INACTIVE]);
+
+                        Notification::make()
+                            ->success()
+                            ->title('Batch ditandai kedaluwarsa')
+                            ->body("Stok {$batchCode} telah dihapus dan dicatat di Penyesuaian Stok.")
+                            ->send();
                     }),
             ])
             ->toolbarActions([])

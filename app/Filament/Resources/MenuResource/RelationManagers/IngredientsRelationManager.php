@@ -2,11 +2,10 @@
 
 namespace App\Filament\Resources\MenuResource\RelationManagers;
 
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -63,12 +62,20 @@ class IngredientsRelationManager extends RelationManager
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action) {
+                        /** @var \App\Models\Menu $menu */
+                        $menu = $this->getOwnerRecord();
+                        if ($menu->menuIngredients()->count() <= 1) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Bahan terakhir tidak dapat dihapus')
+                                ->body('Setiap menu minimal harus memiliki satu bahan baku.')
+                                ->send();
+                            $action->cancel();
+                        }
+                    }),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ]);
+            ->toolbarActions([]);
     }
 }

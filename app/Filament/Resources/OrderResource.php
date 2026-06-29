@@ -6,7 +6,9 @@ use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\Pages\ViewOrder;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 use App\Models\Order;
-use Filament\Actions\ViewAction;
+use Filament\Actions\Action;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\RepeatableEntry\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -17,7 +19,6 @@ use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Facades\Cache;
 
 class OrderResource extends Resource
 {
@@ -31,21 +32,26 @@ class OrderResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
-    public static function infolist(Schema $schema): Schema
+    public static function getInfolistComponents(string $prefix = ''): array
     {
-        return $schema->components([
+        $p = $prefix; // shorthand
+
+        return [
             Section::make('Informasi Pesanan')
                 ->schema([
-                    TextEntry::make('order_code')->label('Kode Pesanan')->copyable(),
-                    TextEntry::make('created_at')->label('Tanggal')->dateTime('d M Y, H:i'),
-                    TextEntry::make('cashier.name')->label('Kasir')->default('-'),
+                    TextEntry::make($p.'order_code')->label('Kode Pesanan')->copyable(),
+                    TextEntry::make($p.'created_at')->label('Waktu')->dateTime('d M Y, H:i:s'),
+                    TextEntry::make($p.'processed_at')->label('Diproses')->dateTime('d M Y, H:i:s'),
+                    TextEntry::make($p.'completed_at')->label('Selesai')->dateTime('d M Y, H:i:s'),
+                    TextEntry::make($p.'cancelled_at')->label('Dibatalkan')->dateTime('d M Y, H:i:s'),
+                    TextEntry::make($p.'cashier.name')->label('Kasir')->default('-'),
                 ])->columns(3),
 
             Section::make('Pelanggan')
                 ->schema([
-                    TextEntry::make('customer_name')->label('Nama')->default('Guest'),
-                    TextEntry::make('customer_phone')->label('No. HP')->default('-'),
-                    TextEntry::make('order_type')->label('Jenis')
+                    TextEntry::make($p.'customer_name')->label('Nama')->default('Guest'),
+                    TextEntry::make($p.'customer_phone')->label('No. HP')->default('-'),
+                    TextEntry::make($p.'order_type')->label('Jenis')
                         ->badge()
                         ->color(fn (string $state): string => match ($state) {
                             'qr' => 'info',
@@ -61,7 +67,7 @@ class OrderResource extends Resource
 
             Section::make('Pembayaran')
                 ->schema([
-                    TextEntry::make('payment_method')->label('Metode')
+                    TextEntry::make($p.'payment_method')->label('Metode')
                         ->badge()
                         ->formatStateUsing(fn (?string $state): string => match ($state) {
                             'cash' => 'Tunai',
@@ -69,12 +75,12 @@ class OrderResource extends Resource
                             'bayar_nanti' => 'Bayar Nanti',
                             default => '-',
                         }),
-                    TextEntry::make('total_amount')->label('Total')->money('IDR'),
-                    TextEntry::make('is_paid')->label('Status Bayar')
+                    TextEntry::make($p.'total_amount')->label('Total')->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
+                    TextEntry::make($p.'is_paid')->label('Status Bayar')
                         ->badge()
                         ->color(fn (bool $state): string => $state ? 'success' : 'danger')
                         ->formatStateUsing(fn (bool $state): string => $state ? 'Lunas' : 'Belum Bayar'),
-                    TextEntry::make('status')->label('Status Pesanan')
+                    TextEntry::make($p.'status')->label('Status Pesanan')
                         ->badge()
                         ->color(fn (string $state): string => match ($state) {
                             'pending' => 'warning',
@@ -89,7 +95,32 @@ class OrderResource extends Resource
                             default => $state,
                         }),
                 ])->columns(4),
-        ]);
+
+            Section::make('Item Pesanan')
+                ->schema([
+                    RepeatableEntry::make($p.'items')
+                        ->hiddenLabel()
+                        ->table([
+                            TableColumn::make('Menu'),
+                            TableColumn::make('Harga')->width(120),
+                            TableColumn::make('Jumlah')->width(80),
+                            TableColumn::make('Subtotal')->width(120),
+                        ])
+                        ->schema([
+                            TextEntry::make('menu.name'),
+                            TextEntry::make('unit_price')
+                                ->formatStateUsing(fn ($state) => 'Rp' . number_format((float) $state, 0, ',', '.')),
+                            TextEntry::make('quantity'),
+                            TextEntry::make('subtotal')
+                                ->formatStateUsing(fn ($state) => 'Rp' . number_format((float) $state, 0, ',', '.')),
+                        ]),
+                ]),
+        ];
+    }
+
+    public static function infolist(Schema $schema): Schema
+    {
+        return $schema->components(static::getInfolistComponents());
     }
 
     public static function table(Table $table): Table
@@ -111,7 +142,7 @@ class OrderResource extends Resource
                     ->default('-'),
                 TextColumn::make('total_amount')
                     ->label('Total')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
                 TextColumn::make('payment_method')
                     ->label('Metode')
@@ -141,10 +172,11 @@ class OrderResource extends Resource
                     ->label('Lunas')
                     ->boolean(),
                 TextColumn::make('created_at')
-                    ->label('Tanggal')
-                    ->dateTime('d M Y, H:i')
+                    ->label('Waktu')
+                    ->dateTime('d M Y, H:i:s')
                     ->sortable(),
             ])
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['items.menu', 'cashier']))
             ->filters([
                 SelectFilter::make('status')
                     ->label('Status')
@@ -173,7 +205,14 @@ class OrderResource extends Resource
                     ->toggle(),
             ])
             ->recordActions([
-                ViewAction::make(),
+                Action::make('view')
+                    ->label('Lihat')
+                    ->icon('heroicon-o-eye')
+                    ->record(fn (Order $record): Order => $record->loadMissing('items.menu'))
+                    ->infolist(static::getInfolistComponents())
+                    ->modalAutofocus(false)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup'),
             ])
             ->toolbarActions([])
             ->defaultSort('created_at', 'desc');
@@ -194,17 +233,5 @@ class OrderResource extends Resource
         ];
     }
 
-    public static function getNavigationBadge(): ?string
-    {
-        $count = Cache::remember('nav_badge_orders_today', 120, function () {
-            return static::getModel()::whereDate('created_at', today())->count();
-        });
 
-        return $count ?: null;
-    }
-
-    public static function getNavigationBadgeColor(): string|array|null
-    {
-        return 'info';
-    }
 }

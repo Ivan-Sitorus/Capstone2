@@ -153,7 +153,7 @@ export default function CustomerCart() {
                                 </p>
                             </div>
                             <button
-                                onClick={() => router.visit(`/customer/menu?table=${tableId ?? ''}`)}
+                                onClick={() => router.visit(`/pelanggan/menu?table=${tableId ?? ''}`)}
                                 className="w9cart-btn"
                                 style={{
                                     marginTop: 4, height: 46, padding: '0 28px',

@@ -4,18 +4,16 @@ namespace App\Filament\Resources;
 
 use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Helpers\TextInputHelper;
-use App\Filament\Resources\StockResource\Pages\EditStock;
 use App\Filament\Resources\StockResource\Pages\ListStocks;
 use App\Filament\Resources\StockResource\Pages\ManageBatches;
+use App\Filament\Resources\StockResource\Pages\ViewStockHistory;
 use App\Models\Ingredient;
 use Filament\Actions\Action;
-use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -34,11 +32,17 @@ class StockResource extends Resource
 
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cube';
 
-    protected static bool $shouldRegisterNavigation = false;
+    protected static bool $shouldRegisterNavigation = true;
 
     protected static string|\UnitEnum|null $navigationGroup = 'Inventori';
 
-    protected static ?string $navigationLabel = 'Stok';
+    protected static ?string $navigationLabel = 'Bahan Baku';
+
+    protected static ?string $pluralLabel = 'Bahan Baku';
+
+    protected static ?string $label = 'Bahan Baku';
+
+    protected static ?string $slug = 'stok';
 
     protected static ?int $navigationSort = 1;
 
@@ -47,7 +51,7 @@ class StockResource extends Resource
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('Ingredient Name')
+                    ->label('Nama Bahan')
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true)
@@ -60,25 +64,19 @@ class StockResource extends Resource
                     ->native(false)
                     ->live(),
                 TextInput::make('low_stock_threshold')
-                    ->label('Low Stock Threshold')
-                    ->required()
+                    ->label('Peringatan Stok Rendah')
                     ->type('text')
                     ->extraInputAttributes(NumberInputHelper::decimal())
                     ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
                     ->stripCharacters('.')
                     ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                     ->suffix(fn ($get) => $get('unit') ? ' '.$get('unit') : ''),
-                Toggle::make('is_active')
-                    ->label('Active')
-                    ->default(true)
-                    ->inline(false),
-                Radio::make('batch_mode')
-                    ->label('Mode Pengambilan Batch')
+                Select::make('batch_mode')
+                    ->label('Prioritas Batch')
                     ->options(array_slice(Ingredient::batchModes(), 0, 2))
                     ->default(Ingredient::BATCH_MODE_FEFO)
                     ->required()
-                    ->inline(false)
-                    ->helperText('FEFO: batch dengan tanggal kadaluarsa terdekat digunakan lebih dulu. FIFO: batch yang diterima lebih dulu digunakan lebih dulu.'),
+                    ->native(false),
                 Repeater::make('batches')
                     ->relationship('batches')
                     ->label('Stok Awal (Batch)')
@@ -128,21 +126,39 @@ class StockResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->searchPlaceholder('Cari Nama Bahan')
             ->columns([
                 TextColumn::make('name')
-                    ->label('Ingredient Name')
+                    ->label('Nama Bahan')
                     ->searchable()
                     ->sortable(),
                 TextColumn::make('unit')
                     ->label('Unit')
                     ->sortable(),
+                TextColumn::make('nearest_expiry')
+                    ->label('Kedaluwarsa Terdekat')
+                    ->getStateUsing(fn (Ingredient $record) =>
+                        $record->batches()
+                            ->where('quantity', '>', 0)
+                            ->whereNotNull('expiry_date')
+                            ->min('expiry_date')
+                    )
+                    ->date('d M Y')
+                    ->color(fn ($state) => $state && \Carbon\Carbon::parse($state)->isPast() ? 'danger' : null)
+                    ->sortable(query: fn ($query, string $direction) =>
+                        $query->orderByRaw('(SELECT MIN(expiry_date) FROM ingredient_batches WHERE ingredient_id = ingredients.id AND quantity > 0 AND expiry_date IS NOT NULL) '.$direction)
+                    ),
                 TextColumn::make('low_stock_threshold')
-                    ->label('Low Stock Threshold')
-                    ->numeric(decimalPlaces: 2, decimalSeparator: ',', thousandsSeparator: '.')
+                    ->label('Peringatan Stok Rendah')
+                    ->formatStateUsing(fn ($state) => 
+                        $state === null || $state === '' 
+                            ? '' 
+                            : number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.')
+                    )
                     ->suffix(fn (Ingredient $record) => ' '.$record->unit)
                     ->sortable(),
                 TextColumn::make('total_stock')
-                    ->label('Total Stock')
+                    ->label('Total Stok')
                     ->getStateUsing(fn (Ingredient $record) => $record->getTotalStock() + 0)
                     ->suffix(fn (Ingredient $record) => ' '.$record->unit)
                     ->badge()
@@ -150,35 +166,45 @@ class StockResource extends Resource
                     ->sortable(query: function ($query, string $direction): void {
                         $query->orderByRaw('(SELECT COALESCE(SUM(quantity), 0) FROM ingredient_batches WHERE ingredient_batches.ingredient_id = ingredients.id) '.$direction);
                     }),
-                IconColumn::make('is_active')
-                    ->label('Active')
-                    ->boolean()
-                    ->sortable(),
+                TextColumn::make('batch_mode')
+                    ->label('Prioritas Batch')
+                    ->badge()
+                    ->color(fn ($state) => $state === 'fifo' ? 'info' : 'warning')
+                    ->formatStateUsing(fn ($state) => strtoupper($state)),
             ])
             ->filters([
                 Filter::make('low_stock')
-                    ->label('Low Stock')
+                    ->label('Stok Rendah')
                     ->query(fn ($query) => $query->whereRaw('(SELECT COALESCE(SUM(quantity), 0) FROM ingredient_batches WHERE ingredient_batches.ingredient_id = ingredients.id) < low_stock_threshold')),
-                TernaryFilter::make('is_active')
-                    ->label('Active Status')
-                    ->placeholder('All')
-                    ->trueLabel('Active only')
-                    ->falseLabel('Inactive only'),
             ])
             ->recordActions([
                 Action::make('batches')
-                    ->label('Batch')
+                    ->label('Stok Bahan')
                     ->icon('heroicon-o-cube')
                     ->url(fn ($record) => static::getUrl('batches', ['record' => $record])),
+                Action::make('history')
+                    ->label('Riwayat Pemakaian')
+                    ->icon('heroicon-o-clock')
+                    ->url(fn ($record) => static::getUrl('history', ['record' => $record])),
                 EditAction::make()->modal(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, Ingredient $record) {
+                        $activeCount = $record->menuIngredients()
+                            ->whereHas('menu', fn ($q) => $q->whereNull('deleted_at'))
+                            ->count();
+                        
+                        if ($activeCount > 0) {
+                            Notification::make()
+                                ->danger()
+                                ->title("Bahan baku '{$record->name}' tidak dapat dihapus")
+                                ->body("Masih digunakan oleh {$activeCount} menu. Gunakan filter Bahan Baku di halaman Menu untuk melihat daftarnya.")
+                                ->send();
+
+                            $action->cancel();
+                        }
+                    }),
             ])
-            ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
-            ])
-            ->defaultSort('id', 'desc');
+            ->defaultSort('nearest_expiry', 'asc');
     }
 
     public static function getRelations(): array
@@ -190,8 +216,8 @@ class StockResource extends Resource
     {
         return [
             'index' => ListStocks::route('/'),
-            'edit' => EditStock::route('/{record}/edit'),
             'batches' => ManageBatches::route('/{record}/batches'),
+            'history' => ViewStockHistory::route('/{record}/history'),
         ];
     }
 }

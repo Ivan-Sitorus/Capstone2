@@ -29,16 +29,13 @@ class Ingredient extends Model
         'name',
         'unit',
         'low_stock_threshold',
-        'is_active',
         'batch_mode',
     ];
 
     protected function casts(): array
     {
         return [
-            'is_active' => 'boolean',
             'low_stock_threshold' => 'decimal:2',
-            'batch_mode' => 'string',
         ];
     }
 
@@ -49,11 +46,6 @@ class Ingredient extends Model
             self::BATCH_MODE_FIFO => 'FIFO (First In First Out)',
             self::BATCH_MODE_CUSTOM => 'Custom (Manual Order)',
         ];
-    }
-
-    public function scopeActive(Builder $query): void
-    {
-        $query->where('is_active', true);
     }
 
     public function batches()

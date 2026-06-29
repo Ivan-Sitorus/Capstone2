@@ -76,7 +76,7 @@ export default function CashStatus({ order }) {
 
                 {order.status === 'selesai' && (
                     <button
-                        onClick={() => router.visit('/customer/menu')}
+                        onClick={() => router.visit('/pelanggan/menu')}
                         className="w-full h-[50px] bg-primary text-primary-foreground border-none rounded-[16px] text-[15px] font-bold cursor-pointer"
                     >
                         Pesan Lagi

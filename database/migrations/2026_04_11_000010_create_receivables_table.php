@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('amount');
             $table->string('customer_name', 100);
+            $table->date('invoice_date')->nullable();
             $table->unsignedBigInteger('paid_amount')->default(0);
             $table->string('status', 20)->default('pending');
             $table->date('due_date')->nullable();

@@ -293,7 +293,7 @@ function OrderRow({ order }) {
             </div>
             <div style={{ width: 70, flexShrink: 0 }}>
                 <Link
-                    href={`/kasir/order/${order.id}`}
+                    href={`/kasir/pesanan/${order.id}`}
                     style={{
                         fontSize: 13, fontWeight: 500,
                         color: T.accent, textDecoration: 'none',

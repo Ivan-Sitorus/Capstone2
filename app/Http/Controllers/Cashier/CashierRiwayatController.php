@@ -13,7 +13,7 @@ class CashierRiwayatController extends Controller
     {
         $orders = Order::with(['cashier' => fn ($q) => $q->select('id', 'name')])
             ->select('id', 'order_code', 'cashier_id', 'customer_name', 'total_amount', 'payment_method', 'status', 'created_at')
-            ->where('status', Order::STATUS_SELESAI)
+            ->whereIn('status', [Order::STATUS_SELESAI, Order::STATUS_DIBATALKAN])
             ->when($request->search, fn ($q) => $q->where('order_code', 'like', '%'.$request->search.'%')
                 ->orWhere('customer_name', 'like', '%'.$request->search.'%'))
             ->when($request->date, fn ($q) => $q->whereDate('created_at', $request->date))

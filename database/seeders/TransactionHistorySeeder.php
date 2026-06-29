@@ -41,31 +41,28 @@ class TransactionHistorySeeder extends Seeder
     {
         // ── 1. Pastikan kategori "Data Mining" ada ──────────────────────
         $category = Category::firstOrCreate(
-            ['slug' => 'data-mining-seed'],
+            ['name' => 'Data Mining Seed'],
             [
                 'name' => 'Data Mining Seed',
-                'slug' => 'data-mining-seed',
-                'is_active' => true,
             ]
         );
 
         // ── 2. Pastikan 5 menu ada ──────────────────────────────────────
         $menuData = [
-            ['name' => 'Cheesecake',   'slug' => 'dm-cheesecake',   'price' => 27000],
-            ['name' => 'Mie Goreng',   'slug' => 'dm-mie-goreng',   'price' => 28000],
-            ['name' => 'Nasi Goreng',  'slug' => 'dm-nasi-goreng',  'price' => 30000],
-            ['name' => 'French Fries', 'slug' => 'dm-french-fries', 'price' => 20000],
-            ['name' => 'Cappucino',    'slug' => 'dm-cappucino',    'price' => 22000],
+            ['name' => 'Cheesecake',   'price' => 27000],
+            ['name' => 'Mie Goreng',   'price' => 28000],
+            ['name' => 'Nasi Goreng',  'price' => 30000],
+            ['name' => 'French Fries', 'price' => 20000],
+            ['name' => 'Cappucino',    'price' => 22000],
         ];
 
         $menus = [];
         foreach ($menuData as $m) {
             $menus[$m['name']] = Menu::firstOrCreate(
-                ['slug' => $m['slug']],
+                ['name' => $m['name']],
                 [
                     'category_id' => $category->id,
                     'name' => $m['name'],
-                    'slug' => $m['slug'],
                     'description' => null,
                     'price' => $m['price'],
                     'cashback' => 0,
@@ -130,6 +127,7 @@ class TransactionHistorySeeder extends Seeder
                     'order_type' => 'cashier',
                     'total_amount' => $subtotal,
                     'payment_method' => 'cash',
+                    'uuid' => \Illuminate\Support\Str::uuid(),
                     'notes' => null,
                     'is_paid' => true,
                     'created_at' => $date->copy()->setTime(10, 0, 0)->toDateTimeString(),

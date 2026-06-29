@@ -12,7 +12,6 @@ return new class extends Migration
             $table->id();
             $table->integer('table_number')->unique();
             $table->string('qr_code', 500)->unique();
-            $table->boolean('is_available')->default(true);
             $table->timestamps();
         });
     }

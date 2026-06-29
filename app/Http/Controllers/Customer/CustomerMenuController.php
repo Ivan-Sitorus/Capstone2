@@ -15,8 +15,8 @@ class CustomerMenuController extends Controller
     {
         if (!$tableId) return null;
 
-        return Cache::remember("cafe_table_{$tableId}", 600, fn() =>
-            CafeTable::select(['id', 'table_number'])->find($tableId)
+        return Cache::remember("cafe_table_{$tableId}", 600, fn () =>
+            CafeTable::select(['id', 'table_number', 'is_available'])->find($tableId)
         );
     }
 
@@ -24,8 +24,11 @@ class CustomerMenuController extends Controller
     {
         $table = $this->findTable($request->query('table'));
 
-        if ($table && $table->table_number > 10) {
-            abort(404);
+        // Tolak jika meja tidak ada di DB atau ditandai tidak tersedia
+        if ($tableId = $request->query('table')) {
+            if (! $table || ! $table->is_available) {
+                abort(404);
+            }
         }
 
         return Inertia::render('Pelanggan/Identitas', ['table' => $table]);
@@ -35,19 +38,21 @@ class CustomerMenuController extends Controller
     {
         $categories = Cache::remember('customer_menu_v2', 300, function () {
             return Category::with([
-                'menus' => fn($q) => $q
-                    ->select(['id', 'category_id', 'name', 'price', 'image'])
+                'menus' => fn ($q) => $q
+                    ->select(['id', 'category_id', 'name', 'price', 'image', 'is_available'])
                     ->orderBy('name'),
             ])
-              ->select(['id', 'name'])
-              ->orderBy('name')
-              ->get();
+                ->select(['id', 'name'])
+                ->orderBy('name')
+                ->get();
         });
 
         $table = $this->findTable($request->query('table'));
 
-        if ($table && $table->table_number > 10) {
-            abort(404);
+        if ($tableId = $request->query('table')) {
+            if (! $table || ! $table->is_available) {
+                abort(404);
+            }
         }
 
         return Inertia::render('Pelanggan/Menu/Index', compact('categories', 'table'));

@@ -179,7 +179,7 @@ class PromotionResource extends Resource
                             return number_format((float) $record->discount_value, 2).'%';
                         }
 
-                        return 'Rp '.number_format((float) $record->discount_value, 0, ',', '.');
+                        return 'Rp'.number_format((float) $record->discount_value, 0, ',', '.');
                     }),
                 TextColumn::make('start_date')
                     ->label('Start Date')

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MoreVertical, Banknote, QrCode, Check, Clock } from 'lucide-react';
+import { MoreVertical, Banknote, QrCode, Check, Clock, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -21,7 +21,7 @@ const STATUS_META = {
     selesai:  { dot: '#4D9B6A', label: 'Selesai'  },
 };
 
-export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone, onConfirmPayment }) {
+export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone, onConfirmPayment, onCancel }) {
     const [menuOpen,      setMenuOpen]      = useState(false);
     const [payPopover,    setPayPopover]    = useState(false);
     const [showQrisReview, setShowQrisReview] = useState(false);
@@ -157,6 +157,21 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                                 </button>
                                             );
                                         })}
+
+                                        {/* Divider + Batalkan */}
+                                        {onCancel && (
+                                            <>
+                                                <div style={{ height: 1, background: '#E5E4E1', margin: '4px 0' }} />
+                                                <button
+                                                    onClick={() => { setMenuOpen(false); onCancel(order); }}
+                                                    className="flex items-center gap-2.5 w-full rounded-lg border-none text-left px-2.5 py-2 cursor-pointer transition-colors duration-100 hover:bg-red-50"
+                                                    style={{ color: '#DC2626' }}
+                                                >
+                                                    <XCircle size={14} strokeWidth={2} />
+                                                    <span className="text-sm font-medium">Batalkan Pesanan</span>
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 )}
                             </div>

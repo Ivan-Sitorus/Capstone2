@@ -41,7 +41,7 @@ class ReceivableResource extends Resource
 
     protected static ?string $navigationLabel = 'Piutang';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Schema $schema): Schema
     {
@@ -88,6 +88,7 @@ class ReceivableResource extends Resource
                 ->type('text')
                 ->prefix('Rp')
                 ->disabled()
+                ->dehydrated(true)
                 ->extraInputAttributes(NumberInputHelper::decimal())
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
             DatePicker::make('invoice_date')
@@ -148,13 +149,13 @@ class ReceivableResource extends Resource
                         ->date('d M Y'),
                     TextEntry::make('amount')
                         ->label('Jumlah Total')
-                        ->money('IDR'),
+                        ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
                     TextEntry::make('paid_amount')
                         ->label('Jumlah Dibayar')
-                        ->money('IDR'),
+                        ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
                     TextEntry::make('remaining_amount')
                         ->label('Sisa')
-                        ->money('IDR')
+                        ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                         ->color(fn (Receivable $record): string => $record->remaining_amount > 0 ? 'danger' : 'success'),
                     TextEntry::make('due_date')
                         ->label('Jatuh Tempo')
@@ -193,7 +194,7 @@ class ReceivableResource extends Resource
                         }),
                     TextEntry::make('order.total_amount')
                         ->label('Total Pesanan')
-                        ->money('IDR'),
+                        ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
                 ])->columns(3),
 
             Section::make('Item Pesanan')
@@ -237,15 +238,15 @@ class ReceivableResource extends Resource
                     ->color(fn (Receivable $record): ?string => $record->isOverdue() ? 'danger' : null),
                 TextColumn::make('amount')
                     ->label('Jumlah')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
                 TextColumn::make('paid_amount')
                     ->label('Dibayar')
-                    ->money('IDR')
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
                 TextColumn::make('remaining_amount')
                     ->label('Sisa')
-                    ->money('IDR'),
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
