@@ -15,26 +15,31 @@ use Filament\Tables\Table;
 
 class IngredientsRelationManager extends RelationManager
 {
-    protected static string $relationship = 'menuIngredients';
+    protected static string $relationship = "menuIngredients";
 
-    protected static ?string $title = 'Resep (Bahan)';
+    protected static ?string $title = "Resep (Bahan)";
 
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-            Select::make('ingredient_id')
-                ->label('Bahan')
-                ->relationship('ingredient', 'name')
+            Select::make("ingredient_id")
+                ->label("Bahan")
+                ->relationship("ingredient", "name")
                 ->required()
                 ->searchable()
                 ->preload()
-                ->getOptionLabelFromRecordUsing(fn ($record) => $record->name.' ('.$record->unit.')'),
-            TextInput::make('quantity_used')
-                ->label('Jumlah per Porsi')
+                ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".$record->unit.")"),
+            TextInput::make("quantity_used")
+                ->label("Jumlah per Porsi")
                 ->required()
                 ->numeric()
                 ->minValue(0.01)
                 ->step(0.01),
+            Select::make("unit_id")
+                ->label("Satuan")
+                ->relationship("unit", "name")
+                ->searchable()
+                ->preload(),
         ]);
     }
 
@@ -42,20 +47,20 @@ class IngredientsRelationManager extends RelationManager
     {
         return $table
             ->columns([
-                TextColumn::make('ingredient.name')
-                    ->label('Bahan')
+                TextColumn::make("ingredient.name")
+                    ->label("Bahan")
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('quantity_used')
-                    ->label('Jumlah/Porsi')
+                TextColumn::make("quantity_used")
+                    ->label("Jumlah/Porsi")
                     ->sortable()
-                    ->suffix(fn ($record) => ' '.($record->ingredient->unit ?? '')),
-                TextColumn::make('ingredient.total_stock')
-                    ->label('Stok Tersedia')
+                    ->formatStateUsing(fn ($state, $record) => $state . " " . ($record->unit?->abbreviation ?? "")),
+                TextColumn::make("ingredient.total_stock")
+                    ->label("Stok Tersedia")
                     ->getStateUsing(fn ($record) => number_format($record->ingredient?->getTotalStock() ?? 0, 2))
-                    ->suffix(fn ($record) => ' '.($record->ingredient->unit ?? ''))
+                    ->suffix(fn ($record) => " ".($record->ingredient->unit ?? ""))
                     ->badge()
-                    ->color(fn ($record) => ($record->ingredient?->getTotalStock() ?? 0) < (float) ($record->ingredient->low_stock_threshold ?? 0) ? 'danger' : 'success'),
+                    ->color(fn ($record) => ($record->ingredient?->getTotalStock() ?? 0) < (float) ($record->ingredient->low_stock_threshold ?? 0) ? "danger" : "success"),
             ])
             ->headerActions([
                 CreateAction::make(),
@@ -69,8 +74,8 @@ class IngredientsRelationManager extends RelationManager
                         if ($menu->menuIngredients()->count() <= 1) {
                             Notification::make()
                                 ->danger()
-                                ->title('Bahan terakhir tidak dapat dihapus')
-                                ->body('Setiap menu minimal harus memiliki satu bahan baku.')
+                                ->title("Bahan terakhir tidak dapat dihapus")
+                                ->body("Setiap menu minimal harus memiliki satu bahan baku.")
                                 ->send();
                             $action->cancel();
                         }

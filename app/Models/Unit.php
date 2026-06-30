@@ -8,15 +8,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Unit extends Model
 {
-    protected $fillable = ['name', 'abbreviation', 'unit_type', 'base_unit_id', 'conversion_factor'];
+    protected $fillable = ["name", "abbreviation", "unit_type", "base_unit_id", "conversion_factor"];
 
     public function baseUnit(): BelongsTo
     {
-        return $this->belongsTo(self::class, 'base_unit_id');
+        return $this->belongsTo(self::class, "base_unit_id");
     }
 
     public function subUnits(): HasMany
     {
-        return $this->hasMany(self::class, 'base_unit_id');
+        return $this->hasMany(self::class, "base_unit_id");
     }
 }

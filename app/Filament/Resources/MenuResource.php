@@ -31,113 +31,121 @@ class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-document-text';
+    protected static string|\BackedEnum|null $navigationIcon = "heroicon-o-document-text";
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Menu';
+    protected static string|\UnitEnum|null $navigationGroup = "Menu";
 
-    protected static ?string $navigationLabel = 'Menu';
+    protected static ?string $navigationLabel = "Menu";
 
     protected static ?int $navigationSort = 1;
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static ?string $slug = 'menu';
+    protected static ?string $slug = "menu";
 
-    protected static ?string $breadcrumb = 'Menu';
+    protected static ?string $breadcrumb = "Menu";
 
-    protected static ?string $pluralLabel = 'Menu';
+    protected static ?string $pluralLabel = "Menu";
 
     public static function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('name')
-                ->label('Nama Menu')
+            TextInput::make("name")
+                ->label("Nama Menu")
                 ->required()
                 ->maxLength(255)
                 ->live(onBlur: true)
                 ->extraInputAttributes(TextInputHelper::string()),
-            Select::make('category_id')
-                ->label('Kategori Menu')
-                ->relationship('category', 'name')
+            Select::make("category_id")
+                ->label("Kategori Menu")
+                ->relationship("category", "name")
                 ->required()
                 ->searchable()
                 ->preload()
-                ->placeholder('Pilih Kategori Menu')
+                ->placeholder("Pilih Kategori Menu")
                 ->createOptionForm([
-                    TextInput::make('name')
-                        ->label('Kategori Menu')
+                    TextInput::make("name")
+                        ->label("Kategori Menu")
                         ->required(),
                 ])
-                ->createOptionAction(fn (Action $action) => $action->label('+ Kategori Baru')),
-            FileUpload::make('image')
-                ->label('Gambar Menu')
-                ->directory('menus/')
-                ->disk('public')
-                ->imagePreviewHeight('200')
-                ->placeholder('Pilih gambar...')
-                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                ->createOptionAction(fn (Action $action) => $action->label("+ Kategori Baru")),
+            FileUpload::make("image")
+                ->label("Gambar Menu")
+                ->directory("menus/")
+                ->disk("public")
+                ->imagePreviewHeight("200")
+                ->placeholder("Pilih gambar...")
+                ->acceptedFileTypes(["image/jpeg", "image/png", "image/webp"])
                 ->maxSize(5120)
                 ->nullable()
                 ->saveUploadedFileUsing(function ($file) {
                     return app(MenuImageService::class)->convertAndStore($file);
                 }),
-            TextInput::make('price')
-                ->label('Harga')
+            TextInput::make("price")
+                ->label("Harga")
                 ->required()
-                ->type('text')
+                ->type("text")
                 ->minValue(0.01)
-                ->stripCharacters('.')
+                ->stripCharacters(".")
                 ->extraInputAttributes(NumberInputHelper::integer())
-                ->prefix('Rp'),
-            Toggle::make('is_available')
-                ->label('Tersedia')
+                ->prefix("Rp"),
+            Toggle::make("is_available")
+                ->label("Tersedia")
                 ->default(true)
                 ->inline(false),
-            TextInput::make('student_price')
-                ->label('Diskon Mahasiswa')
-                ->type('text')
+            TextInput::make("student_price")
+                ->label("Diskon Mahasiswa")
+                ->type("text")
                 ->minValue(0)
                 ->rules([
                     fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
-                        $price = (int) str_replace('.', '', $get('price') ?? '0');
-                        $studentPrice = (int) str_replace('.', '', $value ?? '0');
+                        $price = (int) str_replace(".", "", $get("price") ?? "0");
+                        $studentPrice = (int) str_replace(".", "", $value ?? "0");
                         if ($studentPrice > $price) {
-                            $fail('Diskon mahasiswa tidak boleh lebih besar dari harga menu (Rp '.number_format($price, 0, ',', '.').').');
+                            $fail("Diskon mahasiswa tidak boleh lebih besar dari harga menu (Rp ".number_format($price, 0, ",", ".").").");
                         }
                     },
                 ])
-                ->stripCharacters('.')
+                ->stripCharacters(".")
                 ->extraInputAttributes(NumberInputHelper::integer())
-                ->prefix('Rp')
-                ->placeholder('Kosongkan jika tidak ada'),
-            Repeater::make('menuIngredients')
-                ->relationship('menuIngredients')
-                ->label('Resep Menu')
-                ->addActionLabel('+ Tambah Bahan')
+                ->prefix("Rp")
+                ->placeholder("Kosongkan jika tidak ada"),
+            Repeater::make("menuIngredients")
+                ->relationship("menuIngredients")
+                ->label("Resep Menu")
+                ->addActionLabel("+ Tambah Bahan")
                 ->columnSpanFull()
                 ->minItems(1)
                 ->required()
                 ->schema([
-                    Select::make('ingredient_id')
-                        ->label('Bahan Baku')
-                        ->relationship('ingredient', 'name')
+                    Select::make("ingredient_id")
+                        ->label("Bahan Baku")
+                        ->relationship("ingredient", "name")
                         ->required()
                         ->searchable()
                         ->preload()
                         ->live()
-                        ->placeholder('Pilih bahan baku...')
-                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name.' ('.$record->unit.')'),
-                    TextInput::make('quantity_used')
-                        ->label('Jumlah per Porsi')
+                        ->placeholder("Pilih bahan baku...")
+                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".$record->unit.")"),
+                    TextInput::make("quantity_used")
+                        ->label("Jumlah per Porsi")
                         ->required()
-                        ->type('text')
+                        ->type("text")
                         ->minValue(0.01)
-                        ->stripCharacters('.')
+                        ->stripCharacters(".")
                         ->extraInputAttributes(NumberInputHelper::decimal())
-                        ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                        ->suffix(fn (Get $get): ?string => $get('ingredient_id')
-                            ? ' '.(Ingredient::find($get('ingredient_id'))?->unit ?? '')
+                        ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(",", ".", $state) : $state)
+                        ->suffix(fn (Get $get): ?string => $get("ingredient_id")
+                            ? " ".(Ingredient::find($get("ingredient_id"))?->unit ?? "")
                             : null),
+                    Select::make("unit_id")
+                        ->label("Satuan")
+                        ->relationship("unit", "name")
+                        ->searchable()
+                        ->preload()
+                        ->default(fn (Get $get, ?\App\Models\MenuIngredient $record) =>
+                            $record ? $record->unit_id : null
+                        ),
                 ]),
         ]);
     }
@@ -145,49 +153,49 @@ class MenuResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->searchPlaceholder('Cari Nama Menu')
+            ->searchPlaceholder("Cari Nama Menu")
             ->columns([
-                TextColumn::make('name')
-                    ->label('Nama Menu')
+                TextColumn::make("name")
+                    ->label("Nama Menu")
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('category.name')
-                    ->label('Kategori Menu')
+                TextColumn::make("category.name")
+                    ->label("Kategori Menu")
                     ->sortable()
                     ->searchable(),
-                TextColumn::make('price')
-                    ->label('Harga')
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                TextColumn::make("price")
+                    ->label("Harga")
+                    ->formatStateUsing(fn ($state) => "Rp".number_format($state, 0, ",", "."))
                     ->sortable(),
-                TextColumn::make('student_price')
-                    ->label('Diskon Mahasiswa')
-                    ->formatStateUsing(fn ($state) => $state ? 'Rp'.number_format($state, 0, ',', '.') : '-')
+                TextColumn::make("student_price")
+                    ->label("Diskon Mahasiswa")
+                    ->formatStateUsing(fn ($state) => $state ? "Rp".number_format($state, 0, ",", ".") : "-")
                     ->sortable(),
-                TextColumn::make('is_available')
-                    ->label('Tersedia')
+                TextColumn::make("is_available")
+                    ->label("Tersedia")
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state ? 'Tersedia' : 'Tidak')
-                    ->color(fn ($state) => $state ? 'success' : 'danger'),
+                    ->formatStateUsing(fn ($state) => $state ? "Tersedia" : "Tidak")
+                    ->color(fn ($state) => $state ? "success" : "danger"),
             ])
             ->filters([
-                SelectFilter::make('category')
-                    ->relationship('category', 'name')
-                    ->label('Kategori Menu')
-                    ->placeholder('Semua'),
-                TernaryFilter::make('is_available')
-                    ->label('Tersedia')
-                    ->placeholder('Semua')
-                    ->trueLabel('Tersedia')
-                    ->falseLabel('Tidak Tersedia'),
-                SelectFilter::make('ingredient')
-                    ->label('Bahan Baku')
-                    ->placeholder('Semua')
-                    ->options(Ingredient::pluck('name', 'id'))
+                SelectFilter::make("category")
+                    ->relationship("category", "name")
+                    ->label("Kategori Menu")
+                    ->placeholder("Semua"),
+                TernaryFilter::make("is_available")
+                    ->label("Tersedia")
+                    ->placeholder("Semua")
+                    ->trueLabel("Tersedia")
+                    ->falseLabel("Tidak Tersedia"),
+                SelectFilter::make("ingredient")
+                    ->label("Bahan Baku")
+                    ->placeholder("Semua")
+                    ->options(Ingredient::pluck("name", "id"))
                     ->searchable()
                     ->query(fn (Builder $query, array $data) =>
-                        $query->when($data['value'] ?? null, fn ($q, $id) =>
-                            $q->whereHas('menuIngredients', fn ($q) =>
-                                $q->where('ingredient_id', $id)
+                        $query->when($data["value"] ?? null, fn ($q, $id) =>
+                            $q->whereHas("menuIngredients", fn ($q) =>
+                                $q->where("ingredient_id", $id)
                             )
                         )
                     ),
@@ -198,13 +206,13 @@ class MenuResource extends Resource
                         if (! $record->menuIngredients()->exists()) {
                             Notification::make()
                                 ->warning()
-                                ->title('Belum ada bahan baku')
-                                ->body("Menu '{$record->name}' belum memiliki bahan baku. Tambahkan bahan baku terlebih dahulu agar stok dapat terdeduksi saat menu terjual.")
+                                ->title("Belum ada bahan baku")
+                                ->body("Menu \"{$record->name}\" belum memiliki bahan baku. Tambahkan bahan baku terlebih dahulu agar stok dapat terdeduksi saat menu terjual.")
                                 ->send();
                         }
                     }),
                 DeleteAction::make()
-                    ->modalDescription('Apakah Anda yakin ingin melakukan ini? Seluruh data pesanan menu ini tetap aman dan tidak berubah.'),
+                    ->modalDescription("Apakah Anda yakin ingin melakukan ini? Seluruh data pesanan menu ini tetap aman dan tidak berubah."),
             ]);
     }
 
@@ -218,7 +226,7 @@ class MenuResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListMenus::route('/'),
+            "index" => ListMenus::route("/"),
         ];
     }
 }
