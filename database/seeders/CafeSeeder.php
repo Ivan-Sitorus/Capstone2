@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\CafeTable;
 use App\Models\Category;
+use App\Models\Ingredient;
 use App\Models\Menu;
+use App\Models\MenuIngredient;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -272,6 +274,27 @@ class CafeSeeder extends Seeder
         // 11. StockAdjustments + StockMovements from Adjustments
         $this->seedStockAdjustments();
         $this->seedStockMovementsFromAdjustments();
+
+        // 12. Assign unit_id to ingredients
+        $unitMap = [];
+        foreach (['gram','kg','ml','liter','pcs','sachet','sdm','sdt'] as $u) {
+            $unitMap[$u] = \App\Models\Unit::where('name', $u)->value('id');
+        }
+        foreach (Ingredient::all() as $ingredient) {
+            if (isset($unitMap[$ingredient->unit])) {
+                Ingredient::withoutTimestamps(fn () =>
+                    $ingredient->update(['unit_id' => $unitMap[$ingredient->unit]])
+                );
+            }
+        }
+        // Assign unit_id to menu_ingredients (default to ingredient's unit)
+        foreach (MenuIngredient::with('ingredient')->get() as $mi) {
+            if ($mi->ingredient && $mi->ingredient->unit_id) {
+                MenuIngredient::withoutTimestamps(fn () =>
+                    $mi->update(['unit_id' => $mi->ingredient->unit_id])
+                );
+            }
+        }
     }
 
     // ──────────────────────────────────────────────────────────────

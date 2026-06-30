@@ -119,15 +119,15 @@ export default function RiwayatTable({
       <Card className="shadow-md overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-[#F8F9FA]">
-              <TableHead className="text-xs font-semibold text-[#6C757D]">ID Pesanan</TableHead>
-              <TableHead className="text-xs font-semibold text-[#6C757D]">Tanggal</TableHead>
-              <TableHead className="text-xs font-semibold text-[#6C757D]">Waktu</TableHead>
-              <TableHead className="text-xs font-semibold text-[#6C757D]">Total</TableHead>
-              <TableHead className="text-xs font-semibold text-[#6C757D]">Pembayaran</TableHead>
-              <TableHead className="text-xs font-semibold text-[#6C757D]">Kasir</TableHead>
-              <TableHead className="text-xs font-semibold text-[#6C757D]">Status</TableHead>
-              <TableHead className="text-xs font-semibold text-[#6C757D] text-right">Aksi</TableHead>
+            <TableRow style={{ background: '#F8F9FA' }}>
+              <TableHead className="text-xs font-semibold text-[#6C757D] uppercase" style={{ padding: '10px 16px', letterSpacing: 0.5 }}>ID Pesanan</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D] uppercase" style={{ padding: '10px 16px' }}>Tanggal</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D] uppercase" style={{ padding: '10px 16px' }}>Waktu</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D] uppercase" style={{ padding: '10px 16px' }}>Total</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D] uppercase" style={{ padding: '10px 16px' }}>Pembayaran</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D] uppercase" style={{ padding: '10px 16px' }}>Kasir</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D] uppercase" style={{ padding: '10px 16px' }}>Status</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D] uppercase text-right" style={{ padding: '10px 16px' }}>Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -141,7 +141,7 @@ export default function RiwayatTable({
               rows.map(order => {
                 const statusCfg = STATUS_CONFIG[order.status] ?? { variant: 'outline', label: order.status };
                 return (
-                  <TableRow key={order.id}>
+                  <TableRow key={order.id} className="hover:bg-[#F8F9FA]" style={{ borderBottom: '1px solid #E9ECEF' }}>
                     <TableCell className="font-semibold">{order.order_code}</TableCell>
                     <TableCell className="text-muted-foreground">{formatDate(order.created_at)}</TableCell>
                     <TableCell className="text-muted-foreground">{formatTime(order.created_at)}</TableCell>
