@@ -276,6 +276,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                             variant="outline"
                             size="sm"
                             onClick={() => onDetail(order.id)}
+                            className="bg-white border-[#E2E8F0] text-[#374151] rounded-lg px-3.5 py-1 text-[13px] h-auto"
                         >
                             Detail
                         </Button>

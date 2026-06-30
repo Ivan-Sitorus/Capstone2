@@ -119,15 +119,15 @@ export default function RiwayatTable({
       <Card className="shadow-md overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow className="bg-muted">
-              <TableHead className="text-xs font-semibold text-foreground">ID Pesanan</TableHead>
-              <TableHead className="text-xs font-semibold text-foreground">Tanggal</TableHead>
-              <TableHead className="text-xs font-semibold text-foreground">Waktu</TableHead>
-              <TableHead className="text-xs font-semibold text-foreground">Total</TableHead>
-              <TableHead className="text-xs font-semibold text-foreground">Pembayaran</TableHead>
-              <TableHead className="text-xs font-semibold text-foreground">Kasir</TableHead>
-              <TableHead className="text-xs font-semibold text-foreground">Status</TableHead>
-              <TableHead className="text-xs font-semibold text-foreground text-right">Aksi</TableHead>
+            <TableRow className="bg-[#F8F9FA]">
+              <TableHead className="text-xs font-semibold text-[#6C757D]">ID Pesanan</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D]">Tanggal</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D]">Waktu</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D]">Total</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D]">Pembayaran</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D]">Kasir</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D]">Status</TableHead>
+              <TableHead className="text-xs font-semibold text-[#6C757D] text-right">Aksi</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
