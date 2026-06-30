@@ -9,6 +9,7 @@ use App\Filament\Resources\MenuResource\RelationManagers\IngredientsRelationMana
 use App\Models\Ingredient;
 use App\Models\Menu;
 use App\Services\MenuImageService;
+use App\Services\UnitConversionService;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -140,7 +141,7 @@ class MenuResource extends Resource
                             : null),
                     Select::make("unit_id")
                         ->label("Satuan")
-                        ->relationship("unit", "name")
+                        ->options(fn (Get $get): array => static::getCompatibleUnitOptions($get("ingredient_id")))
                         ->searchable()
                         ->preload()
                         ->default(fn (Get $get, ?\App\Models\MenuIngredient $record) =>
@@ -228,5 +229,24 @@ class MenuResource extends Resource
         return [
             "index" => ListMenus::route("/"),
         ];
+    }
+
+    public static function getCompatibleUnitOptions(?int $ingredientId): array
+    {
+        if (! $ingredientId) {
+            return \App\Models\Unit::pluck('name', 'id')->toArray();
+        }
+        $ingredient = Ingredient::find($ingredientId);
+        if (! $ingredient || ! $ingredient->unit_id) {
+            return \App\Models\Unit::pluck('name', 'id')->toArray();
+        }
+        $unit = \App\Models\Unit::find($ingredient->unit_id);
+        if (! $unit) {
+            return \App\Models\Unit::pluck('name', 'id')->toArray();
+        }
+        return app(UnitConversionService::class)
+            ->getCompatibleUnits($unit)
+            ->pluck('name', 'id')
+            ->toArray();
     }
 }

@@ -8,6 +8,7 @@ use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Get;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -28,6 +29,7 @@ class IngredientsRelationManager extends RelationManager
                 ->required()
                 ->searchable()
                 ->preload()
+                ->live()
                 ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".$record->unit.")"),
             TextInput::make("quantity_used")
                 ->label("Jumlah per Porsi")
@@ -37,7 +39,7 @@ class IngredientsRelationManager extends RelationManager
                 ->step(0.01),
             Select::make("unit_id")
                 ->label("Satuan")
-                ->relationship("unit", "name")
+                ->options(fn (Get $get): array => self::getCompatibleUnitOptions($get("ingredient_id")))
                 ->searchable()
                 ->preload(),
         ]);
@@ -82,5 +84,24 @@ class IngredientsRelationManager extends RelationManager
                     }),
             ])
             ->toolbarActions([]);
+    }
+
+    private static function getCompatibleUnitOptions(?int $ingredientId): array
+    {
+        if (! $ingredientId) {
+            return \App\Models\Unit::pluck('name', 'id')->toArray();
+        }
+        $ingredient = \App\Models\Ingredient::find($ingredientId);
+        if (! $ingredient || ! $ingredient->unit_id) {
+            return \App\Models\Unit::pluck('name', 'id')->toArray();
+        }
+        $unit = \App\Models\Unit::find($ingredient->unit_id);
+        if (! $unit) {
+            return \App\Models\Unit::pluck('name', 'id')->toArray();
+        }
+        return app(\App\Services\UnitConversionService::class)
+            ->getCompatibleUnits($unit)
+            ->pluck('name', 'id')
+            ->toArray();
     }
 }
