@@ -5,9 +5,15 @@ namespace App\Filament\Resources\ReceivableResource\Pages;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Receivable;
 use Filament\Actions;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Infolists\Components\RepeatableEntry;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
-use Illuminate\Support\Facades\Log;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
 
 class ViewReceivable extends ViewRecord
 {
@@ -16,50 +22,76 @@ class ViewReceivable extends ViewRecord
     protected function getHeaderActions(): array
     {
         return [
-            Actions\Action::make('record_payment')
-                ->label('Record Payment')
+            Actions\Action::make('recordPayment')
+                ->label('Catat Pembayaran')
                 ->icon('heroicon-o-currency-dollar')
                 ->color('success')
-                ->visible(fn (Receivable $record): bool => $record->remaining_amount > 0)
-                ->modalSubmitActionLabel('Save Payment')
+                ->visible(fn (Receivable $record): bool => ! in_array($record->status, [Receivable::STATUS_PAID, Receivable::STATUS_CANCELLED]))
                 ->form([
-                    TextInput::make('payment_amount')
-                        ->label('Payment Amount')
-                        ->prefix('Rp')
+                    TextInput::make('amount')
+                        ->label('Jumlah Pembayaran')
                         ->required()
                         ->numeric()
                         ->minValue(1)
-                        ->maxValue(fn (Receivable $record): float => (float) $record->remaining_amount)
-                        ->helperText(fn (Receivable $record): string => 'Maximum: Rp '.number_format($record->remaining_amount, 0, ',', '.'))
-                        ->columnSpanFull(),
+                        ->maxValue(fn (Receivable $record): float => (float) $record->remaining_amount),
+                    Select::make('payment_method')
+                        ->label('Metode Pembayaran')
+                        ->options([
+                            'cash' => 'Tunai',
+                            'qris' => 'QRIS',
+                            'transfer' => 'Transfer',
+                        ])
+                        ->required(),
+                    DateTimePicker::make('payment_date')
+                        ->label('Tanggal Pembayaran')
+                        ->default(now()),
+                    Textarea::make('notes')
+                        ->label('Catatan'),
                 ])
                 ->action(function (Receivable $record, array $data): void {
-                    $paymentAmount = (float) $data['payment_amount'];
-                    $newPaidAmount = (float) $record->paid_amount + $paymentAmount;
-                    $remaining = (float) $record->amount - $newPaidAmount;
+                    $record->recordPayment(
+                        (float) $data['amount'],
+                        $data['payment_method'],
+                        auth()->id(),
+                        $data['notes'] ?? null
+                    );
 
-                    if ($remaining <= 0) {
-                        $newStatus = Receivable::STATUS_PAID;
-                        $newPaidAmount = (float) $record->amount;
-                    } elseif ($newPaidAmount > 0) {
-                        $newStatus = Receivable::STATUS_PARTIAL;
-                    } else {
-                        $newStatus = $record->status;
-                    }
-
-                    $record->update([
-                        'paid_amount' => $newPaidAmount,
-                        'status' => $newStatus,
-                    ]);
-
-                    Log::info('Payment recorded', [
-                        'receivable_id' => $record->id,
-                        'payment_amount' => $paymentAmount,
-                        'new_paid_amount' => $newPaidAmount,
-                        'new_status' => $newStatus,
-                    ]);
+                    $this->redirect(request()->header('Referer') ?? url()->previous());
                 }),
             Actions\DeleteAction::make(),
         ];
+    }
+
+    public function infolist(Schema $schema): Schema
+    {
+        return parent::infolist($schema)->components([
+            ...$schema->getComponents(),
+            Section::make('Riwayat Pembayaran')
+                ->schema([
+                    RepeatableEntry::make('payments')
+                        ->schema([
+                            TextEntry::make('payment_date')
+                                ->label('Tanggal')
+                                ->dateTime('d M Y, H:i:s'),
+                            TextEntry::make('amount')
+                                ->label('Jumlah')
+                                ->money('IDR'),
+                            TextEntry::make('payment_method')
+                                ->label('Metode')
+                                ->formatStateUsing(fn ($state) => match ($state) {
+                                    'cash' => 'Tunai',
+                                    'qris' => 'QRIS',
+                                    'transfer' => 'Transfer',
+                                    default => $state ?? '-',
+                                }),
+                            TextEntry::make('notes')
+                                ->label('Catatan')
+                                ->default('-'),
+                            TextEntry::make('recordedBy.name')
+                                ->label('Perekam')
+                                ->default('-'),
+                        ])->columns(5),
+                ]),
+        ]);
     }
 }
