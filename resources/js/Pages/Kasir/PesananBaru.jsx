@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { v7 as uuidv7 } from 'uuid';
-import { Search, X, Banknote, Lock, User, CircleCheck, Clock, Printer, Percent, MessageSquare } from 'lucide-react';
+import { Search, X, Banknote, Lock, User, CircleCheck, Clock, Printer, Percent, MessageSquare, ShoppingCart } from 'lucide-react';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -238,12 +239,78 @@ export default function PesananBaru({ categories, promotions }) {
                 </div>
 
                 {/* ══ CART PANEL ══ */}
-                <div className={cn(
-                    'flex flex-col bg-card min-h-0',
-                    isPortrait
-                        ? 'w-full border-t border-border'
-                        : 'w-[280px] shrink-0 border-l border-border',
-                )}>
+                {isPortrait ? (
+                    <>
+                        {/* Floating trigger button for mobile */}
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <button className="fixed bottom-20 right-4 z-50 flex items-center gap-2 bg-primary text-primary-foreground rounded-full px-4 py-3 shadow-lg cursor-pointer">
+                                    <ShoppingCart size={20} />
+                                    <span className="font-bold">Keranjang ({totalQty})</span>
+                                </button>
+                            </SheetTrigger>
+                            <SheetContent side="bottom" className="max-h-[85vh] p-0 rounded-t-2xl">
+                                <SheetHeader className="px-4 pt-4 pb-2 border-b border-border">
+                                    <SheetTitle className="flex items-center justify-between">
+                                        <span>Keranjang Pesanan</span>
+                                        <span className="rounded-full flex items-center justify-center text-xs font-bold bg-primary text-primary-foreground w-7 h-7">{totalQty}</span>
+                                    </SheetTitle>
+                                </SheetHeader>
+                                <div className="px-4 py-3 overflow-y-auto max-h-[40vh]">
+                                    {cartItems.length === 0 ? (
+                                        <p className="text-center text-sm text-muted-foreground/70 py-8">Keranjang kosong</p>
+                                    ) : (
+                                        cartItems.map(item => (
+                                            <SharedCartItem key={item.menuId} item={item}
+                                                onUpdate={(id, qty) => {
+                                                    const curr = cartItems.find(i => i.menuId === id);
+                                                    if (!curr) return;
+                                                    if (qty > curr.quantity) cashierIncrement(id);
+                                                    else if (qty < curr.quantity && qty > 0) cashierDecrement(id);
+                                                    else cashierRemoveItem(id);
+                                                }}
+                                                onRemove={(id) => cashierRemoveItem(id)}
+                                            />
+                                        ))
+                                    )}
+                                </div>
+                                <div className="px-4 py-3 border-t border-border bg-card">
+                                    <div className="flex justify-between mb-1">
+                                        <span className="text-sm text-muted-foreground">Subtotal</span>
+                                        <span className="text-sm font-medium">{formatRupiah(total)}</span>
+                                    </div>
+                                    {isMahasiswa && totalCashback > 0 && (
+                                        <div className="flex justify-between mb-1">
+                                            <span className="text-sm text-green-600">Cashback Mahasiswa</span>
+                                            <span className="text-sm font-semibold text-green-600">- {formatRupiah(totalCashback)}</span>
+                                        </div>
+                                    )}
+                                    <div className="flex justify-between py-2 border-t border-border mb-3">
+                                        <span className="text-base font-bold">Total</span>
+                                        <span className="text-base font-bold">{formatRupiah(grandTotal)}</span>
+                                    </div>
+                                    <div className="flex gap-2 overflow-x-auto pb-2">
+                                        {promotions?.filter(p => p.is_available).map(promo => (
+                                            <button key={promo.id} onClick={() => applyPromotion(promo)}
+                                                className={cn('shrink-0 px-3 py-1.5 rounded-full text-xs font-medium border transition-colors cursor-pointer',
+                                                    activePromo?.id === promo.id ? 'bg-primary text-primary-foreground border-primary' : 'bg-card text-muted-foreground border-border')}>
+                                                {promo.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                    <Button size="lg" disabled={cartItems.length === 0}
+                                        onClick={openModal}
+                                        className="w-full h-12 text-base font-bold flex items-center justify-between px-5 shadow-md mb-3">
+                                        <span>BAYAR</span><span className="text-lg">{formatRupiah(grandTotal)}</span>
+                                    </Button>
+                                </div>
+                            </SheetContent>
+                        </Sheet>
+                    </>
+                ) : (
+                    <div className={cn('flex flex-col bg-card min-h-0',
+                        isPortrait ? 'w-full border-t border-border' : 'w-[280px] shrink-0 border-l border-border',
+                    )}>
                     <div className={cn('flex items-center justify-between pt-4 pb-3 shrink-0', isPortrait ? 'px-4' : 'px-6')}>
                         <span className="text-base font-bold tracking-tight text-foreground">
                             Keranjang Pesanan
