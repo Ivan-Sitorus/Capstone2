@@ -133,7 +133,23 @@ class ManageBatches extends Page implements HasTable
                             ->default(false),
                     ])
                     ->using(function (array $data): IngredientBatch {
-                        return $this->record->batches()->create($data);
+                        $batch = $this->record->batches()->create($data);
+
+                        // Auto-record purchase stock movement
+                        StockMovement::create([
+                            'ingredient_id' => $batch->ingredient_id,
+                            'ingredient_batch_id' => $batch->id,
+                            'movement_type' => 'purchase',
+                            'source_type' => 'batch_addition',
+                            'quantity_before' => 0,
+                            'quantity_change' => $batch->quantity,
+                            'quantity_after' => $batch->quantity,
+                            'reference' => $batch->batch_code,
+                            'recorded_by' => auth()->id(),
+                            'notes' => 'Pembelian batch '.($batch->batch_code ?? $batch->id),
+                        ]);
+
+                        return $batch;
                     }),
             ])
             ->recordActions([

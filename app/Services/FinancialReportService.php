@@ -89,7 +89,7 @@ class FinancialReportService
 
     private function calcTotalIncome(Carbon $start, Carbon $end): float
     {
-        $fromOrders = (float) Order::where('is_paid', true)
+        $fromOrders = (float) Order::where('payment_method', '!=', 'bayar_nanti')
             ->whereBetween('created_at', [$start, $end])
             ->sum('total_amount');
 
@@ -118,7 +118,7 @@ class FinancialReportService
 
     private function calcIncomeBreakdown(Carbon $start, Carbon $end): array
     {
-        $ordersByPayment = Order::where('is_paid', true)
+        $ordersByPayment = Order::where('payment_method', '!=', 'bayar_nanti')
             ->whereBetween('created_at', [$start, $end])
             ->select('payment_method', DB::raw('SUM(total_amount) as total'), DB::raw('COUNT(*) as count'))
             ->groupBy('payment_method')
@@ -201,7 +201,7 @@ class FinancialReportService
 
     /**
      * Generate Income Statement + Cash Flow Statement for a date range.
-     * Cash basis: only orders with is_paid = true are recognized.
+     * Cash basis: orders with payment_method != 'bayar_nanti' are recognized.
      */
     private function generateRigid(array $params): ReportData
     {
@@ -211,7 +211,7 @@ class FinancialReportService
         $s = Carbon::parse($dateStart)->startOfDay();
         $e = Carbon::parse($dateEnd)->endOfDay();
 
-        $pendapatanOrders = (float) Order::where('is_paid', true)
+        $pendapatanOrders = (float) Order::where('payment_method', '!=', 'bayar_nanti')
             ->whereBetween('created_at', [$s, $e])
             ->sum('total_amount');
 
@@ -445,7 +445,7 @@ class FinancialReportService
     {
         $dateCol = sprintf($dateExpr, 'o.created_at');
 
-        $where = 'o.is_paid = true AND o.created_at BETWEEN ? AND ?';
+        $where = "(o.payment_method IS DISTINCT FROM 'bayar_nanti' OR o.payment_method IS NULL) AND o.created_at BETWEEN ? AND ?";
         $bindings[] = $from;
         $bindings[] = $to;
 

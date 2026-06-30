@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 
 class Receivable extends Model
 {
@@ -16,11 +17,14 @@ class Receivable extends Model
 
     public const STATUS_OVERDUE = 'overdue';
 
+    public const STATUS_CANCELLED = 'cancelled';
+
     public const STATUSES = [
         self::STATUS_PENDING,
         self::STATUS_PARTIAL,
         self::STATUS_PAID,
         self::STATUS_OVERDUE,
+        self::STATUS_CANCELLED,
     ];
 
     protected $fillable = [
@@ -56,37 +60,28 @@ class Receivable extends Model
             && $this->due_date->lessThan(now());
     }
 
-    /**
-     * Record a payment for this receivable.
-     * Automatically updates status based on paid_amount.
-     *
-     * @param  float  $amount  Payment amount to add
-     *
-     * @throws \InvalidArgumentException If receivable is already paid
-     */
-    public function recordPayment(float $amount): void
+    public function recordPayment(float $amount, ?string $method = null, ?int $recordedBy = null, ?string $notes = null): void
     {
-        if ($this->status === self::STATUS_PAID) {
-            throw new \InvalidArgumentException('Receivable is already fully paid');
+        if ($this->status === 'paid') {
+            throw new \RuntimeException('Receivable sudah lunas');
         }
-
-        if ($amount <= 0) {
-            throw new \InvalidArgumentException('Payment amount must be positive');
+        $remaining = $this->amount - $this->paid_amount;
+        if ($amount <= 0 || $amount > $remaining) {
+            throw new \InvalidArgumentException('Jumlah pembayaran tidak valid');
         }
-
-        $currentPaid = (float) $this->paid_amount;
-        $totalAmount = (float) $this->amount;
-        $newPaid = min($currentPaid + $amount, $totalAmount);
-
-        $this->paid_amount = $newPaid;
-
-        if ($newPaid >= $totalAmount) {
-            $this->status = self::STATUS_PAID;
-            $this->paid_amount = $totalAmount;
-        } elseif ($newPaid > 0) {
-            $this->status = self::STATUS_PARTIAL;
+        $this->payments()->create([
+            'amount' => $amount,
+            'payment_date' => now(),
+            'payment_method' => $method,
+            'notes' => $notes,
+            'recorded_by' => $recordedBy ?? Auth::id(),
+        ]);
+        $this->increment('paid_amount', $amount);
+        if ((float)$this->paid_amount >= (float)$this->amount) {
+            $this->status = 'paid';
+        } elseif ($this->paid_amount > 0) {
+            $this->status = 'partial';
         }
-
         $this->save();
     }
 
@@ -124,5 +119,15 @@ class Receivable extends Model
     public function payments(): HasMany
     {
         return $this->hasMany(ReceivablePayment::class);
+    }
+
+    public function cancel(?string $reason = null): void
+    {
+        if (in_array($this->status, ['paid', 'cancelled'])) {
+            throw new \RuntimeException('Receivable tidak dapat dibatalkan');
+        }
+        $this->status = self::STATUS_CANCELLED;
+        $this->notes = $reason ? trim($this->notes."\n[Dibatalkan: {$reason}]") : $this->notes;
+        $this->save();
     }
 }

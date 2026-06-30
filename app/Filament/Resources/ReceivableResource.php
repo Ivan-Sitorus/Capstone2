@@ -10,12 +10,9 @@ use App\Filament\Resources\ReceivableResource\Pages\ListReceivables;
 use App\Filament\Resources\ReceivableResource\Pages\ViewReceivable;
 use App\Models\Menu;
 use App\Models\Receivable;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Actions\Action;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -288,13 +285,17 @@ class ReceivableResource extends Resource
             ])
             ->recordActions([
                 ViewAction::make(),
-                EditAction::make()->modal(),
-                DeleteAction::make(),
+                Action::make('cancel')
+                    ->label('Batalkan')
+                    ->color('danger')
+                    ->icon('heroicon-o-x-circle')
+                    ->action(fn ($record, array $data) => $record->cancel($data['reason'] ?? null))
+                    ->form([Textarea::make('reason')->label('Alasan Pembatalan')->required()])
+                    ->visible(fn ($record) => !in_array($record->status, ['paid', 'cancelled']))
+                    ->requiresConfirmation(),
             ])
             ->toolbarActions([
-                BulkActionGroup::make([
-                    DeleteBulkAction::make(),
-                ]),
+
             ])
             ->defaultSort('due_date', 'asc');
     }

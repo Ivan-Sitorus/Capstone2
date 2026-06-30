@@ -171,6 +171,33 @@ class ViewStockHistory extends ListRecords
                     ->modalAutofocus(false)
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Tutup'),
+                Action::make('view_purchase')
+                    ->label('Detail')
+                    ->icon('heroicon-o-eye')
+                    ->modalHeading('Detail Pembelian Batch')
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->modalAutofocus(false)
+                    ->visible(fn ($record) => $record->movement_type === 'purchase')
+                    ->infolist(fn ($record) => [
+                        \Filament\Infolists\Components\Section::make('Informasi Batch')
+                            ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.batch_code')->label('Kode Batch')->copyable(),
+                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.received_at')->label('Waktu Diterima')->dateTime('d M Y, H:i:s'),
+                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.expiry_date')->label('Tanggal Kedaluwarsa')->date('d M Y')->default('-'),
+                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.quantity')->label('Quantity Awal')->formatStateUsing(fn ($state) => number_format((float)$state, 2)),
+                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.cost_per_unit')->label('Harga per Unit')->money('IDR')->default('-'),
+                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.status')->label('Status')->badge()
+                                    ->formatStateUsing(fn ($state) => $state === 'active' ? 'Aktif' : 'Nonaktif'),
+                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.allow_expired_usage')->label('Bisa Kedaluwarsa')->boolean(),
+                            ])->columns(3),
+                        \Filament\Infolists\Components\Section::make('Statistik Pemakaian')
+                            ->schema([
+                                \Filament\Infolists\Components\TextEntry::make('quantity_before')->label('Quantity Awal')->formatStateUsing(fn ($state) => number_format((float)$state, 2)),
+                                \Filament\Infolists\Components\TextEntry::make('quantity_change')->label('Perubahan')->formatStateUsing(fn ($state) => number_format((float)$state, 2)),
+                                \Filament\Infolists\Components\TextEntry::make('quantity_after')->label('Sisa')->formatStateUsing(fn ($state) => number_format((float)$state, 2)),
+                            ])->columns(3),
+                    ]),
             ])
             ->defaultSort('created_at', 'desc');
     }
