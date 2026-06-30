@@ -33,7 +33,6 @@ class QrisReviewTest extends TestCase
             'qris_status' => 'proof_submitted',
             'payment_method' => 'qris',
             'payment_proof' => 'qris-proofs/fake-proof.webp',
-            'is_paid' => false,
         ], $overrides));
     }
 
@@ -70,15 +69,15 @@ class QrisReviewTest extends TestCase
     }
 
     /**
-     * Rejecting a proof sets is_paid to false, saves reason, and deletes the proof file.
+     * Rejecting a proof sets qris_status to rejected, saves reason, and deletes the proof file.
      */
-    public function test_rejects_proof_and_sets_is_paid_false(): void
+    public function test_rejects_proof_and_sets_qris_rejected(): void
     {
         Event::fake([OrderQrisReviewed::class]);
         Storage::fake('public');
         Storage::disk('public')->put('qris-proofs/fake-proof.webp', 'fake-content');
 
-        $order = $this->createProofSubmittedOrder(['is_paid' => true]);
+        $order = $this->createProofSubmittedOrder();
 
         $reason = 'Gambar bukti tidak sesuai dengan nominal transaksi.';
         $response = $this->cashierActingAs()
@@ -91,7 +90,6 @@ class QrisReviewTest extends TestCase
 
         $order->refresh();
         $this->assertSame('rejected', $order->qris_status);
-        $this->assertFalse($order->is_paid, 'is_paid must be set to false on reject');
         $this->assertSame($reason, $order->rejection_note);
         $this->assertNull($order->payment_proof);
 
@@ -230,14 +228,14 @@ class QrisReviewTest extends TestCase
     }
 
     /**
-     * Accepting proof does not set is_paid to true (confirmation is separate).
+     * Accepting proof advances order to diproses.
      */
-    public function test_accept_does_not_set_is_paid_true(): void
+    public function test_accept_advances_order_status(): void
     {
         Event::fake([OrderQrisReviewed::class]);
         Storage::fake('public');
 
-        $order = $this->createProofSubmittedOrder(['is_paid' => false]);
+        $order = $this->createProofSubmittedOrder();
 
         $response = $this->cashierActingAs()
             ->postJson("/kasir/pesanan/{$order->id}/qris/accept");
@@ -245,7 +243,7 @@ class QrisReviewTest extends TestCase
         $response->assertOk();
         $order->refresh();
 
-        $this->assertFalse($order->is_paid, 'is_paid should remain false; payment confirmation is separate');
+        $this->assertSame(Order::STATUS_DIPROSES, $order->status);
         $this->assertSame('accepted', $order->qris_status);
     }
 

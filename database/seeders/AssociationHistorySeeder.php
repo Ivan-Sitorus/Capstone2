@@ -146,7 +146,6 @@ class AssociationHistorySeeder extends Seeder
                     'payment_method' => 'cash',
                     'total_amount' => $totalAmount,
                     'notes' => null,
-                    'is_paid' => true,
                     'created_at' => $orderDate->toDateTimeString(),
                     'updated_at' => $orderDate->toDateTimeString(),
                 ];

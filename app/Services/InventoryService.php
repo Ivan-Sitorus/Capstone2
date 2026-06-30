@@ -9,8 +9,11 @@ use App\Models\Menu;
 use App\Models\Order;
 use App\Models\StockMovement;
 use App\Models\StockAdjustment;
+use App\Models\Unit;
+use App\Services\UnitConversionService;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class InventoryService
 {
@@ -101,6 +104,7 @@ class InventoryService
                             requiredQuantity: $requiredQuantity,
                             context: array_merge($itemContext, [
                                 'notes' => "Order usage for menu {$menu->name}",
+                                'recipeUnitId' => $menuIngredient->unit_id,
                             ])
                         );
 
@@ -148,6 +152,16 @@ class InventoryService
                 foreach ($menu->menuIngredients as $menuIngredient) {
                     $ingredient = $menuIngredient->ingredient;
                     $requiredQuantity = (float) $menuIngredient->quantity_used * $quantity;
+
+                    // Unit conversion: if recipe unit differs from ingredient storage unit
+                    if ($menuIngredient->unit_id && $ingredient->unit_id && $menuIngredient->unit_id != $ingredient->unit_id) {
+                        $fromUnit = Unit::find($menuIngredient->unit_id);
+                        $toUnit = Unit::find($ingredient->unit_id);
+                        if ($fromUnit && $toUnit) {
+                            $requiredQuantity = app(UnitConversionService::class)->convert($requiredQuantity, $fromUnit, $toUnit);
+                        }
+                    }
+
                     $availableQuantity = $ingredient->getTotalStock();
 
                     if ($availableQuantity < $requiredQuantity) {
@@ -233,6 +247,7 @@ class InventoryService
             $deductionContext = array_merge($context, [
                 'stock_adjustment_id' => $adjustment->id,
                 'source_id' => (string) $adjustment->id,
+                'recipeUnitId' => $menuIngredient->unit_id,
             ]);
 
             $this->deductIngredientStock(
@@ -254,6 +269,19 @@ class InventoryService
     private function deductIngredientStock(int $ingredientId, float $requiredQuantity, array $context = []): array
     {
         $ingredient = Ingredient::findOrFail($ingredientId);
+
+        // Unit conversion: if recipe unit differs from ingredient storage unit
+        if (isset($context['recipeUnitId'])) {
+            if ($ingredient->unit_id && $context['recipeUnitId'] != $ingredient->unit_id) {
+                $fromUnit = Unit::find($context['recipeUnitId']);
+                $toUnit = Unit::find($ingredient->unit_id);
+                if ($fromUnit && $toUnit) {
+                    $converted = app(UnitConversionService::class)->convert($requiredQuantity, $fromUnit, $toUnit);
+                    Log::info("Unit conversion: {$requiredQuantity} {$fromUnit->name} → {$converted} {$toUnit->name} for ingredient {$ingredient->name}");
+                    $requiredQuantity = $converted;
+                }
+            }
+        }
 
         $query = IngredientBatch::where('ingredient_id', $ingredientId)
             ->where('quantity', '>', 0)

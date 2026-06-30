@@ -55,7 +55,6 @@ class FinancialReportTestDataSeeder extends Seeder
                 'order_code' => 'ORD-TDD-'.($i + 1),
                 'customer_name' => $names[$i],
                 'total_amount' => $amount,
-                'is_paid' => true,
                 'payment_method' => $i % 2 === 0 ? 'cash' : 'qris',
                 'status' => Order::STATUS_SELESAI,
                 'created_at' => $this->baseDate->copy()->addHours($i),

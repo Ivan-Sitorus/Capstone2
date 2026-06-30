@@ -23,8 +23,8 @@ class OrderSyncController extends Controller
      *
      * Idempotent: skips orders whose UUID already exists on the server.
      * Soft stock: deducts stock without validation — stock shortage does NOT fail the order.
-     * Kitchen bypass: order goes directly to 'selesai' with is_paid=true.
-     * No Receivable: is_paid is always true, so the Receivable boot trigger never fires.
+     * Kitchen bypass: order goes directly to 'selesai'.
+     * No Receivable: payment is direct, so the Receivable boot trigger never fires.
      */
     public function store(Request $request): JsonResponse
     {
@@ -125,7 +125,6 @@ class OrderSyncController extends Controller
                 'payment_method' => $orderData['paymentMethod'],
                 'customer_name'  => $orderData['customerName'] ?? null,
                 'status'         => Order::STATUS_SELESAI,
-                'is_paid'        => true,
                 'total_amount'   => 0,
             ]);
 

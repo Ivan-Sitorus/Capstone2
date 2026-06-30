@@ -52,7 +52,6 @@ class CashierPesananBaruController extends Controller
                     'payment_method' => $request->payment_method,
                     'customer_name' => $request->customer_name,
                     'status' => Order::STATUS_PENDING,
-                    'is_paid' => true,
                     'total_amount' => 0,
                 ]);
 

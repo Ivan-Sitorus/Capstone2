@@ -36,7 +36,7 @@ class CashierPesananAktifController extends Controller
             'all' => $orders->count(),
             'pending' => $orders->where('status', Order::STATUS_PENDING)->count(),
             'diproses' => $orders->where('status', Order::STATUS_DIPROSES)->count(),
-            'belum_bayar' => $orders->where('is_paid', false)->count(),
+            'belum_bayar' => $orders->where('payment_method', 'bayar_nanti')->count(),
         ];
 
         $ordersData = $orders->map(fn ($o) => [
@@ -51,7 +51,6 @@ class CashierPesananAktifController extends Controller
             'total_amount' => $o->total_amount,
             'payment_proof' => $o->payment_proof ? asset('storage/'.$o->payment_proof) : null,
             'rejection_note' => $o->rejection_note,
-            'is_paid' => (bool) $o->is_paid,
             'items' => $o->items->map(fn ($i) => [
                 'name' => $i->menu->name,
                 'quantity' => $i->quantity,

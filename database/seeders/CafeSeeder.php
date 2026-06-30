@@ -542,7 +542,6 @@ class CafeSeeder extends Seeder
                     } else {
                         $status = 'selesai';
                     }
-                    $isPaid = $paymentMethod !== 'bayar_nanti' || $status === 'selesai';
 
                     $completedAt = $status === 'selesai' ? (clone $timestamp)->addMinutes($rng->int(10, 45)) : null;
                     $processedAt = in_array($status, ['diproses', 'selesai']) ? (clone $timestamp)->addMinutes($rng->int(2, 10)) : null;
@@ -561,7 +560,6 @@ class CafeSeeder extends Seeder
                         'order_type' => $rng->pick(['qr', 'qr', 'qr', 'cashier', 'cashier']),
                         'total_amount' => $totalAmount,
                         'payment_method' => $paymentMethod,
-                        'is_paid' => $isPaid,
                         'uuid' => Str::uuid(),
                         'notes' => null,
                         'processed_by' => $status !== 'pending' ? $this->cashierIds[$rng->int(0, 2)] : null,
@@ -582,7 +580,7 @@ class CafeSeeder extends Seeder
         // Fetch back IDs
         $orderIds = DB::table('orders')->pluck('id', 'order_code')->all();
 
-        // Build return data: [order_id => [menu_name => qty, total_amount, payment_method, is_paid, cashier_id, created_at]]
+        // Build return data: [order_id => [menu_name => qty, total_amount, payment_method, cashier_id, created_at]]
         $result = [];
         foreach ($orderRows as $row) {
             $code = $row['order_code'];
@@ -591,7 +589,6 @@ class CafeSeeder extends Seeder
                 'items' => $orderMeta[$code],
                 'total_amount' => $row['total_amount'],
                 'payment_method' => $row['payment_method'],
-                'is_paid' => $row['is_paid'],
                 'cashier_id' => $row['cashier_id'],
                 'customer_name' => $row['customer_name'],
                 'created_at' => $row['created_at'],
@@ -641,9 +638,6 @@ class CafeSeeder extends Seeder
             if ($data['payment_method'] === 'bayar_nanti') {
                 continue;
             }
-            if (!$data['is_paid']) {
-                continue;
-            }
             $pm = $data['payment_method'];
             $gatewayMethod = $pm === 'qris' ? 'qris' : 'cash';
 
@@ -683,8 +677,8 @@ class CafeSeeder extends Seeder
                 'amount' => $data['total_amount'],
                 'invoice_date' => $createdAt->toDateString(),
                 'due_date' => $createdAt->copy()->addDays(30)->toDateString(),
-                'status' => $data['is_paid'] ? 'paid' : 'pending',
-                'paid_amount' => $data['is_paid'] ? $data['total_amount'] : 0,
+                'status' => 'pending',
+                'paid_amount' => 0,
                 'notes' => "Auto-generated from Order #{$data['order_code']}",
                 'created_at' => $data['created_at'],
                 'updated_at' => $data['created_at'],

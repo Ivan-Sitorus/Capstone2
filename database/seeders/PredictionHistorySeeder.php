@@ -110,7 +110,6 @@ class PredictionHistorySeeder extends Seeder
                     'payment_method' => 'cash',
                     'total_amount' => $subtotal,
                     'notes' => null,
-                    'is_paid' => true,
                     'created_at' => $ts,
                     'updated_at' => $ts,
                 ];

@@ -183,12 +183,12 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
                                     <Badge
                                         variant="outline"
                                         className={`text-xs font-semibold px-2 py-0.5 ${
-                                            order.is_paid
+                                            order.payment_method !== 'bayar_nanti'
                                                 ? 'bg-green-50 text-green-600'
                                                 : 'bg-yellow-50 text-yellow-600'
                                         }`}
                                     >
-                                        {order.is_paid ? 'Lunas' : 'Belum Lunas'}
+                                        {order.payment_method !== 'bayar_nanti' ? 'Lunas' : 'Belum Lunas'}
                                     </Badge>
                                 </div>
                             </div>

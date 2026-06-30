@@ -26,7 +26,6 @@ class KitchenController extends Controller
             'table_number' => $o->cafeTable?->table_number,
             'created_at' => $o->created_at->toISOString(),
             'total_amount' => $o->total_amount,
-            'is_paid' => (bool) $o->is_paid,
             'items' => $o->items->map(fn ($i) => [
                 'name' => $i->menu->name,
                 'quantity' => $i->quantity,

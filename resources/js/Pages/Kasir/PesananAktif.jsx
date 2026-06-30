@@ -70,7 +70,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         switch (activeTab) {
             case 'pending':     return localOrders.filter(o => o.status === 'pending');
             case 'diproses':    return localOrders.filter(o => o.status === 'diproses');
-            case 'belum_bayar': return localOrders.filter(o => o.is_paid === false);
+            case 'belum_bayar': return localOrders.filter(o => o.payment_method === 'bayar_nanti');
             default:            return localOrders;
         }
     })();

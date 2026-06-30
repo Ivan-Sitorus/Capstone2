@@ -181,7 +181,6 @@ class OrderPromotionIntegrationTest extends TestCase
         $order = Order::with('appliedPromotions')->latest('id')->firstOrFail();
 
         $this->assertSame(Order::STATUS_DIPROSES, $order->status);
-        $this->assertTrue($order->is_paid);
         $this->assertSame(14400.0, (float) $order->total_amount);
         $this->assertCount(1, $order->appliedPromotions);
 

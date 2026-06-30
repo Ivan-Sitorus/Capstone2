@@ -48,7 +48,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
 
     const isQrisPending  = order.status === 'pending' && order.payment_method === 'qris';
     const hasProof       = !!order.payment_proof;
-    const belumBayar     = order.is_paid === false;
+    const belumBayar     = order.payment_method === 'bayar_nanti';
     const ALL_STATUSES   = ['pending', 'diproses', 'selesai'];
     const statusIndex    = ALL_STATUSES.indexOf(order.status);
 

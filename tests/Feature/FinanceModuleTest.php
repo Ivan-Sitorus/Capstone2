@@ -24,7 +24,6 @@ class FinanceModuleTest extends TestCase
             'order_code' => 'ORD-FK-001',
             'customer_name' => 'Cust FK',
             'total_amount' => 50000,
-            'is_paid' => false,
             'payment_method' => 'cash',
             'status' => Order::STATUS_PENDING,
         ]);
@@ -56,7 +55,6 @@ class FinanceModuleTest extends TestCase
             'order_code' => 'ORD-BN-001',
             'customer_name' => 'Bayar Nanti Cust',
             'total_amount' => 75000,
-            'is_paid' => false,
             'payment_method' => 'bayar_nanti',
             'status' => Order::STATUS_PENDING,
         ]);
@@ -84,7 +82,6 @@ class FinanceModuleTest extends TestCase
             'order_code' => 'ORD-CASH-001',
             'customer_name' => 'Cash Cust',
             'total_amount' => 25000,
-            'is_paid' => true,
             'payment_method' => 'cash',
             'status' => Order::STATUS_DIPROSES,
         ]);
@@ -161,7 +158,6 @@ class FinanceModuleTest extends TestCase
             'order_code' => 'ORD-RPT-001',
             'customer_name' => 'Rpt Cash',
             'total_amount' => 100000,
-            'is_paid' => true,
             'payment_method' => 'cash',
             'status' => Order::STATUS_SELESAI,
         ]);
@@ -170,7 +166,6 @@ class FinanceModuleTest extends TestCase
             'order_code' => 'ORD-RPT-002',
             'customer_name' => 'Rpt QRIS',
             'total_amount' => 200000,
-            'is_paid' => true,
             'payment_method' => 'qris',
             'status' => Order::STATUS_SELESAI,
         ]);
@@ -179,7 +174,6 @@ class FinanceModuleTest extends TestCase
             'order_code' => 'ORD-RPT-003',
             'customer_name' => 'Rpt BN',
             'total_amount' => 50000,
-            'is_paid' => false,
             'payment_method' => 'bayar_nanti',
             'status' => Order::STATUS_PENDING,
         ]);
@@ -229,7 +223,7 @@ class FinanceModuleTest extends TestCase
         ]);
 
         $rawOrderIncome = (float) DB::table('orders')
-            ->where('is_paid', true)
+            ->whereNot('payment_method', 'bayar_nanti')
             ->whereBetween('created_at', [now()->subDay()->startOfDay(), now()->addDay()->endOfDay()])
             ->sum('total_amount');
 

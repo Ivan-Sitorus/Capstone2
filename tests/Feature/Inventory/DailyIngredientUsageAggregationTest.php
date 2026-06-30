@@ -185,7 +185,6 @@ class DailyIngredientUsageAggregationTest extends TestCase
             'order_type' => 'qr',
             'status' => Order::STATUS_PENDING,
             'payment_method' => 'cash',
-            'is_paid' => false,
             'total_amount' => 10000 * $quantity,
         ]);
 

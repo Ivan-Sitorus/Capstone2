@@ -12,7 +12,6 @@ class OrderFactory extends Factory
     public function definition(): array
     {
         $paymentMethod = fake()->randomElement(['cash', 'qris', 'bayar_nanti']);
-        $isPaid = $paymentMethod !== 'bayar_nanti';
 
         return [
             'order_code' => 'ORD-'.now()->format('Ymd').'-'.str_pad(self::$orderSequence++, 4, '0', STR_PAD_LEFT),
@@ -25,7 +24,6 @@ class OrderFactory extends Factory
             'payment_method' => $paymentMethod,
             'payment_proof' => null,
             'rejection_note' => null,
-            'is_paid' => $isPaid,
             'total_amount' => fake()->numberBetween(10000, 200000),
             'notes' => fake()->optional(0.3)->sentence(),
         ];
@@ -35,7 +33,6 @@ class OrderFactory extends Factory
     {
         return $this->state(fn (array $attrs) => [
             'status' => 'pending',
-            'is_paid' => false,
             'payment_method' => 'qris',
         ]);
     }
@@ -44,7 +41,6 @@ class OrderFactory extends Factory
     {
         return $this->state(fn (array $attrs) => [
             'status' => 'diproses',
-            'is_paid' => true,
         ]);
     }
 
@@ -52,7 +48,6 @@ class OrderFactory extends Factory
     {
         return $this->state(fn (array $attrs) => [
             'status' => 'selesai',
-            'is_paid' => true,
         ]);
     }
 
@@ -60,7 +55,6 @@ class OrderFactory extends Factory
     {
         return $this->state(fn (array $attrs) => [
             'payment_method' => 'bayar_nanti',
-            'is_paid' => false,
         ]);
     }
 }

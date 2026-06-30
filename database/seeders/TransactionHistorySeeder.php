@@ -129,7 +129,6 @@ class TransactionHistorySeeder extends Seeder
                     'payment_method' => 'cash',
                     'uuid' => \Illuminate\Support\Str::uuid(),
                     'notes' => null,
-                    'is_paid' => true,
                     'created_at' => $date->copy()->setTime(10, 0, 0)->toDateTimeString(),
                     'updated_at' => $date->copy()->setTime(10, 0, 0)->toDateTimeString(),
                 ];

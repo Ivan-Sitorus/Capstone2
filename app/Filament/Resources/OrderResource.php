@@ -76,10 +76,6 @@ class OrderResource extends Resource
                             default => '-',
                         }),
                     TextEntry::make($p.'total_amount')->label('Total')->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
-                    TextEntry::make($p.'is_paid')->label('Status Bayar')
-                        ->badge()
-                        ->color(fn (bool $state): string => $state ? 'success' : 'danger')
-                        ->formatStateUsing(fn (bool $state): string => $state ? 'Lunas' : 'Belum Bayar'),
                     TextEntry::make($p.'status')->label('Status Pesanan')
                         ->badge()
                         ->color(fn (string $state): string => match ($state) {
@@ -94,7 +90,7 @@ class OrderResource extends Resource
                             'selesai' => 'Selesai',
                             default => $state,
                         }),
-                ])->columns(4),
+                ])->columns(3),
 
             Section::make('Item Pesanan')
                 ->schema([
@@ -168,9 +164,6 @@ class OrderResource extends Resource
                         'selesai' => 'Selesai',
                         default => $state,
                     }),
-                IconColumn::make('is_paid')
-                    ->label('Lunas')
-                    ->boolean(),
                 TextColumn::make('created_at')
                     ->label('Waktu')
                     ->dateTime('d M Y, H:i:s')

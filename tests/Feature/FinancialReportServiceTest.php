@@ -40,7 +40,6 @@ class FinancialReportServiceTest extends TestCase
             'order_code' => 'ORD-FS-001',
             'customer_name' => 'Test Customer',
             'total_amount' => 100000,
-            'is_paid' => true,
             'payment_method' => 'cash',
             'status' => Order::STATUS_SELESAI,
         ]);
@@ -49,7 +48,6 @@ class FinancialReportServiceTest extends TestCase
             'order_code' => 'ORD-FS-002',
             'customer_name' => 'Test Customer 2',
             'total_amount' => 200000,
-            'is_paid' => true,
             'payment_method' => 'qris',
             'status' => Order::STATUS_SELESAI,
         ]);
@@ -126,7 +124,6 @@ class FinancialReportServiceTest extends TestCase
             'order_code' => 'ORD-RG-001',
             'customer_name' => 'Rigid Customer',
             'total_amount' => 300000,
-            'is_paid' => true,
             'payment_method' => 'cash',
             'status' => Order::STATUS_SELESAI,
         ]);
@@ -188,7 +185,6 @@ class FinancialReportServiceTest extends TestCase
             'order_code' => 'ORD-CS-001',
             'customer_name' => 'Custom Customer',
             'total_amount' => 45000,
-            'is_paid' => true,
             'payment_method' => 'cash',
             'status' => Order::STATUS_SELESAI,
         ]);
@@ -435,7 +431,6 @@ class FinancialReportServiceTest extends TestCase
             'order_code' => 'ORD-BND-001',
             'customer_name' => 'Boundary Start',
             'total_amount' => 100000,
-            'is_paid' => true,
             'payment_method' => 'cash',
             'status' => Order::STATUS_SELESAI,
             'created_at' => $dateStart,
@@ -445,7 +440,6 @@ class FinancialReportServiceTest extends TestCase
             'order_code' => 'ORD-BND-002',
             'customer_name' => 'Boundary End',
             'total_amount' => 50000,
-            'is_paid' => true,
             'payment_method' => 'cash',
             'status' => Order::STATUS_SELESAI,
             'created_at' => $dateEnd,
@@ -497,7 +491,6 @@ class FinancialReportServiceTest extends TestCase
             'order_code' => 'ORD-RT-001',
             'customer_name' => 'RT Customer',
             'total_amount' => 40000,
-            'is_paid' => true,
             'payment_method' => 'cash',
             'status' => Order::STATUS_SELESAI,
         ]);

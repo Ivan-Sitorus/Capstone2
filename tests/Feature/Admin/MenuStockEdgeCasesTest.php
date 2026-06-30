@@ -155,7 +155,6 @@ class MenuStockEdgeCasesTest extends TestCase
             'status' => 'pending',
             'order_type' => 'cashier',
             'payment_method' => 'cash',
-            'is_paid' => false,
             'total_amount' => 8000,
         ]);
 
@@ -240,7 +239,6 @@ class MenuStockEdgeCasesTest extends TestCase
             'status' => 'pending',
             'order_type' => 'cashier',
             'payment_method' => 'cash',
-            'is_paid' => false,
             'total_amount' => 56000,
         ]);
 

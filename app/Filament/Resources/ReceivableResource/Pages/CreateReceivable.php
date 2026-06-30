@@ -25,7 +25,6 @@ class CreateReceivable extends CreateRecord
                 'payment_method' => 'bayar_nanti',
                 'customer_name' => $data['customer_name'],
                 'status' => Order::STATUS_PENDING,
-                'is_paid' => false,
                 'total_amount' => 0,
             ]);
 

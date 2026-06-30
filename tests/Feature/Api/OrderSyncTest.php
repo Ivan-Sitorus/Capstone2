@@ -69,7 +69,7 @@ class OrderSyncTest extends TestCase
     }
 
     // ─────────────────────────────────────────────────────
-    //  2. Correct status: selesai + is_paid=true
+    //  2. Correct status: selesai + payment_method=cash
     // ─────────────────────────────────────────────────────
     public function test_sync_order_creates_correct_status(): void
     {
@@ -85,7 +85,6 @@ class OrderSyncTest extends TestCase
         $order = Order::where('uuid', $uuid)->firstOrFail();
 
         $this->assertEquals(Order::STATUS_SELESAI, $order->status);
-        $this->assertTrue($order->is_paid);
         $this->assertEquals('cash', $order->payment_method);
     }
 

@@ -78,8 +78,8 @@ class CashierOrderController extends Controller
             return response()->json(['message' => 'Transisi status tidak valid.'], 409);
         }
 
-        // Blok selesai jika belum bayar
-        if ($request->status === Order::STATUS_SELESAI && ! $order->is_paid) {
+        // Blok selesai jika bayar_nanti
+        if ($request->status === Order::STATUS_SELESAI && $order->payment_method === 'bayar_nanti') {
             return response()->json(['message' => 'Pesanan belum lunas. Konfirmasi pembayaran terlebih dahulu.'], 409);
         }
 
@@ -122,13 +122,12 @@ class CashierOrderController extends Controller
 
     public function confirmPayment(Request $request, Order $order)
     {
-        if ($order->is_paid) {
+        if ($order->payment_method !== 'bayar_nanti') {
             return response()->json(['message' => 'Sudah lunas.'], 409);
         }
         $request->validate(['payment_method' => 'required|in:cash,qris']);
 
         $order->update([
-            'is_paid' => true,
             'payment_method' => $request->payment_method,
             'cashier_id' => Auth::id(),
         ]);
@@ -300,7 +299,6 @@ class CashierOrderController extends Controller
 
             $order->update([
                 'qris_status'    => 'rejected',
-                'is_paid'        => false,
                 'payment_proof'  => null,
                 'rejection_note' => $request->reason,
             ]);
