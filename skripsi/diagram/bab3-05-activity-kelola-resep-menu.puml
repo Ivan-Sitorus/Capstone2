@@ -1,0 +1,32 @@
+@startuml
+|Admin|
+start
+:Membuka halaman daftar menu;
+:Memilih menu;
+:Membuka tab "Resep";
+:Memilih bahan baku dari dropdown;
+:Mengisi jumlah pemakaian per unit;
+:Mengklik "Simpan";
+|Sistem|
+:Menerima input resep;
+:Validasi bahan;
+if (Bahan sudah ada di resep?) then (tidak)
+  |Database|
+  :INSERT ke tabel menu_ingredients;
+  :Mengembalikan response sukses;
+  |Sistem|
+  :Mengirim notifikasi sukses;
+  |Admin|
+  :Menampilkan notifikasi;
+  :Resep terdaftar di tabel;
+else (ya)
+  |Sistem|
+  :Menampilkan pesan "Bahan sudah terdaftar";
+  |Admin|
+  :Melihat pesan error;
+  :Memilih bahan lain;
+  :Mengklik "Simpan" kembali;
+  -[hidden]-> Sistem
+endif
+stop
+@enduml

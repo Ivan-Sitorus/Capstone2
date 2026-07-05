@@ -10,6 +10,7 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
     const isUnlimitedStock = stock !== undefined && stock >= 999999;
     const isStockOut = !isUnlimitedStock && stock !== undefined && stock <= 0;
     const isUnavailable = isAdminDisabled || isStockOut;
+    const isCashier = variant === 'cashier';
 
     const displayPrice = menu.is_student_discount && menu.student_price
         ? Number(menu.student_price)
@@ -27,18 +28,18 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
                 'cursor-pointer transition-all duration-150 select-none relative',
                 'hover:shadow-md hover:-translate-y-0.5',
                 isCustomer && 'overflow-hidden rounded-[18px]',
-                isUnavailable && 'opacity-70 pointer-events-none',
+                isUnavailable && 'opacity-50 pointer-events-none grayscale',
             )}
             onClick={(e) => { e.stopPropagation(); handleAdd(e); }}
         >
             {isAdminDisabled && (
-                <span className="absolute top-2 right-2 z-10 bg-gray-500 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
-                    Tidak Tersedia
+                <span className="absolute top-2 right-2 z-10 bg-red-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
+                    Nonaktif
                 </span>
             )}
             {isStockOut && (
                 <span className="absolute top-2 right-2 z-10 bg-red-600 text-white text-[11px] font-bold px-2.5 py-1 rounded-full shadow">
-                    Stok Habis
+                    Habis
                 </span>
             )}
 
@@ -123,7 +124,7 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
                             onClick={(e) => { e.stopPropagation(); handleAdd(e); }}
                         >
                             <Plus size={14} />
-                            {isAdminDisabled ? 'Tidak Tersedia' : isStockOut ? 'Stok Habis' : 'Tambah'}
+                            {isAdminDisabled ? 'Nonaktif' : isStockOut ? 'Habis' : 'Tambah'}
                         </Button>
                     )
                 )}
@@ -138,7 +139,7 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
                         disabled={isUnavailable}
                         onClick={(e) => { e.stopPropagation(); handleAdd(e); }}
                     >
-                        {isAdminDisabled ? 'Tidak Tersedia' : isStockOut ? 'Stok Habis' : '+ Tambah'}
+                        {isAdminDisabled ? 'Nonaktif' : isStockOut ? 'Habis' : '+ Tambah'}
                     </Button>
                 </div>
             )}

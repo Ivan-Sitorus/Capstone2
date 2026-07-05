@@ -15,6 +15,29 @@ class InventoryServiceFefoTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_fefo_deducts_soonest_expiry_first(): void
+    {
+        $category = Category::create(['name' => 'Minuman Test FEFO', 'slug' => 'minuman-test-fefo', 'is_active' => true]);
+        $ingredient = Ingredient::create(['name' => 'Susu Test FEFO', 'unit' => 'ml', 'is_active' => true]);
+        $nearExpiry = IngredientBatch::create([
+            'ingredient_id' => $ingredient->id, 'quantity' => 80,
+            'expiry_date' => now()->addDays(3), 'received_at' => now()->subDays(3),
+        ]);
+        $farExpiry = IngredientBatch::create([
+            'ingredient_id' => $ingredient->id, 'quantity' => 80,
+            'expiry_date' => now()->addDays(30), 'received_at' => now()->subDays(1),
+        ]);
+        $menu = Menu::create(['category_id' => $category->id, 'name' => 'Menu Test FEFO', 'slug' => 'menu-test-fefo', 'price' => 10000]);
+        MenuIngredient::create(['menu_id' => $menu->id, 'ingredient_id' => $ingredient->id, 'quantity_used' => 30]);
+
+        app(InventoryService::class)->decreaseStockForOrder([
+            ['menu_id' => $menu->id, 'quantity' => 3],
+        ]);
+
+        $this->assertSame(0.0, (float) $nearExpiry->fresh()->quantity);
+        $this->assertSame(70.0, (float) $farExpiry->fresh()->quantity);
+    }
+
     public function test_decrease_stock_for_order_uses_fefo_batches_first(): void
     {
         $category = Category::create([

@@ -23,8 +23,7 @@ class CashierPesananBaruController extends Controller
     {
         // Cache 5 menit — menu jarang berubah, admin bisa clear cache jika update menu
         $categories = Cache::remember('menu_categories_cashier', 300, fn () => Category::with([
-            'menus' => fn ($q) => $q->where('is_available', true)
-                ->orderBy('name'),
+            'menus' => fn ($q) => $q->orderBy('name'),
         ])
             ->orderBy('name')
             ->get()

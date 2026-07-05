@@ -131,11 +131,9 @@ class MenuResource extends Resource
                     TextInput::make("quantity_used")
                         ->label("Jumlah per Porsi")
                         ->required()
-                        ->type("text")
+                        ->numeric()
                         ->minValue(0.01)
-                        ->stripCharacters(".")
-                        ->extraInputAttributes(NumberInputHelper::decimal())
-                        ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(",", ".", $state) : $state)
+                        ->step(0.01)
                         ->suffix(fn (Get $get): ?string => $get("ingredient_id")
                             ? " ".(Ingredient::find($get("ingredient_id"))?->unit ?? "")
                             : null),
@@ -171,6 +169,16 @@ class MenuResource extends Resource
                 TextColumn::make("student_price")
                     ->label("Diskon Mahasiswa")
                     ->formatStateUsing(fn ($state) => $state ? "Rp".number_format($state, 0, ",", ".") : "-")
+                    ->sortable(),
+                TextColumn::make("stock")
+                    ->label("Sisa Jual")
+                    ->formatStateUsing(fn ($state) => $state === null ? "-" : number_format($state, 0, ",", "."))
+                    ->color(fn ($state) => match (true) {
+                        $state === null || $state > 10 => "success",
+                        $state > 0 => "warning",
+                        default => "danger",
+                    })
+                    ->badge()
                     ->sortable(),
                 TextColumn::make("is_available")
                     ->label("Tersedia")

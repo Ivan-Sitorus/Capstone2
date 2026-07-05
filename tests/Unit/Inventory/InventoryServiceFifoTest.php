@@ -15,6 +15,53 @@ class InventoryServiceFifoTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_decrease_stock_for_order_deducts_ingredients_by_recipe(): void
+    {
+        $category = Category::create(['name' => 'Minuman', 'slug' => 'minuman', 'is_active' => true]);
+        $menu = Menu::create(['category_id' => $category->id, 'name' => 'Kopi Susu Test', 'slug' => 'kopi-susu-test', 'price' => 12000]);
+        $ingredient = Ingredient::create(['name' => 'Kopi Test', 'unit' => 'gram', 'is_active' => true]);
+        IngredientBatch::create([
+            'ingredient_id' => $ingredient->id, 'quantity' => 100,
+            'expiry_date' => now()->addYear(), 'received_at' => now(),
+        ]);
+        MenuIngredient::create([
+            'menu_id' => $menu->id, 'ingredient_id' => $ingredient->id, 'quantity_used' => 30,
+        ]);
+
+        $result = app(InventoryService::class)->decreaseStockForOrder([
+            ['menu_id' => $menu->id, 'quantity' => 2],
+        ]);
+
+        $this->assertTrue($result['success']);
+        $this->assertDatabaseHas('stock_movements', [
+            'ingredient_id' => $ingredient->id,
+            'movement_type' => 'sale',
+        ]);
+    }
+
+    public function test_fifo_deducts_oldest_batch_first(): void
+    {
+        $category = Category::create(['name' => 'Minuman Test FIFO', 'slug' => 'minuman-test-fifo', 'is_active' => true]);
+        $ingredient = Ingredient::create(['name' => 'Kopi Test FIFO', 'unit' => 'gram', 'is_active' => true, 'batch_mode' => 'fifo']);
+        $oldBatch = IngredientBatch::create([
+            'ingredient_id' => $ingredient->id, 'quantity' => 100,
+            'received_at' => now()->subDays(5), 'expiry_date' => now()->addYear(),
+        ]);
+        $newBatch = IngredientBatch::create([
+            'ingredient_id' => $ingredient->id, 'quantity' => 200,
+            'received_at' => now()->subDays(1), 'expiry_date' => now()->addDays(3),
+        ]);
+        $menu = Menu::create(['category_id' => $category->id, 'name' => 'Menu Test FIFO', 'slug' => 'menu-test-fifo', 'price' => 10000]);
+        MenuIngredient::create(['menu_id' => $menu->id, 'ingredient_id' => $ingredient->id, 'quantity_used' => 30]);
+
+        app(InventoryService::class)->decreaseStockForOrder([
+            ['menu_id' => $menu->id, 'quantity' => 2],
+        ]);
+
+        $this->assertSame(40.0, (float) $oldBatch->fresh()->quantity);
+        $this->assertSame(200.0, (float) $newBatch->fresh()->quantity);
+    }
+
     public function test_decrease_stock_for_order_uses_fifo_batches_first(): void
     {
         $category = Category::create([

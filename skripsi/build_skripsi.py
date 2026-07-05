@@ -45,6 +45,7 @@ CHAPTERS = [
     ('daftar-isi',   None),
     ('daftar-gambar', None),
     ('daftar-tabel', None),
+    ('daftar-rumus',  None),
     ('abstrak',      'abstrak.md'),
     ('abstract',     'abstract.md'),
     ('bab1',         'bab1-pendahuluan.md'),
@@ -703,6 +704,15 @@ def build_skripsi():
             p.add_run('\n(Klik kanan → Update Field untuk menampilkan Daftar Tabel)').font.size = Pt(10)
             continue
 
+        if chap_id == 'daftar-rumus':
+            doc.add_page_break()
+            doc.add_paragraph('DAFTAR RUMUS', style='Heading 1').alignment = WD_ALIGN_PARAGRAPH.CENTER
+            p = doc.add_paragraph()
+            p.paragraph_format.first_line_indent = Cm(0)
+            add_field_code(p, 'TOC \\c "Rumus" \\h \\z')
+            p.add_run('\n(Klik kanan → Update Field untuk menampilkan Daftar Rumus)').font.size = Pt(10)
+            continue
+
         if chap_id == 'daftar-pustaka':
             filepath = SKRIPSI_DIR / filename
             if filepath.exists():
@@ -770,37 +780,44 @@ def build_skripsi():
                 text = block['content'].strip()
                 text = text.replace('**', '')
                 if text:
-                    img_match = re.match(r'^!\[(.*)\]\((.+)\)$', text)
-                    if img_match:
-                        caption = img_match.group(1)
-                        img_path = str(SKRIPSI_DIR / img_match.group(2))
-                        add_image(doc, img_path, caption)
-                    elif re.match(r'^Tabel\s+\d+\.\d+\s+', text):
-                        add_caption_with_seq(doc, text, 'Table', 'TableCaption')
-                    elif re.match(r'^Gambar\s+\d+\.\d+\s+', text):
-                        add_caption_with_seq(doc, text, 'Figure', 'FigureCaption')
-                    elif re.match(r'^BAB\s+[IVXLCDM]+\s+', text):
-                        p = doc.add_paragraph('')
-                        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
-                        p.paragraph_format.first_line_indent = Cm(0)
-                        p.paragraph_format.left_indent = Cm(0)
-                        run = p.add_run(text)
-                        run.bold = True
-                        run.font.name = 'Times New Roman'
-                        run.font.size = Pt(12)
-                    elif re.match(r'^\d+[\.\)]\s', text):
-                        lines = text.split('\n')
-                        for item in lines:
-                            item = item.strip()
-                            if not item:
-                                continue
-                            sp = item.split(' ', 1)
-                            num_text = sp[0] + '	' + sp[1] if len(sp) > 1 else item
-                            p = add_formatted_paragraph(doc, num_text, para_style)
-                            p.paragraph_format.left_indent = Cm(1.25)
-                            p.paragraph_format.first_line_indent = Cm(-1.25)
-                    else:
-                        add_formatted_paragraph(doc, text, para_style)
+                    # Split multi-line text blocks into individual lines for processing
+                    for line in text.split('\n'):
+                        line = line.strip()
+                        if not line:
+                            continue
+                        img_match = re.match(r'^!\[(.*)\]\((.+)\)$', line)
+                        if img_match:
+                            caption = img_match.group(1)
+                            img_path = str(SKRIPSI_DIR / img_match.group(2))
+                            add_image(doc, img_path, caption)
+                        elif re.match(r'^Tabel\s+\d+\.\d+\s+', line):
+                            add_caption_with_seq(doc, line, 'Table', 'TableCaption')
+                        elif re.match(r'^Gambar\s+\d+\.\d+\s+', line):
+                            add_caption_with_seq(doc, line, 'Figure', 'FigureCaption')
+                        elif re.match(r'^Rumus\s+\d+\.\d+\s+', line):
+                            add_caption_with_seq(doc, line, 'Rumus', 'FigureCaption')
+                        elif re.match(r'^BAB\s+[IVXLCDM]+\s+', line):
+                            p = doc.add_paragraph('')
+                            p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+                            p.paragraph_format.first_line_indent = Cm(0)
+                            p.paragraph_format.left_indent = Cm(0)
+                            run = p.add_run(line)
+                            run.bold = True
+                            run.font.name = 'Times New Roman'
+                            run.font.size = Pt(12)
+                        elif re.match(r'^\d+[\.\)]\s', line):
+                            lines_list = line.split('\n')
+                            for item in lines_list:
+                                item = item.strip()
+                                if not item:
+                                    continue
+                                sp = item.split(' ', 1)
+                                num_text = sp[0] + '\t' + sp[1] if len(sp) > 1 else item
+                                p = add_formatted_paragraph(doc, num_text, para_style)
+                                p.paragraph_format.left_indent = Cm(1.25)
+                                p.paragraph_format.first_line_indent = Cm(-1.25)
+                        else:
+                            add_formatted_paragraph(doc, line, para_style)
 
             elif t == 'code':
                 code_text = block['content']

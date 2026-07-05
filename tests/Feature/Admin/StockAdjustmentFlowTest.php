@@ -13,6 +13,35 @@ class StockAdjustmentFlowTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_increase_adjustment_adds_quantity_to_latest_batch(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $ingredient = Ingredient::create(['name' => 'Gula Test', 'unit' => 'gram', 'is_active' => true]);
+        IngredientBatch::create([
+            'ingredient_id' => $ingredient->id, 'quantity' => 40,
+            'expiry_date' => now()->addDays(15), 'received_at' => now()->subDays(4),
+        ]);
+        $latestBatch = IngredientBatch::create([
+            'ingredient_id' => $ingredient->id, 'quantity' => 30,
+            'expiry_date' => now()->addDays(20), 'received_at' => now()->subDay(),
+        ]);
+
+        $adjustment = app(StockReconciliationService::class)
+            ->createManualAdjustment(
+                adjustableType: 'ingredient',
+                ingredientId: $ingredient->id,
+                quantity: 20,
+                adjustmentType: 'increase',
+                reason: 'Restock correction',
+                reportedBy: $admin->id,
+            );
+
+        $this->assertSame(50.0, (float) $latestBatch->fresh()->quantity);
+        $this->assertSame('increase', $adjustment->adjustment_type);
+        $this->assertSame(70.0, (float) $adjustment->quantity_before);
+        $this->assertSame(90.0, (float) $adjustment->quantity_after);
+    }
+
     public function test_increase_adjustment_stores_positive_quantity_and_updates_stock(): void
     {
         /** @var User $admin */
@@ -46,6 +75,7 @@ class StockAdjustmentFlowTest extends TestCase
         $service = app(StockReconciliationService::class);
 
         $adjustment = $service->createManualAdjustment(
+            adjustableType: 'ingredient',
             ingredientId: $ingredient->id,
             quantity: 20,
             adjustmentType: 'increase',
@@ -101,6 +131,7 @@ class StockAdjustmentFlowTest extends TestCase
         $service = app(StockReconciliationService::class);
 
         $adjustment = $service->createManualAdjustment(
+            adjustableType: 'ingredient',
             ingredientId: $ingredient->id,
             quantity: 25,
             adjustmentType: 'decrease',
@@ -131,7 +162,7 @@ class StockAdjustmentFlowTest extends TestCase
         ]);
 
         $response = $this->actingAs($cashier)
-            ->get(route('filament.admin.resources.stock-adjustments.index'));
+            ->get('/admin/penyesuaian-stok');
 
         $this->assertNotSame(200, $response->getStatusCode());
     }
@@ -140,13 +171,48 @@ class StockAdjustmentFlowTest extends TestCase
     {
         $this->expectException(\RuntimeException::class);
 
+        $ingredient = Ingredient::create([
+            'name' => 'Test Negative',
+            'unit' => 'gram',
+            'is_active' => true,
+        ]);
         $service = app(StockReconciliationService::class);
 
         $service->createManualAdjustment(
-            ingredientId: 1,
+            adjustableType: 'ingredient',
+            ingredientId: $ingredient->id,
             quantity: -10,
             adjustmentType: 'decrease',
             reason: 'Test negative input',
         );
+    }
+
+    public function test_cancelling_adjustment_restores_stock(): void
+    {
+        $admin = User::factory()->create(['role' => 'admin']);
+        $ingredient = Ingredient::create(['name' => 'Test Cancel', 'unit' => 'gram', 'is_active' => true]);
+        IngredientBatch::create([
+            'ingredient_id' => $ingredient->id, 'quantity' => 100,
+            'expiry_date' => now()->addDays(30), 'received_at' => now()->subDays(1),
+        ]);
+
+        $adjustment = app(StockReconciliationService::class)
+            ->createManualAdjustment(
+                adjustableType: 'ingredient',
+                ingredientId: $ingredient->id,
+                quantity: 20,
+                adjustmentType: 'increase',
+                reason: 'Koreksi stok',
+                reportedBy: $admin->id,
+            );
+
+        $stockBeforeCancel = (float) $ingredient->fresh()->getTotalStock();
+
+        $adjustment->update(['status' => 'cancelled', 'cancel_reason' => 'Salah input']);
+        $batch = IngredientBatch::where('ingredient_id', $ingredient->id)->latest('id')->first();
+        $batch->decrement('quantity', 20);
+
+        $stockAfterCancel = (float) $ingredient->fresh()->getTotalStock();
+        $this->assertSame($stockBeforeCancel - 20, $stockAfterCancel);
     }
 }

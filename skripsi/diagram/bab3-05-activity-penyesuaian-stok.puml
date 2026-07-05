@@ -1,0 +1,39 @@
+@startuml
+|Admin|
+start
+:Membuka halaman penyesuaian stok;
+:Memilih bahan baku;
+:Memilih tipe (increase / decrease);
+:Mengisi jumlah dan alasan;
+:Mengklik "Simpan";
+|Sistem|
+:Menerima input;
+:Validasi jumlah;
+if (Jumlah > 0?) then (ya)
+  if (Tipe increase?) then (ya)
+    |Database|
+    :INSERT stock_adjustments (increase);
+    :INSERT stock_movements;
+    :UPDATE ingredient_batches (tambah);
+  else (decrease)
+    :INSERT stock_adjustments (decrease);
+    :INSERT stock_movements;
+    :UPDATE ingredient_batches (kurang);
+  endif
+  :COMMIT;
+  |Sistem|
+  :Mengirim notifikasi sukses;
+  |Admin|
+  :Menampilkan notifikasi;
+  :Stok berubah;
+else (tidak)
+  |Sistem|
+  :Menampilkan pesan "Jumlah harus lebih dari 0";
+  |Admin|
+  :Melihat pesan error;
+  :Memperbaiki input;
+  :Mengklik "Simpan" kembali;
+  -[hidden]-> Sistem
+endif
+stop
+@enduml

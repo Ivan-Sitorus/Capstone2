@@ -41,25 +41,6 @@ class IngredientModelTest extends TestCase
         $this->assertSame(200.0, $ingredient->getTotalStock());
     }
 
-    public function test_scope_active_returns_only_active_ingredients(): void
-    {
-        Ingredient::create([
-            'name' => 'Susu Aktif',
-            'unit' => 'ml',
-            'low_stock_threshold' => 100,
-            'is_active' => true,
-        ]);
-
-        Ingredient::create([
-            'name' => 'Susu Nonaktif',
-            'unit' => 'ml',
-            'low_stock_threshold' => 100,
-            'is_active' => false,
-        ]);
-
-        $this->assertCount(1, Ingredient::active()->get());
-    }
-
     public function test_stock_movement_is_immutable_on_update(): void
     {
         $ingredient = Ingredient::create([

@@ -1,78 +1,57 @@
 %%{init: {"flowchart": {"nodeSpacing": 20, "rankSpacing": 25, "padding": 10}}}%%
 flowchart TB
-    START([Mulai]) --> CEK["Periksa idempotensi:
-StockMovement dengan
-order_id sudah ada?"]
-    CEK --> YA1{Sudah\ndiproses?}
-    YA1 -->|Ya| SKIP["Return: skipped
-proses dilewati"]
-    SKIP --> END_SKIP([Selesai])
-    YA1 -->|Tidak| LOAD["Muat data items
-dari order"]
+    START([Mulai]) --> CEK["Cek idempotensi:
+    StockMovement untuk
+    order ini sudah ada?"]
+    CEK --> SUDAH{Sudah\ndiproses?}
+    SUDAH -->|Ya| SKIP(["Selesai:
+    dilewati"])
+    SUDAH -->|Belum| ITEM{Item\nkosong?}
+    ITEM -->|Ya| SKIP
+    ITEM -->|Tidak| LOAD["Muat data menu
+    dan bahan baku resep"]
 
-    LOAD --> ITEM_KOSONG{Items\ntidak kosong?}
-    ITEM_KOSONG -->|Kosong| SKIP2["Return: skipped
-tidak ada item"]
-    ITEM_KOSONG -->|Ada| TRANS["Mulai transaksi
-database"]
-    SKIP2 --> END_SKIP
+    LOAD --> PROSES_ITEM["Ambil item
+    berikutnya"]
+    PROSES_ITEM --> ADA_ITEM{Item\nberikutnya?}
+    ADA_ITEM -->|Tidak| KOMIT(["Selesai:
+    stok berhasil dikurangi"])
 
-    TRANS --> PRELOAD["Pre-load semua menu
-beserta ingredients
-dan menuStock"]
-    PRELOAD --> ITEM_LOOP{Ada item\nberikutnya?}
-    ITEM_LOOP -->|Tidak| KOMIT["Menyimpan transaksi
-commit"]
-    KOMIT --> SUCCESS(["Selesai:
-Stok berhasil dikurangi"])
+    ADA_ITEM -->|Ya| RESEP{Resep\ntersedia?}
+    RESEP -->|Tidak| PROSES_ITEM
+    RESEP -->|Ya| BAHAN["Ambil bahan baku
+    berikutnya"]
 
-    ITEM_LOOP -->|Ya| CEK_MENU{Menu memiliki\nresep?}
+    BAHAN --> ADA_BAHAN{Bahan baku\nberikutnya?}
+    ADA_BAHAN -->|Tidak| PROSES_ITEM
+    ADA_BAHAN -->|Ya|     HITUNG["Hitung kebutuhan:
+    quantity_used
+    × jumlah pesanan"]
 
-    %% Jalur Resep
-    CEK_MENU -->|Ya| HITUNG["Hitung kebutuhan:
-quantity_used x
-qty pesanan"]
-    HITUNG --> LOCK_ING["Lock IngredientBatch
-dengan lockForUpdate
-ORDER BY id ASC"]
-    LOCK_ING --> VAL_ING["Re-validasi stok
-setelah mendapatkan lock"]
-    VAL_ING --> CUKUP_ING{Stok bahan baku\nmencukupi?}
-    CUKUP_ING -->|Tidak| ROLLBACK(["Rollback transaksi:
-Throw Exception"])
-    CUKUP_ING -->|Ya| SORT["Urutkan batch
-sesuai batch_mode
-FEFO: expiry_date ASC
-FIFO: received_at ASC"]
-    SORT --> LOOP_BATCH{Loop setiap batch:\nmasih perlu deduksi?}
-    LOOP_BATCH -->|Ya| DEDUCT["Hitung jumlah:
-min(qty, remaining)"]
-    DEDUCT --> UPDATE["Update quantity batch:
-batch save"]
-    UPDATE --> SM["Buat StockMovement:
-immutable record"]
-    SM --> LOOP_BATCH
-    LOOP_BATCH -->|Selesai| USAGE["RecordDailyIngredientUsage:
-upsert pemakaian harian"]
-    USAGE --> ITEM_LOOP
+    HITUNG --> MODE{Mode batch?}
+    MODE -->|FIFO| URUT_FIFO["Urut received_at ASC
+    (paling lama
+    duluan)"]
+    MODE -->|FEFO| URUT_FEFO["Urut expiry_date ASC
+    (paling cepat
+    kedaluwarsa duluan)"]
 
-    %% Jalur MenuStock
-    CEK_MENU -->|Tidak - punya MenuStock| LOCK_MS["Lock MenuStockBatch
-dengan lockForUpdate"]
-    LOCK_MS --> VAL_MS2["Re-validasi stok
-setelah mendapatkan lock"]
-    VAL_MS2 --> CUKUP_MS{Stok menu\nmencukupi?}
-    CUKUP_MS -->|Tidak| ROLLBACK
-    CUKUP_MS -->|Ya| DEDUCT_MS["MenuStockService:
-deductMenuStockBatch"]
-    DEDUCT_MS --> BROADCAST["Setelah commit:
-broadcast StockUpdated"]
-    BROADCAST --> ITEM_LOOP
+    URUT_FIFO --> SISA["Sisa kebutuhan:
+    requiredQuantity"]
+    URUT_FEFO --> SISA
+    SISA --> AMBIL_BATCH["Ambil batch
+    berikutnya"]
+    AMBIL_BATCH --> DEDUKSI["Kurangi:
+    min(qty_batch,
+    sisa)"]
+    DEDUKSI --> CATAT["Catat pergerakan
+    stok"]
+    CATAT --> SISAKURANG{"Sisa kebutuhan\nmasih ada?"}
+    SISAKURANG -->|Ya| AMBIL_BATCH
+    SISAKURANG -->|Tidak| ADA_BAHAN
 
     classDef start fill:#1a1a2e,color:#fff;
     classDef endNode fill:#1a1a2e,color:#fff;
     classDef decision fill:#f0f0f0,stroke:#333;
-    classDef rollback fill:#dc3545,color:#fff;
-    class START,SUCCESS,END_SKIP start;
-    class ROLLBACK rollback;
-    class YA1,ITEM_KOSONG,ITEM_LOOP,CEK_MENU,CUKUP_ING,LOOP_BATCH,CUKUP_MS decision;
+    class START,SKIP,KOMIT start;
+    class SUDAH,ITEM,ADA_ITEM,RESEP,MODE,SISAKURANG decision;

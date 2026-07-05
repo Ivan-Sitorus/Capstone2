@@ -62,7 +62,7 @@ class MenuWasteTest extends TestCase
         $adj = $result['adjustments'][0];
         $this->assertEquals('ingredient', $adj->adjustable_type);
         $this->assertEquals('decrease', $adj->adjustment_type);
-        $this->assertEquals('expired', $adj->waste_category);
+        $this->assertEquals('expired', $adj->category);
         $this->assertEquals(-2, (int) $adj->quantity);
         $this->assertEquals('Test waste', $adj->reason);
         $this->assertNotNull($adj->ingredient_id);
@@ -89,10 +89,16 @@ class MenuWasteTest extends TestCase
 
     public function test_waste_invalid_category_throws_exception(): void
     {
+        $category = Category::create(['name' => 'Minuman Invalid']);
+        $menu = Menu::create([
+            'category_id' => $category->id, 'name' => 'Kopi Invalid',
+            'description' => null, 'price' => 10000, 'image' => null,
+            'is_available' => true, 'is_student_discount' => false, 'student_price' => null,
+        ]);
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Kategori waste tidak valid');
         $service = app(InventoryService::class);
-        $service->wasteMenu(menuId: 1, quantity: 1, wasteCategory: 'invalid_category', reason: 'Test', recordedBy: null);
+        $service->wasteMenu(menuId: $menu->id, quantity: 1, wasteCategory: 'invalid_category', reason: 'Test', recordedBy: null);
     }
 
     public function test_waste_zero_quantity_throws_exception(): void

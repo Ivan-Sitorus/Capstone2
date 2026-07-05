@@ -146,6 +146,17 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         }
     }
 
+    async function handleCancel(order) {
+        if (!confirm('Batalkan pesanan ' + order.order_code + '?')) return;
+        setProcessing(true);
+        try {
+            await axios.patch(route('kasir.pesanan.cancel', {order: order.id}));
+            router.reload({ only: ['orders', 'counts'] });
+        } finally {
+            setProcessing(false);
+        }
+    }
+
     return (
         <><Head title="Pesanan Aktif | W9 Cafe" /><CashierLayout title="Pesanan Aktif" fullscreen>
             <div className="flex-1 overflow-y-auto overflow-x-hidden p-8 bg-muted min-w-0">
@@ -192,6 +203,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                             onOpenQrisModal={o => { setQrisOrder(o); setRejectNote(''); }}
                             onMarkDone={handleMarkDone}
                             onConfirmPayment={handleConfirmPayment}
+                            onCancel={handleCancel}
                         />
                     ))}
                 </div>

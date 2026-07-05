@@ -23,7 +23,7 @@ class Menu extends Model
         'unit',
     ];
 
-    protected $appends = ['image_url'];
+    protected $appends = ['image_url', 'stock'];
 
     protected function casts(): array
     {
@@ -45,7 +45,33 @@ class Menu extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image ? app(MenuImageService::class)->getImageUrl($this->image) : null;
+        return $this->image ? url('storage/' . $this->image) : null;
+    }
+
+    public function getStockAttribute(): ?float
+    {
+        $ingredients = $this->menuIngredients()->with('ingredient')->get();
+        if ($ingredients->isEmpty()) {
+            return null;
+        }
+        $minServings = null;
+        foreach ($ingredients as $mi) {
+            if (! $mi->ingredient) continue;
+            $totalStock = (float) $mi->ingredient->batches()
+                ->where('quantity', '>', 0)
+                ->where(function ($q) {
+                    $q->whereNull('expiry_date')
+                      ->orWhereDate('expiry_date', '>', now())
+                      ->orWhere('allow_expired_usage', true);
+                })
+                ->sum('quantity') ?: 0;
+            $needed = (float) $mi->quantity_used;
+            $servings = $needed > 0 ? (int) ($totalStock / $needed) : 0;
+            if ($minServings === null || $servings < $minServings) {
+                $minServings = $servings;
+            }
+        }
+        return $minServings ?? 0;
     }
 
     public function category()
