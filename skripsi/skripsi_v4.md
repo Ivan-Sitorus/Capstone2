@@ -172,10 +172,11 @@ seca ra  intuitif. Sistem mengimplementa sika n dua  mode deduksi batch ya itu F
 First-Out)  da n  FIFO  (First-In-First-Out),  denga n  meka nisme  penguncia n  da ta   untuk  mencegah
 konflik  pa da   transa ksi  bersamaa n.  Integra si  dengan  modul  tra nsa ksi  ka sir  dila kukan  seca ra
 otoma tis di ma na  deduksi stok terja di seba ga i ba gia n da ri pemrosesa n pesa na n.
-Pengujia n dila kukan denga n metode black box dan white box. Ha sil pengujia n black box
-terhada p  seluruh  modul  menunjukka n  skena rio  berha sil.  Pen gujia n white  box memva lida si
-kebena ra n a lgoritma  FIFO da n FEFO. Seluruh meka nisme deduksi stok dan pencata ta n pergera kan
-berja la n sesua i pera nca nga n.
+Pengujia n dila kukan denga n metode black box, white box, dan integration testing.
+Ha sil pengujia n black box terhada p seluruh modul menunjukka n skena rio berha sil. Pengujia n
+white box memva lida si kebena ra n a lgoritma FIFO da n FEFO. Pengujia n integrasi memva lida si
+konsistensi a lira n da ta a nta r modul. Seluruh meka nisme deduksi stok da n penca tata n
+pergera ka n berja la n sesua i pera nca nga n.
 Kata kunci: Sistem ma na jemen inventori, Point of Sale, La ra vel, Fila ment, FEFO, FIFO.
 
 
@@ -193,14 +194,14 @@ management. The system implements two batch deduction modes: FEFO (First-Expiry-
 and  FIFO  (First-In-First-Out),  with  data locking  mechanisms  to  prevent  conflicts  in  concurrent
 transactions.  Integration  with  the  cashier  transaction  module  is  achieved  automatically  where
 stock deduction occurs as part of order processing.
-Testing was conducted using black box and white box methods. Black box testing across
-all  modules  showed  scenarios  passed.  White  box  testing validated  FIFO  and  FEFO  algorithms.
+Testing was conducted using black box, white box, and integration testing methods.
+Black box testing across all modules showed scenarios passed. White box testing validated
+FIFO and FEFO algorithms. Integration testing validated data consistency across modules.
 All stock deduction mechanisms and movement recording functioned as designed.
 Keywords:  Inventory  management  system,  Point  of  Sale,  Laravel,  Filament,  FEFO,
 ## FIFO.
 
 
-## 12
 ## BAB I
 ## PENDAHULUAN
 
@@ -231,7 +232,6 @@ Berdasarkan latar belakang, dirumuskan permasalahan  sebagai berikut:
 - Bagaimana merancang dan membangun  sistem  manajemen  inventori pada
 POS W9 Cafe menggunakan Laravel dan Filament?
 
-## 13
 
 - Bagaimana  sistem  dapat menggunakan stok  berdasarkan prioritas masa
 kedaluwarsa (FEFO) dan urutan penerimaan (FIFO) untuk meminimalkan
@@ -240,6 +240,8 @@ pemborosan bahan baku?
 dan akurat setiap terjadi transaksi penjualan?
 - Bagaimana hasil pengujian sistem dalam meningkatkan akurasi pencatatan
 stok dan efisiensi operasional?
+- Bagaimana hasil pengujian integrasi antara modul inventori dan modul
+transaksi dalam memastikan konsistensi data stok?
 
 ## 1.3 Batasan Masalah
 - Sistem   berfokus   pada   manajemen   inventori   bahan   baku   dan   fitur
@@ -247,8 +249,9 @@ pendukung  (autentikasi, dashboard, kategori,   menu).  Penelitian  tidak
 mencakup laporan keuangan dan modul di luar konteks inventori.
 - Mode deduksi batch stok terbatas pada FEFO dan FIFO.
 - Sistem memerlukan  koneksi internet untuk diakses.
-- Pengujian terbatas pada black box dan white box yang mencakup verifikasi
-algoritma deduksi, konsistensi data, validasi fungsionalitas sistem.
+- Pengujian terbatas pada black box, white box, dan integration test yang
+mencakup verifikasi algoritma deduksi, konsistensi data antar modul, dan
+validasi fungsionalitas sistem.
 
 ## 1.4 Tujuan Penelitian
 - Mengimplementasikan  sistem  manajemen  inventori  pada  POS  W9 Cafe
@@ -261,9 +264,10 @@ dengan  setiap  transaksi  penjualan  serta  menyediakan  riwayat  perubahan
 stok yang dapat dilacak.
 - Melakukan  pengujian  sistem  untuk  memvalidasi  akurasi  pencatatan  stok
 dan efisiensi operasional.
+- Melakukan pengujian integrasi untuk memvalidasi konsistensi aliran data
+antar modul inventori dan modul transaksi.
 
 
-## 14
 
 ## 1.5 Manfaat Penelitian
 - Manfaat bagi Penulis:  Mendapatkan pengalaman dalam merancang sistem
@@ -281,8 +285,8 @@ studi literatur.
 antarmuka panel Filament.
 - Development: Implementasi  secara  bertahap  dalam  dua  iterasi,  yaitu  inti
 inventori dan panel administrasi.
-- Testing:  Pengujian black  box dan white  box untuk  memvalidasi  seluruh
-fungsionalitas sistem.
+- Testing:  Pengujian black box, white box, dan integration testing untuk
+memvalidasi seluruh fungsionalitas dan integrasi sistem.
 - Review:  Evaluasi  hasil  pengujian  dan  penyusunan  dokumentasi sistem
 sebagai bagian dari laporan tugas akhir.
 - Penyusunan  Laporan: Menyusun laporan  Tugas  Akhir  sebagai  bentuk
@@ -296,7 +300,6 @@ Berisi    latar    belakang,    rumusan    masalah,    batasan    masalah,    tu
 penelitian, manfaat penelitian, metodologi penelitian, dan sistematika penulisan.
 ## BAB II KAJIAN PUSTAKA
 
-## 15
 
 Membahas  penelitian  terdahulu,  metode  penelitian  yang  digunakan,  serta
 landasan teori yang meliputi konsep sistem manajemen inventori, algoritma FEFO
@@ -307,15 +310,14 @@ kebutuhan  fungsional  dan  non-fungsional,  perancangan  proses  dan  alur  sis
 perancangan   basis   data,   perancangan   arsitektur   aplikasi,   serta   perancangan
 antarmuka.
 ## BAB IV IMPLEMENTASI DAN PENGUJIAN
-Menyajikan  implementasi  panel  administrasi  serta  hasil  pengujian black
-box dan white box.
+Menyajikan  implementasi  panel  administrasi,  implementasi  algoritma  inti,
+serta hasil pengujian black box, white box, dan integration.
 ## BAB V PENUTUP
 Bab ini berisi kesimpulan dari perancangan, implementasi, dan pengujian
 yang telah dilakukan, serta saran pengembangan dan penelitian lebih  lanjut pada
 masa mendatang.
 
 
-## 16
 ## BAB II
 ## KAJIAN PUSTAKA
 
@@ -348,7 +350,6 @@ Penelitian oleh R. A. Farisi, A. R. Zayn, B. A. Nugroho, dan A. Heriadi,
 dalam  "Implementasi  Sistem  Informasi  Akademik  Pengelolaan   Tugas  Akhir
 Berbasis  Laravel  dan  Filament"  membahas  implementasi  Filament  sebagai  panel
 
-## 17
 
 administrasi   Laravel.   Persamaan   dengan   penelitian   ini   adalah   penggunaan
 Filament    untuk    antarmuka    administrasi,    sedangkan    perbedaannya    adalah
@@ -395,7 +396,6 @@ untuk pengelolaan data inventori.
 Metode  penelitian  menggunakan Agile yang  menekankan  kolaborasi  erat
 antara  pengembang  dan  pengguna,  serta  pengembangan  sistem  yang  dilakukan
 
-## 18
 
 secara  iteratif,  bertahap,  dan  fleksibel  agar  dapat  menyesuaikan  diri  dengan
 perubahan kebutuhan selama proses berlangsung.
@@ -423,7 +423,6 @@ kebutuhan tambahan. Pendekatan siklus berulang ini memungkinkan proyek terus
 disempurnakan secara adaptif [6].
 
 
-## 19
 
 ## 2.3 Landasan Teori
 ## 2.3.1 Sistem Manajemen Inventori
@@ -457,7 +456,6 @@ transaksi  penjualan  dan  mengelola  data  penjualan,  produk,  serta  stok  se
 terintegrasi [10].
 
 
-## 20
 
 ## 2.3.5 PHP
 PHP  (Hypertext  Preprocessor)  adalah  bahasa  pemrograman  skrip  yang
@@ -490,7 +488,6 @@ digunakan  untuk  memodelkan  hubungan  antara  bahan  baku  dengan batch stok,
 menu dengan resep, serta keterkaitan antara stok dengan pergerakannya.
 
 
-## 21
 
 ## 2.3.9 Activity Diagram
 Activity  diagram merupakan  salah  satu  diagram  dalam Unified  Modeling
@@ -520,8 +517,11 @@ dari  perspektif  pengembang  dengan  menguji  seluruh  bagian  kode  yang  dapa
 diuji,   bertujuan   untuk   menemukan   kesalahan   logis   pada source   code dan
 memastikan  bahwa  setiap fitur  berfungsi sesuai  dengan  yang  diharapkan [17].
 
+## 2.3.13 Pengujian Integration
+Pengujian integration merupakan level pengujian perangkat lunak yang berfokus pada interaksi antar modul atau komponen dalam sistem. Berbeda dengan pengujian unit yang menguji fungsi secara terisolasi, pengujian integration memvalidasi bahwa modul-modul yang telah diuji secara individual dapat bekerja sama dengan benar ketika diintegrasikan. Tujuannya adalah mendeteksi kesalahan pada antarmuka antar modul, aliran data, dan konsistensi state ketika terjadi pertukaran informasi antar komponen [18].
 
-## 22
+Pengujian integration dapat dilakukan dengan dua pendekatan. Pendekatan white box integration testing memverifikasi kebenaran aliran data antar modul melalui pengujian berbasis kode dengan memeriksa keadaan database sebelum dan sesudah transaksi. Pendekatan black box integration testing memverifikasi interaksi antar modul dari sisi pengguna melalui antarmuka sistem. Kombinasi kedua pendekatan ini memberikan keyakinan bahwa integrasi antar modul berjalan dengan benar baik dari sisi teknis maupun fungsional.
+
 ## BAB III
 ## PERANCANGAN SISTEM
 
@@ -541,7 +541,6 @@ resep   menu,   lalu   hasilnya   akan   dicatat   dan   ditampilkan   sebagai  
 penggunaan bahan baku.
 
 
-## 23
 
 3.2 Perancangan Proses dan Alur Sistem
 ## 3.2.1 Use Case Diagram
@@ -553,7 +552,6 @@ mengelola  data  inventori  (login,  kelola  bahan  baku, batch stok,  resep  me
 penyesuaian  stok), sedangkan sistem  secara  otomatis  menjalankan  deduksi  stok
 ketika pesanan diproses.
 
-## 24
 
 ## 3.2.2 Flowchart Proses Deduksi Stok
 
@@ -563,7 +561,6 @@ kasir.   Sistem   mendekomposisi   setiap   menu   berdasarkan   resep   pada   
 menu_ingredients,  kemudian mulai  mengurangi stok  dari IngredientBatch
 sesuai mode FEFO atau FIFO dalam satu proses yang konsisten.
 
-## 25
 
 
 ## 3.2.3 Activity Diagram
@@ -571,16 +568,13 @@ Activity  diagram merupakan  salah  satu  jenis  diagram  dalam Unified
 Modeling Language (UML) yang digunakan untuk menggambarkan alur aktivitas
 atau  proses  dalam  suatu  sistem.  Diagram  ini  menampilkan  urutan  kegiatan  dari
 awal hingga akhir melalui  aliran kontrol antar aktivitas [16].
-## 3
 
 
 Ga mba r 3.3 Activity diagram ta mba h ba ha n ba ku.
-## 4
 Gambar   3.3 memperlihatkan activity   diagram ketika   admin    ingin
 menambah  bahan  baku  baru  ke  dalam  sistem.  Pertama-tama,  admin  membuka
 halaman daftar bahan baku dan menekan tombol "Buat Bahan Baku". Sistem akan
 
-## 26
 
 menampilkan  formulir  yang  berisi input nama  bahan  baku,  pilihan  unit  satuan,
 dan  mode batch (FEFO  atau  FIFO).  Setelah  admin  mengisi  data  dan  menekan
@@ -594,7 +588,6 @@ menambah batch stok  untuk  suatu  bahan  baku.  Admin  memilih  bahan  baku  da
 daftar,  lalu  menekan  tombol  "Batch Stok" dan  kemudian  "Buat Batch". Sistem
 menampilkan  formulir batch yang  berisi input jumlah  stok,  tanggal  kedaluwarsa
 
-## 27
 
 (untuk mode FEFO) atau tanggal diterima (untuk mode FIFO), dan harga per unit.
 Setelah  admin  mengisi  data  dan  menekan  "Buat",  sistem  memvalidasi input dan
@@ -609,7 +602,6 @@ memilih bahan baku yang akan disesuaikan, kemudian memilih tipe penyesuaian
 (penambahan   atau   pengurangan)   serta   mengisi   jumlah   dan   alasan.   Setelah
 menekan   "Buat",   sistem   memvalidasi   bahwa   jumlah   lebih   besar   dari   nol,
 
-## 28
 
 kemudian  mencatat  penyesuaian  ke  tabel stock_adjustments dan  pergerakan
 stok  ke  tabel stock_movements,  serta  memperbarui  kuantitas  pada batch terkait
@@ -626,7 +618,6 @@ menekan  "Buat". Setiap  menu  wajib  punya  minimal  satu  bahan  baku. Sistem
 memvalidasi data menu. Jika data tidak valid, admin akan melihat pesan error dan
 memperbaiki input. Jika valid, sistem menyimpan data menu ke tabel  menus dan
 
-## 29
 
 relasi resep ke tabel menu_ingredients. Database mengembalikan respons sukses,
 dan sistem menampilkan pesan bahwa menu beserta resep berhasil  disimpan.
@@ -665,7 +656,6 @@ Kebutuhan  non-fungsional  berkaitan  dengan  kualitas  sistem  sebagaimana
 disajikan pada Tabel 3.2.
 3Ta bel 3.2 Kebutuha n non-fungsiona l
 
-## 30
 
 ## No Kode Parameter Target Verifikasi
 1 INV-NF01 Akurasi
@@ -704,7 +694,8 @@ batch
 ## 3.4 Perancangan Arsitektur Sistem
 ## 3.4.1 Arsitektur Umum
 Gambar 3.3 memperlihatkan arsitektur umum sistem yang terbagi menjadi
-dua  subsistem  utama,  yaitu  Sistem  Transaksi  dan  Sistem  Inventori.  Sistem
+tiga subsistem utama, yaitu Sistem Transaksi, Sistem Inventori, dan Sistem
+Data Mining.  Sistem
 Transaksi menangani proses pemesanan yang dilakukan oleh kasir dan pelanggan
 melalui antarmuka masing-masing,   yang   kemudian   diproses   oleh   Modul
 Transaksi.  Sistem  Inventori  mencakup  Panel  Admin  (Filament)  yang  digunakan
@@ -712,7 +703,6 @@ oleh  admin  untuk  mengelola  data  inventori,  serta business  logic inventori
 menangani seluruh logika pencatatan dan perubahan stok. Seluruh data disimpan
 dan dikelola pada PostgreSQL sebagai basis data utama.
 
-## 31
 
 
 11Ga mba r 3.7 Arsitektur umum keseluruha n sistem
@@ -727,9 +717,16 @@ Business  logic sistem  inventori kemudian  membaca  dan  menyimpan  data  ke
 PostgreSQL.
 Penelitian   ini   berfokus   pada   pengembangan sistem inventori yang
 mencakup  panel  admin  dan business  logic sistem  inventori,  sedangkan sistem
-transaksi merupakan modul yang sudah dikembangkan dalam penelitian terpisah.
+transaksi merupakan modul yang sudah dikembangkan dalam penelitian terpisah. Seluruh data disimpan dan dikelola pada PostgreSQL sebagai basis data utama, yang juga digunakan oleh modul Data Mining (pengembangan terpisah) untuk analisis pola penjualan dan prediksi bahan baku.
 
-## 32
+## 3.4.2 Arsitektur Detail Sistem Inventori
+Arsitektur detail sistem inventori menggambarkan lapisan-lapisan yang menyusun subsistem inventori secara lebih rinci. Sistem inventori terdiri dari lima lapisan yang saling terhubung.
+
+Lapisan pertama adalah **Lapisan Presentasi** yang terdiri dari Panel Admin Filament yang digunakan oleh admin untuk mengelola data inventori, serta halaman kasir (Inertia.js + React) yang menampilkan informasi menu dan stok kepada kasir. Lapisan kedua adalah **Lapisan Controller** yang terdiri dari CashierPesananBaruController dan CashierOrderController yang bertugas menerima permintaan dari pengguna dan mendelegasikannya ke lapisan service.
+
+Lapisan ketiga adalah **Lapisan Service (Business Logic)** yang merupakan inti dari sistem inventori. Lapisan ini terdiri dari InventoryService yang mengimplementasikan algoritma deduksi batch FEFO/FIFO, StockReconciliationService yang menangani logika penyesuaian stok dan pembatalannya, serta OrderPromotionService yang menangani perhitungan diskon. Lapisan keempat adalah **Lapisan Model (Data Access)** yang terdiri dari model Eloquent: Menu, Ingredient, IngredientBatch, StockMovement, StockAdjustment, dan DailyIngredientUsage. Model-model ini bertanggung jawab untuk membaca dan menulis data ke database.
+
+Lapisan kelima adalah **Database PostgreSQL** yang menyimpan seluruh data inventori. Alur data dimulai ketika pesanan masuk melalui Lapisan Presentasi, kemudian Controller mendelegasikan ke InventoryService. Service melakukan query ke IngredientBatch dengan urutan FEFO atau FIFO, mendeduksi stok dari batch yang sesuai, mencatat perubahan ke StockMovement, dan memperbarui DailyIngredientUsage. *(Diagram arsitektur detail akan dibuat dan disertakan pada lampiran)*.
 
 ## 3.5 Perancangan Basis Data
 ## 3.5.1 Entity Relationship Diagram
@@ -749,7 +746,6 @@ dijelaskan   secara   rinci   melalui   tabel-tabel   berikut   yang   mencakup 
 spesifikasi  teknis  penyimpanan  data  berdasarkan Entity  Relationship  Diagram
 ## (ERD).
 
-## 33
 
 4Ta bel 3.3 Struktur ta bel ingredients
 ## Kolom Tipe Keterangan
@@ -765,7 +761,6 @@ is_active BOOLEAN Status aktif
 deleted_at TIMESTAMP Soft delete
 created_at TIMESTAMP Waktu dibuat
 updated_at TIMESTAMP Waktu diperbarui
-## 5
 Ta bel 3.4 Struktur ta bel ingredient_ba tches
 ## Kolom Tipe Keterangan
 id BIGINT PK Primary key, auto-
@@ -785,7 +780,6 @@ increment
 menu_id BIGINT FK
 Foreign key ke menus
 
-## 34
 
 ingredient_id BIGINT FK Foreign key ke
 ingredients
@@ -825,7 +819,6 @@ updated_at TIMESTAMP Waktu diperbarui
 
 
 
-## 35
 
 8Ta bel 3.7 Struktur ta bel stock_movements
 ## Kolom Tipe Keterangan
@@ -859,7 +852,6 @@ Foreign key ke users
 created_at TIMESTAMP Waktu dicatat
 
 
-## 36
 ## BAB IV
 ## IMPLEMENTASI DAN PENGUJIAN
 
@@ -877,7 +869,6 @@ Halaman kategori menu menampilkan daftar kategori menu beserta jumlah
 menu   yang   termasuk   ke   dalam   kategori   tersebut.   Admin   dapat   melihat,
 menambah, mengedit, dan menghapus kategori sesuai kebutuhan.
 
-## 37
 
 14 Ga mba r 4.2 Hala ma n da fta r ka tegori
 
@@ -891,7 +882,6 @@ kategori,  harga, diskon khusus mahasiswa STIE  Totalwin, jumlah prediksi sisa
 jual, dan status ketersediaan. Admin dapat melihat dan mengelola data menu dari
 halaman ini.
 
-## 38
 
 
 Ga mba r 4.4 Ha la ma n da fta r menu
@@ -908,7 +898,6 @@ jika  status  tersedia  dimatikan,  maka  menu  tidak  akan  muncul  di  web  PO
 dan web self-order pelanggan.15
 
 
-## 39
 
 ## 4.1.4 Halaman Bahan Baku
 Halaman  bahan  baku   menampilkan  daftar  seluruh  bahan   baku  yang
@@ -926,7 +915,6 @@ deduksi  stok ketika  stok  berkurang  karena  pesanan.  Terdapat dua  mode  pri
 batch stok, yaitu  FEFO yang  memprioritaskan masa  kedaluwarsa, serta FIFO
 yang memprioritaskan waktu penerimaan batch stok. Khusus mode FEFO, batch
 
-## 40
 
 stok yang kedaluwarsa secara default tidak akan dipakai lagi oleh  sistem. Namun
 perilaku  sistem  ini  bisa  diubah  admin  untuk  setiap batch yang  akan  diinput
@@ -948,7 +936,6 @@ kedaluwarsa,  maka batch stok  akan  dianggap  habis  dan  akan  disembunyikan
 ketika  admin  pertama  kali  mengunjungi  halaman batch stok  untuk  bahan  baku
 tersebut.
 
-## 41
 
 
 Ga mba r 4.9 Admin mena nda i batch keda luwa rsa
@@ -964,7 +951,6 @@ dalam kondisi nyata masih layak pakai.
 Ga mba r 4.10 Form bua t batch stok ba ru
 
 
-## 42
 
 ## 4.1.6 Halaman Penyesuaian Stok
 Halaman penyesuaian  stok menampilkan daftar seluruh penyesuaian yang
@@ -981,7 +967,6 @@ meliputi catatan penyesuaian serta alasan pembatalan (jika dibatalkan).
 
 Ga mba r 4.12 Deta il penyesua ia n stok
 
-## 43
 
 Form penyesuaian  stok baru terdiri dari pemilihan jenis  (bahan baku atau
 menu), pemilihan bahan baku atau menu yang akan disesuaikan, tipe penyesuaian
@@ -998,7 +983,6 @@ dilakukan dengan membalikkan setiap perubahan pada batch terkait dan mencatat
 pergerakan  stok  baru  sebagai reversal.  Status  penyesuaian  berubah  menjadi
 "Dibatalkan" dan stok kembali seperti semula.
 
-## 44
 
 
 Ga mba r 4.14 Admin memba ta lka n penyesua ia n stok
@@ -1011,7 +995,6 @@ membantu admin dalam memantau tren penggunaan bahan baku.
 16Ga mba r 4.15 Ha la ma n riwa ya t stok
 
 
-## 45
 
 
 17Ga mba r 4.16 Ha la ma n deta il riwa ya t stok versi penyesua ia n
@@ -1026,7 +1009,190 @@ item  menu  yang  diproses. Jika pemakaian  berasal  dari  penyesuaian  stok,  d
 akan menampilkan  kode penyesuaian dan alasan dilakukannya penyesuaian.
 
 
-## 46
+## 4.1.8 Implementasi Algoritma Deduksi Stok
+Algoritma deduksi stok merupakan inti dari sistem manajemen inventori
+yang menentukan urutan konsumsi batch ketika terjadi pemakaian bahan baku.
+Sistem mengimplementasikan dua mode deduksi utama, yaitu FEFO (First-Expiry-
+First-Out) untuk bahan dengan masa kedaluwarsa terbatas dan FIFO (First-In-
+First-Out) untuk bahan non-perishable. Mekanisme penguncian data (row-level
+locking) diterapkan untuk mencegah konflik pada transaksi bersamaan.
+
+Penentuan urutan batch dilakukan melalui perintah match yang
+menerjemahkan mode batch bahan baku menjadi urutan query SQL. Batch
+dengan quantity lebih besar dari nol diambil, kemudian diurutkan berdasarkan
+mode yang dikonfigurasi pada setiap bahan baku. Batch yang memiliki nilai
+relevan kosong (NULL) ditempatkan di akhir urutan agar tidak mengganggu
+prioritas.
+
+$query = IngredientBatch::where('ingredient_id',
+$ingredientId)
+##     ->where('quantity', '>', 0)
+##     ->where(function ($q) {
+##         $q->whereNull('expiry_date')
+##           ->orWhereDate('expiry_date', '>',
+## now())
+##           ->orWhere('allow_expired_usage', true);
+##     })
+##     ->lockForUpdate();
+
+match ($ingredient->batch_mode) {
+##     Ingredient::BATCH_MODE_FIFO => $query
+##         ->orderByRaw('CASE WHEN received_at IS NULL
+## THEN 1 ELSE 0 END')
+##         ->orderBy('received_at', 'asc')
+##         ->orderBy('expiry_date', 'asc')
+##         ->orderBy('id', 'asc'),
+##     Ingredient::BATCH_MODE_CUSTOM => $query
+##         ->orderByRaw('CASE WHEN custom_order IS NULL
+## THEN 1 ELSE 0 END')
+##         ->orderBy('custom_order', 'asc')
+##         ->orderBy('received_at', 'asc')
+##         ->orderBy('id', 'asc'),
+##     default => $query  // FEFO
+##         ->orderByRaw('CASE WHEN expiry_date IS NULL
+## THEN 1 ELSE 0 END')
+##         ->orderBy('expiry_date', 'asc')
+##         ->orderBy('received_at', 'asc')
+##         ->orderBy('id', 'asc'),
+};
+
+Pada kode di atas, baris match menentukan urutan batch berdasarkan
+mode. Pada mode FIFO, batch diurutkan berdasarkan received_at terlama
+(ascending). Pada mode default (FEFO), batch diurutkan berdasarkan
+expiry_date terdekat (ascending). Klausa orderByRaw('CASE WHEN ... IS
+NULL THEN 1 ELSE 0 END') memastikan bahwa batch yang memiliki nilai
+relevan kosong ditempatkan paling akhir sehingga tidak dikonsumsi lebih dahulu.
+Klausa lockForUpdate() mengunci baris-baris batch yang terpilih untuk mencegah
+transaksi bersamaan mengakses data yang sama sebelum transaksi saat ini selesai.
+
+Setelah batch diurutkan sesuai prioritas, sistem melakukan iterasi deduksi
+dari batch pertama hingga kebutuhan kuantitas terpenuhi. Setiap iterasi mencatat
+pergerakan stok melalui model StockMovement yang merekam quantity_before,
+quantity_change, dan quantity_after untuk keperluan audit.
+
+foreach ($batches as $batch) {
+##     if ($remainingToDeduct <= 0) break;
+##     $before = (float) $batch->quantity;
+##     $deductFromThisBatch = min($before,
+## $remainingToDeduct);
+##     $after = $before - $deductFromThisBatch;
+##     $batch->quantity = $after;
+##     $batch->save();
+##     $remainingToDeduct -= $deductFromThisBatch;
+##     StockMovement::create([
+##         'ingredient_id' => $ingredientId,
+##         'ingredient_batch_id' => $batch->id,
+##         'order_id' => $context['order_id'] ?? null,
+##         'movement_type' => $context['movement_type']
+## ?? 'sale',
+##         'quantity_before' => $before,
+##         'quantity_change' => -
+## $deductFromThisBatch,
+##         'quantity_after' => $after,
+##         'unit_cost' => $batch->cost_per_unit,
+##         'notes' => $context['notes'] ?? null,
+##     ]);
+}
+
+Pada kode di atas, setiap batch diproses secara berurutan. Variabel before
+menyimpan nilai stok sebelum deduksi, deductFromThisBatch menghitung
+jumlah yang diambil dari batch saat ini menggunakan fungsi min(), dan after
+menyimpan nilai stok setelah deduksi. Setelah penyimpanan batch, sistem
+mencatat StockMovement dengan quantity_change bernilai negatif karena
+merupakan pengurangan stok. Proses berlanjut hingga remainingToDeduct habis
+atau seluruh batch telah diproses.
+
+## 4.1.9 Implementasi Penyesuaian Stok dan Perhitungan Stok
+Penyesuaian stok (stock adjustment) merupakan fitur yang memungkinkan
+admin melakukan perubahan stok secara manual di luar transaksi penjualan, baik
+berupa penambahan (increase) maupun pengurangan (decrease, waste, damage).
+Fitur pembatalan penyesuaian (cancel) juga diimplementasikan untuk
+mengembalikan stok ke kondisi sebelum penyesuaian dilakukan.
+
+Mekanisme pembatalan penyesuaian bekerja dengan cara membalikkan
+(reverse) setiap pergerakan stok yang tercatat pada penyesuaian yang akan
+dibatalkan. Untuk setiap StockMovement yang terkait, sistem menghitung nilai
+perubahan kebalikan (reversalChange = -originalChange), mengembalikan stok
+batch ke nilai semula, dan mencatat StockMovement baru sebagai jejak audit.
+
+foreach ($record->stockMovements as $movement) {
+##     $batch = IngredientBatch::find(
+##         $movement->ingredient_batch_id);
+##     if (! $batch) continue;
+##     $originalChange = (float)
+## $movement->quantity_change;
+##     $reversalChange = -$originalChange;
+##     $batchBefore = (float) $batch->quantity;
+##     $batch->increment('quantity',
+## $reversalChange);
+##     $batchAfter = (float) $batch->quantity;
+##     StockMovement::create([
+##         'ingredient_id' =>
+## $movement->ingredient_id,
+##         'ingredient_batch_id' => $batch->id,
+##         'stock_adjustment_id' => $record->id,
+##         'movement_type' =>
+## $movement->movement_type,
+##         'source_type' =>
+## 'stock_adjustment_reversal',
+##         'source_id' => (string) $record->id,
+##         'quantity_before' => $batchBefore,
+##         'quantity_change' => $reversalChange,
+##         'quantity_after' => $batchAfter,
+##         'unit_cost' => $batch->cost_per_unit,
+##         'notes' => 'Pembatalan: ' . $reason,
+##     ]);
+}
+
+Selain penyesuaian stok, sistem juga menyediakan perhitungan stok yang
+dikonversi menjadi jumlah porsi (servings) yang dapat diproduksi dari bahan baku
+yang tersedia. Atribut stock pada model Menu menghitung ketersediaan stok
+untuk setiap menu berdasarkan resep bahan baku penyusunnya. Perhitungan
+dilakukan dengan membagi total stok setiap bahan baku dengan kebutuhan per
+porsi (quantity_used), kemudian mengambil nilai minimum di antara seluruh
+bahan baku penyusun. Pendekatan ini memastikan bahwa jumlah porsi yang
+dilaporkan sesuai dengan bahan baku yang paling terbatas.
+
+public function getStockAttribute(): ?float
+## {
+##     $ingredients = $this->menuIngredients()
+##         ->with('ingredient')->get();
+##     if ($ingredients->isEmpty()) return null;
+##     $minServings = null;
+##     foreach ($ingredients as $mi) {
+##         if (! $mi->ingredient) continue;
+##         $totalStock = (float)
+## $mi->ingredient->batches()
+##             ->where('quantity', '>', 0)
+##             ->where(function ($q) {
+##                 $q->whereNull('expiry_date')
+##                   ->orWhereDate('expiry_date', '>',
+## now())
+##                   ->orWhere('allow_expired_usage',
+## true);
+##             })
+##             ->sum('quantity') ?: 0;
+##         $needed = (float)
+## $mi->quantity_used;
+##         $servings = $needed > 0
+##             ? (int) ($totalStock / $needed)
+##             : 0;
+##         if ($minServings === null
+##             || $servings < $minServings) {
+##             $minServings = $servings;
+##         }
+##     }
+##     return $minServings ?? 0;
+## }
+
+Pada kode di atas, setiap bahan baku penyusun menu diperiksa stoknya
+melalui relasi batches. Hanya batch dengan quantity lebih dari nol dan belum
+kedaluwarsa (atau diizinkan penggunaan kedaluwarsa) yang dihitung. Total stok
+dibagi dengan quantity_used (kebutuhan per porsi) untuk mendapatkan jumlah
+porsi yang dapat dibuat dari bahan tersebut. Nilai minimum (minServings) di
+antara seluruh bahan kemudian menjadi nilai akhir atribut stock. Jika menu tidak
+memiliki resep (ingredients kosong), fungsi mengembalikan null.
+
 
 ## 4.2 Pengujian
 ## 4.2.1 Pengujian Black Box
@@ -1072,7 +1238,6 @@ serta tambah batch stok.
 
 
 
-## 47
 
 10Ta bel 4.2 Pengujia n black box ma na jemen ba ha n ba ku
 ## Skenario Langkah Hasil
@@ -1126,7 +1291,6 @@ d. Pengujian Manajemen  Menu
 Pengujian  manajemen  menu  dilakukan  untuk  memvalidasi  bahwa  admin
 dapat  mengelola  data  menu  beserta  resep  bahan  baku  penyusunnya.  Skenario
 
-## 48
 
 pengujian  mencakup  tambah,  ubah,  dan  hapus  menu,  serta  penambahan  dan
 penghapusan resep menu.12
@@ -1174,7 +1338,6 @@ yang merepresentasikan  fitur inti manajemen  inventori.
 Pengujian  ini  memvalidasi bahwa ketika  suatu menu yang  memiliki  resep
 (komposisi bahan baku) diproses, sistem secara otomatis  mengurangi stok bahan
 
-## 49
 
 baku sesuai dengan jumlah yang terdaftar pada tabel menu_ingredients. Dalam
 skenario  pengujian, langkah  pertama  adalah  menentukan sebuah  menu  "Kopi
@@ -1221,7 +1384,6 @@ gram.  Hasil  pengujian  sesuai  dengan  prinsip  FIFO  karena batch yang  diter
 lebih awal diproses terlebih dahulu.
 
 
-## 50
 
 public function test_fifo_deducts_oldest_batch_first(): void
 ## {
@@ -1267,7 +1429,6 @@ $this->assertSame(60.0, (float) $farExpiry->fresh()-
 ## >quantity);
 ## }
 
-## 51
 
 
 Ga mba r 4.20 Pengujia n a lgoritma  FEFO
@@ -1311,7 +1472,6 @@ public function test_cancelling_adjustment_restores_stock():
 void
 ## {
 
-## 52
 
 // Setup: buat adjustment increase 20 unit
 $adjustment = $this->createAdjustment('increase', 20);
@@ -1335,8 +1495,182 @@ yang  dirancang.  Algoritma  FIFO  dan  FEFO  bekerja  dengan  benar,  penyesuai
 stok  berjalan  akurat,  serta  pembatalan  penyesuaian  berhasil  mengembalikan  stok
 ke kondisi awal.
 
+## 4.2.3 Pengujian Integration
+Pengujian integrasi merupakan level pengujian yang melengkapi pengujian
+black box dan white box. Jika black box menguji fungsionalitas fitur secara
+individual dan white box menguji kebenaran logika internal, maka pengujian
+integrasi memvalidasi aliran data antar modul serta konsistensi state ketika terjadi
+pertukaran informasi antar komponen sistem [18].
 
-## 53
+a. Pengujian Penambahan Batch
+Pengujian penambahan batch dilakukan untuk memverifikasi bahwa
+penambahan stok bahan baku melalui fitur batch management menghasilkan
+perubahan total stok yang akurat dan tidak menghasilkan pencatatan
+stock_movements yang tidak semestinya.
+
+## Skenario Langkah Hasil Diharapkan Status
+Tambah batch Tambah batch
+stok dengan
+kuantitas 50
+unit
+Total stok
+bertambah 50
+sesuai batch
+## Berhasil
+Verifikasi
+## stock_movements
+Cek tabel
+## stock_movements
+Tidak ada
+pergerakan baru
+(penambahan
+batch bukan
+transaksi stok)
+## Berhasil
+
+b. Pengujian Penyesuaian Stok
+Pengujian penyesuaian stok dilakukan untuk memverifikasi bahwa
+penyesuaian stok tipe increase dan decrease berfungsi dengan benar, serta
+pembatalan penyesuaian mengembalikan stok ke kondisi semula dan mencatat
+reversal movement.
+
+## Skenario Langkah Hasil Diharapkan Status
+## Adjustment
+## increase
+Buat adjustment
+dengan kuantitas
+## +30
+Batch stok
+bertambah 30
+## Berhasil
+Verifikasi batch
+naik
+Cek kuantitas
+batch terkait
+Kuantitas batch
+bertambah sesuai
+adjustment
+## Berhasil
+## Batalkan
+## adjustment
+Klik batalkan
+pada adjustment
+Stok kembali ke
+jumlah semula
+## Berhasil
+Verifikasi
+reversal
+Cek
+## stock_movements
+Movement reversal
+tercatat dengan
+quantity_change
+berlawanan
+## Berhasil
+
+c. Pengujian Deduksi FEFO
+Pengujian deduksi FEFO dilakukan untuk memverifikasi bahwa batch
+dengan expiry_date terdekat dikonsumsi terlebih dahulu ketika terjadi pemakaian
+stok.
+
+## Skenario Langkah Hasil Diharapkan Status
+Buat 2 batch Batch A: qty 80,
+expiry 3 hari
+Batch B: qty 80,
+expiry 30 hari
+Kedua batch
+terbuat
+## Berhasil
+Deduksi 100
+unit
+Jalankan fungsi
+deduksi stok
+Batch A habis (80
+unit), Batch B
+sisa 60 unit
+## Berhasil
+Verifikasi
+prioritas
+## FEFO
+Cek urutan
+deduksi
+Batch expiry 3
+hari terpakai
+duluan
+## Berhasil
+
+d. Pengujian Konsistensi Riwayat
+Pengujian konsistensi riwayat dilakukan untuk memverifikasi bahwa setiap
+pergerakan stok mencatat quantity_before, quantity_change, dan quantity_after
+secara akurat sehingga riwayat dapat dilacak dengan tepat.
+
+## Skenario Langkah Hasil Diharapkan Status
+Proses order Buat order
+dengan 2 menu
+beresep
+Order diproses Berhasil
+Cek konsistensi
+## stock_movements
+Periksa
+quantity_before,
+quantity_change,
+quantity_after
+quantity_after =
+quantity_before +
+quantity_change
+## Berhasil
+Verifikasi
+penjumlahan
+Hitung total
+quantity_change
+Total sesuai
+dengan jumlah
+bahan baku yang
+terpakai
+## Berhasil
+
+e. Pengujian Integrasi Lintas Modul — Order ke Stok
+Pengujian integrasi lintas modul dilakukan untuk memverifikasi bahwa
+ketika pesanan diproses melalui modul transaksi (POS), stok bahan baku pada
+modul inventori berkurang sesuai resep menu dan daily_ingredient_usage tercatat
+dengan benar.
+
+## Skenario Langkah Hasil Diharapkan Status
+Order POS Buat pesanan
+melalui sistem
+## POS
+Stok bahan baku
+berkurang sesuai
+resep
+## Berhasil
+Verifikasi
+deduksi resep
+Cek total stok
+bahan baku
+penyusun
+Stok berkurang
+tepat sesuai
+quantity_used kali
+kuantitas order
+## Berhasil
+Verifikasi
+## daily_usage
+Cek tabel
+## daily_ingredient
+## _usage
+Pemakaian harian
+tercatat dengan
+tanggal dan
+kuantitas yang
+benar
+## Berhasil
+
+Seluruh skenario pengujian integration menunjukkan status Berhasil. Hasil
+ini membuktikan bahwa aliran data antar modul inventori dan modul transaksi
+berjalan konsisten, pencatatan pergerakan stok akurat, serta mekanisme deduksi
+batch dan reversal berfungsi sesuai perancangan.
+
+
 ## BAB V
 ## PENUTUP
 
@@ -1356,7 +1690,8 @@ yang dapat dilacak secara lengkap.
 - Pengujian black   box terhadap   seluruh   modul   menunjukkan   skenario
 berhasil.   Pengujian   white   box   memvalidasi   kebenaran   deduksi   stok
 berbasis   resep,   algoritma   FIFO   dan   FEFO,   penyesuaian   stok,   serta
-pembatalan penyesuaian stok.
+pembatalan penyesuaian stok. Pengujian integrasi memvalidasi konsistensi
+aliran data antar modul inventori dan modul transaksi.
 
 ## 5.2 Saran
 Berdasarkan hasil penelitian, terdapat beberapa saran untuk pengembangan
@@ -1368,14 +1703,12 @@ sedang tidak berada di dekat laptop atau desktop PC.
 notifikasi  Stok  Menipis  dan  Kedaluwarsa  melalui  aplikasi  perpesanan
 seperti  WhatsApp  ketika  stok  bahan  baku  berada di  bawah  ambang  batas
 
-## 54
 
 atau mendekati tanggal kedaluwarsa agar  admin dapat mengetahui segera
 bahan baku mana yang stoknya perlu diperbarui.
 - Integrasi Barcode Scanner untuk  mempercepat dan mempermudah proses
 pencatatan dan identifikasi batch stok bahan baku.
 
-## 55
 
 ## DAFTAR PUSTAKA
 
@@ -1408,7 +1741,6 @@ Waterfall, Agile, dan Hybrid,” JIEET (Journal of Information Engineering
 and  Educational  Technology),  vol.  7,  no.  1,  pp.  36–42,  Jun.  2023,  doi:
 https://doi.org/10.26740/jieet.v7n1.p36-42.
 
-## 56
 
 [7] E. Kurniawati and A. Ikhwan, “Perancangan Sistem Informasi Manajemen
 ## Inventaris Kontrol Stok Barang Berbasis Web,” Jurnal  Teknologi  Sistem
@@ -1442,7 +1774,6 @@ pp. 143–147, Feb. 2023, doi: https://doi.org/10.47233/jemb.v1i2.533.
 [14] Siska  Narulita,  Ahmad  Nugroho,  and  M.  Zakki  Abdillah,  “Diagram
 Unified Modelling Language (UML) untuk Perancangan Sistem Informasi
 
-## 57
 
 Manajemen Penelitian dan Pengabdian Masyarakat
 (SIMLITABMAS),” Bridge  :  Jurnal  publikasi  Sistem  Informasi  dan
@@ -1461,3 +1792,8 @@ https://doi.org/10.32520/jupel.v6i2.3326.
 [17] M. Helmi and S. Fedianto, “Pengujian Sistem Jaringan Dokumentasi Dan
 Informasi Menggunakan Black Box Testing Dan White Box Testing” vol.
 3, no. 1, 2024. Available: https://repository.upnjatim.ac.id/id/eprint/20155
+[18] Susanti Kurmilasari, "PENGUJIAN PERANGKAT LUNAK PADA WEBSITE
+KA'CAKE: IMPLEMENTASI UNIT TESTING, INTEGRATION TESTING, SYSTEM
+TESTING, DAN VALIDATION TESTING UNTUK MENJAMIN KUALITAS DAN
+KEANDALAN SISTEM," JATI (Jurnal Mahasiswa Teknik Informatika), vol. 8,
+no. 3, pp. 1–10, 2024.

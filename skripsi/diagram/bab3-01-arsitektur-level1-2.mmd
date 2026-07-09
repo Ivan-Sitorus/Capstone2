@@ -23,6 +23,12 @@ graph TB
         DB[("Database (PostgreSQL)")]
     end
 
+    subgraph DataMining["Sistem Data Mining (Pengembangan Terpisah)"]
+        ASOSIASI["Asosiatif Menu\n(Algoritma Apriori)\nFastAPI"]
+        KLASTER["Klasterisasi Bahan Baku\n(K-Means Clustering)\nPython Scikit-learn"]
+        PREDIKSI["Prediksi Bahan Baku\n(ARIMA/SARIMA)\nPython Statsmodels"]
+    end
+
     ADMIN -->|"Mengelola Operasional"| FILAMENT
     KASIR -->|"Memproses transaksi"| WEB
     PELANGGAN -->|"Melihat dan memesan lewat ponsel"| MOBILE
@@ -30,3 +36,6 @@ graph TB
     WEB --> API
     MOBILE --> API
     API --> DB
+    DB -->|"Data transaksi"| ASOSIASI
+    DB -->|"Data pemakaian"| KLASTER
+    DB -->|"Data historis"| PREDIKSI

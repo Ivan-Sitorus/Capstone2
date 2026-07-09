@@ -1,0 +1,48 @@
+%%{init: {"flowchart": {"nodeSpacing": 15, "rankSpacing": 20, "padding": 5}}}%%
+graph TB
+    subgraph Presentation["Lapisan Presentasi"]
+        FILAMENT["Admin Panel (Filament)"]
+        INERTIA["Kasir Pages (Inertia.js + React)"]
+    end
+
+    subgraph Controller["Lapisan Controller"]
+        PESANAN["CashierPesananBaruController"]
+        ORDER["CashierOrderController"]
+    end
+
+    subgraph Service["Lapisan Service (Business Logic)"]
+        INV["InventoryService\n(FEFO/FIFO Engine)"]
+        RECON["StockReconciliationService\n(Adjustment Logic)"]
+        PROMO["OrderPromotionService"]
+    end
+
+    subgraph Model["Lapisan Model (Data Access)"]
+        direction LR
+        MENU["Menu"]
+        INGREDIENT["Ingredient"]
+        BATCH["IngredientBatch"]
+        MOVEMENT["StockMovement"]
+        ADJUST["StockAdjustment"]
+        USAGE["DailyIngredientUsage"]
+    end
+
+    subgraph Database["Database"]
+        DB[("PostgreSQL")]
+    end
+
+    FILAMENT -->|"Manage data"| PESANAN
+    INERTIA -->|"Order request"| ORDER
+    PESANAN -->|"processSaleForOrder()"| INV
+    PESANAN -->|"calculateLine()"| PROMO
+    ORDER -->|"confirmCash/QRIS"| INV
+    INV -->|"deductIngredientStock()"| INGREDIENT
+    INV -->|"FEFO/FIFO query"| BATCH
+    INV -->|"record movement"| MOVEMENT
+    INV -->|"record daily"| USAGE
+    RECON -->|"createManualAdjustment()"| ADJUST
+    RECON -->|"reversal"| MOVEMENT
+    INGREDIENT --> DB
+    BATCH --> DB
+    MOVEMENT --> DB
+    MENU --> DB
+    USAGE --> DB
