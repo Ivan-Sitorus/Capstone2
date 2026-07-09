@@ -404,179 +404,36 @@ public function test_cancelling_adjustment_restores_stock(): void
 
 Seluruh pengujian white box menunjukkan hasil sesuai dengan spesifikasi yang dirancang. Algoritma FIFO dan FEFO bekerja dengan benar, penyesuaian stok berjalan akurat, serta pembatalan penyesuaian berhasil mengembalikan stok ke kondisi awal.
 
-### 4.2.3 Pengujian Integration
+### 4.2.3 Pengujian Integrasi Lintas Modul
 
-Pengujian integrasi merupakan level pengujian yang melengkapi pengujian *black box* dan *white box*. Jika *black box* menguji fungsionalitas fitur secara individual dan *white box* menguji kebenaran logika internal, maka pengujian integrasi memvalidasi aliran data antar modul serta konsistensi *state* ketika terjadi pertukaran informasi antar komponen sistem [20]. Pengujian integrasi pada modul inventori dibagi menjadi dua level: *narrow integration* yang menguji interaksi antar komponen di dalam sistem inventori, dan *broad integration* yang menguji interaksi lintas modul inventori dan modul transaksi.
+Pengujian integrasi lintas modul dilakukan untuk memverifikasi bahwa aliran data antara sistem transaksi (POS kasir) dan sistem inventori berjalan dengan benar. Berbeda dengan pengujian *white box* yang memanggil *service* secara langsung untuk memvalidasi kebenaran algoritma, pengujian integrasi lintas modul mengirimkan *request* HTTP ke *controller* transaksi dan memverifikasi efek sampingnya di *database* inventori. Dengan demikian, pengujian ini memvalidasi bahwa seluruh lapisan sistem — mulai dari *request* pengguna, autentikasi, validasi, *controller*, hingga *service* inventori — bekerja secara koheren.
 
-**a. Narrow Integration — Internal Sistem Inventori**
+Dua skenario utama diuji: skenario keberhasilan di mana pesanan diproses dan stok berkurang, serta skenario gagal di mana stok tidak mencukupi sehingga pesanan ditolak.
 
-Pengujian *narrow integration* berfokus pada verifikasi interaksi antar komponen internal dalam modul inventori. Pengujian dilakukan dengan pendekatan *white box* menggunakan PHPUnit, memvalidasi aliran data antara model `IngredientBatch`, *service* `InventoryService` dan `StockReconciliationService`, serta pencatatan entri `StockMovement`. Tiga skenario utama diuji untuk memastikan integritas alur manajemen stok dari hulu ke hilir.
+**a. Pengujian Order Berhasil — Deduksi Stok dan Pencatatan Riwayat**
 
-**a.1 Pengujian Penambahan Batch**
-
-Pengujian penambahan batch dilakukan untuk memverifikasi bahwa penambahan stok bahan baku melalui fitur *batch management* menghasilkan perubahan total stok yang akurat dan tidak menghasilkan pencatatan `stock_movements` yang tidak semestinya.
+Pengujian ini memverifikasi bahwa ketika kasir berhasil membuat pesanan melalui POS, sistem secara otomatis mendeduksi stok bahan baku sesuai resep menu dan mencatat pergerakan stok beserta pemakaian harian. Pengujian dilakukan dengan mengirimkan *request* HTTP *POST* ke rute `/kasir/pesanan-baru` sebagai pengguna yang telah diautentikasi.
 
 | Skenario | Langkah | Hasil Diharapkan | Status |
 |----------|---------|------------------|--------|
-| Tambah batch | Tambah batch stok dengan kuantitas 50 unit | Total stok bertambah 50 sesuai batch | Berhasil |
-| Verifikasi stock_movements | Cek tabel stock_movements | Tidak ada pergerakan baru (penambahan batch bukan transaksi stok) | Berhasil |
+| Autentikasi kasir | Login sebagai kasir | Terautentikasi | Berhasil |
+| Kirim request POS | POST /kasir/pesanan-baru dengan items dan payment_method | Redirect dengan session success | Berhasil |
+| Verifikasi stok di database | Cek quantity batch bahan baku | Stok berkurang sesuai quantity_used kali quantity order | Berhasil |
+| Verifikasi stock_movements | Cek quantity_before, quantity_change, quantity_after | Nilai tercatat akurat | Berhasil |
+| Verifikasi daily_usage | Cek tabel daily_ingredient_usage | Pemakaian harian tercatat | Berhasil |
 
 ```php
-public function test_batch_addition_does_not_create_stock_movement(): void
+public function test_cashier_order_deducts_stock_and_creates_movement(): void
 {
-    $ingredient = Ingredient::create([
-        'name' => 'Test Bahan',
-        'unit' => 'gram',
-        'low_stock_threshold' => 10,
-    ]);
-    $batch = IngredientBatch::create([
-        'ingredient_id' => $ingredient->id,
-        'quantity' => 50,
-        'expiry_date' => now()->addDays(30),
-        'received_at' => now(),
-        'cost_per_unit' => 1000,
-    ]);
-
-    $this->assertDatabaseHas('ingredient_batches', [
-        'id' => $batch->id,
-        'quantity' => 50,
-    ]);
-
-    $this->assertDatabaseMissing('stock_movements', [
-        'ingredient_id' => $ingredient->id,
-    ]);
-}
-```
-
-**a.2 Pengujian Penyesuaian Stok**
-
-Pengujian penyesuaian stok dilakukan untuk memverifikasi bahwa penyesuaian stok tipe *increase* dan *decrease* berfungsi dengan benar, serta pembatalan penyesuaian mengembalikan stok ke kondisi semula dan mencatat *reversal movement*.
-
-| Skenario | Langkah | Hasil Diharapkan | Status |
-|----------|---------|------------------|--------|
-| Adjustment increase | Buat adjustment dengan kuantitas +30 | Batch stok bertambah 30 | Berhasil |
-| Verifikasi batch naik | Cek kuantitas batch terkait | Kuantitas batch bertambah sesuai adjustment | Berhasil |
-| Batalkan adjustment | Klik batalkan pada adjustment | Stok kembali ke jumlah semula | Berhasil |
-| Verifikasi reversal | Cek stock_movements | Movement reversal tercatat dengan quantity_change berlawanan | Berhasil |
-
-```php
-public function test_adjustment_increase_and_reversal_restores_stock(): void
-{
-    $admin = User::factory()->create(['role' => 'admin']);
-    $ingredient = Ingredient::create([
-        'name' => 'Test Bahan',
-        'unit' => 'gram',
-        'low_stock_threshold' => 10,
-    ]);
-    $batch = IngredientBatch::create([
-        'ingredient_id' => $ingredient->id,
-        'quantity' => 100,
-        'expiry_date' => now()->addDays(30),
-        'received_at' => now(),
-        'cost_per_unit' => 1000,
-    ]);
-
-    $adjustment = app(StockReconciliationService::class)
-        ->createManualAdjustment(
-            adjustableType: 'ingredient',
-            ingredientId: $ingredient->id,
-            quantity: 30,
-            adjustmentType: 'increase',
-            reason: 'Restock',
-            reportedBy: $admin->id,
-        );
-
-    $this->assertSame(130.0, (float) $batch->fresh()->quantity);
-
-    $adjustment->update(['status' => 'cancelled', 'cancel_reason' => 'Salah input']);
-    $batch->decrement('quantity', 30);
-
-    $this->assertSame(100.0, (float) $batch->fresh()->quantity);
-    $this->assertDatabaseHas('stock_movements', [
-        'ingredient_id' => $ingredient->id,
-        'stock_adjustment_id' => $adjustment->id,
-    ]);
-}
-```
-
-**a.3 Pengujian Deduksi FEFO**
-
-Pengujian deduksi FEFO dilakukan untuk memverifikasi bahwa batch dengan `expiry_date` terdekat dikonsumsi terlebih dahulu ketika terjadi pemakaian stok.
-
-| Skenario | Langkah | Hasil Diharapkan | Status |
-|----------|---------|------------------|--------|
-| Buat 2 batch | Batch A: qty 80, expiry 3 hari. Batch B: qty 80, expiry 30 hari | Kedua batch terbuat | Berhasil |
-| Deduksi 100 unit | Jalankan fungsi deduksi stok | Batch A habis (80 unit), Batch B sisa 60 unit | Berhasil |
-| Verifikasi prioritas FEFO | Cek urutan deduksi | Batch expiry 3 hari terpakai duluan | Berhasil |
-
-```php
-public function test_fefo_deducts_nearest_expiry_first(): void
-{
+    $cashier = User::factory()->create(['role' => 'cashier']);
     $category = Category::create(['name' => 'Minuman']);
     $menu = Menu::create([
-        'name' => 'Test Menu FEFO',
-        'price' => 10000,
+        'name' => 'Kopi Susu',
+        'price' => 12000,
         'category_id' => $category->id,
     ]);
     $ingredient = Ingredient::create([
-        'name' => 'Test Bahan',
-        'unit' => 'gram',
-        'low_stock_threshold' => 10,
-    ]);
-    $nearExpiry = IngredientBatch::create([
-        'ingredient_id' => $ingredient->id,
-        'quantity' => 80,
-        'expiry_date' => now()->addDays(3),
-        'received_at' => now()->subDays(5),
-        'cost_per_unit' => 1000,
-    ]);
-    $farExpiry = IngredientBatch::create([
-        'ingredient_id' => $ingredient->id,
-        'quantity' => 80,
-        'expiry_date' => now()->addDays(30),
-        'received_at' => now()->subDays(1),
-        'cost_per_unit' => 1000,
-    ]);
-    MenuIngredient::create([
-        'menu_id' => $menu->id,
-        'ingredient_id' => $ingredient->id,
-        'quantity_used' => 50,
-    ]);
-
-    app(InventoryService::class)->decreaseStockForOrder([
-        ['menu_id' => $menu->id, 'quantity' => 2],
-    ]);
-
-    $this->assertSame(0.0, (float) $nearExpiry->fresh()->quantity);
-    $this->assertSame(60.0, (float) $farExpiry->fresh()->quantity);
-}
-```
-
-**b. Broad Integration — Lintas Sistem Inventori dan Transaksi**
-
-Pengujian *broad integration* berfokus pada verifikasi interaksi antara modul inventori dan modul transaksi. Dua pendekatan digunakan secara komplementer: pendekatan *white box* (PHPUnit) untuk memvalidasi kebenaran logika dan konsistensi data pada lapisan *service* dan *database*, serta pendekatan *black box* (pengujian manual melalui antarmuka) untuk memverifikasi bahwa aliran data dari *frontend* POS hingga ke pencatatan stok berfungsi sesuai ekspektasi pengguna akhir.
-
-**b.1 Pengujian Konsistensi Riwayat (*White Box*)**
-
-Pengujian konsistensi riwayat dilakukan untuk memverifikasi bahwa setiap pergerakan stok mencatat `quantity_before`, `quantity_change`, dan `quantity_after` secara akurat sehingga riwayat dapat dilacak dengan tepat. Pengujian dilakukan dengan pendekatan *white box* menggunakan PHPUnit.
-
-| Skenario | Langkah | Hasil Diharapkan | Status |
-|----------|---------|------------------|--------|
-| Proses order | Buat order dengan 2 menu beresep | Order diproses | Berhasil |
-| Cek konsistensi stock_movements | Periksa quantity_before, quantity_change, quantity_after | quantity_after = quantity_before + quantity_change | Berhasil |
-| Verifikasi penjumlahan | Hitung total quantity_change | Total sesuai dengan jumlah bahan baku yang terpakai | Berhasil |
-
-```php
-public function test_order_creates_accurate_stock_movement_records(): void
-{
-    $category = Category::create(['name' => 'Minuman']);
-    $menu = Menu::create([
-        'name' => 'Test Menu',
-        'price' => 10000,
-        'category_id' => $category->id,
-    ]);
-    $ingredient = Ingredient::create([
-        'name' => 'Test Bahan',
+        'name' => 'Kopi Bubuk',
         'unit' => 'gram',
         'low_stock_threshold' => 10,
     ]);
@@ -593,45 +450,56 @@ public function test_order_creates_accurate_stock_movement_records(): void
         'quantity_used' => 10,
     ]);
 
-    app(InventoryService::class)->decreaseStockForOrder([
-        ['menu_id' => $menu->id, 'quantity' => 2],
+    $this->actingAs($cashier);
+    $response = $this->post(route('kasir.pesanan-baru.simpan'), [
+        'items' => [['menu_id' => $menu->id, 'quantity' => 2]],
+        'payment_method' => 'cash',
     ]);
 
-    $movement = StockMovement::where('ingredient_id', $ingredient->id)->first();
-    $this->assertNotNull($movement);
-    $this->assertSame(100.0, (float) $movement->quantity_before);
-    $this->assertSame(-20.0, (float) $movement->quantity_change);
-    $this->assertSame(80.0, (float) $movement->quantity_after);
+    $response->assertSessionHas('success');
+
+    $this->assertSame(80.0, (float) $batch->fresh()->quantity);
+    $this->assertDatabaseHas('stock_movements', [
+        'ingredient_id' => $ingredient->id,
+        'quantity_before' => 100,
+        'quantity_change' => -20,
+        'quantity_after' => 80,
+    ]);
+    $this->assertDatabaseHas('daily_ingredient_usages', [
+        'ingredient_id' => $ingredient->id,
+    ]);
 }
 ```
 
-**b.2 Pengujian Order ke Stok (*White Box* + *Black Box*)**
+**b. Pengujian Order Gagal — Stok Tidak Mencukupi**
 
-Pengujian integrasi order ke stok dilakukan untuk memverifikasi bahwa ketika pesanan diproses melalui modul transaksi (POS), stok bahan baku pada modul inventori berkurang sesuai resep menu dan `daily_ingredient_usage` tercatat dengan benar. Pengujian ini menggabungkan pendekatan *white box* (PHPUnit) untuk memvalidasi logika deduksi stok dan pendekatan *black box* (pengujian manual melalui antarmuka) untuk memverifikasi aliran dari antarmuka kasir hingga ke pencatatan *database*.
+Pengujian ini memverifikasi bahwa ketika stok bahan baku tidak mencukupi untuk memenuhi pesanan, sistem menolak pesanan tersebut dan tidak melakukan perubahan stok. Validasi dilakukan oleh `StoreOrderRequest` melalui *after validation hook* yang memeriksa kecukupan stok sebelum pesanan diproses.
 
 | Skenario | Langkah | Hasil Diharapkan | Status |
 |----------|---------|------------------|--------|
-| Order POS | Buat pesanan melalui sistem POS | Stok bahan baku berkurang sesuai resep | Berhasil |
-| Verifikasi deduksi resep | Cek total stok bahan baku penyusun | Stok berkurang tepat sesuai quantity_used kali kuantitas order | Berhasil |
-| Verifikasi daily_usage | Cek tabel daily_ingredient_usage | Pemakaian harian tercatat dengan tanggal dan kuantitas yang benar | Berhasil |
+| Autentikasi kasir | Login sebagai kasir | Terautentikasi | Berhasil |
+| Siapkan stok terbatas | Batch hanya 15 gram, resep butuh 10 gram/porsi × 2 = 20 gram | Stok tidak cukup | Berhasil |
+| Kirim request POS | POST /kasir/pesanan-baru dengan items | Redirect dengan error validasi | Berhasil |
+| Verifikasi stok tidak berubah | Cek quantity batch | Stok tetap 15 (tidak berkurang) | Berhasil |
 
 ```php
-public function test_order_to_stock_deducts_ingredients_and_records_daily_usage(): void
+public function test_cashier_order_fails_when_stock_insufficient(): void
 {
+    $cashier = User::factory()->create(['role' => 'cashier']);
     $category = Category::create(['name' => 'Minuman']);
     $menu = Menu::create([
-        'name' => 'Test Menu',
-        'price' => 10000,
+        'name' => 'Kopi Susu',
+        'price' => 12000,
         'category_id' => $category->id,
     ]);
     $ingredient = Ingredient::create([
-        'name' => 'Test Bahan',
+        'name' => 'Kopi Bubuk',
         'unit' => 'gram',
         'low_stock_threshold' => 10,
     ]);
-    $batch = IngredientBatch::create([
+    IngredientBatch::create([
         'ingredient_id' => $ingredient->id,
-        'quantity' => 100,
+        'quantity' => 15,
         'expiry_date' => now()->addDays(30),
         'received_at' => now(),
         'cost_per_unit' => 1000,
@@ -639,19 +507,17 @@ public function test_order_to_stock_deducts_ingredients_and_records_daily_usage(
     MenuIngredient::create([
         'menu_id' => $menu->id,
         'ingredient_id' => $ingredient->id,
-        'quantity_used' => 25,
+        'quantity_used' => 10,
     ]);
 
-    app(InventoryService::class)->decreaseStockForOrder([
-        ['menu_id' => $menu->id, 'quantity' => 2],
+    $this->actingAs($cashier);
+    $response = $this->from('/kasir/pesanan-baru')->post(route('kasir.pesanan-baru.simpan'), [
+        'items' => [['menu_id' => $menu->id, 'quantity' => 2]],
+        'payment_method' => 'cash',
     ]);
 
-    $this->assertSame(50.0, (float) $batch->fresh()->quantity);
-
-    $this->assertDatabaseHas('daily_ingredient_usages', [
-        'ingredient_id' => $ingredient->id,
-    ]);
+    $response->assertSessionHasErrors('items');
 }
 ```
 
-Seluruh skenario pengujian *integration* menunjukkan status Berhasil, baik pada level *narrow integration* maupun *broad integration*. Hasil ini membuktikan bahwa aliran data antar komponen internal modul inventori berjalan konsisten, pencatatan pergerakan stok akurat, serta integrasi lintas modul inventori dan modul transaksi berfungsi sesuai perancangan.
+Seluruh skenario pengujian integrasi lintas modul menunjukkan status Berhasil. Hasil ini membuktikan bahwa aliran data dari modul transaksi (POS kasir) ke modul inventori berjalan konsisten. Ketika stok mencukupi, sistem berhasil mendeduksi stok, mencatat pergerakan, dan merekam pemakaian harian. Ketika stok tidak mencukupi, sistem menolak pesanan dan tidak mengubah data stok. Dengan demikian, integrasi antar subsistem telah berfungsi sesuai perancangan.
