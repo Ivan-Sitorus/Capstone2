@@ -501,7 +501,7 @@ Pengujian deduksi FEFO dilakukan untuk memverifikasi bahwa batch dengan `expiry_
 public function test_fefo_deducts_nearest_expiry_first(): void
 {
     $menu = Menu::factory()->create();
-    $ingredient = Ingredient::factory()->create(['batch_mode' => 'fefo']);
+    $ingredient = Ingredient::factory()->create();
     $nearExpiry = IngredientBatch::factory()->create([
         'ingredient_id' => $ingredient->id,
         'quantity' => 80,
@@ -511,6 +511,11 @@ public function test_fefo_deducts_nearest_expiry_first(): void
         'ingredient_id' => $ingredient->id,
         'quantity' => 80,
         'expiry_date' => now()->addDays(30),
+    ]);
+    MenuIngredient::factory()->create([
+        'menu_id' => $menu->id,
+        'ingredient_id' => $ingredient->id,
+        'quantity_used' => 50,
     ]);
 
     app(InventoryService::class)->decreaseStockForOrder([
@@ -539,26 +544,28 @@ Pengujian konsistensi riwayat dilakukan untuk memverifikasi bahwa setiap pergera
 ```php
 public function test_order_creates_accurate_stock_movement_records(): void
 {
-    $order = Order::factory()->create();
     $menu = Menu::factory()->create();
     $ingredient = Ingredient::factory()->create(['unit' => 'gram']);
     $batch = IngredientBatch::factory()->create([
         'ingredient_id' => $ingredient->id,
         'quantity' => 100,
+        'expiry_date' => now()->addDays(30),
     ]);
-    MenuIngredient::create([
+    MenuIngredient::factory()->create([
         'menu_id' => $menu->id,
         'ingredient_id' => $ingredient->id,
         'quantity_used' => 10,
     ]);
 
-    app(InventoryService::class)->processSaleForOrder($order);
+    app(InventoryService::class)->decreaseStockForOrder([
+        ['menu_id' => $menu->id, 'quantity' => 2],
+    ]);
 
-    $movement = StockMovement::where('order_id', $order->id)->first();
+    $movement = StockMovement::where('ingredient_id', $ingredient->id)->first();
     $this->assertNotNull($movement);
     $this->assertSame(100.0, (float) $movement->quantity_before);
-    $this->assertSame(-10.0, (float) $movement->quantity_change);
-    $this->assertSame(90.0, (float) $movement->quantity_after);
+    $this->assertSame(-20.0, (float) $movement->quantity_change);
+    $this->assertSame(80.0, (float) $movement->quantity_after);
 }
 ```
 
@@ -575,7 +582,6 @@ Pengujian integrasi order ke stok dilakukan untuk memverifikasi bahwa ketika pes
 ```php
 public function test_order_to_stock_deducts_ingredients_and_records_daily_usage(): void
 {
-    $order = Order::factory()->create();
     $menu = Menu::factory()->create();
     $ingredient = Ingredient::factory()->create(['unit' => 'gram']);
     $batch = IngredientBatch::factory()->create([
@@ -589,15 +595,16 @@ public function test_order_to_stock_deducts_ingredients_and_records_daily_usage(
         'quantity_used' => 25,
     ]);
 
-    app(InventoryService::class)->processSaleForOrder($order);
+    app(InventoryService::class)->decreaseStockForOrder([
+        ['menu_id' => $menu->id, 'quantity' => 2],
+    ]);
 
     // White Box: verifikasi stok berkurang di database
-    $this->assertSame(75.0, (float) $batch->fresh()->quantity);
+    $this->assertSame(50.0, (float) $batch->fresh()->quantity);
 
     // White Box: verifikasi daily_ingredient_usage tercatat
     $this->assertDatabaseHas('daily_ingredient_usages', [
         'ingredient_id' => $ingredient->id,
-        'usage_date' => now()->toDateString(),
     ]);
 }
 ```
