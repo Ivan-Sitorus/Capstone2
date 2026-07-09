@@ -63,3 +63,21 @@ Filament adalah pustaka antarmuka pengguna yang dibangun di atas Laravel dan men
 ### 2.3.9 Activity Diagram
 
 *Activity diagram* merupakan salah satu diagram dalam *Unified Modeling Language* (UML) yang digunakan untuk menggambarkan alur aktivitas atau proses dalam suatu sistem. Diagram ini menampilkan urutan kegiatan dari awal hingga akhir melalui aliran kontrol antar aktivitas. *Activity diagram* terdiri dari elemen-elemen seperti *initial node* (titik awal), *action node* (aktivitas), *decision node* (percabangan berdasarkan kondisi), serta *swimlane* yang memisahkan aktivitas berdasarkan aktor yang bertanggung jawab [16].
+
+### 2.3.10 Flowchart
+
+*Flowchart* atau diagram alir merupakan jenis diagram yang merepresentasikan algoritma, alur kerja, atau proses dengan menampilkan langkah-langkah dalam bentuk simbol-simbol grafis yang dihubungkan dengan panah. *Flowchart* digunakan untuk menganalisis, mendesain, dan mendokumentasikan sebuah proses atau program secara sistematis [17].
+
+### 2.3.11 Pengujian Black Box
+
+Pengujian *black box* merupakan teknik pengujian perangkat lunak yang berfokus pada spesifikasi fungsional tanpa memerlukan pengetahuan tentang struktur internal kode program. Pengujian ini dilakukan dengan mendefinisikan kondisi masukan dan memverifikasi keluaran yang dihasilkan, sehingga lebih menitikberatkan pada kesesuaian fungsi sistem dengan kebutuhan pengguna [18].
+
+### 2.3.12 Pengujian White Box
+
+Pengujian *white box* merupakan teknik pengujian perangkat lunak yang berfokus pada struktur internal dan logika kode program. Pengujian ini dirancang dari perspektif pengembang dengan menguji seluruh bagian kode yang dapat diuji, bertujuan untuk menemukan kesalahan logis pada *source code* dan memastikan bahwa setiap fitur berfungsi sesuai dengan yang diharapkan [19].
+
+### 2.3.13 Pengujian Integration
+
+Pengujian *integration* merupakan level pengujian perangkat lunak yang berfokus pada interaksi antar modul atau komponen dalam sistem. Berbeda dengan pengujian unit yang menguji fungsi secara terisolasi, pengujian *integration* memvalidasi bahwa modul-modul yang telah diuji secara individual dapat bekerja sama dengan benar ketika diintegrasikan. Tujuannya adalah mendeteksi kesalahan pada antarmuka antar modul, aliran data, dan konsistensi *state* ketika terjadi pertukaran informasi antar komponen [20].
+
+Pengujian *integration* dapat dilakukan dengan dua pendekatan. Pendekatan *white box integration testing* memverifikasi kebenaran aliran data antar modul melalui pengujian berbasis kode dengan memeriksa keadaan *database* sebelum dan sesudah transaksi. Pendekatan *black box integration testing* memverifikasi interaksi antar modul dari sisi pengguna melalui antarmuka sistem. Kombinasi kedua pendekatan ini memberikan keyakinan bahwa integrasi antar modul berjalan dengan benar baik dari sisi teknis maupun fungsional.

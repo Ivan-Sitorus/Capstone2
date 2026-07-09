@@ -138,9 +138,21 @@ Tabel 3.4 Perangkat lunak pengembangan.
 ## 3.5 Perancangan Arsitektur Sistem
 ### 3.5.1 Arsitektur Umum
 
-Sistem dirancang dengan arsitektur aplikasi yang terdiri dari lapisan presentasi (panel Filament), controller (Laravel), dan data (model Eloquent dengan PostgreSQL). Seluruh manajemen stok berbasis bahan baku, di mana setiap menu yang terjual harus memiliki resep.
+Arsitektur umum sistem terbagi menjadi tiga subsistem utama, yaitu Sistem Transaksi, Sistem Inventori, dan Sistem Data Mining. Sistem Transaksi menangani proses pemesanan yang dilakukan oleh kasir dan pelanggan melalui antarmuka masing-masing, yang kemudian diproses oleh Modul Transaksi. Sistem Inventori mencakup Panel Admin (Filament) yang digunakan oleh admin untuk mengelola data inventori, serta *business logic* inventori yang menangani seluruh logika pencatatan dan perubahan stok. Sistem Data Mining (dikembangkan dalam penelitian terpisah) melakukan analisis pola penjualan dan prediksi kebutuhan bahan baku. Seluruh data disimpan dan dikelola pada PostgreSQL sebagai basis data utama.
 
-Gambar 3.3 Arsitektur umum sistem.
+Gambar 3.3 Arsitektur umum keseluruhan sistem.
+
+Admin mengakses Panel Admin melalui *web browser* untuk mengelola data inventori seperti bahan baku, *batch* stok, resep menu, dan penyesuaian stok. Kasir dan pelanggan masing-masing mengakses antarmuka melalui *web browser* untuk terhubung ke antarmuka masing-masing, yang kemudian akan terhubung ke modul transaksi untuk memproses pesanan. Ketika transaksi diproses, modul transaksi secara otomatis memicu deduksi stok ke sistem inventori. Panel Admin juga terhubung ke sistem inventori untuk seluruh operasi pengelolaan data. *Business logic* sistem inventori kemudian membaca dan menyimpan data ke PostgreSQL. Penelitian ini berfokus pada pengembangan sistem inventori yang mencakup panel admin dan *business logic* sistem inventori, sedangkan sistem transaksi merupakan modul yang sudah dikembangkan dalam penelitian terpisah. Seluruh data disimpan dan dikelola pada PostgreSQL sebagai basis data utama, yang juga digunakan oleh modul *Data Mining* (pengembangan terpisah) untuk analisis pola penjualan dan prediksi bahan baku.
+
+### 3.5.2 Arsitektur Detail Sistem Inventori
+
+Arsitektur detail sistem inventori menggambarkan lapisan-lapisan yang menyusun subsistem inventori secara lebih rinci. Sistem inventori terdiri dari lima lapisan yang saling terhubung.
+
+Lapisan pertama adalah **Lapisan Presentasi** yang terdiri dari Panel Admin Filament yang digunakan oleh admin untuk mengelola data inventori, serta halaman kasir (Inertia.js + React) yang menampilkan informasi menu dan stok kepada kasir. Lapisan kedua adalah **Lapisan Controller** yang terdiri dari CashierPesananBaruController dan CashierOrderController yang bertugas menerima permintaan dari pengguna dan mendelegasikannya ke lapisan service.
+
+Lapisan ketiga adalah **Lapisan Service (Business Logic)** yang merupakan inti dari sistem inventori. Lapisan ini terdiri dari InventoryService yang mengimplementasikan algoritma deduksi batch FEFO/FIFO, StockReconciliationService yang menangani logika penyesuaian stok dan pembatalannya, serta OrderPromotionService yang menangani perhitungan diskon. Lapisan keempat adalah **Lapisan Model (Data Access)** yang terdiri dari model Eloquent: Menu, Ingredient, IngredientBatch, StockMovement, StockAdjustment, dan DailyIngredientUsage. Model-model ini bertanggung jawab untuk membaca dan menulis data ke database.
+
+Lapisan kelima adalah **Database PostgreSQL** yang menyimpan seluruh data inventori. Alur data dimulai ketika pesanan masuk melalui Lapisan Presentasi, kemudian Controller mendelegasikan ke InventoryService. Service melakukan query ke IngredientBatch dengan urutan FEFO atau FIFO, mendeduksi stok dari batch yang sesuai, mencatat perubahan ke StockMovement, dan memperbarui DailyIngredientUsage.
 
 ## 3.6 Perancangan Basis Data
 ### 3.6.1 Entity Relationship Diagram

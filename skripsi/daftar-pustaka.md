@@ -39,3 +39,5 @@
 [20] A. Ihwan, "Rancang bangun sistem informasi manajemen inventaris berbasis web menggunakan metode agile pada Biro Sarana dan Prasarana Universitas Wijaya Putra Surabaya," Skripsi, Universitas Wijaya Putra, 2019. [Online]. Available: https://repository.uwp.ac.id/1969/
 
 [21] R. H. Nugroho, "Sistem informasi inventory barang menggunakan metode agile pada CV. Enigma," Skripsi, Universitas Mercu Buana, 2020. [Online]. Available: https://repository.mercubuana.ac.id/75081/
+
+[22] Susanti Kurmilasari, "PENGUJIAN PERANGKAT LUNAK PADA WEBSITE KA'CAKE: IMPLEMENTASI UNIT TESTING, INTEGRATION TESTING, SYSTEM TESTING, DAN VALIDATION TESTING UNTUK MENJAMIN KUALITAS DAN KEANDALAN SISTEM," JATI (Jurnal Mahasiswa Teknik Informatika), vol. 8, no. 3, pp. 1–10, 2024.

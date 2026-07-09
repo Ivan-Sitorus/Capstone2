@@ -64,6 +64,131 @@ Halaman riwayat penggunaan bahan baku menampilkan data pemakaian bahan baku berd
 
 Gambar 4.12 Halaman riwayat penggunaan bahan baku.
 
+### 4.1.8 Implementasi Algoritma Deduksi Stok
+
+Algoritma deduksi stok merupakan inti dari sistem manajemen inventori yang menentukan urutan konsumsi batch ketika terjadi pemakaian bahan baku. Sistem mengimplementasikan dua mode deduksi utama, yaitu FEFO (*First-Expiry-First-Out*) untuk bahan dengan masa kedaluwarsa terbatas dan FIFO (*First-In-First-Out*) untuk bahan non-perishable. Mekanisme penguncian data (*row-level locking*) diterapkan untuk mencegah konflik pada transaksi bersamaan.
+
+Penentuan urutan batch dilakukan melalui perintah `match` yang menerjemahkan mode batch bahan baku menjadi urutan query SQL. Batch dengan quantity lebih besar dari nol diambil, kemudian diurutkan berdasarkan mode yang dikonfigurasi pada setiap bahan baku. Batch yang memiliki nilai relevan kosong (NULL) ditempatkan di akhir urutan agar tidak mengganggu prioritas.
+
+```php
+$query = IngredientBatch::where('ingredient_id', $ingredientId)
+    ->where('quantity', '>', 0)
+    ->where(function ($q) {
+        $q->whereNull('expiry_date')
+          ->orWhereDate('expiry_date', '>', now())
+          ->orWhere('allow_expired_usage', true);
+    })
+    ->lockForUpdate();
+
+match ($ingredient->batch_mode) {
+    Ingredient::BATCH_MODE_FIFO => $query
+        ->orderByRaw('CASE WHEN received_at IS NULL THEN 1 ELSE 0 END')
+        ->orderBy('received_at', 'asc')
+        ->orderBy('expiry_date', 'asc')
+        ->orderBy('id', 'asc'),
+    Ingredient::BATCH_MODE_CUSTOM => $query
+        ->orderByRaw('CASE WHEN custom_order IS NULL THEN 1 ELSE 0 END')
+        ->orderBy('custom_order', 'asc')
+        ->orderBy('received_at', 'asc')
+        ->orderBy('id', 'asc'),
+    default => $query  // FEFO
+        ->orderByRaw('CASE WHEN expiry_date IS NULL THEN 1 ELSE 0 END')
+        ->orderBy('expiry_date', 'asc')
+        ->orderBy('received_at', 'asc')
+        ->orderBy('id', 'asc'),
+};
+```
+
+Pada kode di atas, baris `match` menentukan urutan batch berdasarkan mode. Pada mode FIFO, batch diurutkan berdasarkan `received_at` terlama (*ascending*). Pada mode *default* (FEFO), batch diurutkan berdasarkan `expiry_date` terdekat (*ascending*). Klausa `orderByRaw('CASE WHEN ... IS NULL THEN 1 ELSE 0 END')` memastikan bahwa batch yang memiliki nilai relevan kosong ditempatkan paling akhir sehingga tidak dikonsumsi lebih dahulu. Klausa `lockForUpdate()` mengunci baris-baris batch yang terpilih untuk mencegah transaksi bersamaan mengakses data yang sama sebelum transaksi saat ini selesai.
+
+Setelah batch diurutkan sesuai prioritas, sistem melakukan iterasi deduksi dari batch pertama hingga kebutuhan kuantitas terpenuhi. Setiap iterasi mencatat pergerakan stok melalui model `StockMovement` yang merekam `quantity_before`, `quantity_change`, dan `quantity_after` untuk keperluan audit.
+
+```php
+foreach ($batches as $batch) {
+    if ($remainingToDeduct <= 0) break;
+    $before = (float) $batch->quantity;
+    $deductFromThisBatch = min($before, $remainingToDeduct);
+    $after = $before - $deductFromThisBatch;
+    $batch->quantity = $after;
+    $batch->save();
+    $remainingToDeduct -= $deductFromThisBatch;
+    StockMovement::create([
+        'ingredient_id' => $ingredientId,
+        'ingredient_batch_id' => $batch->id,
+        'order_id' => $context['order_id'] ?? null,
+        'movement_type' => $context['movement_type'] ?? 'sale',
+        'quantity_before' => $before,
+        'quantity_change' => -$deductFromThisBatch,
+        'quantity_after' => $after,
+        'unit_cost' => $batch->cost_per_unit,
+        'notes' => $context['notes'] ?? null,
+    ]);
+}
+```
+
+Pada kode di atas, setiap batch diproses secara berurutan. Variabel `before` menyimpan nilai stok sebelum deduksi, `deductFromThisBatch` menghitung jumlah yang diambil dari batch saat ini menggunakan fungsi `min()`, dan `after` menyimpan nilai stok setelah deduksi. Setelah penyimpanan batch, sistem mencatat `StockMovement` dengan `quantity_change` bernilai negatif karena merupakan pengurangan stok. Proses berlanjut hingga `remainingToDeduct` habis atau seluruh batch telah diproses.
+
+### 4.1.9 Implementasi Penyesuaian Stok dan Perhitungan Stok
+
+Penyesuaian stok (*stock adjustment*) merupakan fitur yang memungkinkan admin melakukan perubahan stok secara manual di luar transaksi penjualan, baik berupa penambahan (*increase*) maupun pengurangan (*decrease*, *waste*, *damage*). Fitur pembatalan penyesuaian (*cancel*) juga diimplementasikan untuk mengembalikan stok ke kondisi sebelum penyesuaian dilakukan.
+
+Mekanisme pembatalan penyesuaian bekerja dengan cara membalikkan (*reverse*) setiap pergerakan stok yang tercatat pada penyesuaian yang akan dibatalkan. Untuk setiap `StockMovement` yang terkait, sistem menghitung nilai perubahan kebalikan (`reversalChange = -originalChange`), mengembalikan stok batch ke nilai semula, dan mencatat `StockMovement` baru sebagai jejak audit.
+
+```php
+foreach ($record->stockMovements as $movement) {
+    $batch = IngredientBatch::find($movement->ingredient_batch_id);
+    if (! $batch) continue;
+    $originalChange = (float) $movement->quantity_change;
+    $reversalChange = -$originalChange;
+    $batchBefore = (float) $batch->quantity;
+    $batch->increment('quantity', $reversalChange);
+    $batchAfter = (float) $batch->quantity;
+    StockMovement::create([
+        'ingredient_id' => $movement->ingredient_id,
+        'ingredient_batch_id' => $batch->id,
+        'stock_adjustment_id' => $record->id,
+        'movement_type' => $movement->movement_type,
+        'source_type' => 'stock_adjustment_reversal',
+        'source_id' => (string) $record->id,
+        'quantity_before' => $batchBefore,
+        'quantity_change' => $reversalChange,
+        'quantity_after' => $batchAfter,
+        'unit_cost' => $batch->cost_per_unit,
+        'notes' => 'Pembatalan: ' . $reason,
+    ]);
+}
+```
+
+Selain penyesuaian stok, sistem juga menyediakan perhitungan stok yang dikonversi menjadi jumlah porsi (*servings*) yang dapat diproduksi dari bahan baku yang tersedia. Atribut `stock` pada model `Menu` menghitung ketersediaan stok untuk setiap menu berdasarkan resep bahan baku penyusunnya. Perhitungan dilakukan dengan membagi total stok setiap bahan baku dengan kebutuhan per porsi (`quantity_used`), kemudian mengambil nilai minimum di antara seluruh bahan baku penyusun. Pendekatan ini memastikan bahwa jumlah porsi yang dilaporkan sesuai dengan bahan baku yang paling terbatas.
+
+```php
+public function getStockAttribute(): ?float
+{
+    $ingredients = $this->menuIngredients()->with('ingredient')->get();
+    if ($ingredients->isEmpty()) return null;
+    $minServings = null;
+    foreach ($ingredients as $mi) {
+        if (! $mi->ingredient) continue;
+        $totalStock = (float) $mi->ingredient->batches()
+            ->where('quantity', '>', 0)
+            ->where(function ($q) {
+                $q->whereNull('expiry_date')
+                  ->orWhereDate('expiry_date', '>', now())
+                  ->orWhere('allow_expired_usage', true);
+            })
+            ->sum('quantity') ?: 0;
+        $needed = (float) $mi->quantity_used;
+        $servings = $needed > 0 ? (int) ($totalStock / $needed) : 0;
+        if ($minServings === null || $servings < $minServings) {
+            $minServings = $servings;
+        }
+    }
+    return $minServings ?? 0;
+}
+```
+
+Pada kode di atas, setiap bahan baku penyusun menu diperiksa stoknya melalui relasi `batches`. Hanya batch dengan *quantity* lebih dari nol dan belum kedaluwarsa (atau diizinkan penggunaan kedaluwarsa) yang dihitung. Total stok dibagi dengan `quantity_used` (kebutuhan per porsi) untuk mendapatkan jumlah porsi yang dapat dibuat dari bahan tersebut. Nilai minimum (`minServings`) di antara seluruh bahan kemudian menjadi nilai akhir atribut `stock`. Jika menu tidak memiliki resep (*ingredients* kosong), fungsi mengembalikan `null`.
+
 ## 4.2 Pengujian
 
 Pengujian sistem dilakukan melalui dua pendekatan: black box dan white box.
@@ -278,3 +403,59 @@ public function test_cancelling_adjustment_restores_stock(): void
 ```
 
 Seluruh pengujian white box menunjukkan hasil sesuai dengan spesifikasi yang dirancang. Algoritma FIFO dan FEFO bekerja dengan benar, penyesuaian stok berjalan akurat, serta pembatalan penyesuaian berhasil mengembalikan stok ke kondisi awal.
+
+### 4.2.3 Pengujian Integration
+
+Pengujian integrasi merupakan level pengujian yang melengkapi pengujian *black box* dan *white box*. Jika *black box* menguji fungsionalitas fitur secara individual dan *white box* menguji kebenaran logika internal, maka pengujian integrasi memvalidasi aliran data antar modul serta konsistensi *state* ketika terjadi pertukaran informasi antar komponen sistem [20].
+
+**a. Pengujian Penambahan Batch**
+
+Pengujian penambahan batch dilakukan untuk memverifikasi bahwa penambahan stok bahan baku melalui fitur *batch management* menghasilkan perubahan total stok yang akurat dan tidak menghasilkan pencatatan `stock_movements` yang tidak semestinya.
+
+| Skenario | Langkah | Hasil Diharapkan | Status |
+|----------|---------|------------------|--------|
+| Tambah batch | Tambah batch stok dengan kuantitas 50 unit | Total stok bertambah 50 sesuai batch | Berhasil |
+| Verifikasi stock_movements | Cek tabel stock_movements | Tidak ada pergerakan baru (penambahan batch bukan transaksi stok) | Berhasil |
+
+**b. Pengujian Penyesuaian Stok**
+
+Pengujian penyesuaian stok dilakukan untuk memverifikasi bahwa penyesuaian stok tipe *increase* dan *decrease* berfungsi dengan benar, serta pembatalan penyesuaian mengembalikan stok ke kondisi semula dan mencatat *reversal movement*.
+
+| Skenario | Langkah | Hasil Diharapkan | Status |
+|----------|---------|------------------|--------|
+| Adjustment increase | Buat adjustment dengan kuantitas +30 | Batch stok bertambah 30 | Berhasil |
+| Verifikasi batch naik | Cek kuantitas batch terkait | Kuantitas batch bertambah sesuai adjustment | Berhasil |
+| Batalkan adjustment | Klik batalkan pada adjustment | Stok kembali ke jumlah semula | Berhasil |
+| Verifikasi reversal | Cek stock_movements | Movement reversal tercatat dengan quantity_change berlawanan | Berhasil |
+
+**c. Pengujian Deduksi FEFO**
+
+Pengujian deduksi FEFO dilakukan untuk memverifikasi bahwa batch dengan `expiry_date` terdekat dikonsumsi terlebih dahulu ketika terjadi pemakaian stok.
+
+| Skenario | Langkah | Hasil Diharapkan | Status |
+|----------|---------|------------------|--------|
+| Buat 2 batch | Batch A: qty 80, expiry 3 hari. Batch B: qty 80, expiry 30 hari | Kedua batch terbuat | Berhasil |
+| Deduksi 100 unit | Jalankan fungsi deduksi stok | Batch A habis (80 unit), Batch B sisa 60 unit | Berhasil |
+| Verifikasi prioritas FEFO | Cek urutan deduksi | Batch expiry 3 hari terpakai duluan | Berhasil |
+
+**d. Pengujian Konsistensi Riwayat**
+
+Pengujian konsistensi riwayat dilakukan untuk memverifikasi bahwa setiap pergerakan stok mencatat `quantity_before`, `quantity_change`, dan `quantity_after` secara akurat sehingga riwayat dapat dilacak dengan tepat.
+
+| Skenario | Langkah | Hasil Diharapkan | Status |
+|----------|---------|------------------|--------|
+| Proses order | Buat order dengan 2 menu beresep | Order diproses | Berhasil |
+| Cek konsistensi stock_movements | Periksa quantity_before, quantity_change, quantity_after | quantity_after = quantity_before + quantity_change | Berhasil |
+| Verifikasi penjumlahan | Hitung total quantity_change | Total sesuai dengan jumlah bahan baku yang terpakai | Berhasil |
+
+**e. Pengujian Integrasi Lintas Modul — Order ke Stok**
+
+Pengujian integrasi lintas modul dilakukan untuk memverifikasi bahwa ketika pesanan diproses melalui modul transaksi (POS), stok bahan baku pada modul inventori berkurang sesuai resep menu dan `daily_ingredient_usage` tercatat dengan benar.
+
+| Skenario | Langkah | Hasil Diharapkan | Status |
+|----------|---------|------------------|--------|
+| Order POS | Buat pesanan melalui sistem POS | Stok bahan baku berkurang sesuai resep | Berhasil |
+| Verifikasi deduksi resep | Cek total stok bahan baku penyusun | Stok berkurang tepat sesuai quantity_used kali kuantitas order | Berhasil |
+| Verifikasi daily_usage | Cek tabel daily_ingredient_usage | Pemakaian harian tercatat dengan tanggal dan kuantitas yang benar | Berhasil |
+
+Seluruh skenario pengujian *integration* menunjukkan status Berhasil. Hasil ini membuktikan bahwa aliran data antar modul inventori dan modul transaksi berjalan konsisten, pencatatan pergerakan stok akurat, serta mekanisme deduksi batch dan reversal berfungsi sesuai perancangan.
