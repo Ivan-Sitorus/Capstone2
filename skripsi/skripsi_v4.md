@@ -772,10 +772,9 @@ ingredients
 quantity DECIMAL Jumlah stok
 expiry_date DATE Kedaluwarsa (FEFO)
 received_at TIMESTAMP Penerimaan  (FIFO)
-cost_per_unit INTEGER Harga per unit
-custom_order INTEGER Urutan kustom batch
-
-6Ta bel 3.5 Struktur ta bel menu_ingredients
+ cost_per_unit INTEGER Harga per unit
+ 
+ 6Ta bel 3.5 Struktur ta bel menu_ingredients
 ## Kolom Tipe Keterangan
 id BIGINT PK Primary key, auto-
 increment
@@ -1043,12 +1042,6 @@ match ($ingredient->batch_mode) {
 ## THEN 1 ELSE 0 END')
 ##         ->orderBy('received_at', 'asc')
 ##         ->orderBy('expiry_date', 'asc')
-##         ->orderBy('id', 'asc'),
-##     Ingredient::BATCH_MODE_CUSTOM => $query
-##         ->orderByRaw('CASE WHEN custom_order IS NULL
-## THEN 1 ELSE 0 END')
-##         ->orderBy('custom_order', 'asc')
-##         ->orderBy('received_at', 'asc')
 ##         ->orderBy('id', 'asc'),
 ##     default => $query  // FEFO
 ##         ->orderByRaw('CASE WHEN expiry_date IS NULL

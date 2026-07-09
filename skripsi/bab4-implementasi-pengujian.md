@@ -86,11 +86,6 @@ match ($ingredient->batch_mode) {
         ->orderBy('received_at', 'asc')
         ->orderBy('expiry_date', 'asc')
         ->orderBy('id', 'asc'),
-    Ingredient::BATCH_MODE_CUSTOM => $query
-        ->orderByRaw('CASE WHEN custom_order IS NULL THEN 1 ELSE 0 END')
-        ->orderBy('custom_order', 'asc')
-        ->orderBy('received_at', 'asc')
-        ->orderBy('id', 'asc'),
     default => $query  // FEFO
         ->orderByRaw('CASE WHEN expiry_date IS NULL THEN 1 ELSE 0 END')
         ->orderBy('expiry_date', 'asc')
