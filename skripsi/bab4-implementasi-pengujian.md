@@ -406,7 +406,9 @@ Seluruh pengujian white box menunjukkan hasil sesuai dengan spesifikasi yang dir
 
 ### 4.2.3 Pengujian Integrasi Lintas Modul
 
-Pengujian integrasi lintas modul dilakukan untuk memverifikasi bahwa aliran data antara sistem transaksi (POS kasir) dan sistem inventori berjalan dengan benar. Berbeda dengan pengujian *white box* yang memanggil *service* secara langsung untuk memvalidasi kebenaran algoritma, pengujian integrasi lintas modul mengirimkan *request* HTTP ke *controller* transaksi dan memverifikasi efek sampingnya di *database* inventori. Dengan demikian, pengujian ini memvalidasi bahwa seluruh lapisan sistem — mulai dari *request* pengguna, autentikasi, validasi, *controller*, hingga *service* inventori — bekerja secara koheren.
+Pengujian integrasi lintas modul dilakukan untuk memverifikasi bahwa aliran data antara sistem transaksi (POS kasir) dan sistem inventori berjalan dengan benar. Berbeda dengan pengujian *white box* yang memanggil *service* secara langsung untuk memvalidasi kebenaran algoritma, pengujian integrasi lintas modul mengirimkan *request* HTTP ke *controller* transaksi dan memverifikasi efek sampingnya di *database* inventori.
+
+Pendekatan yang digunakan dalam pengujian ini termasuk dalam kategori *gray box testing*, yaitu metode pengujian yang menggabungkan aspek *black box* dan *white box* dengan pengetahuan parsial terhadap struktur internal sistem [23]. Dalam konteks ini, penguji memiliki pengetahuan tentang skema *database* dan alur sistem (seperti nama tabel `stock_movements` dan kolom `quantity_change`), namun pengujian tetap dilakukan melalui antarmuka HTTP tanpa memanggil kode secara langsung. Dengan demikian, pengujian ini memvalidasi bahwa seluruh lapisan sistem — mulai dari *request* pengguna, autentikasi, validasi, *controller*, hingga *service* inventori — bekerja secara koheren.
 
 Tiga skenario utama diuji: skenario keberhasilan pesanan kasir, skenario gagal ketika stok tidak mencukupi, serta skenario alur pemesanan pelanggan yang dikonfirmasi oleh kasir.
 
