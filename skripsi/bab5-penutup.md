@@ -10,7 +10,7 @@ Berdasarkan hasil perancangan, implementasi, dan pengujian sistem manajemen inve
 
 3. Sistem berhasil mencatat pemakaian bahan baku secara otomatis setiap kali terjadi transaksi penjualan dan menyediakan riwayat perubahan stok yang dapat dilacak secara lengkap.
 
-4. Pengujian *black box* terhadap seluruh modul menunjukkan skenario berhasil. Pengujian *white box* memvalidasi kebenaran deduksi stok berbasis resep, algoritma FIFO dan FEFO, penyesuaian stok, serta pembatalan penyesuaian stok. Pengujian integrasi memvalidasi konsistensi aliran data antar modul inventori dan modul transaksi.
+4. Pengujian *black box* terhadap seluruh modul menunjukkan skenario berhasil. Pengujian *white box* memvalidasi kebenaran deduksi stok berbasis resep, algoritma FIFO dan FEFO, penyesuaian stok, serta pembatalan penyesuaian stok. Pengujian *gray box* memvalidasi konsistensi aliran data antar modul inventori dan modul transaksi.
 
 ## 5.2 Saran
 

@@ -156,18 +156,79 @@ Arsitektur detail sistem inventori menggambarkan komponen-komponen yang membentu
 
 Sistem transaksi berinteraksi dengan sistem inventori melalui dua jalur. Pertama, Panel Admin Filament melakukan operasi CRUD ke model inventori (Category, Menu, Ingredient, IngredientBatch, StockAdjustment) serta membaca data riwayat pemakaian dari StockMovement. Kedua, controller transaksi (`CashierPesananBaruController` dan `CashierOrderController`) memanggil `InventoryService::processSaleForOrder()` ketika pesanan diproses, yang kemudian menjalankan algoritma deduksi batch, mencatat perubahan ke `StockMovement`, dan memperbarui stok pada `IngredientBatch` yang sesuai.
 
-## 3.6 Perancangan Basis Data
-### 3.6.1 Entity Relationship Diagram
+## 3.6 Perencanaan Pengujian
+
+Bab ini menjelaskan perencanaan pengujian perangkat lunak yang akan dilakukan untuk memvalidasi sistem manajemen inventori. Pengujian dilakukan dengan tiga metode yang saling melengkapi, yaitu *black box testing*, *white box testing*, dan *gray box testing*.
+
+### 3.6.1 Pengujian Black Box
+
+**Tujuan:** Pengujian *black box* bertujuan untuk memvalidasi fungsionalitas fitur sistem dari sisi pengguna tanpa mengetahui struktur internal kode. Fokus pengujian adalah pada kesesuaian input dan output sistem terhadap spesifikasi kebutuhan fungsional yang telah dirancang pada Tabel 3.1.
+
+**Skenario:** Pengujian mencakup autentikasi admin (login, logout), manajemen bahan baku (*create*, *read*, *update*, *delete*), penyesuaian stok (penambahan, pengurangan, input tidak valid), serta manajemen menu (tambah, ubah, hapus menu, tambah dan hapus resep).
+
+**Tools:** Pengujian dilakukan secara manual melalui antarmuka pengguna pada panel admin Filament menggunakan *web browser*.
+
+**Kriteria Keberhasilan:** Seluruh skenario pengujian menunjukkan status "Berhasil" sesuai dengan hasil yang diharapkan.
+
+Tabel 3.6 Rencana skenario pengujian *black box*.
+
+| Modul | Skenario | Target |
+|-------|----------|--------|
+| Autentikasi | Login valid, login gagal, logout | 3 skenario |
+| Bahan Baku | Tambah, ubah, hapus, tambah batch | 4 skenario |
+| Penyesuaian Stok | Penambahan, pengurangan, input <= 0 | 3 skenario |
+| Menu | Tambah, ubah, hapus menu, tambah/hapus resep | 5 skenario |
+
+### 3.6.2 Pengujian White Box
+
+**Tujuan:** Pengujian *white box* bertujuan untuk memvalidasi kebenaran logika internal dan algoritma sistem dengan mengakses kode sumber secara langsung. Fokus pengujian adalah pada kebenaran algoritma deduksi batch FEFO dan FIFO, mekanisme penyesuaian stok, serta pembatalan penyesuaian.
+
+**Skenario:** Pengujian mencakup deduksi stok berdasarkan resep menu, algoritma FIFO (batch dengan `received_at` paling awal dikonsumsi terlebih dahulu), algoritma FEFO (batch dengan `expiry_date` terdekat dikonsumsi terlebih dahulu), penyesuaian stok tipe *increase*, serta pembatalan penyesuaian stok yang mengembalikan stok ke kondisi awal.
+
+**Tools:** Pengujian dilakukan menggunakan PHPUnit dengan *database* PostgreSQL untuk memverifikasi perubahan data secara langsung.
+
+**Kriteria Keberhasilan:** Seluruh *test case* (*test method*) menunjukkan status *passed*.
+
+Tabel 3.7 Rencana skenario pengujian *white box*.
+
+| Kode | Skenario | Target |
+|------|----------|--------|
+| WB-01 | Deduksi stok berdasarkan resep menu | 1 test |
+| WB-02 | Algoritma FIFO | 1 test |
+| WB-03 | Algoritma FEFO | 1 test |
+| WB-04 | Penyesuaian stok (*increase*) | 1 test |
+| WB-05 | Pembatalan penyesuaian stok | 1 test |
+
+### 3.6.3 Pengujian Gray Box
+
+**Tujuan:** Pengujian *gray box* bertujuan untuk memvalidasi interaksi antara sistem transaksi dan sistem inventori dengan pengetahuan parsial terhadap struktur internal sistem [23]. Pengujian dilakukan dengan mengirimkan *request* HTTP ke *controller* transaksi dan memverifikasi efek sampingnya pada *database* inventori.
+
+**Skenario:** Pengujian mencakup skenario keberhasilan pesanan kasir (memastikan stok berkurang, pergerakan stok tercatat, dan pemakaian harian direkam), skenario kegagalan ketika stok tidak mencukupi (memastikan pesanan ditolak dan stok tidak berubah), serta skenario alur pemesanan pelanggan yang dikonfirmasi oleh kasir (memastikan stok baru berkurang setelah konfirmasi).
+
+**Tools:** Pengujian dilakukan menggunakan PHPUnit dengan *HTTP testing* (`$this->post()`, `$this->patch()`) dan asersi *database* (`assertDatabaseHas`, `assertSame`) untuk memverifikasi konsistensi data.
+
+**Kriteria Keberhasilan:** Seluruh *test case* menunjukkan status *passed* dengan total 16 asersi.
+
+Tabel 3.8 Rencana skenario pengujian *gray box*.
+
+| Kode | Skenario | Target |
+|------|----------|--------|
+| GB-01 | Pesanan kasir sukses — stok berkurang | 1 test (7 asersi) |
+| GB-02 | Pesanan kasir gagal — stok tidak cukup | 1 test (1 asersi) |
+| GB-03 | Alur pelanggan ke konfirmasi kasir | 1 test (8 asersi) |
+
+
+### 3.7.1 Entity Relationship Diagram
 
 Terdapat lima tabel utama: ingredients, ingredient_batches, menu_ingredients, stock_movements, dan stock_adjustments.
 
 Gambar 3.4 ERD sistem inventori.
 
-### 3.6.2 Deskripsi Entitas
+### 3.7.2 Deskripsi Entitas
 
 Pada implementasi sistem manajemen inventori, desain fisik database dijelaskan secara rinci melalui tabel-tabel berikut yang mencakup seluruh spesifikasi teknis penyimpanan data berdasarkan hasil transformasi dari Entity Relationship Diagram (ERD).
 
-Tabel 3.6 Struktur tabel ingredients.
+Tabel 3.9 Struktur tabel ingredients.
 
 | Kolom | Tipe | Keterangan |
 |-------|------|------------|
@@ -178,7 +239,7 @@ Tabel 3.6 Struktur tabel ingredients.
 | is_active | BOOLEAN | Status aktif |
 | deleted_at | TIMESTAMP | Soft delete |
 
-Tabel 3.7 Struktur tabel ingredient_batches.
+Tabel 3.10 Struktur tabel ingredient_batches.
 
 | Kolom | Tipe | Keterangan |
 |-------|------|------------|
@@ -189,7 +250,7 @@ Tabel 3.7 Struktur tabel ingredient_batches.
 | received_at | TIMESTAMP | Penerimaan (FIFO) |
 | cost_per_unit | DECIMAL(12,2) | Harga per unit |
 
-Tabel 3.8 Struktur tabel menu_ingredients.
+Tabel 3.11 Struktur tabel menu_ingredients.
 
 | Kolom | Tipe | Keterangan |
 |-------|------|------------|
@@ -198,7 +259,7 @@ Tabel 3.8 Struktur tabel menu_ingredients.
 | ingredient_id | BIGINT FK | Foreign key ke ingredients |
 | quantity_used | DECIMAL(12,2) | Jumlah bahan per unit menu |
 
-Tabel 3.9 Struktur tabel stock_movements (immutable).
+Tabel 3.12 Struktur tabel stock_movements (immutable).
 
 | Kolom | Tipe | Keterangan |
 |-------|------|------------|

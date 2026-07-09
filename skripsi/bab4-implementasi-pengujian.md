@@ -399,7 +399,7 @@ public function test_cancelling_adjustment_restores_stock(): void
 
 Seluruh pengujian white box menunjukkan hasil sesuai dengan spesifikasi yang dirancang. Algoritma FIFO dan FEFO bekerja dengan benar, penyesuaian stok berjalan akurat, serta pembatalan penyesuaian berhasil mengembalikan stok ke kondisi awal.
 
-### 4.2.3 Pengujian Integrasi Lintas Modul
+### 4.2.3 Pengujian Gray Box
 
 Pengujian integrasi lintas modul dilakukan untuk memverifikasi bahwa aliran data antara sistem transaksi (POS kasir) dan sistem inventori berjalan dengan benar. Berbeda dengan pengujian *white box* yang memanggil *service* secara langsung untuk memvalidasi kebenaran algoritma, pengujian integrasi lintas modul mengirimkan *request* HTTP ke *controller* transaksi dan memverifikasi efek sampingnya di *database* inventori.
 

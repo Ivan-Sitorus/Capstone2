@@ -30,7 +30,7 @@ Berdasarkan latar belakang, dirumuskan permasalahan sebagai berikut:
 
 3. Sistem memerlukan koneksi internet untuk diakses.
 
-4. Pengujian terbatas pada *black box*, *white box*, dan *integration test* yang mencakup verifikasi algoritma deduksi, konsistensi data antar modul, dan validasi fungsionalitas sistem.
+4. Pengujian terbatas pada *black box*, *white box*, dan *gray box test* yang mencakup verifikasi algoritma deduksi, konsistensi data antar modul, dan validasi fungsionalitas sistem.
 
 ## 1.4 Tujuan Penelitian
 
@@ -62,10 +62,10 @@ Penelitian ini menggunakan metode *Agile* melalui tahapan sebagai berikut:
 
 3. **Development**: Implementasi secara bertahap dalam dua iterasi, yaitu inti inventori dan panel administrasi.
 
-4. **Testing**: Pengujian *black box*, *white box*, dan *integration testing* untuk memvalidasi seluruh fungsionalitas dan integrasi sistem.
+4. **Testing**: Pengujian *black box*, *white box*, dan *gray box testing* untuk memvalidasi seluruh fungsionalitas dan integrasi sistem.
 
 5. **Review**: Evaluasi hasil pengujian dan penyusunan dokumentasi.
 
 ## 1.7 Sistematika Penulisan
 
-Tugas akhir ini terdiri atas lima bab. BAB I berisi pendahuluan. BAB II membahas kajian pustaka yang meliputi penelitian terdahulu dan landasan teori termasuk metode pengujian *black box*, *white box*, dan *integration testing*. BAB III menjelaskan perancangan sistem. BAB IV menyajikan implementasi algoritma inti dan hasil pengujian *black box*, *white box*, serta *integration*. BAB V berisi penutup.
+Tugas akhir ini terdiri atas lima bab. BAB I berisi pendahuluan. BAB II membahas kajian pustaka yang meliputi penelitian terdahulu dan landasan teori termasuk metode pengujian *black box*, *white box*, dan *gray box testing*. BAB III menjelaskan perancangan sistem. BAB IV menyajikan implementasi algoritma inti dan hasil pengujian *black box*, *white box*, serta *gray box*. BAB V berisi penutup.

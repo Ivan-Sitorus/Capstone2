@@ -172,9 +172,9 @@ seca ra  intuitif. Sistem mengimplementa sika n dua  mode deduksi batch ya itu F
 First-Out)  da n  FIFO  (First-In-First-Out),  denga n  meka nisme  penguncia n  da ta   untuk  mencegah
 konflik  pa da   transa ksi  bersamaa n.  Integra si  dengan  modul  tra nsa ksi  ka sir  dila kukan  seca ra
 otoma tis di ma na  deduksi stok terja di seba ga i ba gia n da ri pemrosesa n pesa na n.
-Pengujia n dila kukan denga n metode black box, white box, dan integration testing.
+Pengujia n dila kukan denga n metode black box, white box, dan gray box testing.
 Ha sil pengujia n black box terhada p seluruh modul menunjukka n skena rio berha sil. Pengujia n
-white box memva lida si kebena ra n a lgoritma FIFO da n FEFO. Pengujia n integrasi memva lida si
+white box memva lida si kebena ra n a lgoritma FIFO da n FEFO. Pengujia n gray box memva lida si
 konsistensi a lira n da ta a nta r modul. Seluruh meka nisme deduksi stok da n penca tata n
 pergera ka n berja la n sesua i pera nca nga n.
 Kata kunci: Sistem ma na jemen inventori, Point of Sale, La ra vel, Fila ment, FEFO, FIFO.
@@ -194,9 +194,9 @@ management. The system implements two batch deduction modes: FEFO (First-Expiry-
 and  FIFO  (First-In-First-Out),  with  data locking  mechanisms  to  prevent  conflicts  in  concurrent
 transactions.  Integration  with  the  cashier  transaction  module  is  achieved  automatically  where
 stock deduction occurs as part of order processing.
-Testing was conducted using black box, white box, and integration testing methods.
+Testing was conducted using black box, white box, and gray box testing methods.
 Black box testing across all modules showed scenarios passed. White box testing validated
-FIFO and FEFO algorithms. Integration testing validated data consistency across modules.
+FIFO and FEFO algorithms. Gray box testing validated data consistency across modules.
 All stock deduction mechanisms and movement recording functioned as designed.
 Keywords:  Inventory  management  system,  Point  of  Sale,  Laravel,  Filament,  FEFO,
 ## FIFO.
@@ -249,7 +249,7 @@ pendukung  (autentikasi, dashboard, kategori,   menu).  Penelitian  tidak
 mencakup laporan keuangan dan modul di luar konteks inventori.
 - Mode deduksi batch stok terbatas pada FEFO dan FIFO.
 - Sistem memerlukan  koneksi internet untuk diakses.
-- Pengujian terbatas pada black box, white box, dan integration test yang
+- Pengujian terbatas pada black box, white box, dan gray box test yang
 mencakup verifikasi algoritma deduksi, konsistensi data antar modul, dan
 validasi fungsionalitas sistem.
 
@@ -285,7 +285,7 @@ studi literatur.
 antarmuka panel Filament.
 - Development: Implementasi  secara  bertahap  dalam  dua  iterasi,  yaitu  inti
 inventori dan panel administrasi.
-- Testing:  Pengujian black box, white box, dan integration testing untuk
+- Testing:  Pengujian black box, white box, dan gray box testing untuk
 memvalidasi seluruh fungsionalitas dan integrasi sistem.
 - Review:  Evaluasi  hasil  pengujian  dan  penyusunan  dokumentasi sistem
 sebagai bagian dari laporan tugas akhir.
@@ -311,7 +311,7 @@ perancangan   basis   data,   perancangan   arsitektur   aplikasi,   serta   per
 antarmuka.
 ## BAB IV IMPLEMENTASI DAN PENGUJIAN
 Menyajikan  implementasi  panel  administrasi,  implementasi  algoritma  inti,
-serta hasil pengujian black box, white box, dan integration.
+serta hasil pengujian black box, white box, dan gray box.
 ## BAB V PENUTUP
 Bab ini berisi kesimpulan dari perancangan, implementasi, dan pengujian
 yang telah dilakukan, serta saran pengembangan dan penelitian lebih  lanjut pada
@@ -850,8 +850,41 @@ unit_cost DECIMAL(12,2) Harga per unit
 notes TEXT Catatan
 recorded_by BIGINT FK
 Foreign key ke users
-created_at TIMESTAMP Waktu dicatat
+ created_at TIMESTAMP Waktu dicatat
 
+## 3.6 Perencanaan Pengujian
+
+Bab ini menjelaskan perencanaan pengujian perangkat lunak yang akan dilakukan untuk memvalidasi sistem manajemen inventori. Pengujian dilakukan dengan tiga metode yang saling melengkapi, yaitu black box testing, white box testing, dan gray box testing.
+
+### 3.6.1 Pengujian Black Box
+
+**Tujuan:** Pengujian black box bertujuan untuk memvalidasi fungsionalitas fitur sistem dari sisi pengguna tanpa mengetahui struktur internal kode. Fokus pengujian adalah pada kesesuaian input dan output sistem terhadap spesifikasi kebutuhan fungsional yang telah dirancang.
+
+**Skenario:** Pengujian mencakup autentikasi admin (login, logout), manajemen bahan baku (create, read, update, delete), penyesuaian stok (penambahan, pengurangan, input tidak valid), serta manajemen menu (tambah, ubah, hapus menu, tambah dan hapus resep).
+
+**Tools:** Pengujian dilakukan secara manual melalui antarmuka pengguna pada panel admin Filament menggunakan web browser.
+
+**Kriteria Keberhasilan:** Seluruh skenario pengujian menunjukkan status "Berhasil" sesuai dengan hasil yang diharapkan.
+
+### 3.6.2 Pengujian White Box
+
+**Tujuan:** Pengujian white box bertujuan untuk memvalidasi kebenaran logika internal dan algoritma sistem dengan mengakses kode sumber secara langsung. Fokus pengujian adalah pada kebenaran algoritma deduksi batch FEFO dan FIFO, mekanisme penyesuaian stok, serta pembatalan penyesuaian.
+
+**Skenario:** Pengujian mencakup deduksi stok berdasarkan resep menu, algoritma FIFO (batch dengan received_at paling awal dikonsumsi terlebih dahulu), algoritma FEFO (batch dengan expiry_date terdekat dikonsumsi terlebih dahulu), penyesuaian stok tipe increase, serta pembatalan penyesuaian stok yang mengembalikan stok ke kondisi awal.
+
+**Tools:** Pengujian dilakukan menggunakan PHPUnit dengan database PostgreSQL untuk memverifikasi perubahan data secara langsung.
+
+**Kriteria Keberhasilan:** Seluruh test case (test method) menunjukkan status passed.
+
+### 3.6.3 Pengujian Gray Box
+
+**Tujuan:** Pengujian gray box bertujuan untuk memvalidasi interaksi antara sistem transaksi dan sistem inventori dengan pengetahuan parsial terhadap struktur internal sistem [23]. Pengujian dilakukan dengan mengirimkan request HTTP ke controller transaksi dan memverifikasi efek sampingnya pada database inventori.
+
+**Skenario:** Pengujian mencakup skenario keberhasilan pesanan kasir (memastikan stok berkurang, pergerakan stok tercatat, dan pemakaian harian direkam), skenario kegagalan ketika stok tidak mencukupi (memastikan pesanan ditolak dan stok tidak berubah), serta skenario alur pemesanan pelanggan yang dikonfirmasi oleh kasir (memastikan stok baru berkurang setelah konfirmasi).
+
+**Tools:** Pengujian dilakukan menggunakan PHPUnit dengan HTTP testing ($this->post(), $this->patch()) dan asersi database (assertDatabaseHas, assertSame) untuk memverifikasi konsistensi data.
+
+**Kriteria Keberhasilan:** Seluruh test case menunjukkan status passed dengan total 16 assertions.
 
 ## BAB IV
 ## IMPLEMENTASI DAN PENGUJIAN
@@ -1490,7 +1523,7 @@ yang  dirancang.  Algoritma  FIFO  dan  FEFO  bekerja  dengan  benar,  penyesuai
 stok  berjalan  akurat,  serta  pembatalan  penyesuaian  berhasil  mengembalikan  stok
 ke kondisi awal.
 
-## 4.2.3 Pengujian Integration
+## 4.2.3 Pengujian Gray Box
 Pengujian integrasi merupakan level pengujian yang melengkapi pengujian
 black box dan white box. Jika black box menguji fungsionalitas fitur secara
 individual dan white box menguji kebenaran logika internal, maka pengujian
@@ -1685,7 +1718,7 @@ yang dapat dilacak secara lengkap.
 - Pengujian black   box terhadap   seluruh   modul   menunjukkan   skenario
 berhasil.   Pengujian   white   box   memvalidasi   kebenaran   deduksi   stok
 berbasis   resep,   algoritma   FIFO   dan   FEFO,   penyesuaian   stok,   serta
-pembatalan penyesuaian stok. Pengujian integrasi memvalidasi konsistensi
+pembatalan penyesuaian stok. Pengujian gray box memvalidasi konsistensi
 aliran data antar modul inventori dan modul transaksi.
 
 ## 5.2 Saran

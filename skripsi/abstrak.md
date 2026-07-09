@@ -4,6 +4,6 @@ Manajemen inventori merupakan aspek kritis dalam operasional kafe yang mempengar
 
 Sistem dikembangkan menggunakan kerangka kerja Laravel 13 dengan panel administrasi Filament yang menyediakan antarmuka pengelolaan data dan manajemen batch secara intuitif. Sistem mengimplementasikan dua mode deduksi batch yaitu FEFO (*First-Expiry-First-Out*) dan FIFO (*First-In-First-Out*), dengan mekanisme penguncian data untuk mencegah konflik pada transaksi bersamaan. Integrasi dengan modul transaksi kasir dilakukan secara otomatis di mana deduksi stok terjadi sebagai bagian dari pemrosesan pesanan.
 
-Pengujian dilakukan dengan metode *black box*, *white box*, dan *integration testing*. Hasil pengujian *black box* terhadap seluruh modul menunjukkan skenario berhasil. Pengujian *white box* memvalidasi kebenaran algoritma FIFO dan FEFO. Pengujian integrasi memvalidasi konsistensi aliran data antar modul. Seluruh mekanisme deduksi stok dan pencatatan pergerakan berjalan sesuai perancangan.
+Pengujian dilakukan dengan metode *black box*, *white box*, dan *gray box testing*. Hasil pengujian *black box* terhadap seluruh modul menunjukkan skenario berhasil. Pengujian *white box* memvalidasi kebenaran algoritma FIFO dan FEFO. Pengujian *gray box* memvalidasi konsistensi aliran data antar modul. Seluruh mekanisme deduksi stok dan pencatatan pergerakan berjalan sesuai perancangan.
 
 Kata kunci: Sistem manajemen inventori, *Point of Sale*, Laravel, Filament, FEFO, FIFO.
