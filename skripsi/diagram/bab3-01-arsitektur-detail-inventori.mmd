@@ -6,7 +6,9 @@ graph TB
 
         subgraph Service["Lapisan Service (Business Logic)"]
             INV["InventoryService\n(FEFO/FIFO Engine)"]
-            RECON["StockReconciliationService\n(Adjustment Logic)"]
+            RECON["StockReconciliationService\n(Adjustment & Reversal)"]
+            UCONV["UnitConversionService\n(Konversi Satuan)"]
+            MIMG["MenuImageService\n(Upload Gambar Menu)"]
         end
 
         subgraph Model["Lapisan Model (Data Access)"]
@@ -32,6 +34,7 @@ graph TB
 
     ADMIN -->|"CRUD"| CATEGORY
     ADMIN -->|"CRUD"| MENU
+    ADMIN -->|"upload image"| MIMG
     ADMIN -->|"CRUD"| INGREDIENT
     ADMIN -->|"CRUD"| BATCH
     ADMIN -->|"CRUD"| ADJUST
@@ -40,6 +43,7 @@ graph TB
     PESANAN -->|"processSaleForOrder()"| INV
     ORDER -->|"confirmCash / confirmQris"| INV
     INV -->|"deductIngredientStock()\nFEFO/FIFO"| BATCH
+    INV -->|"convert unit"| UCONV
     INV -->|"record movement"| MOVEMENT
     RECON -->|"createManualAdjustment()"| ADJUST
     RECON -->|"reversal"| MOVEMENT
