@@ -517,10 +517,10 @@ dari  perspektif  pengembang  dengan  menguji  seluruh  bagian  kode  yang  dapa
 diuji,   bertujuan   untuk   menemukan   kesalahan   logis   pada source   code dan
 memastikan  bahwa  setiap fitur  berfungsi sesuai  dengan  yang  diharapkan [17].
 
-## 2.3.13 Pengujian Integration
-Pengujian integration merupakan level pengujian perangkat lunak yang berfokus pada interaksi antar modul atau komponen dalam sistem. Berbeda dengan pengujian unit yang menguji fungsi secara terisolasi, pengujian integration memvalidasi bahwa modul-modul yang telah diuji secara individual dapat bekerja sama dengan benar ketika diintegrasikan. Tujuannya adalah mendeteksi kesalahan pada antarmuka antar modul, aliran data, dan konsistensi state ketika terjadi pertukaran informasi antar komponen [18].
+## 2.3.13 Pengujian Gray Box
+Gray box testing merupakan metode pengujian perangkat lunak yang menggabungkan aspek black box dan white box dengan pengetahuan parsial terhadap struktur internal sistem [23]. Tidak seperti white box yang memerlukan akses penuh ke kode sumber, maupun black box yang sama sekali tidak mengetahui struktur internal, gray box testing berada di antara keduanya — penguji memiliki pengetahuan terbatas seperti skema database, arsitektur sistem, atau algoritma yang digunakan, namun pengujian tetap dilakukan melalui antarmuka eksternal sistem.
 
-Pengujian integration dapat dilakukan dengan dua pendekatan. Pendekatan white box integration testing memverifikasi kebenaran aliran data antar modul melalui pengujian berbasis kode dengan memeriksa keadaan database sebelum dan sesudah transaksi. Pendekatan black box integration testing memverifikasi interaksi antar modul dari sisi pengguna melalui antarmuka sistem. Kombinasi kedua pendekatan ini memberikan keyakinan bahwa integrasi antar modul berjalan dengan benar baik dari sisi teknis maupun fungsional.
+Pendekatan gray box sangat sesuai untuk pengujian integrasi antar modul atau subsistem, karena penguji dapat memanfaatkan pengetahuan parsial tentang struktur internal untuk merancang kasus uji yang lebih terarah, sementara pengujian tetap dilakukan dari perspektif pengguna melalui request HTTP atau antarmuka lainnya. Dalam konteks sistem inventori yang terintegrasi dengan sistem transaksi, gray box testing memungkinkan verifikasi bahwa aliran data antar kedua sistem berjalan dengan benar tanpa harus memanggil kode sumber secara langsung.
 
 ## BAB III
 ## PERANCANGAN SISTEM
