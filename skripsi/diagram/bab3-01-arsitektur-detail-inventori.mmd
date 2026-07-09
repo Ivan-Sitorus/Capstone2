@@ -1,15 +1,9 @@
 %%{init: {"flowchart": {"nodeSpacing": 15, "rankSpacing": 20, "padding": 5}}}%%
 graph TB
-    subgraph Transaction["Sistem Transaksi"]
-        direction TB
-        ADMIN["Admin Panel (Filament)"]
-        KASIR["Kasir Pages (Inertia.js + React)"]
-        PESANAN["CashierPesananBaruController"]
-        ORDER["CashierOrderController"]
-    end
-
     subgraph Inventory["Sistem Inventori"]
         direction TB
+        ADMIN["Admin Panel (Filament)\n(Kelola Menu, Bahan Baku,\nBatch, Penyesuaian Stok)"]
+
         subgraph Service["Lapisan Service (Business Logic)"]
             INV["InventoryService\n(FEFO/FIFO Engine)"]
             RECON["StockReconciliationService\n(Adjustment Logic)"]
@@ -27,6 +21,12 @@ graph TB
         subgraph Database["Database"]
             DB[("PostgreSQL")]
         end
+    end
+
+    subgraph Transaction["Sistem Transaksi"]
+        KASIR["Kasir Pages (Inertia.js + React)"]
+        PESANAN["CashierPesananBaruController"]
+        ORDER["CashierOrderController"]
     end
 
     ADMIN -->|"CRUD"| MENU
