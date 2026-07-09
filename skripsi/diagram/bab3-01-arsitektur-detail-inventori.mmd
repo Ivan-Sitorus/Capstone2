@@ -2,7 +2,7 @@
 graph TB
     subgraph Inventory["Sistem Inventori"]
         direction TB
-        ADMIN["Admin Panel (Filament)\n(Kelola Menu, Kategori,\nBahan Baku, Batch,\nPenyesuaian Stok)"]
+        ADMIN["Admin Panel (Filament)\n(Kelola Menu, Kategori,\nBahan Baku, Batch,\nPenyesuaian Stok,\nLihat Riwayat Pemakaian)"]
 
         subgraph Service["Lapisan Service (Business Logic)"]
             INV["InventoryService\n(FEFO/FIFO Engine)"]
@@ -34,6 +34,8 @@ graph TB
     ADMIN -->|"CRUD"| MENU
     ADMIN -->|"CRUD"| INGREDIENT
     ADMIN -->|"CRUD"| BATCH
+    ADMIN -->|"CRUD"| ADJUST
+    ADMIN -->|"view"| MOVEMENT
     KASIR -->|"Order request"| PESANAN
     PESANAN -->|"processSaleForOrder()"| INV
     ORDER -->|"confirmCash / confirmQris"| INV

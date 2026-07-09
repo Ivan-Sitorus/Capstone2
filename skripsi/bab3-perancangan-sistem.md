@@ -156,7 +156,7 @@ Arsitektur detail sistem inventori menggambarkan komponen-komponen yang membentu
 
 **Database PostgreSQL** menyimpan seluruh data inventori.
 
-Sistem transaksi berinteraksi dengan sistem inventori melalui dua jalur. Pertama, Panel Admin Filament melakukan operasi CRUD langsung ke model inventori (Menu, Ingredient, IngredientBatch) untuk pengelolaan data master. Kedua, controller transaksi (`CashierPesananBaruController` dan `CashierOrderController`) memanggil `InventoryService::processSaleForOrder()` ketika pesanan diproses, yang kemudian menjalankan algoritma deduksi batch, mencatat perubahan ke `StockMovement`, dan memperbarui stok pada `IngredientBatch` yang sesuai.
+Sistem transaksi berinteraksi dengan sistem inventori melalui dua jalur. Pertama, Panel Admin Filament melakukan operasi CRUD ke model inventori (Category, Menu, Ingredient, IngredientBatch, StockAdjustment) serta membaca data riwayat pemakaian dari StockMovement. Kedua, controller transaksi (`CashierPesananBaruController` dan `CashierOrderController`) memanggil `InventoryService::processSaleForOrder()` ketika pesanan diproses, yang kemudian menjalankan algoritma deduksi batch, mencatat perubahan ke `StockMovement`, dan memperbarui stok pada `IngredientBatch` yang sesuai.
 
 ## 3.6 Perancangan Basis Data
 ### 3.6.1 Entity Relationship Diagram
