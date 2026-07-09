@@ -408,7 +408,7 @@ Seluruh pengujian white box menunjukkan hasil sesuai dengan spesifikasi yang dir
 
 Pengujian integrasi lintas modul dilakukan untuk memverifikasi bahwa aliran data antara sistem transaksi (POS kasir) dan sistem inventori berjalan dengan benar. Berbeda dengan pengujian *white box* yang memanggil *service* secara langsung untuk memvalidasi kebenaran algoritma, pengujian integrasi lintas modul mengirimkan *request* HTTP ke *controller* transaksi dan memverifikasi efek sampingnya di *database* inventori. Dengan demikian, pengujian ini memvalidasi bahwa seluruh lapisan sistem — mulai dari *request* pengguna, autentikasi, validasi, *controller*, hingga *service* inventori — bekerja secara koheren.
 
-Dua skenario utama diuji: skenario keberhasilan di mana pesanan diproses dan stok berkurang, serta skenario gagal di mana stok tidak mencukupi sehingga pesanan ditolak.
+Tiga skenario utama diuji: skenario keberhasilan pesanan kasir, skenario gagal ketika stok tidak mencukupi, serta skenario alur pemesanan pelanggan yang dikonfirmasi oleh kasir.
 
 **a. Pengujian Order Berhasil — Deduksi Stok dan Pencatatan Riwayat**
 
@@ -520,4 +520,76 @@ public function test_cashier_order_fails_when_stock_insufficient(): void
 }
 ```
 
-Seluruh skenario pengujian integrasi lintas modul menunjukkan status Berhasil. Hasil ini membuktikan bahwa aliran data dari modul transaksi (POS kasir) ke modul inventori berjalan konsisten. Ketika stok mencukupi, sistem berhasil mendeduksi stok, mencatat pergerakan, dan merekam pemakaian harian. Ketika stok tidak mencukupi, sistem menolak pesanan dan tidak mengubah data stok. Dengan demikian, integrasi antar subsistem telah berfungsi sesuai perancangan.
+**c. Pengujian Alur Pelanggan ke Konfirmasi Kasir**
+
+Pengujian ini memverifikasi alur lengkap dari pemesanan oleh pelanggan melalui web *self-order* hingga konfirmasi pembayaran oleh kasir. Pelanggan membuat pesanan melalui *endpoint* `/customer/order/store`, kemudian kasir mengonfirmasi pembayaran tunai melalui rute `/kasir/pesanan/{order}/konfirmasi-tunai`. Pengujian ini memvalidasi bahwa stok bahan baku tidak berubah saat pelanggan memesan (karena pesanan pelanggan bersifat menunggu konfirmasi), dan baru berkurang setelah kasir mengonfirmasi pembayaran.
+
+| Skenario | Langkah | Hasil Diharapkan | Status |
+|----------|---------|------------------|--------|
+| Pelanggan pesan | POST /customer/order/store dengan data valid | Response 201 dengan order_code | Berhasil |
+| Verifikasi stok | Cek quantity batch setelah pesanan dibuat | Stok belum berubah (100) | Berhasil |
+| Kasir konfirmasi | PATCH /kasir/pesanan/{order}/konfirmasi-tunai | Response 200 | Berhasil |
+| Verifikasi stok akhir | Cek quantity batch setelah konfirmasi | Stok berkurang jadi 80 | Berhasil |
+
+```php
+public function test_customer_order_flow_to_cashier_confirmation_deducts_stock(): void
+{
+    $customer = User::factory()->create(['role' => 'customer']);
+    $cashier = User::factory()->create(['role' => 'cashier']);
+    $category = Category::create(['name' => 'Minuman']);
+    $menu = Menu::create([
+        'name' => 'Es Kopi',
+        'price' => 15000,
+        'category_id' => $category->id,
+        'is_available' => true,
+    ]);
+    $ingredient = Ingredient::create([
+        'name' => 'Kopi Bubuk',
+        'unit' => 'gram',
+        'low_stock_threshold' => 10,
+    ]);
+    $batch = IngredientBatch::create([
+        'ingredient_id' => $ingredient->id,
+        'quantity' => 100,
+        'expiry_date' => now()->addDays(30),
+        'received_at' => now(),
+        'cost_per_unit' => 1000,
+    ]);
+    MenuIngredient::create([
+        'menu_id' => $menu->id,
+        'ingredient_id' => $ingredient->id,
+        'quantity_used' => 10,
+    ]);
+    $table = CafeTable::create([
+        'table_number' => 1,
+        'qr_code' => 'table-1',
+    ]);
+
+    $this->actingAs($customer);
+    $response = $this->postJson(route('customer.order.store'), [
+        'customer_name' => 'Budi',
+        'customer_phone' => '081234567890',
+        'table_id' => $table->id,
+        'items' => [['menu_id' => $menu->id, 'quantity' => 2]],
+    ]);
+
+    $response->assertStatus(201);
+    $this->assertSame(100.0, (float) $batch->fresh()->quantity);
+
+    $this->actingAs($cashier);
+    $order = \App\Models\Order::find($response->json('order_id'));
+    $order->update(['payment_method' => 'cash']);
+    $confirmResponse = $this->patch(route('kasir.pesanan.konfirmasi-tunai', [
+        'order' => $order->id,
+    ]));
+
+    $confirmResponse->assertStatus(200);
+    $this->assertSame(80.0, (float) $batch->fresh()->quantity);
+    $this->assertDatabaseHas('stock_movements', [
+        'ingredient_id' => $ingredient->id,
+        'quantity_change' => -20,
+    ]);
+}
+```
+
+Seluruh skenario pengujian integrasi lintas modul menunjukkan status Berhasil. Hasil ini membuktikan bahwa aliran data dari modul transaksi (POS kasir dan *self-order* pelanggan) ke modul inventori berjalan konsisten. Ketika stok mencukupi, sistem berhasil mendeduksi stok, mencatat pergerakan, dan merekam pemakaian harian. Ketika stok tidak mencukupi, sistem menolak pesanan dan tidak mengubah data stok. Pada alur pelanggan, stok baru berkurang setelah kasir mengonfirmasi pembayaran, yang menunjukkan bahwa integrasi antar subsistem telah berfungsi sesuai perancangan.
