@@ -424,10 +424,17 @@ Pengujian penambahan batch dilakukan untuk memverifikasi bahwa penambahan stok b
 ```php
 public function test_batch_addition_does_not_create_stock_movement(): void
 {
-    $ingredient = Ingredient::factory()->create(['unit' => 'gram']);
-    $batch = IngredientBatch::factory()->create([
+    $ingredient = Ingredient::create([
+        'name' => 'Test Bahan',
+        'unit' => 'gram',
+        'low_stock_threshold' => 10,
+    ]);
+    $batch = IngredientBatch::create([
         'ingredient_id' => $ingredient->id,
         'quantity' => 50,
+        'expiry_date' => now()->addDays(30),
+        'received_at' => now(),
+        'cost_per_unit' => 1000,
     ]);
 
     $this->assertDatabaseHas('ingredient_batches', [
@@ -455,14 +462,20 @@ Pengujian penyesuaian stok dilakukan untuk memverifikasi bahwa penyesuaian stok 
 ```php
 public function test_adjustment_increase_and_reversal_restores_stock(): void
 {
-    $ingredient = Ingredient::factory()->create(['unit' => 'gram']);
-    $batch = IngredientBatch::factory()->create([
+    $admin = User::factory()->create(['role' => 'admin']);
+    $ingredient = Ingredient::create([
+        'name' => 'Test Bahan',
+        'unit' => 'gram',
+        'low_stock_threshold' => 10,
+    ]);
+    $batch = IngredientBatch::create([
         'ingredient_id' => $ingredient->id,
         'quantity' => 100,
         'expiry_date' => now()->addDays(30),
+        'received_at' => now(),
+        'cost_per_unit' => 1000,
     ]);
 
-    // Increase: tambah 30 unit
     $adjustment = app(StockReconciliationService::class)
         ->createManualAdjustment(
             adjustableType: 'ingredient',
@@ -470,12 +483,11 @@ public function test_adjustment_increase_and_reversal_restores_stock(): void
             quantity: 30,
             adjustmentType: 'increase',
             reason: 'Restock',
-            reportedBy: 1,
+            reportedBy: $admin->id,
         );
 
     $this->assertSame(130.0, (float) $batch->fresh()->quantity);
 
-    // Reverse: batalkan adjustment
     $adjustment->update(['status' => 'cancelled', 'cancel_reason' => 'Salah input']);
     $batch->decrement('quantity', 30);
 
@@ -500,19 +512,32 @@ Pengujian deduksi FEFO dilakukan untuk memverifikasi bahwa batch dengan `expiry_
 ```php
 public function test_fefo_deducts_nearest_expiry_first(): void
 {
-    $menu = Menu::factory()->create();
-    $ingredient = Ingredient::factory()->create();
-    $nearExpiry = IngredientBatch::factory()->create([
+    $category = Category::create(['name' => 'Minuman']);
+    $menu = Menu::create([
+        'name' => 'Test Menu FEFO',
+        'price' => 10000,
+        'category_id' => $category->id,
+    ]);
+    $ingredient = Ingredient::create([
+        'name' => 'Test Bahan',
+        'unit' => 'gram',
+        'low_stock_threshold' => 10,
+    ]);
+    $nearExpiry = IngredientBatch::create([
         'ingredient_id' => $ingredient->id,
         'quantity' => 80,
         'expiry_date' => now()->addDays(3),
+        'received_at' => now()->subDays(5),
+        'cost_per_unit' => 1000,
     ]);
-    $farExpiry = IngredientBatch::factory()->create([
+    $farExpiry = IngredientBatch::create([
         'ingredient_id' => $ingredient->id,
         'quantity' => 80,
         'expiry_date' => now()->addDays(30),
+        'received_at' => now()->subDays(1),
+        'cost_per_unit' => 1000,
     ]);
-    MenuIngredient::factory()->create([
+    MenuIngredient::create([
         'menu_id' => $menu->id,
         'ingredient_id' => $ingredient->id,
         'quantity_used' => 50,
@@ -544,14 +569,25 @@ Pengujian konsistensi riwayat dilakukan untuk memverifikasi bahwa setiap pergera
 ```php
 public function test_order_creates_accurate_stock_movement_records(): void
 {
-    $menu = Menu::factory()->create();
-    $ingredient = Ingredient::factory()->create(['unit' => 'gram']);
-    $batch = IngredientBatch::factory()->create([
+    $category = Category::create(['name' => 'Minuman']);
+    $menu = Menu::create([
+        'name' => 'Test Menu',
+        'price' => 10000,
+        'category_id' => $category->id,
+    ]);
+    $ingredient = Ingredient::create([
+        'name' => 'Test Bahan',
+        'unit' => 'gram',
+        'low_stock_threshold' => 10,
+    ]);
+    $batch = IngredientBatch::create([
         'ingredient_id' => $ingredient->id,
         'quantity' => 100,
         'expiry_date' => now()->addDays(30),
+        'received_at' => now(),
+        'cost_per_unit' => 1000,
     ]);
-    MenuIngredient::factory()->create([
+    MenuIngredient::create([
         'menu_id' => $menu->id,
         'ingredient_id' => $ingredient->id,
         'quantity_used' => 10,
@@ -582,14 +618,25 @@ Pengujian integrasi order ke stok dilakukan untuk memverifikasi bahwa ketika pes
 ```php
 public function test_order_to_stock_deducts_ingredients_and_records_daily_usage(): void
 {
-    $menu = Menu::factory()->create();
-    $ingredient = Ingredient::factory()->create(['unit' => 'gram']);
-    $batch = IngredientBatch::factory()->create([
+    $category = Category::create(['name' => 'Minuman']);
+    $menu = Menu::create([
+        'name' => 'Test Menu',
+        'price' => 10000,
+        'category_id' => $category->id,
+    ]);
+    $ingredient = Ingredient::create([
+        'name' => 'Test Bahan',
+        'unit' => 'gram',
+        'low_stock_threshold' => 10,
+    ]);
+    $batch = IngredientBatch::create([
         'ingredient_id' => $ingredient->id,
         'quantity' => 100,
         'expiry_date' => now()->addDays(30),
+        'received_at' => now(),
+        'cost_per_unit' => 1000,
     ]);
-    MenuIngredient::factory()->create([
+    MenuIngredient::create([
         'menu_id' => $menu->id,
         'ingredient_id' => $ingredient->id,
         'quantity_used' => 25,
@@ -599,10 +646,8 @@ public function test_order_to_stock_deducts_ingredients_and_records_daily_usage(
         ['menu_id' => $menu->id, 'quantity' => 2],
     ]);
 
-    // White Box: verifikasi stok berkurang di database
     $this->assertSame(50.0, (float) $batch->fresh()->quantity);
 
-    // White Box: verifikasi daily_ingredient_usage tercatat
     $this->assertDatabaseHas('daily_ingredient_usages', [
         'ingredient_id' => $ingredient->id,
     ]);
