@@ -1,0 +1,17 @@
+%%{init: {"flowchart": {"nodeSpacing": 20, "rankSpacing": 25, "padding": 8}}}%%
+graph LR
+    subgraph Test["Gray Box Test (PHPUnit)"]
+        HTTP["HTTP Request\nPOST /kasir/pesanan-baru\nPATCH .../konfirmasi-tunai"]
+        ASSERT["Assert Database\nassertDatabaseHas(stock_movements)\nassertSame(batch.quantity)"]
+    end
+    subgraph Transaction["Sistem Transaksi"]
+        CTRL["CashierPesananBaruController\nCashierOrderController"]
+    end
+    subgraph Inventory["Sistem Inventori"]
+        INV["InventoryService"]
+        DB[("PostgreSQL\nstock_movements, batches,\ndaily_ingredient_usages")]
+    end
+    HTTP -->|"trigger"| CTRL
+    CTRL -->|"processSaleForOrder()"| INV
+    INV -->|"update"| DB
+    ASSERT -.->|"verifikasi"| DB

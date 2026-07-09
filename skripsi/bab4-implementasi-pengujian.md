@@ -407,6 +407,8 @@ Pendekatan yang digunakan dalam pengujian ini termasuk dalam kategori *gray box 
 
 Tiga skenario utama diuji: skenario keberhasilan pesanan kasir, skenario gagal ketika stok tidak mencukupi, serta skenario alur pemesanan pelanggan yang dikonfirmasi oleh kasir.
 
+Gambar 4.23 Alur pengujian *gray box* — *request* HTTP ke sistem transaksi, asersi *database* ke sistem inventori.
+
 **a. Pengujian Order Berhasil — Deduksi Stok dan Pencatatan Riwayat**
 
 Pengujian ini memverifikasi bahwa ketika kasir berhasil membuat pesanan melalui POS, sistem secara otomatis mendeduksi stok bahan baku sesuai resep menu dan mencatat pergerakan stok beserta pemakaian harian. Pengujian dilakukan dengan mengirimkan *request* HTTP *POST* ke rute `/kasir/pesanan-baru` sebagai pengguna yang telah diautentikasi.

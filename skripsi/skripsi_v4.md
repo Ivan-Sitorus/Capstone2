@@ -1524,182 +1524,69 @@ stok  berjalan  akurat,  serta  pembatalan  penyesuaian  berhasil  mengembalikan
 ke kondisi awal.
 
 ## 4.2.3 Pengujian Gray Box
-Pengujian integrasi merupakan level pengujian yang melengkapi pengujian
-black box dan white box. Jika black box menguji fungsionalitas fitur secara
-individual dan white box menguji kebenaran logika internal, maka pengujian
-integrasi memvalidasi aliran data antar modul serta konsistensi state ketika terjadi
-pertukaran informasi antar komponen sistem [18].
+Pengujian integrasi lintas modul dilakukan untuk memverifikasi bahwa aliran data
+antara sistem transaksi (POS kasir) dan sistem inventori berjalan dengan benar.
+Berbeda dengan pengujian white box yang memanggil service secara langsung untuk
+memvalidasi kebenaran algoritma, pengujian integrasi lintas modul mengirimkan
+request HTTP ke controller transaksi dan memverifikasi efek sampingnya di
+database inventori.
 
-a. Pengujian Penambahan Batch
-Pengujian penambahan batch dilakukan untuk memverifikasi bahwa
-penambahan stok bahan baku melalui fitur batch management menghasilkan
-perubahan total stok yang akurat dan tidak menghasilkan pencatatan
-stock_movements yang tidak semestinya.
+Pendekatan yang digunakan dalam pengujian ini termasuk dalam kategori gray box
+testing, yaitu metode pengujian yang menggabungkan aspek black box dan white box
+dengan pengetahuan parsial terhadap struktur internal sistem [23]. Dalam konteks
+ini, penguji memiliki pengetahuan tentang skema database dan alur sistem (seperti
+nama tabel stock_movements dan kolom quantity_change), namun pengujian tetap
+dilakukan melalui antarmuka HTTP tanpa memanggil kode secara langsung.
 
-## Skenario Langkah Hasil Diharapkan Status
-Tambah batch Tambah batch
-stok dengan
-kuantitas 50
-unit
-Total stok
-bertambah 50
-sesuai batch
-## Berhasil
-Verifikasi
-## stock_movements
-Cek tabel
-## stock_movements
-Tidak ada
-pergerakan baru
-(penambahan
-batch bukan
-transaksi stok)
-## Berhasil
+Gambar 4.23 Alur pengujian gray box — request HTTP ke sistem transaksi,
+asersi database ke sistem inventori.
 
-b. Pengujian Penyesuaian Stok
-Pengujian penyesuaian stok dilakukan untuk memverifikasi bahwa
-penyesuaian stok tipe increase dan decrease berfungsi dengan benar, serta
-pembatalan penyesuaian mengembalikan stok ke kondisi semula dan mencatat
-reversal movement.
+a. Pengujian Order Berhasil — Deduksi Stok dan Pencatatan Riwayat
+Pengujian ini memverifikasi bahwa ketika kasir berhasil membuat pesanan
+melalui POS, sistem secara otomatis mendeduksi stok bahan baku sesuai resep
+menu dan mencatat pergerakan stok beserta pemakaian harian. Pengujian dilakukan
+dengan mengirimkan request HTTP POST ke rute /kasir/pesanan-baru sebagai
+pengguna yang telah diautentikasi.
 
-## Skenario Langkah Hasil Diharapkan Status
-## Adjustment
-## increase
-Buat adjustment
-dengan kuantitas
-## +30
-Batch stok
-bertambah 30
-## Berhasil
-Verifikasi batch
-naik
-Cek kuantitas
-batch terkait
-Kuantitas batch
-bertambah sesuai
-adjustment
-## Berhasil
-## Batalkan
-## adjustment
-Klik batalkan
-pada adjustment
-Stok kembali ke
-jumlah semula
-## Berhasil
-Verifikasi
-reversal
-Cek
-## stock_movements
-Movement reversal
-tercatat dengan
-quantity_change
-berlawanan
-## Berhasil
+| Skenario | Langkah | Hasil Diharapkan | Status |
+|----------|---------|------------------|--------|
+| Autentikasi kasir | Login sebagai kasir | Terautentikasi | Berhasil |
+| Kirim request POS | POST /kasir/pesanan-baru | Redirect dengan session success | Berhasil |
+| Verifikasi stok di database | Cek quantity batch | Stok berkurang sesuai quantity_used | Berhasil |
+| Verifikasi stock_movements | Cek quantity_before, change, after | Nilai tercatat akurat | Berhasil |
+| Verifikasi daily_usage | Cek daily_ingredient_usage | Pemakaian harian tercatat | Berhasil |
 
-c. Pengujian Deduksi FEFO
-Pengujian deduksi FEFO dilakukan untuk memverifikasi bahwa batch
-dengan expiry_date terdekat dikonsumsi terlebih dahulu ketika terjadi pemakaian
-stok.
+b. Pengujian Order Gagal — Stok Tidak Mencukupi
+Pengujian ini memverifikasi bahwa ketika stok bahan baku tidak mencukupi,
+sistem menolak pesanan dan tidak melakukan perubahan stok. Validasi dilakukan
+oleh StoreOrderRequest melalui after validation hook.
 
-## Skenario Langkah Hasil Diharapkan Status
-Buat 2 batch Batch A: qty 80,
-expiry 3 hari
-Batch B: qty 80,
-expiry 30 hari
-Kedua batch
-terbuat
-## Berhasil
-Deduksi 100
-unit
-Jalankan fungsi
-deduksi stok
-Batch A habis (80
-unit), Batch B
-sisa 60 unit
-## Berhasil
-Verifikasi
-prioritas
-## FEFO
-Cek urutan
-deduksi
-Batch expiry 3
-hari terpakai
-duluan
-## Berhasil
+| Skenario | Langkah | Hasil Diharapkan | Status |
+|----------|---------|------------------|--------|
+| Autentikasi kasir | Login sebagai kasir | Terautentikasi | Berhasil |
+| Siapkan stok terbatas | Batch hanya 15 gram, butuh 20 | Stok tidak cukup | Berhasil |
+| Kirim request POS | POST /kasir/pesanan-baru | Redirect dengan error validasi | Berhasil |
+| Verifikasi stok tidak berubah | Cek quantity batch | Stok tetap 15 | Berhasil |
 
-d. Pengujian Konsistensi Riwayat
-Pengujian konsistensi riwayat dilakukan untuk memverifikasi bahwa setiap
-pergerakan stok mencatat quantity_before, quantity_change, dan quantity_after
-secara akurat sehingga riwayat dapat dilacak dengan tepat.
+c. Pengujian Alur Pelanggan ke Konfirmasi Kasir
+Pengujian ini memverifikasi alur lengkap dari pemesanan oleh pelanggan
+hingga konfirmasi oleh kasir. Pelanggan membuat pesanan melalui endpoint
+/customer/order/store, kemudian kasir mengonfirmasi pembayaran tunai melalui
+/kasir/pesanan/{order}/konfirmasi-tunai.
 
-## Skenario Langkah Hasil Diharapkan Status
-Proses order Buat order
-dengan 2 menu
-beresep
-Order diproses Berhasil
-Cek konsistensi
-## stock_movements
-Periksa
-quantity_before,
-quantity_change,
-quantity_after
-quantity_after =
-quantity_before +
-quantity_change
-## Berhasil
-Verifikasi
-penjumlahan
-Hitung total
-quantity_change
-Total sesuai
-dengan jumlah
-bahan baku yang
-terpakai
-## Berhasil
+| Skenario | Langkah | Hasil Diharapkan | Status |
+|----------|---------|------------------|--------|
+| Pelanggan pesan | POST /customer/order/store | Response 201 | Berhasil |
+| Verifikasi stok setelah pesan | Cek quantity batch | Stok belum berubah (100) | Berhasil |
+| Kasir konfirmasi | PATCH .../konfirmasi-tunai | Response 200 | Berhasil |
+| Verifikasi stok akhir | Cek quantity batch | Stok berkurang jadi 80 | Berhasil |
 
-e. Pengujian Integrasi Lintas Modul — Order ke Stok
-Pengujian integrasi lintas modul dilakukan untuk memverifikasi bahwa
-ketika pesanan diproses melalui modul transaksi (POS), stok bahan baku pada
-modul inventori berkurang sesuai resep menu dan daily_ingredient_usage tercatat
-dengan benar.
-
-## Skenario Langkah Hasil Diharapkan Status
-Order POS Buat pesanan
-melalui sistem
-## POS
-Stok bahan baku
-berkurang sesuai
-resep
-## Berhasil
-Verifikasi
-deduksi resep
-Cek total stok
-bahan baku
-penyusun
-Stok berkurang
-tepat sesuai
-quantity_used kali
-kuantitas order
-## Berhasil
-Verifikasi
-## daily_usage
-Cek tabel
-## daily_ingredient
-## _usage
-Pemakaian harian
-tercatat dengan
-tanggal dan
-kuantitas yang
-benar
-## Berhasil
-
-Seluruh skenario pengujian integration menunjukkan status Berhasil. Hasil
-ini membuktikan bahwa aliran data antar modul inventori dan modul transaksi
-berjalan konsisten, pencatatan pergerakan stok akurat, serta mekanisme deduksi
-batch dan reversal berfungsi sesuai perancangan.
-
-
-## BAB V
+Seluruh skenario pengujian gray box menunjukkan status Berhasil. Hasil ini
+membuktikan bahwa aliran data dari sistem transaksi ke sistem inventori berjalan
+konsisten. Ketika stok mencukupi, stok berhasil didekduksi dan pergerakan
+tercatat. Ketika stok tidak mencukupi, sistem menolak pesanan tanpa mengubah
+data stok. Pada alur pelanggan, stok baru berkurang setelah kasir mengonfirmasi
+pembayaran.
 ## PENUTUP
 
 ## 5.1 Kesimpulan
