@@ -34,15 +34,13 @@ Berdasarkan latar belakang, dirumuskan permasalahan sebagai berikut:
 
 ## 1.4 Tujuan Penelitian
 
-1. Mengimplementasikan sistem manajemen inventori pada POS W9 Cafe menggunakan Laravel dan Filament.
+1. Mengimplementasikan sistem manajemen inventori pada POS W9 Cafe yang mencakup pengelolaan menu, resep bahan baku, dan *batch* stok.
 
-2. Menerapkan prioritas penggunaan stok berdasarkan masa kedaluwarsa (FEFO) dan urutan penerimaan (FIFO) untuk meminimalkan pemborosan bahan baku.
+2. Menerapkan algoritma deduksi *batch* FEFO dan FIFO pada pengelolaan stok bahan baku untuk meminimalkan pemborosan.
 
-3. Mengintegrasikan pencatatan pemakaian bahan baku secara otomatis dengan setiap transaksi penjualan serta menyediakan riwayat perubahan stok yang dapat dilacak.
+3. Menyediakan pencatatan pemakaian bahan baku secara otomatis, penyesuaian stok manual, serta riwayat perubahan stok yang dapat dilacak.
 
-4. Melakukan pengujian sistem untuk memvalidasi akurasi pencatatan stok dan efisiensi operasional.
-
-5. Melakukan pengujian integrasi untuk memvalidasi konsistensi aliran data antar modul inventori dan modul transaksi.
+4. Melakukan pengujian sistem menggunakan *black box*, *white box*, dan *gray box testing* untuk memvalidasi fungsionalitas fitur, kebenaran algoritma, serta konsistensi aliran data antar modul.
 
 ## 1.5 Manfaat Penelitian
 

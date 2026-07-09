@@ -255,17 +255,14 @@ validasi fungsionalitas sistem.
 
 ## 1.4 Tujuan Penelitian
 - Mengimplementasikan  sistem  manajemen  inventori  pada  POS  W9 Cafe
-menggunakan Laravel dan Filament.
-- Menerapkan  prioritas  penggunaan  stok  berdasarkan  masa  kedaluwarsa
-(FEFO) dan urutan penerimaan (FIFO) untuk meminimalkan pemborosan
-bahan baku.
-- Mengintegrasikan   pencatatan   pemakaian   bahan   baku   secara   otomatis
-dengan  setiap  transaksi  penjualan  serta  menyediakan  riwayat  perubahan
-stok yang dapat dilacak.
-- Melakukan  pengujian  sistem  untuk  memvalidasi  akurasi  pencatatan  stok
-dan efisiensi operasional.
-- Melakukan pengujian integrasi untuk memvalidasi konsistensi aliran data
-antar modul inventori dan modul transaksi.
+yang mencakup pengelolaan menu, resep bahan baku, dan batch stok.
+- Menerapkan  algoritma  deduksi  batch  FEFO  dan  FIFO  pada  pengelolaan
+stok bahan baku untuk meminimalkan pemborosan.
+- Menyediakan  pencatatan  pemakaian  bahan  baku  secara  otomatis,
+penyesuaian stok manual, serta riwayat perubahan stok yang dapat dilacak.
+- Melakukan  pengujian  sistem  menggunakan  black box, white box, dan
+gray box testing  untuk  memvalidasi  fungsionalitas  fitur,  kebenaran
+algoritma, serta konsistensi aliran data antar modul.
 
 
 
