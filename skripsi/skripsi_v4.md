@@ -720,13 +720,15 @@ mencakup  panel  admin  dan business  logic sistem  inventori,  sedangkan sistem
 transaksi merupakan modul yang sudah dikembangkan dalam penelitian terpisah. Seluruh data disimpan dan dikelola pada PostgreSQL sebagai basis data utama, yang juga digunakan oleh modul Data Mining (pengembangan terpisah) untuk analisis pola penjualan dan prediksi bahan baku.
 
 ## 3.4.2 Arsitektur Detail Sistem Inventori
-Arsitektur detail sistem inventori menggambarkan lapisan-lapisan yang menyusun subsistem inventori secara lebih rinci. Sistem inventori terdiri dari lima lapisan yang saling terhubung.
+Arsitektur detail sistem inventori menggambarkan komponen-komponen yang membentuk subsistem inventori serta hubungannya dengan subsistem transaksi. Sistem inventori terdiri dari tiga lapisan inti: Lapisan Service, Lapisan Model, dan Database.
 
-Lapisan pertama adalah **Lapisan Presentasi** yang terdiri dari Panel Admin Filament yang digunakan oleh admin untuk mengelola data inventori, serta halaman kasir (Inertia.js + React) yang menampilkan informasi menu dan stok kepada kasir. Lapisan kedua adalah **Lapisan Controller** yang terdiri dari CashierPesananBaruController dan CashierOrderController yang bertugas menerima permintaan dari pengguna dan mendelegasikannya ke lapisan service.
+**Lapisan Service (Business Logic)** merupakan inti dari sistem inventori. Lapisan ini terdiri dari InventoryService yang mengimplementasikan seluruh logika deduksi batch dengan algoritma FEFO/FIFO, termasuk pencatatan pergerakan stok ke dalam StockMovement, serta StockReconciliationService yang menangani logika penyesuaian stok manual (penambahan dan pengurangan) dan mekanisme pembatalan penyesuaian yang mengembalikan stok ke kondisi semula (reversal).
 
-Lapisan ketiga adalah **Lapisan Service (Business Logic)** yang merupakan inti dari sistem inventori. Lapisan ini terdiri dari InventoryService yang mengimplementasikan algoritma deduksi batch FEFO/FIFO, StockReconciliationService yang menangani logika penyesuaian stok dan pembatalannya, serta OrderPromotionService yang menangani perhitungan diskon. Lapisan keempat adalah **Lapisan Model (Data Access)** yang terdiri dari model Eloquent: Menu, Ingredient, IngredientBatch, StockMovement, StockAdjustment, dan DailyIngredientUsage. Model-model ini bertanggung jawab untuk membaca dan menulis data ke database.
+**Lapisan Model (Data Access)** terdiri dari model Eloquent yang mewakili entitas inventori: Menu (beserta resep bahan baku melalui MenuIngredient), Ingredient (master data bahan baku), IngredientBatch (stok per batch dengan informasi kedaluwarsa dan harga), StockMovement (catatan immutable setiap perubahan stok), dan StockAdjustment (penyesuaian stok manual). Seluruh model ini menggunakan Eloquent ORM untuk membaca dan menulis data ke database.
 
-Lapisan kelima adalah **Database PostgreSQL** yang menyimpan seluruh data inventori. Alur data dimulai ketika pesanan masuk melalui Lapisan Presentasi, kemudian Controller mendelegasikan ke InventoryService. Service melakukan query ke IngredientBatch dengan urutan FEFO atau FIFO, mendeduksi stok dari batch yang sesuai, mencatat perubahan ke StockMovement, dan memperbarui DailyIngredientUsage. *(Diagram arsitektur detail akan dibuat dan disertakan pada lampiran)*.
+**Database PostgreSQL** menyimpan seluruh data inventori.
+
+Sistem transaksi berinteraksi dengan sistem inventori melalui dua jalur. Pertama, Panel Admin Filament melakukan operasi CRUD langsung ke model inventori (Menu, Ingredient, IngredientBatch) untuk pengelolaan data master. Kedua, controller transaksi (CashierPesananBaruController dan CashierOrderController) memanggil InventoryService::processSaleForOrder() ketika pesanan diproses, yang kemudian menjalankan algoritma deduksi batch, mencatat perubahan ke StockMovement, dan memperbarui stok pada IngredientBatch yang sesuai.
 
 ## 3.5 Perancangan Basis Data
 ## 3.5.1 Entity Relationship Diagram
