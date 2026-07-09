@@ -152,7 +152,7 @@ Arsitektur detail sistem inventori menggambarkan komponen-komponen yang membentu
 - `InventoryService` yang mengimplementasikan seluruh logika deduksi batch dengan algoritma FEFO/FIFO, termasuk pencatatan pergerakan stok ke dalam `StockMovement`.
 - `StockReconciliationService` yang menangani logika penyesuaian stok manual (penambahan dan pengurangan) serta mekanisme pembatalan penyesuaian yang mengembalikan stok ke kondisi semula (*reversal*).
 
-**Lapisan Model (Data Access)** terdiri dari model Eloquent yang mewakili entitas inventori: `Menu` (beserta resep bahan baku melalui `MenuIngredient`), `Ingredient` (master data bahan baku), `IngredientBatch` (stok per batch dengan informasi kadaluwarsa dan harga), `StockMovement` (catatan immutable setiap perubahan stok), dan `StockAdjustment` (penyesuaian stok manual). Seluruh model ini menggunakan Eloquent ORM untuk membaca dan menulis data ke database.
+**Lapisan Model (Data Access)** terdiri dari model Eloquent yang mewakili entitas inventori: `Category` (pengelompokan menu), `Menu` (beserta resep bahan baku melalui `MenuIngredient`), `Ingredient` (master data bahan baku), `IngredientBatch` (stok per batch dengan informasi kadaluwarsa dan harga), `StockMovement` (catatan immutable setiap perubahan stok), dan `StockAdjustment` (penyesuaian stok manual). Seluruh model ini menggunakan Eloquent ORM untuk membaca dan menulis data ke database.
 
 **Database PostgreSQL** menyimpan seluruh data inventori.
 

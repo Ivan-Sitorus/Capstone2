@@ -2,7 +2,7 @@
 graph TB
     subgraph Inventory["Sistem Inventori"]
         direction TB
-        ADMIN["Admin Panel (Filament)\n(Kelola Menu, Bahan Baku,\nBatch, Penyesuaian Stok)"]
+        ADMIN["Admin Panel (Filament)\n(Kelola Menu, Kategori,\nBahan Baku, Batch,\nPenyesuaian Stok)"]
 
         subgraph Service["Lapisan Service (Business Logic)"]
             INV["InventoryService\n(FEFO/FIFO Engine)"]
@@ -11,6 +11,7 @@ graph TB
 
         subgraph Model["Lapisan Model (Data Access)"]
             direction LR
+            CATEGORY["Category"]
             MENU["Menu"]
             INGREDIENT["Ingredient"]
             BATCH["IngredientBatch"]
@@ -29,6 +30,7 @@ graph TB
         ORDER["CashierOrderController"]
     end
 
+    ADMIN -->|"CRUD"| CATEGORY
     ADMIN -->|"CRUD"| MENU
     ADMIN -->|"CRUD"| INGREDIENT
     ADMIN -->|"CRUD"| BATCH
@@ -39,6 +41,7 @@ graph TB
     INV -->|"record movement"| MOVEMENT
     RECON -->|"createManualAdjustment()"| ADJUST
     RECON -->|"reversal"| MOVEMENT
+    CATEGORY --> DB
     MENU --> DB
     INGREDIENT --> DB
     BATCH --> DB
