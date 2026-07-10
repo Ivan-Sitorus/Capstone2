@@ -172,23 +172,23 @@ Bab ini menjelaskan perencanaan pengujian perangkat lunak yang akan dilakukan un
 
 Tabel 3.6 Rencana skenario pengujian *black box*.
 
-| Skenario | Hasil yang Diharapkan | Status |
-|----------|----------------------|--------|
-| Login dengan kredensial valid | Berhasil masuk ke panel admin | Berhasil |
-| Login dengan password salah | Muncul pesan error | Berhasil |
-| Logout | Kembali ke halaman login | Berhasil |
-| Tambah bahan baku | Data muncul di tabel | Berhasil |
-| Ubah bahan baku | Data berubah | Berhasil |
-| Hapus bahan baku | Data hilang (*soft delete*) | Berhasil |
-| Tambah batch stok | Batch muncul di daftar | Berhasil |
-| Penyesuaian penambahan | Stok bertambah | Berhasil |
-| Penyesuaian pengurangan | Stok berkurang | Berhasil |
-| Input jumlah <= 0 | Ditolak sistem | Berhasil |
-| Tambah menu baru | Data muncul di tabel | Berhasil |
-| Ubah menu | Data berubah | Berhasil |
-| Hapus menu | Data hilang (*soft delete*) | Berhasil |
-| Tambah resep menu | Menu memiliki resep baru | Berhasil |
-| Hapus resep menu | Muncul peringatan resep wajib diisi | Berhasil |
+| No | Nama Pengujian | Skenario Pengujian | Hasil yang Diharapkan |
+|:--:|---------------|-------------------|----------------------|
+| 1 | Autentikasi | Login dengan kredensial valid | Berhasil masuk ke panel admin |
+| 2 | Autentikasi | Login dengan password salah | Muncul pesan error |
+| 3 | Autentikasi | Logout | Kembali ke halaman login |
+| 4 | Bahan Baku | Tambah bahan baku | Data muncul di tabel |
+| 5 | Bahan Baku | Ubah bahan baku | Data berubah |
+| 6 | Bahan Baku | Hapus bahan baku | Data hilang (*soft delete*) |
+| 7 | Bahan Baku | Tambah *batch* stok | Batch muncul di daftar |
+| 8 | Penyesuaian Stok | Penyesuaian penambahan | Stok bertambah |
+| 9 | Penyesuaian Stok | Penyesuaian pengurangan | Stok berkurang |
+| 10 | Penyesuaian Stok | Input jumlah tidak valid | Ditolak sistem |
+| 11 | Menu | Tambah menu baru | Data muncul di tabel |
+| 12 | Menu | Ubah menu | Data berubah |
+| 13 | Menu | Hapus menu | Data hilang (*soft delete*) |
+| 14 | Menu | Tambah resep menu | Menu memiliki resep baru |
+| 15 | Menu | Hapus resep menu | Muncul peringatan resep wajib diisi |
 
 ### 3.6.2 Pengujian White Box
 
@@ -202,13 +202,13 @@ Tabel 3.6 Rencana skenario pengujian *black box*.
 
 Tabel 3.7 Rencana skenario pengujian *white box*.
 
-| Skenario | Hasil yang Diharapkan | Status |
-|----------|----------------------|--------|
-| Deduksi stok berdasarkan resep menu | Stok bahan baku berkurang sesuai *quantity_used* | Pass |
-| Algoritma FIFO | Batch dengan *received_at* paling awal terpakai duluan | Pass |
-| Algoritma FEFO | Batch dengan *expiry_date* terdekat terpakai duluan | Pass |
-| Penyesuaian stok (*increase*) | Kuantitas batch bertambah | Pass |
-| Pembatalan penyesuaian stok | Stok kembali ke kondisi awal | Pass |
+| No | Nama Pengujian | Skenario Pengujian | Hasil yang Diharapkan |
+|:--:|---------------|-------------------|----------------------|
+| 1 | Deduksi Resep | Deduksi stok berdasarkan resep menu | Stok bahan baku berkurang sesuai *quantity_used* |
+| 2 | Algoritma FIFO | Batch dengan *received_at* berbeda | Batch paling awal terpakai duluan |
+| 3 | Algoritma FEFO | Batch dengan *expiry_date* berbeda | Batch terdekat kedaluwarsa terpakai duluan |
+| 4 | Penyesuaian Stok | Penyesuaian tipe *increase* | Kuantitas batch bertambah |
+| 5 | Pembatalan | Pembatalan penyesuaian stok | Stok kembali ke kondisi awal |
 
 ### 3.6.3 Pengujian Gray Box
 
@@ -222,11 +222,11 @@ Tabel 3.7 Rencana skenario pengujian *white box*.
 
 Tabel 3.8 Rencana skenario pengujian *gray box*.
 
-| Skenario | Hasil yang Diharapkan | Status |
-|----------|----------------------|--------|
-| Pesanan kasir sukses | Stok berkurang, pergerakan tercatat, pemakaian harian direkam | Pass |
-| Pesanan kasir gagal (stok kurang) | Pesanan ditolak, stok tidak berubah | Pass |
-| Alur pelanggan ke konfirmasi kasir | Stok baru berkurang setelah konfirmasi | Pass |
+| No | Nama Pengujian | Skenario Pengujian | Hasil yang Diharapkan |
+|:--:|---------------|-------------------|----------------------|
+| 1 | Pesanan Kasir Sukses | Kasir membuat pesanan melalui POS | Stok berkurang, pergerakan tercatat, pemakaian harian direkam |
+| 2 | Pesanan Kasir Gagal | Kasir membuat pesanan dengan stok tidak mencukupi | Pesanan ditolak, stok tidak berubah |
+| 3 | Alur Pelanggan | Pelanggan pesan lalu kasir konfirmasi | Stok baru berkurang setelah konfirmasi |
 
 
 ### 3.7.1 Entity Relationship Diagram
