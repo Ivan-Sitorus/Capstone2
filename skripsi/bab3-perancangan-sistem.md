@@ -172,12 +172,23 @@ Bab ini menjelaskan perencanaan pengujian perangkat lunak yang akan dilakukan un
 
 Tabel 3.6 Rencana skenario pengujian *black box*.
 
-| Modul | Skenario | Target |
-|-------|----------|--------|
-| Autentikasi | Login valid, login gagal, logout | 3 skenario |
-| Bahan Baku | Tambah, ubah, hapus, tambah batch | 4 skenario |
-| Penyesuaian Stok | Penambahan, pengurangan, input <= 0 | 3 skenario |
-| Menu | Tambah, ubah, hapus menu, tambah/hapus resep | 5 skenario |
+| Skenario | Hasil yang Diharapkan | Status |
+|----------|----------------------|--------|
+| Login dengan kredensial valid | Berhasil masuk ke panel admin | Berhasil |
+| Login dengan password salah | Muncul pesan error | Berhasil |
+| Logout | Kembali ke halaman login | Berhasil |
+| Tambah bahan baku | Data muncul di tabel | Berhasil |
+| Ubah bahan baku | Data berubah | Berhasil |
+| Hapus bahan baku | Data hilang (*soft delete*) | Berhasil |
+| Tambah batch stok | Batch muncul di daftar | Berhasil |
+| Penyesuaian penambahan | Stok bertambah | Berhasil |
+| Penyesuaian pengurangan | Stok berkurang | Berhasil |
+| Input jumlah <= 0 | Ditolak sistem | Berhasil |
+| Tambah menu baru | Data muncul di tabel | Berhasil |
+| Ubah menu | Data berubah | Berhasil |
+| Hapus menu | Data hilang (*soft delete*) | Berhasil |
+| Tambah resep menu | Menu memiliki resep baru | Berhasil |
+| Hapus resep menu | Muncul peringatan resep wajib diisi | Berhasil |
 
 ### 3.6.2 Pengujian White Box
 
@@ -191,13 +202,13 @@ Tabel 3.6 Rencana skenario pengujian *black box*.
 
 Tabel 3.7 Rencana skenario pengujian *white box*.
 
-| Kode | Skenario | Target |
-|------|----------|--------|
-| WB-01 | Deduksi stok berdasarkan resep menu | 1 test |
-| WB-02 | Algoritma FIFO | 1 test |
-| WB-03 | Algoritma FEFO | 1 test |
-| WB-04 | Penyesuaian stok (*increase*) | 1 test |
-| WB-05 | Pembatalan penyesuaian stok | 1 test |
+| Skenario | Hasil yang Diharapkan | Status |
+|----------|----------------------|--------|
+| Deduksi stok berdasarkan resep menu | Stok bahan baku berkurang sesuai *quantity_used* | Pass |
+| Algoritma FIFO | Batch dengan *received_at* paling awal terpakai duluan | Pass |
+| Algoritma FEFO | Batch dengan *expiry_date* terdekat terpakai duluan | Pass |
+| Penyesuaian stok (*increase*) | Kuantitas batch bertambah | Pass |
+| Pembatalan penyesuaian stok | Stok kembali ke kondisi awal | Pass |
 
 ### 3.6.3 Pengujian Gray Box
 
@@ -211,11 +222,11 @@ Tabel 3.7 Rencana skenario pengujian *white box*.
 
 Tabel 3.8 Rencana skenario pengujian *gray box*.
 
-| Kode | Skenario | Target |
-|------|----------|--------|
-| GB-01 | Pesanan kasir sukses — stok berkurang | 1 test (7 asersi) |
-| GB-02 | Pesanan kasir gagal — stok tidak cukup | 1 test (1 asersi) |
-| GB-03 | Alur pelanggan ke konfirmasi kasir | 1 test (8 asersi) |
+| Skenario | Hasil yang Diharapkan | Status |
+|----------|----------------------|--------|
+| Pesanan kasir sukses | Stok berkurang, pergerakan tercatat, pemakaian harian direkam | Pass |
+| Pesanan kasir gagal (stok kurang) | Pesanan ditolak, stok tidak berubah | Pass |
+| Alur pelanggan ke konfirmasi kasir | Stok baru berkurang setelah konfirmasi | Pass |
 
 
 ### 3.7.1 Entity Relationship Diagram
