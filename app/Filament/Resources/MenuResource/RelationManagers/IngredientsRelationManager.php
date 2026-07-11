@@ -88,20 +88,6 @@ class IngredientsRelationManager extends RelationManager
 
     private static function getCompatibleUnitOptions(?int $ingredientId): array
     {
-        if (! $ingredientId) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        $ingredient = \App\Models\Ingredient::find($ingredientId);
-        if (! $ingredient || ! $ingredient->unit_id) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        $unit = \App\Models\Unit::find($ingredient->unit_id);
-        if (! $unit) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        return app(\App\Services\UnitConversionService::class)
-            ->getCompatibleUnits($unit)
-            ->pluck('name', 'id')
-            ->toArray();
+        return \App\Models\Unit::pluck('name', 'id')->toArray();
     }
 }

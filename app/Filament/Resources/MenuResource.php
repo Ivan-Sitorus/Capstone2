@@ -9,7 +9,6 @@ use App\Filament\Resources\MenuResource\RelationManagers\IngredientsRelationMana
 use App\Models\Ingredient;
 use App\Models\Menu;
 use App\Services\MenuImageService;
-use App\Services\UnitConversionService;
 use Illuminate\Database\Eloquent\Builder;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -172,6 +171,7 @@ class MenuResource extends Resource
                     ->sortable(),
                 TextColumn::make("stock")
                     ->label("Sisa Jual")
+                    ->headerTooltip("Maksimal porsi dihitung dari stok bahan baku. Nilai dapat berubah jika bahan baku dipakai bersama menu lain.")
                     ->formatStateUsing(fn ($state) => $state === null ? "-" : number_format($state, 0, ",", "."))
                     ->color(fn ($state) => match (true) {
                         $state === null || $state > 10 => "success",
@@ -241,9 +241,8 @@ class MenuResource extends Resource
 
     public static function getCompatibleUnitOptions(?int $ingredientId): array
     {
-        if (! $ingredientId) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
+        return \App\Models\Unit::pluck('name', 'id')->toArray();
+    }
         $ingredient = Ingredient::find($ingredientId);
         if (! $ingredient || ! $ingredient->unit_id) {
             return \App\Models\Unit::pluck('name', 'id')->toArray();
