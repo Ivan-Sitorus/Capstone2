@@ -243,17 +243,4 @@ class MenuResource extends Resource
     {
         return \App\Models\Unit::pluck('name', 'id')->toArray();
     }
-        $ingredient = Ingredient::find($ingredientId);
-        if (! $ingredient || ! $ingredient->unit_id) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        $unit = \App\Models\Unit::find($ingredient->unit_id);
-        if (! $unit) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        return app(UnitConversionService::class)
-            ->getCompatibleUnits($unit)
-            ->pluck('name', 'id')
-            ->toArray();
-    }
 }
