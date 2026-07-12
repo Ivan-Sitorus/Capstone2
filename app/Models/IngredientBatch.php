@@ -2,15 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class IngredientBatch extends Model
 {
     use HasFactory;
+
     public $timestamps = false;
+
+    public function scopeAvailable(Builder $query): void
+    {
+        $query->where('quantity', '>', 0)
+            ->where(function (Builder $q) {
+                $q->whereNull('expiry_date')
+                  ->orWhereDate('expiry_date', '>', now())
+                  ->orWhere('allow_expired_usage', true);
+            });
+    }
 
     public const STATUS_ACTIVE = 'active';
     public const STATUS_INACTIVE = 'inactive';

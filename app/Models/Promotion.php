@@ -70,7 +70,13 @@ class Promotion extends Model
 
     public function isApplicableTo(int $menuId, int $categoryId): bool
     {
-        return true;
+        $items = $this->applicable_items ?? [];
+
+        if (empty($items)) {
+            return true;
+        }
+
+        return in_array($menuId, $items) || in_array($categoryId, $items);
     }
 
     public function rules(): HasMany
