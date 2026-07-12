@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class StockAdjustment extends Model
 {
+    use HasFactory;
     public const TYPE_INCREASE = 'increase';
 
     public const TYPE_DECREASE = 'decrease';

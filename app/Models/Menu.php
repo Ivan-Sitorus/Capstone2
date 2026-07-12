@@ -120,11 +120,11 @@ class Menu extends Model
 
     public function hasRecipe(): bool
     {
-        return true;
+        return $this->menuIngredients()->exists();
     }
 
-    public function getEffectivePriceAttribute(): string
+    public function getEffectivePriceAttribute()
     {
-        return $this->student_price ?: $this->price;
+        return $this->student_price ?? $this->price;
     }
 }
