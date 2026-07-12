@@ -9,15 +9,18 @@ use App\Filament\Resources\PromotionResource\Tables\PromotionTable;
 use App\Models\Promotion;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class PromotionResource extends Resource
 {
     protected static ?string $model = Promotion::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-gift';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedGift;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
+    protected static string | UnitEnum | null $navigationGroup = 'Transaksi';
 
     protected static ?string $navigationLabel = 'Promosi';
 

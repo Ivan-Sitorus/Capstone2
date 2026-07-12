@@ -2,10 +2,23 @@
 
 namespace App\Http\Requests;
 
+use App\Services\InventoryService;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreOrderRequest extends FormRequest
 {
+    public function __construct(
+        protected InventoryService $inventoryService,
+        array $query = [],
+        array $request = [],
+        array $attributes = [],
+        array $cookies = [],
+        array $files = [],
+        array $server = [],
+        $content = null
+    ) {
+        parent::__construct($query, $request, $attributes, $cookies, $files, $server, $content);
+    }
     public function authorize(): bool
     {
         return true;
@@ -38,7 +51,7 @@ class StoreOrderRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            $result = app(\App\Services\InventoryService::class)
+            $result = $this->inventoryService
                 ->canFulfillOrder($this->input('items'));
 
             if (!$result['can_fulfill']) {

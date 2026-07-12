@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Concerns\HasOrderStatusBadge;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\Pages\ViewOrder;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
@@ -13,15 +14,20 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class OrderResource extends Resource
 {
+    use HasOrderStatusBadge;
+
     protected static ?string $model = Order::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedShoppingCart;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
+    protected static string | UnitEnum | null $navigationGroup = 'Transaksi';
 
     protected static ?string $navigationLabel = 'Pesanan';
 
@@ -64,27 +70,12 @@ class OrderResource extends Resource
                 ->schema([
                     TextEntry::make($p.'payment_method')->label('Metode')
                         ->badge()
-                        ->formatStateUsing(fn (?string $state): string => match ($state) {
-                            'cash' => 'Tunai',
-                            'qris' => 'QRIS',
-                            'bayar_nanti' => 'Bayar Nanti',
-                            default => '-',
-                        }),
+                        ->formatStateUsing(fn (?string $state): string => self::getPaymentLabel($state)),
                     TextEntry::make($p.'total_amount')->label('Total')->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
                     TextEntry::make($p.'status')->label('Status Pesanan')
                         ->badge()
-                        ->color(fn (string $state): string => match ($state) {
-                            'pending' => 'warning',
-                            'diproses' => 'info',
-                            'selesai' => 'success',
-                            default => 'gray',
-                        })
-                        ->formatStateUsing(fn (string $state): string => match ($state) {
-                            'pending' => 'Pending',
-                            'diproses' => 'Diproses',
-                            'selesai' => 'Selesai',
-                            default => $state,
-                        }),
+                        ->color(fn (string $state): string => self::getStatusColor($state))
+                        ->formatStateUsing(fn (string $state): string => self::getStatusLabel($state)),
                 ])->columns(3),
 
             Section::make('Item Pesanan')

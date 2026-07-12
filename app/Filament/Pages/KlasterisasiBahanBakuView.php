@@ -10,11 +10,12 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Schema;
+use BackedEnum;
 use Filament\Support\Icons\Heroicon;
 
 class KlasterisasiBahanBakuView extends Page
 {
-    protected static string|\BackedEnum|null $navigationIcon = null;
+    protected static string | BackedEnum | null $navigationIcon = null;
 
     protected static bool $shouldRegisterNavigation = false;
 

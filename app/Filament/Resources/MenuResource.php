@@ -11,15 +11,18 @@ use App\Models\Menu;
 use App\Services\UnitConversionService;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class MenuResource extends Resource
 {
     protected static ?string $model = Menu::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = "heroicon-o-document-text";
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedDocumentText;
 
-    protected static string|\UnitEnum|null $navigationGroup = "Menu";
+    protected static string | UnitEnum | null $navigationGroup = "Menu";
 
     protected static ?string $navigationLabel = "Menu";
 

@@ -8,6 +8,7 @@ use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
@@ -78,7 +79,7 @@ abstract class AnalyticsPage extends Page implements HasTable
         return [
             Action::make('run_analysis')
                 ->label('Jalankan Baru')
-                ->icon('heroicon-o-play')
+                ->icon(Heroicon::OutlinedPlay)
                 ->color('primary')
                 ->requiresConfirmation()
                 ->modalHeading('Konfirmasi')
@@ -97,7 +98,7 @@ abstract class AnalyticsPage extends Page implements HasTable
             $response = $this->callFastAPI();
 
             if (($response['status'] ?? '') === 'error') {
-                throw new \Exception($response['message'] ?? 'Unknown error');
+                throw new \RuntimeException($response['message'] ?? 'Unknown error');
             }
 
             $run = $this->storeRun($response);
@@ -110,7 +111,7 @@ abstract class AnalyticsPage extends Page implements HasTable
                 ->title('Analisis selesai!')
                 ->success()
                 ->send();
-        } catch (\Exception $e) {
+        } catch (\RuntimeException $e) {
             $this->errorMsg = $e->getMessage();
             $this->hasResult = false;
 
@@ -130,7 +131,7 @@ abstract class AnalyticsPage extends Page implements HasTable
         $response = Http::timeout($this->getFastApiTimeout())->post($url);
 
         if (! $response->successful()) {
-            throw new \Exception('FastAPI merespons dengan status '.$response->status());
+            throw new \RuntimeException('FastAPI merespons dengan status '.$response->status());
         }
 
         return $response->json();

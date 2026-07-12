@@ -12,6 +12,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\StockAdjustmentResource;
+use Filament\Support\Icons\Heroicon;
 
 class ViewStockHistory extends ListRecords
 {
@@ -149,7 +150,7 @@ class ViewStockHistory extends ListRecords
             ->recordActions([
                 Action::make('view_adjustment')
                     ->label('Detail')
-                    ->icon('heroicon-o-eye')
+                    ->icon(Heroicon::OutlinedEye)
                     ->visible(fn (StockMovement $record): bool =>
                         (bool) $record->stock_adjustment_id)
                     ->infolist(function (StockMovement $record): array {
@@ -161,7 +162,7 @@ class ViewStockHistory extends ListRecords
                     ->modalCancelActionLabel('Tutup'),
                 Action::make('view_order')
                     ->label('Detail')
-                    ->icon('heroicon-o-eye')
+                    ->icon(Heroicon::OutlinedEye)
                     ->visible(fn (StockMovement $record): bool =>
                         $record->movement_type === 'sale' && (bool) $record->order_id)
                     ->infolist(function (StockMovement $record): array {
@@ -173,7 +174,7 @@ class ViewStockHistory extends ListRecords
                     ->modalCancelActionLabel('Tutup'),
                 Action::make('view_purchase')
                     ->label('Detail')
-                    ->icon('heroicon-o-eye')
+                    ->icon(Heroicon::OutlinedEye)
                     ->modalHeading('Detail Pembelian Batch')
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Tutup')

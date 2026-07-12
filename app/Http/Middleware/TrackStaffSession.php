@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TrackStaffSession
 {
+    public function __construct(
+        protected StaffSessionService $staffSessionService
+    ) {}
     /**
      * Handle an incoming request.
      *
@@ -32,15 +35,12 @@ class TrackStaffSession
             return $next($request);
         }
 
-        /** @var StaffSessionService $service */
-        $service = app(StaffSessionService::class);
+        $this->staffSessionService->closeExpiredSessions(30);
 
-        $service->closeExpiredSessions(30);
-
-        $activeSession = $service->getActiveSession($user);
+        $activeSession = $this->staffSessionService->getActiveSession($user);
 
         if ($activeSession) {
-            $service->updateActivity($activeSession);
+            $this->staffSessionService->updateActivity($activeSession);
         }
         // No else — session creation is AuthController's job
 

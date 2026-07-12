@@ -10,17 +10,20 @@ use App\Filament\Resources\StockResource\Tables\StockTable;
 use App\Models\Ingredient;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class StockResource extends Resource
 {
     protected static ?string $model = Ingredient::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-cube';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedCube;
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Inventori';
+    protected static string | UnitEnum | null $navigationGroup = 'Inventori';
 
     protected static ?string $navigationLabel = 'Bahan Baku';
 

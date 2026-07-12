@@ -1,46 +1,23 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace App\Filament\Resources\StaffSessionResource\Tables;
 
+use App\Filament\Resources\StaffSessionResource;
 use App\Models\StaffSession;
 use App\Services\StaffSessionService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Pages\Page;
-use Filament\Schemas\Components\EmbeddedTable;
-use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Concerns\InteractsWithTable;
-use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class StaffHistory extends Page implements HasTable
+class StaffSessionTable
 {
-    use InteractsWithTable;
-
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clock';
-
-    protected static string|\UnitEnum|null $navigationGroup = 'Staff';
-
-    protected static ?string $navigationLabel = 'Riwayat Login Staff';
-
-    protected static ?int $navigationSort = 2;
-
-    protected static ?string $title = 'Riwayat Login Staff';
-
-    public function content(Schema $schema): Schema
-    {
-        return $schema->components([
-            EmbeddedTable::make(),
-        ]);
-    }
-
-    public function table(Table $table): Table
+    public static function configure(Table $table): Table
     {
         return $table
             ->query(
@@ -136,13 +113,10 @@ class StaffHistory extends Page implements HasTable
                     ]),
             ])
             ->recordActions([
-                Action::make('detail')
+                Action::make('view')
                     ->label('Detail')
-                    ->icon('heroicon-o-eye')
-                    ->url(fn (StaffSession $record) => route('filament.admin.pages.staff-session-detail.{type}.{session}', [
-                        'type' => $record->type,
-                        'session' => $record->id,
-                    ])),
+                    ->icon(Heroicon::OutlinedEye)
+                    ->url(fn (StaffSession $record) => StaffSessionResource::getUrl('view', ['record' => $record])),
             ])
             ->defaultSort('started_at', 'desc');
     }

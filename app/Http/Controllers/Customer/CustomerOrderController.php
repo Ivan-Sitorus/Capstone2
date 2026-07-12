@@ -9,6 +9,7 @@ use App\Services\OrderPromotionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class CustomerOrderController extends Controller
 {
@@ -17,7 +18,7 @@ class CustomerOrderController extends Controller
         return app(PlaceCustomerOrderAction::class)->handle($request, $orderPromotionService);
     }
 
-    public function riwayat(Request $request): \Inertia\Response
+    public function riwayat(Request $request): Response
     {
         // Riwayat berdasarkan nomor telepon di sessionStorage (dikirim via query param)
         $phone = $request->query('phone');
@@ -60,7 +61,7 @@ class CustomerOrderController extends Controller
         return Inertia::render('Pelanggan/Riwayat/Index', ['orders' => $orders]);
     }
 
-    public function status(string $code): \Inertia\Response
+    public function status(string $code): Response
     {
         $order = Order::select(['id', 'order_code', 'status', 'total_amount', 'payment_method', 'created_at'])
             ->where('order_code', $code)
@@ -78,7 +79,7 @@ class CustomerOrderController extends Controller
         ]);
     }
 
-    public function showStatus(Order $order): \Inertia\Response
+    public function showStatus(Order $order): Response
     {
         return $this->status($order->order_code);
     }

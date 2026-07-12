@@ -15,17 +15,20 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class StockAdjustmentResource extends Resource
 {
     protected static ?string $model = StockAdjustment::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-clipboard-document-check';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedClipboardDocumentCheck;
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Inventori';
+    protected static string | UnitEnum | null $navigationGroup = 'Inventori';
 
     protected static ?string $navigationLabel = 'Penyesuaian Stok';
 

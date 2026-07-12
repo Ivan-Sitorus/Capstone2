@@ -55,7 +55,7 @@ class StockAdjustmentTable
                     ->label('Jumlah')
                     ->formatStateUsing(fn ($state, StockAdjustment $record) =>
                         ($record->adjustment_type === StockAdjustment::TYPE_INCREASE ? '+' : '-')
-                        . number_format(abs((float) $state), abs((float) $state) != (int) abs((float) $state) ? 2 : 0, ',', '.')
+                        . \App\Filament\Resources\StockAdjustmentResource::formatNumber((float) $state)
                         . ' ' . ($record->isMenuAdjustment() ? 'porsi' : ($record->ingredient?->unit ?? ''))
                     )
                     ->color(fn (StockAdjustment $record): string =>
@@ -66,7 +66,7 @@ class StockAdjustmentTable
                     ->formatStateUsing(fn ($state, StockAdjustment $record) =>
                         $record->isMenuAdjustment()
                             ? '-'
-                            : number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.')
+                            : \App\Filament\Resources\StockAdjustmentResource::formatNumber((float) $state)
                                 . ' ' . ($record->ingredient?->unit ?? '')
                     )
                     ->sortable(),
@@ -75,7 +75,7 @@ class StockAdjustmentTable
                     ->formatStateUsing(fn ($state, StockAdjustment $record) =>
                         $record->isMenuAdjustment()
                             ? '-'
-                            : number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.')
+                            : \App\Filament\Resources\StockAdjustmentResource::formatNumber((float) $state)
                                 . ' ' . ($record->ingredient?->unit ?? '')
                     )
                     ->sortable(),

@@ -400,7 +400,7 @@ class StaffSessionTest extends TestCase
 
         $this->actingAs($user);
 
-        $middleware = new TrackStaffSession();
+        $middleware = app(TrackStaffSession::class);
         $request = Request::create('/test', 'GET');
 
         $middleware->handle($request, fn ($req) => response('ok'));
@@ -443,7 +443,7 @@ class StaffSessionTest extends TestCase
 
         $this->actingAs($cashierUser);
 
-        $middleware = new TrackStaffSession();
+        $middleware = app(TrackStaffSession::class);
         $request = Request::create('/test', 'GET');
 
         $middleware->handle($request, fn ($req) => response('ok'));
@@ -464,7 +464,7 @@ class StaffSessionTest extends TestCase
 
         $this->actingAs($user);
 
-        $middleware = new TrackStaffSession();
+        $middleware = app(TrackStaffSession::class);
         $request = Request::create('/test', 'GET');
 
         $middleware->handle($request, fn ($req) => response('ok'));
@@ -491,7 +491,7 @@ class StaffSessionTest extends TestCase
 
         $this->actingAs($user);
 
-        $middleware = new TrackStaffSession();
+        $middleware = app(TrackStaffSession::class);
         $request = Request::create('/test', 'GET');
 
         $middleware->handle($request, fn ($req) => response('ok'));

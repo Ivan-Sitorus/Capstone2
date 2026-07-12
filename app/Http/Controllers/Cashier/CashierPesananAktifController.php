@@ -6,10 +6,11 @@ use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class CashierPesananAktifController extends Controller
 {
-    public function index(): \Inertia\Response
+    public function index(): Response
     {
         $orders = Order::with(['items.menu', 'cafeTable', 'cashier'])
             ->whereNotIn('status', [OrderStatus::Selesai->value, OrderStatus::Dibatalkan->value])

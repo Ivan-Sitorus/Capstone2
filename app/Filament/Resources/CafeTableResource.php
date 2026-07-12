@@ -8,15 +8,18 @@ use App\Filament\Resources\CafeTableResource\Tables\CafeTableTable;
 use App\Models\CafeTable;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class CafeTableResource extends Resource
 {
     protected static ?string $model = CafeTable::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-qr-code';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedQrCode;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
+    protected static string | UnitEnum | null $navigationGroup = 'Transaksi';
 
     protected static ?string $navigationLabel = 'QR Code Meja';
 

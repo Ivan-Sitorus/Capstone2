@@ -8,6 +8,7 @@ use App\Models\StockMovement;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Textarea;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Auth;
 
 class CancelAdjustmentAction extends Action
@@ -19,7 +20,7 @@ class CancelAdjustmentAction extends Action
         $this
             ->name('batalkan')
             ->label('Batalkan')
-            ->icon('heroicon-o-arrow-path')
+            ->icon(Heroicon::OutlinedArrowPath)
             ->color('danger')
             ->hidden(fn (StockAdjustment $record): bool => $record->status === 'cancelled')
             ->modalHeading('Batalkan Penyesuaian Stok')

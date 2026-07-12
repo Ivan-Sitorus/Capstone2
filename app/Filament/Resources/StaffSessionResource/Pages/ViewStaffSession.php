@@ -1,92 +1,67 @@
 <?php
 
-namespace App\Filament\Pages;
+namespace App\Filament\Resources\StaffSessionResource\Pages;
 
-use App\Enums\OrderStatus;
+use App\Filament\Resources\StaffSessionResource;
 use App\Models\Order;
 use App\Models\StaffSession;
-use App\Models\User;
 use App\Services\StaffSessionService;
-use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
-use Filament\Pages\Page;
+use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\EmbeddedTable;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 
-class StaffSessionDetail extends Page implements HasTable
+class ViewStaffSession extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static string|BackedEnum|null $navigationIcon = null;
+    protected static string $resource = StaffSessionResource::class;
 
-    protected static bool $shouldRegisterNavigation = false;
+    public StaffSession $record;
 
-    protected static ?string $slug = 'staff-session-detail/{type}/{session}';
-
-    protected static ?string $title = 'Detail Sesi Staff';
-
-    public StaffSession $sessionRecord;
-
-    public User $staff;
-
-    public string $type;
-
-    public int $orderCount = 0;
-
-    public function mount(string $type, string $session): void
+    public function mount(StaffSession $record): void
     {
-        if (! in_array($type, ['cashier', 'kitchen'])) {
-            abort(404);
-        }
-
-        $this->type = $type;
-        $this->sessionRecord = StaffSession::with('user')->findOrFail($session);
-        $this->staff = $this->sessionRecord->user;
-        $this->orderCount = app(StaffSessionService::class)->getOrderCount($this->sessionRecord);
-    }
-
-    public function getTitle(): string
-    {
-        return "Detail Sesi {$this->getTypeLabel()} — {$this->staff->name}";
-    }
-
-    protected function getTypeLabel(): string
-    {
-        return match ($this->type) {
-            'cashier' => 'Kasir',
-            'kitchen' => 'Dapur',
-        };
+        $this->record = $record;
     }
 
     public function content(Schema $schema): Schema
     {
+        $session = $this->record;
+        $staff = $session->user;
+        $typeLabel = match ($session->type) {
+            'cashier' => 'Kasir',
+            'kitchen' => 'Dapur',
+            default => $session->type,
+        };
+
         return $schema->components([
             Section::make('Informasi Sesi')
                 ->schema([
-                    TextEntry::make('nama')
+                    TextEntry::make('staff_name')
                         ->label('Nama Staff')
-                        ->state($this->staff->name),
-                    TextEntry::make('email')
+                        ->state($staff->name),
+                    TextEntry::make('staff_email')
                         ->label('Email')
-                        ->state($this->staff->email),
-                    TextEntry::make('role')
+                        ->state($staff->email),
+                    TextEntry::make('staff_role')
                         ->label('Role')
-                        ->state($this->getTypeLabel()),
-                    TextEntry::make('masuk')
+                        ->state($typeLabel),
+                    TextEntry::make('started_at')
                         ->label('Waktu Masuk')
-                        ->state($this->sessionRecord->started_at->format('d M Y, H:i')),
-                    TextEntry::make('keluar')
+                        ->state($session->started_at->format('d M Y, H:i')),
+                    TextEntry::make('ended_at')
                         ->label('Waktu Keluar')
-                        ->state($this->sessionRecord->ended_at?->format('d M Y, H:i') ?? 'Masih Aktif'),
-                    TextEntry::make('pesanan')
+                        ->state($session->ended_at?->format('d M Y, H:i') ?? 'Masih Aktif'),
+                    TextEntry::make('order_count')
                         ->label('Jumlah Pesanan')
-                        ->state($this->orderCount),
+                        ->state(app(StaffSessionService::class)->getOrderCount($session)),
                 ])
                 ->columns(3),
             EmbeddedTable::make(),
@@ -95,21 +70,16 @@ class StaffSessionDetail extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        $session = $this->sessionRecord;
+        $session = $this->record;
         $endedAt = $session->ended_at ?? now();
 
-        $baseQuery = match ($session->type) {
-            'cashier' => Order::with('cafeTable')
-                ->where('cashier_id', $session->user_id)
-                ->whereBetween('created_at', [$session->started_at, $endedAt]),
-            'kitchen' => Order::with('cafeTable')
-                ->where('processed_by', $session->user_id)
-                ->where('status', OrderStatus::Selesai->value)
-                ->whereBetween('created_at', [$session->started_at, $endedAt]),
-        };
-
         return $table
-            ->query($baseQuery->latest())
+            ->query(
+                Order::with('cafeTable')
+                    ->where('cashier_id', $session->user_id)
+                    ->whereBetween('created_at', [$session->started_at, $endedAt])
+                    ->latest()
+            )
             ->columns([
                 TextColumn::make('order_code')
                     ->label('Kode Pesanan')
@@ -146,9 +116,21 @@ class StaffSessionDetail extends Page implements HasTable
             ->recordActions([
                 Action::make('viewOrder')
                     ->label('Lihat Pesanan')
-                    ->icon('heroicon-o-eye')
-                    ->url(fn (Order $record) => route('filament.admin.resources.orders.view', $record)),
+                    ->icon(Heroicon::OutlinedEye)
+                    ->url(fn (Order $record) => \App\Filament\Resources\OrderResource::getUrl('view', ['record' => $record])),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public function getTitle(): string
+    {
+        $session = $this->record;
+        $typeLabel = match ($session->type) {
+            'cashier' => 'Kasir',
+            'kitchen' => 'Dapur',
+            default => $session->type,
+        };
+
+        return "Detail Sesi {$typeLabel} — {$session->user->name}";
     }
 }

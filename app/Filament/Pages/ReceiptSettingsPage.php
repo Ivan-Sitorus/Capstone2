@@ -11,14 +11,17 @@ use Filament\Forms\Contracts\HasForms;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Schema;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Illuminate\Support\Facades\Cache;
+use UnitEnum;
 
 class ReceiptSettingsPage extends Page implements HasForms
 {
     use InteractsWithForms;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-receipt-percent';
-    protected static string|\UnitEnum|null $navigationGroup = 'Transaksi';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedReceiptPercent;
+    protected static string | UnitEnum | null $navigationGroup = 'Transaksi';
 
     protected static ?string $navigationLabel = 'Struk & WhatsApp';
 
@@ -98,7 +101,7 @@ class ReceiptSettingsPage extends Page implements HasForms
         return [
             Action::make('save')
                 ->label('Simpan Pengaturan')
-                ->icon('heroicon-o-check')
+                ->icon(Heroicon::OutlinedCheck)
                 ->color('primary')
                 ->action(fn () => $this->save()),
         ];

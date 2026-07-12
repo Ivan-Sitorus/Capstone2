@@ -37,7 +37,7 @@ class ListStockAdjustments extends ListRecords
                             reportedBy: $data['reported_by'] ?? null,
                             adjustedAt: $data['adjusted_at'] ?? null,
                         );
-                    } catch (\Exception $e) {
+                    } catch (\RuntimeException $e) {
                         \Filament\Notifications\Notification::make()
                             ->title('Gagal membuat penyesuaian')
                             ->body($e->getMessage())

@@ -9,6 +9,7 @@ use Filament\Actions\EditAction;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -46,7 +47,7 @@ class CafeTableTable
                     ->modalWidth('md'),
                 Action::make('view_qr')
                     ->label('Lihat QR')
-                    ->icon('heroicon-o-qr-code')
+                    ->icon(Heroicon::OutlinedQrCode)
                     ->modalHeading(fn (CafeTable $record) => 'QR Code Meja '.$record->table_number)
                     ->modalWidth('md')
                     ->infolist(fn (CafeTable $record) => [
@@ -75,7 +76,7 @@ class CafeTableTable
                     ->modalFooterActions([
                         Action::make('download_qr_png')
                             ->label('Download PNG')
-                            ->icon('heroicon-o-arrow-down-tray')
+                            ->icon(Heroicon::OutlinedArrowDownTray)
                             ->action(function (CafeTable $record) {
                                 return response()->streamDownload(
                                     fn () => print ($record->generatePngDownload()),

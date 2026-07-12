@@ -7,6 +7,7 @@ use Filament\Actions\ViewAction;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Textarea;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -94,7 +95,7 @@ class ReceivableTable
                 Action::make('cancel')
                     ->label('Batalkan')
                     ->color('danger')
-                    ->icon('heroicon-o-x-circle')
+                    ->icon(Heroicon::OutlinedXCircle)
                     ->action(fn ($record, array $data) => $record->cancel($data['reason'] ?? null))
                     ->form([Textarea::make('reason')->label('Alasan Pembatalan')->required()])
                     ->visible(fn ($record) => !in_array($record->status, ['paid', 'cancelled']))

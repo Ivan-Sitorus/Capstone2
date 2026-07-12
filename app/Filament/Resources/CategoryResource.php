@@ -8,15 +8,18 @@ use App\Filament\Resources\CategoryResource\Tables\CategoryTable;
 use App\Models\Category;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class CategoryResource extends Resource
 {
     protected static ?string $model = Category::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-tag';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedTag;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Menu';
+    protected static string | UnitEnum | null $navigationGroup = 'Menu';
 
     protected static ?string $navigationLabel = 'Kategori Menu';
 

@@ -7,11 +7,14 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\InventoryService;
 use App\Services\OrderProcessingService;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class CashierOrderController extends Controller
 {
@@ -19,7 +22,7 @@ class CashierOrderController extends Controller
         protected OrderProcessingService $orderProcessingService
     ) {}
 
-    public function show(Order $order): \Inertia\Response
+    public function show(Order $order): Response
     {
         $order->load(['items.menu', 'cafeTable', 'cashier']);
 
@@ -48,7 +51,7 @@ class CashierOrderController extends Controller
         ]);
     }
 
-    public function cancel(Request $request, Order $order): \Illuminate\Http\JsonResponse
+    public function cancel(Request $request, Order $order): JsonResponse
     {
         if (in_array($order->status, [OrderStatus::Selesai->value, OrderStatus::Dibatalkan->value])) {
             return response()->json(['message' => 'Pesanan ini tidak dapat dibatalkan.'], 409);
@@ -66,7 +69,7 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Pesanan dibatalkan.']);
     }
 
-    public function updateStatus(Request $request, Order $order, InventoryService $inventoryService): \Illuminate\Http\JsonResponse
+    public function updateStatus(Request $request, Order $order, InventoryService $inventoryService): JsonResponse
     {
         $request->validate(['status' => 'required|string|in:diproses,selesai']);
 
@@ -112,7 +115,7 @@ class CashierOrderController extends Controller
                     $inventoryService->processSaleForOrder($order, Auth::id());
                 }
             });
-        } catch (\Exception $e) {
+        } catch (\RuntimeException $e) {
             return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
 
@@ -121,7 +124,7 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Status diperbarui.']);
     }
 
-    public function confirmPayment(Request $request, Order $order): \Illuminate\Http\JsonResponse
+    public function confirmPayment(Request $request, Order $order): JsonResponse
     {
         if ($order->payment_method !== 'bayar_nanti') {
             return response()->json(['message' => 'Sudah lunas.'], 409);
@@ -137,7 +140,7 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Pembayaran dikonfirmasi.']);
     }
 
-    public function confirmCash(Order $order): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+    public function confirmCash(Order $order): JsonResponse|RedirectResponse
     {
         if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'cash') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
@@ -147,12 +150,10 @@ class CashierOrderController extends Controller
             return response()->json($this->orderProcessingService->confirmCash($order));
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage());
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
     }
 
-    public function confirmQris(Order $order): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+    public function confirmQris(Order $order): JsonResponse|RedirectResponse
     {
         if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'qris') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
@@ -162,12 +163,10 @@ class CashierOrderController extends Controller
             return response()->json($this->orderProcessingService->confirmQris($order));
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage());
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
     }
 
-    public function rejectQris(Request $request, Order $order): \Illuminate\Http\JsonResponse
+    public function rejectQris(Request $request, Order $order): JsonResponse
     {
         if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'qris') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
@@ -186,7 +185,7 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Bukti QRIS ditolak.']);
     }
 
-    public function acceptQrisProof(Order $order): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+    public function acceptQrisProof(Order $order): JsonResponse|RedirectResponse
     {
         if ($order->qris_status !== 'proof_submitted') {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
@@ -197,12 +196,10 @@ class CashierOrderController extends Controller
             return response()->json(['message' => 'Bukti QRIS diterima. Pesanan diproses.']);
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage());
-        } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
     }
 
-    public function rejectQrisProof(Request $request, Order $order): \Illuminate\Http\JsonResponse
+    public function rejectQrisProof(Request $request, Order $order): JsonResponse
     {
         if ($order->qris_status !== 'proof_submitted') {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
@@ -213,12 +210,12 @@ class CashierOrderController extends Controller
         try {
             $this->orderProcessingService->rejectQrisProof($order, $request->reason);
             return response()->json(['message' => 'Bukti QRIS ditolak.']);
-        } catch (\Exception $e) {
+        } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-    public function requestQrisResubmit(Request $request, Order $order): \Illuminate\Http\JsonResponse
+    public function requestQrisResubmit(Request $request, Order $order): JsonResponse
     {
         if ($order->qris_status !== 'proof_submitted') {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
@@ -229,12 +226,12 @@ class CashierOrderController extends Controller
         try {
             $this->orderProcessingService->requestQrisResubmit($order, $request->reason);
             return response()->json(['message' => 'Pengunggahan ulang bukti QRIS diminta.']);
-        } catch (\Exception $e) {
+        } catch (\RuntimeException $e) {
             return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-    public function whatsappLink(Request $request, Order $order, WhatsAppReceiptService $waService): \Illuminate\Http\JsonResponse
+    public function whatsappLink(Request $request, Order $order, WhatsAppReceiptService $waService): JsonResponse
     {
         $request->validate([
             'phone' => 'required|string',

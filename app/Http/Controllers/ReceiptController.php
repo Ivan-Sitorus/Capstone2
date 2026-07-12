@@ -5,10 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Setting;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class ReceiptController extends Controller
 {
-    public function show(string $orderCode): \Inertia\Response
+    public function show(string $orderCode): Response
     {
         $order = Order::with(['items.menu', 'cafeTable', 'cashier'])
             ->where('order_code', $orderCode)
@@ -17,14 +18,14 @@ class ReceiptController extends Controller
         return $this->renderReceipt($order);
     }
 
-    public function showByUuid(Order $order): \Inertia\Response
+    public function showByUuid(Order $order): Response
     {
         $order->load(['items.menu', 'cafeTable', 'cashier']);
 
         return $this->renderReceipt($order);
     }
 
-    private function renderReceipt(Order $order): \Inertia\Response
+    private function renderReceipt(Order $order): Response
     {
         // Hitung diskon (selisih total dari unit_price * qty vs subtotal)
         $items = $order->items->map(fn ($i) => [

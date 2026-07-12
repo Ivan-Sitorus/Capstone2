@@ -2,11 +2,15 @@
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
+use UnitEnum;
+
 class PrediksiBahanBaku extends AnalyticsPage
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-beaker';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedBeaker;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Analitik';
+    protected static string | UnitEnum | null $navigationGroup = 'Analitik';
 
     protected static ?string $navigationLabel = 'Prediksi Bahan Baku';
 

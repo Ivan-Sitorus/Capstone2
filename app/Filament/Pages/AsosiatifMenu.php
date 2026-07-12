@@ -2,11 +2,15 @@
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
+use UnitEnum;
+
 class AsosiatifMenu extends AnalyticsPage
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-link';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedLink;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Analitik';
+    protected static string | UnitEnum | null $navigationGroup = 'Analitik';
 
     protected static ?string $navigationLabel = 'Asosiatif Menu';
 

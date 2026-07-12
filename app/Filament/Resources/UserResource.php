@@ -9,15 +9,18 @@ use App\Filament\Resources\UserResource\Tables\UserTable;
 use App\Models\User;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-users';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Staff';
+    protected static string | UnitEnum | null $navigationGroup = 'Staff';
 
     protected static ?string $navigationLabel = 'Akun Staff';
 

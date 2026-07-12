@@ -14,6 +14,7 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+use Filament\Support\Icons\Heroicon;
 
 class ViewReceivable extends ViewRecord
 {
@@ -24,7 +25,7 @@ class ViewReceivable extends ViewRecord
         return [
             Actions\Action::make('recordPayment')
                 ->label('Catat Pembayaran')
-                ->icon('heroicon-o-currency-dollar')
+                ->icon(Heroicon::OutlinedCurrencyDollar)
                 ->color('success')
                 ->visible(fn (Receivable $record): bool => ! in_array($record->status, [Receivable::STATUS_PAID, Receivable::STATUS_CANCELLED]))
                 ->form([

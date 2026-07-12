@@ -21,6 +21,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Pages\Page;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -259,7 +260,7 @@ class ManageBatches extends Page implements HasTable
                     }),
                 Action::make('mark_expired')
                     ->label('Tandai Kedaluwarsa')
-                    ->icon('heroicon-o-x-circle')
+                    ->icon(Heroicon::OutlinedXCircle)
                     ->color('danger')
                     ->visible(fn (IngredientBatch $record): bool =>
                         $record->expiry_date
@@ -329,7 +330,7 @@ class ManageBatches extends Page implements HasTable
             Action::make('back')
                 ->label('Kembali')
                 ->color('gray')
-                ->icon('heroicon-o-arrow-left')
+                ->icon(Heroicon::OutlinedArrowLeft)
                 ->url(static::$resource::getUrl('index')),
         ];
     }

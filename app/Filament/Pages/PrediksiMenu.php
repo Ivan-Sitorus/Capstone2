@@ -2,11 +2,15 @@
 
 namespace App\Filament\Pages;
 
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
+use UnitEnum;
+
 class PrediksiMenu extends AnalyticsPage
 {
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedChartBarSquare;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Analitik';
+    protected static string | UnitEnum | null $navigationGroup = 'Analitik';
 
     protected static ?string $navigationLabel = 'Prediksi Menu';
 

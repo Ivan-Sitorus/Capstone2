@@ -7,6 +7,7 @@ use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
@@ -70,11 +71,11 @@ class StockTable
             ->recordActions([
                 Action::make('batches')
                     ->label('Stok Bahan')
-                    ->icon('heroicon-o-cube')
+                    ->icon(Heroicon::OutlinedCube)
                     ->url(fn ($record) => \App\Filament\Resources\StockResource::getUrl('batches', ['record' => $record])),
                 Action::make('history')
                     ->label('Riwayat Pemakaian')
-                    ->icon('heroicon-o-clock')
+                    ->icon(Heroicon::OutlinedClock)
                     ->url(fn ($record) => \App\Filament\Resources\StockResource::getUrl('history', ['record' => $record])),
                 EditAction::make()->modal(),
                 DeleteAction::make()

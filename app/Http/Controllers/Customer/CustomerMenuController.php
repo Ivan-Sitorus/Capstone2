@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Customer;
 use App\Http\Controllers\Controller;
 use App\Models\CafeTable;
 use App\Models\Category;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
+use Inertia\Response;
 
 class CustomerMenuController extends Controller
 {
@@ -20,7 +22,7 @@ class CustomerMenuController extends Controller
         );
     }
 
-    public function showIdentitas(Request $request): \Inertia\Response
+    public function showIdentitas(Request $request): Response
     {
         $table = $this->findTable($request->query('table'));
 
@@ -34,7 +36,7 @@ class CustomerMenuController extends Controller
         return Inertia::render('Pelanggan/Identitas', ['table' => $table]);
     }
 
-    public function submitIdentitas(Request $request): \Illuminate\Http\RedirectResponse
+    public function submitIdentitas(Request $request): RedirectResponse
     {
         $request->validate([
             'customer_name' => 'required|string|max:255',
@@ -45,7 +47,7 @@ class CustomerMenuController extends Controller
         return redirect()->route('customer.menu');
     }
 
-    public function index(Request $request): \Inertia\Response
+    public function index(Request $request): Response
     {
         $categories = Cache::remember('customer_menu_v2', 300, function () {
             return Category::with([

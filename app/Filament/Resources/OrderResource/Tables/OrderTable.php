@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\OrderResource\Tables;
 
+use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use Filament\Actions\Action;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -36,27 +38,12 @@ class OrderTable
                 TextColumn::make('payment_method')
                     ->label('Metode')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'cash' => 'Tunai',
-                        'qris' => 'QRIS',
-                        'bayar_nanti' => 'Bayar Nanti',
-                        default => '-',
-                    }),
+                    ->formatStateUsing(fn (?string $state): string => OrderResource::getPaymentLabel($state)),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'diproses' => 'info',
-                        'selesai' => 'success',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending' => 'Pending',
-                        'diproses' => 'Diproses',
-                        'selesai' => 'Selesai',
-                        default => $state,
-                    }),
+                    ->color(fn (string $state): string => OrderResource::getStatusColor($state))
+                    ->formatStateUsing(fn (string $state): string => OrderResource::getStatusLabel($state)),
                 TextColumn::make('created_at')
                     ->label('Waktu')
                     ->dateTime('d M Y, H:i:s')
@@ -93,7 +80,7 @@ class OrderTable
             ->recordActions([
                 Action::make('view')
                     ->label('Lihat')
-                    ->icon('heroicon-o-eye')
+                    ->icon(Heroicon::OutlinedEye)
                     ->record(fn (Order $record): Order => $record->loadMissing('items.menu'))
                     ->infolist(static::getInfolistComponents())
                     ->modalAutofocus(false)
@@ -106,6 +93,6 @@ class OrderTable
 
     private static function getInfolistComponents(): array
     {
-        return \App\Filament\Resources\OrderResource::getInfolistComponents();
+        return OrderResource::getInfolistComponents();
     }
 }

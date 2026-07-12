@@ -12,6 +12,9 @@ use RuntimeException;
 
 class StockReconciliationService
 {
+    public function __construct(
+        protected InventoryService $inventoryService
+    ) {}
     public static function generateAdjustmentCode(): string
     {
         $dateKey = now()->format('dmy');
@@ -158,8 +161,7 @@ class StockReconciliationService
 
         $movementType = $category ? 'waste' : 'adjustment_decrease';
 
-        $service = app(InventoryService::class);
-        $service->decreaseStockForIngredient(
+        $this->inventoryService->decreaseStockForIngredient(
             ingredientId: $ingredientId,
             quantity: $quantity,
             context: [
@@ -205,13 +207,11 @@ class StockReconciliationService
                 'adjusted_at' => $adjustedAt ?? now(),
             ]);
 
-            $service = app(InventoryService::class);
-
             if ($adjustmentType === StockAdjustment::TYPE_DECREASE) {
                 foreach ($menu->menuIngredients as $mi) {
                     $deductQty = (float) $mi->quantity_used * $quantity;
 
-                    $service->decreaseStockForIngredient(
+                    $this->inventoryService->decreaseStockForIngredient(
                         ingredientId: $mi->ingredient_id,
                         quantity: $deductQty,
                         context: [

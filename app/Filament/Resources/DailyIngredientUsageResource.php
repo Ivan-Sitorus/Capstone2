@@ -8,16 +8,19 @@ use App\Filament\Resources\DailyIngredientUsageResource\Tables\DailyIngredientUs
 use App\Models\DailyIngredientUsage;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use BackedEnum;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class DailyIngredientUsageResource extends Resource
 {
     protected static bool $shouldRegisterNavigation = false;
     protected static ?string $model = DailyIngredientUsage::class;
 
-    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
+    protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedChartBarSquare;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Inventori';
+    protected static string | UnitEnum | null $navigationGroup = 'Inventori';
 
     protected static ?string $navigationLabel = 'Pemakaian Bahan Harian';
 
