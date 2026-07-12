@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Setting;
@@ -16,7 +17,7 @@ class CustomerPaymentController extends Controller
 {
     public function showChoose(Order $order): Response
     {
-        if ($order->status !== Order::STATUS_PENDING) {
+        if ($order->status !== OrderStatus::Pending->value) {
             return Inertia::location('/customer/riwayat');
         }
 
@@ -53,7 +54,7 @@ class CustomerPaymentController extends Controller
 
     public function showQrisUpload(Order $order): Response
     {
-        if (in_array($order->status, [Order::STATUS_DIPROSES, Order::STATUS_SELESAI])) {
+        if (in_array($order->status, [OrderStatus::Diproses->value, OrderStatus::Selesai->value])) {
             return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderData($order)]);
         }
 

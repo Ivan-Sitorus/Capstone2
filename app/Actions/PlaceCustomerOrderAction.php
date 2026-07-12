@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Enums\OrderStatus;
 use Exception;
 use App\Models\CafeTable;
 use App\Models\Menu;
@@ -47,7 +48,7 @@ class PlaceCustomerOrderAction
                 'table_id'       => $request->table_id,
                 'cashier_id'     => null,
                 'order_type'     => 'qr',
-                'status'         => Order::STATUS_PENDING,
+                'status'         => OrderStatus::Pending->value,
                 'total_amount'   => 0,
             ]);
 

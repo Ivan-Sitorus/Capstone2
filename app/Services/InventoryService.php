@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\BatchMode;
 use App\Models\DailyIngredientUsage;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
@@ -212,7 +213,7 @@ class InventoryService
             ->lockForUpdate();
 
         match ($ingredient->batch_mode) {
-            Ingredient::BATCH_MODE_FIFO => $query
+            BatchMode::Fifo->value => $query
                 ->orderByRaw('CASE WHEN received_at IS NULL THEN 1 ELSE 0 END')
                 ->orderBy('received_at', 'asc')
                 ->orderBy('expiry_date', 'asc')

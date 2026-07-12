@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cashier;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
@@ -13,7 +14,7 @@ class CashierRiwayatController extends Controller
     {
         $orders = Order::with(['cashier' => fn ($q) => $q->select('id', 'name')])
             ->select('id', 'order_code', 'cashier_id', 'customer_name', 'total_amount', 'payment_method', 'status', 'created_at')
-            ->whereIn('status', [Order::STATUS_SELESAI, Order::STATUS_DIBATALKAN])
+            ->whereIn('status', [OrderStatus::Selesai->value, OrderStatus::Dibatalkan->value])
             ->when($request->search, fn ($q) => $q->where('order_code', 'like', '%'.$request->search.'%')
                 ->orWhere('customer_name', 'like', '%'.$request->search.'%'))
             ->when($request->date, fn ($q) => $q->whereDate('created_at', $request->date))

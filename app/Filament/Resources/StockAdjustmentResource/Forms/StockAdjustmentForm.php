@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StockAdjustmentResource\Forms;
 
+use App\Enums\AdjustableType;
 use App\Models\Ingredient;
 use App\Models\StockAdjustment;
 use Filament\Forms\Components\DateTimePicker;
@@ -20,7 +21,7 @@ class StockAdjustmentForm
             Select::make('adjustable_type')
                 ->label('Jenis')
                 ->options(StockAdjustment::ADJUSTABLE_TYPES)
-                ->default(StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT)
+                ->default(AdjustableType::Ingredient->value)
                 ->required()
                 ->native(false)
                 ->live(),
@@ -30,7 +31,7 @@ class StockAdjustmentForm
                 ->required()
                 ->searchable()
                 ->preload()
-                ->visible(fn (Get $get) => $get('adjustable_type') === StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT)
+                ->visible(fn (Get $get) => $get('adjustable_type') === AdjustableType::Ingredient->value)
                 ->getOptionLabelFromRecordUsing(fn ($record) => $record->name.' ('.$record->unit.')'),
             Select::make('menu_id')
                 ->label('Menu')
@@ -38,7 +39,7 @@ class StockAdjustmentForm
                 ->required()
                 ->searchable()
                 ->preload()
-                ->visible(fn (Get $get) => $get('adjustable_type') === StockAdjustment::ADJUSTABLE_TYPE_MENU),
+                ->visible(fn (Get $get) => $get('adjustable_type') === AdjustableType::Menu->value),
             Select::make('adjustment_type')
                 ->label('Tipe Penyesuaian')
                 ->options([
@@ -59,9 +60,9 @@ class StockAdjustmentForm
             TextInput::make('quantity')
                 ->label('Jumlah')
                 ->required()
-                ->numeric(fn (Get $get) => $get('adjustable_type') === StockAdjustment::ADJUSTABLE_TYPE_MENU)
+                ->numeric(fn (Get $get) => $get('adjustable_type') === AdjustableType::Menu->value)
                 ->prefix(fn (Get $get) => $get('adjustment_type') === StockAdjustment::TYPE_DECREASE ? '-' : '+')
-                ->suffix(fn (Get $get) => $get('adjustable_type') === StockAdjustment::ADJUSTABLE_TYPE_MENU
+                ->suffix(fn (Get $get) => $get('adjustable_type') === AdjustableType::Menu->value
                     ? ' porsi'
                     : ($get('ingredient_id')
                         ? ' ' . (Ingredient::find($get('ingredient_id'))?->unit ?? '')

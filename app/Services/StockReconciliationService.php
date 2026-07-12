@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\AdjustableType;
 use App\Models\Ingredient;
 use App\Models\Menu;
 use App\Models\StockAdjustment;
@@ -37,7 +38,7 @@ class StockReconciliationService
             throw new RuntimeException('Tipe penyesuaian tidak valid.');
         }
 
-        if ($adjustableType === StockAdjustment::ADJUSTABLE_TYPE_MENU) {
+        if ($adjustableType === AdjustableType::Menu->value) {
             return $this->handleMenuAdjustment(
                 menuId: $menuId,
                 quantity: $quantity,
@@ -100,7 +101,7 @@ class StockReconciliationService
 
             $adjustment = StockAdjustment::create([
                 'code' => self::generateAdjustmentCode(),
-                'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT,
+                'adjustable_type' => AdjustableType::Ingredient->value,
                 'ingredient_id' => $ingredientId,
                 'adjustment_type' => $adjustmentType,
                 'category' => $category,
@@ -143,7 +144,7 @@ class StockReconciliationService
     ): StockAdjustment {
         $adjustment = StockAdjustment::create([
             'code' => self::generateAdjustmentCode(),
-            'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT,
+            'adjustable_type' => AdjustableType::Ingredient->value,
             'ingredient_id' => $ingredientId,
             'adjustment_type' => StockAdjustment::TYPE_DECREASE,
             'category' => $category,
@@ -192,7 +193,7 @@ class StockReconciliationService
 
             $adjustment = StockAdjustment::create([
                 'code' => self::generateAdjustmentCode(),
-                'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_MENU,
+                'adjustable_type' => AdjustableType::Menu->value,
                 'menu_id' => $menu->id,
                 'adjustment_type' => $adjustmentType,
                 'category' => $category,

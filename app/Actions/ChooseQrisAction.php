@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
@@ -11,7 +12,7 @@ class ChooseQrisAction
 {
     public function handle(Order $order): JsonResponse
     {
-        if ($order->status !== Order::STATUS_PENDING) {
+        if ($order->status !== OrderStatus::Pending->value) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
         $order->update(['payment_method' => 'qris']);

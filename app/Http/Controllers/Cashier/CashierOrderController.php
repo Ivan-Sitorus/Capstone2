@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cashier;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\InventoryService;
@@ -49,14 +50,14 @@ class CashierOrderController extends Controller
 
     public function cancel(Request $request, Order $order)
     {
-        if (in_array($order->status, [Order::STATUS_SELESAI, Order::STATUS_DIBATALKAN])) {
+        if (in_array($order->status, [OrderStatus::Selesai->value, OrderStatus::Dibatalkan->value])) {
             return response()->json(['message' => 'Pesanan ini tidak dapat dibatalkan.'], 409);
         }
 
         $request->validate(['reason' => 'nullable|string|max:255']);
 
         $order->update([
-            'status'         => Order::STATUS_DIBATALKAN,
+            'status'         => OrderStatus::Dibatalkan->value,
             'rejection_note' => $request->reason,
             'cashier_id'     => Auth::id(),
             'cancelled_at'   => now(),
@@ -70,8 +71,8 @@ class CashierOrderController extends Controller
         $request->validate(['status' => 'required|string|in:diproses,selesai']);
 
         $validTransitions = [
-            Order::STATUS_PENDING => Order::STATUS_DIPROSES,
-            Order::STATUS_DIPROSES => Order::STATUS_SELESAI,
+            OrderStatus::Pending->value => OrderStatus::Diproses->value,
+            OrderStatus::Diproses->value => OrderStatus::Selesai->value,
         ];
 
         $allowed = $validTransitions[$order->status] ?? null;
@@ -79,11 +80,11 @@ class CashierOrderController extends Controller
             return response()->json(['message' => 'Transisi status tidak valid.'], 409);
         }
 
-        if ($request->status === Order::STATUS_SELESAI && $order->payment_method === 'bayar_nanti') {
+        if ($request->status === OrderStatus::Selesai->value && $order->payment_method === 'bayar_nanti') {
             return response()->json(['message' => 'Pesanan belum lunas. Konfirmasi pembayaran terlebih dahulu.'], 409);
         }
 
-        if ($request->status === Order::STATUS_DIPROSES) {
+        if ($request->status === OrderStatus::Diproses->value) {
             $order->load('items.menu');
             $items = $order->items->map(fn($i) => ['menu_id' => $i->menu_id, 'quantity' => $i->quantity])->toArray();
             $fulfillment = $inventoryService->canFulfillOrder($items);
@@ -99,15 +100,15 @@ class CashierOrderController extends Controller
             DB::transaction(function () use ($request, $order, $inventoryService) {
                 $data = ['status' => $request->status, 'cashier_id' => Auth::id()];
 
-                if ($request->status === Order::STATUS_DIPROSES) {
+                if ($request->status === OrderStatus::Diproses->value) {
                     $data['processed_at'] = now();
-                } elseif ($request->status === Order::STATUS_SELESAI) {
+                } elseif ($request->status === OrderStatus::Selesai->value) {
                     $data['completed_at'] = now();
                 }
 
                 $order->update($data);
 
-                if ($request->status === Order::STATUS_DIPROSES) {
+                if ($request->status === OrderStatus::Diproses->value) {
                     $inventoryService->processSaleForOrder($order, Auth::id());
                 }
             });
@@ -138,7 +139,7 @@ class CashierOrderController extends Controller
 
     public function confirmCash(Order $order)
     {
-        if ($order->status !== Order::STATUS_PENDING || $order->payment_method !== 'cash') {
+        if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'cash') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
 
@@ -153,7 +154,7 @@ class CashierOrderController extends Controller
 
     public function confirmQris(Order $order)
     {
-        if ($order->status !== Order::STATUS_PENDING || $order->payment_method !== 'qris') {
+        if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'qris') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
 
@@ -168,7 +169,7 @@ class CashierOrderController extends Controller
 
     public function rejectQris(Request $request, Order $order)
     {
-        if ($order->status !== Order::STATUS_PENDING || $order->payment_method !== 'qris') {
+        if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'qris') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
         $request->validate(['note' => 'nullable|string|max:255']);

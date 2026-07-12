@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Order;
 
+use App\Enums\OrderStatus;
 use App\Models\CafeTable;
 use App\Models\Category;
 use App\Models\Menu;
@@ -180,7 +181,7 @@ class OrderPromotionIntegrationTest extends TestCase
 
         $order = Order::with('appliedPromotions')->latest('id')->firstOrFail();
 
-        $this->assertSame(Order::STATUS_DIPROSES, $order->status);
+        $this->assertSame(OrderStatus::Diproses->value, $order->status);
         $this->assertSame(14400.0, (float) $order->total_amount);
         $this->assertCount(1, $order->appliedPromotions);
 

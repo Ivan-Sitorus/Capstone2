@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class UploadQrisProofAction
             'proof' => 'required|file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        if ($order->status !== Order::STATUS_PENDING) {
+        if ($order->status !== OrderStatus::Pending->value) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
 

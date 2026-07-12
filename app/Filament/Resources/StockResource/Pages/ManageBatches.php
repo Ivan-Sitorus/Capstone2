@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\StockResource\Pages;
 
+use App\Enums\BatchMode;
+use App\Enums\AdjustableType;
 use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
@@ -106,8 +108,8 @@ class ManageBatches extends Page implements HasTable
                         DatePicker::make('expiry_date')
                             ->label('Tanggal Kedaluwarsa')
                             ->native(false)
-                            ->required(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO)
-                            ->helperText(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO
+                            ->required(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
+                            ->helperText(fn () => $this->record->batch_mode === BatchMode::Fefo->value
                                 ? 'Wajib untuk mode FEFO'
                                 : null),
                         DateTimePicker::make('received_at')
@@ -126,7 +128,7 @@ class ManageBatches extends Page implements HasTable
                         Toggle::make('allow_expired_usage')
                             ->label('Bisa dipakai meskipun kedaluwarsa')
                             ->helperText('Batch ini tetap bisa dipakai FEFO walau sudah kedaluwarsa')
-                            ->visible(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO)
+                            ->visible(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
                             ->default(false),
                     ])
                     ->using(function (array $data): IngredientBatch {
@@ -164,8 +166,8 @@ class ManageBatches extends Page implements HasTable
                         DatePicker::make('expiry_date')
                             ->label('Tanggal Kedaluwarsa')
                             ->native(false)
-                            ->required(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO)
-                            ->helperText(fn () => $this->record->batch_mode === Ingredient::BATCH_MODE_FEFO
+                            ->required(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
+                            ->helperText(fn () => $this->record->batch_mode === BatchMode::Fefo->value
                                 ? 'Wajib untuk mode FEFO'
                                 : null),
                         DateTimePicker::make('received_at')
@@ -201,7 +203,7 @@ class ManageBatches extends Page implements HasTable
 
                         StockAdjustment::create([
                             'code' => StockReconciliationService::generateAdjustmentCode(),
-                            'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT,
+                            'adjustable_type' => AdjustableType::Ingredient->value,
                             'ingredient_id' => $record->ingredient_id,
                             'adjustment_type' => $adjType,
                             'category' => StockAdjustment::CAT_CORRECTION,
@@ -241,7 +243,7 @@ class ManageBatches extends Page implements HasTable
 
                             StockAdjustment::create([
                                 'code' => StockReconciliationService::generateAdjustmentCode(),
-                                'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT,
+                                'adjustable_type' => AdjustableType::Ingredient->value,
                                 'ingredient_id' => $record->ingredient_id,
                                 'adjustment_type' => StockAdjustment::TYPE_DECREASE,
                                 'category' => StockAdjustment::CAT_CORRECTION,
@@ -280,7 +282,7 @@ class ManageBatches extends Page implements HasTable
 
                         $adjustment = StockAdjustment::create([
                             'code' => StockReconciliationService::generateAdjustmentCode(),
-                            'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT,
+                            'adjustable_type' => AdjustableType::Ingredient->value,
                             'ingredient_id' => $record->ingredient_id,
                             'adjustment_type' => StockAdjustment::TYPE_DECREASE,
                             'category' => StockAdjustment::CAT_EXPIRED,

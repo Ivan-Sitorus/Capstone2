@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cashier;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Inertia\Inertia;
@@ -21,14 +22,14 @@ class CashierDashboardController extends Controller
                 SUM(CASE WHEN status = ? AND payment_method = 'cash'   THEN 1 ELSE 0 END) AS cash_pending,
                 SUM(CASE WHEN status = ? AND payment_method = 'qris' AND payment_proof IS NOT NULL THEN 1 ELSE 0 END) AS qris_pending
             ", [
-                Order::STATUS_SELESAI,
-                Order::STATUS_SELESAI,
-                Order::STATUS_PENDING,
-                Order::STATUS_PENDING,
+            OrderStatus::Selesai->value,
+            OrderStatus::Selesai->value,
+            OrderStatus::Pending->value,
+            OrderStatus::Pending->value,
             ])
             ->first();
 
-        $pesananAktif = Order::whereNotIn('status', [Order::STATUS_SELESAI, Order::STATUS_DIBATALKAN])
+        $pesananAktif = Order::whereNotIn('status', [OrderStatus::Selesai->value, OrderStatus::Dibatalkan->value])
             ->where(fn($q) =>
                 $q->where('order_type', 'cashier')
                   ->orWhere(fn($q2) =>

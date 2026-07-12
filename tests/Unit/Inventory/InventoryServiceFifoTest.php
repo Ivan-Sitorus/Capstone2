@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Inventory;
 
+use App\Enums\BatchMode;
 use App\Models\Category;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
@@ -88,7 +89,7 @@ class InventoryServiceFifoTest extends TestCase
             'unit' => 'gram',
             'low_stock_threshold' => 20,
             'is_active' => true,
-            'batch_mode' => Ingredient::BATCH_MODE_FIFO,
+            'batch_mode' => BatchMode::Fifo->value,
         ]);
 
         // Batch A: older received_at (5 days ago), far future expiry

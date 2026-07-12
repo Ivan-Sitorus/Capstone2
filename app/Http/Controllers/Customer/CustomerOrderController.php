@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Actions\PlaceCustomerOrderAction;
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Services\OrderPromotionService;
 use Illuminate\Http\JsonResponse;
@@ -32,7 +33,7 @@ class CustomerOrderController extends Controller
                     // Sembunyikan QRIS yang belum ada bukti & belum dikonfirmasi kasir
                     $q->where('payment_method', 'qris')
                       ->whereNull('payment_proof')
-                      ->whereNotIn('status', [Order::STATUS_DIPROSES, Order::STATUS_SELESAI]);
+                      ->whereNotIn('status', [OrderStatus::Diproses->value, OrderStatus::Selesai->value]);
                 })
                 ->latest()
                 ->limit(50)

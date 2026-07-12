@@ -2,6 +2,7 @@
 
 namespace App\Filament\Pages;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use App\Models\StaffSession;
 use App\Models\User;
@@ -103,7 +104,7 @@ class StaffSessionDetail extends Page implements HasTable
                 ->whereBetween('created_at', [$session->started_at, $endedAt]),
             'kitchen' => Order::with('cafeTable')
                 ->where('processed_by', $session->user_id)
-                ->where('status', Order::STATUS_SELESAI)
+                ->where('status', OrderStatus::Selesai->value)
                 ->whereBetween('created_at', [$session->started_at, $endedAt]),
         };
 

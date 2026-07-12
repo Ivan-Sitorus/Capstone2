@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cashier;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Category;
@@ -50,7 +51,7 @@ class CashierPesananBaruController extends Controller
                     'order_type' => 'cashier',
                     'payment_method' => $request->payment_method,
                     'customer_name' => $request->customer_name,
-                    'status' => Order::STATUS_PENDING,
+                    'status' => OrderStatus::Pending->value,
                     'total_amount' => 0,
                 ]);
 

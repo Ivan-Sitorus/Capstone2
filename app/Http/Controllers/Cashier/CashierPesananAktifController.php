@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Cashier;
 
+use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Inertia\Inertia;
@@ -11,7 +12,7 @@ class CashierPesananAktifController extends Controller
     public function index()
     {
         $orders = Order::with(['items.menu', 'cafeTable', 'cashier'])
-            ->whereNotIn('status', [Order::STATUS_SELESAI, Order::STATUS_DIBATALKAN])
+            ->whereNotIn('status', [OrderStatus::Selesai->value, OrderStatus::Dibatalkan->value])
             ->where(function ($q) {
                 // Order dari kasir: selalu tampil
                 $q->where('order_type', 'cashier')
@@ -23,7 +24,7 @@ class CashierPesananAktifController extends Controller
                                // QRIS: tampil saat bukti dikirim (pending) ATAU sudah dikonfirmasi (diproses, proof dihapus)
                                 ->orWhere(fn ($q4) => $q4->where('payment_method', 'qris')
                                     ->where(fn ($q5) => $q5->whereNotNull('payment_proof')
-                                        ->orWhere('status', Order::STATUS_DIPROSES)
+                                        ->orWhere('status', OrderStatus::Diproses->value)
                                     )
                                 )
                         )
@@ -34,8 +35,8 @@ class CashierPesananAktifController extends Controller
 
         $counts = [
             'all' => $orders->count(),
-            'pending' => $orders->where('status', Order::STATUS_PENDING)->count(),
-            'diproses' => $orders->where('status', Order::STATUS_DIPROSES)->count(),
+'pending' => $orders->where('status', OrderStatus::Pending->value)->count(),
+                'diproses' => $orders->where('status', OrderStatus::Diproses->value)->count(),
             'belum_bayar' => $orders->where('payment_method', 'bayar_nanti')->count(),
         ];
 

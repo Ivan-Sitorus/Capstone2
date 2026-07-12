@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Inventory;
 
+use App\Enums\OrderStatus;
 use App\Models\Category;
 use App\Models\DailyIngredientUsage;
 use App\Models\Ingredient;
@@ -123,7 +124,7 @@ class DailyIngredientUsageAggregationTest extends TestCase
 
         $order = Order::latest('id')->firstOrFail();
 
-        $this->assertSame(Order::STATUS_PENDING, $order->status);
+        $this->assertSame(OrderStatus::Pending->value, $order->status);
 
         $dailyUsage = DailyIngredientUsage::query()
             ->where('ingredient_id', $ingredient->id)
@@ -183,7 +184,7 @@ class DailyIngredientUsageAggregationTest extends TestCase
             'customer_name' => 'Customer Mining',
             'customer_phone' => '081234567890',
             'order_type' => 'qr',
-            'status' => Order::STATUS_PENDING,
+            'status' => OrderStatus::Pending->value,
             'payment_method' => 'cash',
             'total_amount' => 10000 * $quantity,
         ]);

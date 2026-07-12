@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ReceivableResource\Pages;
 
+use App\Enums\OrderStatus;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Menu;
 use App\Models\Order;
@@ -24,7 +25,7 @@ class CreateReceivable extends CreateRecord
                 'order_type' => 'cashier',
                 'payment_method' => 'bayar_nanti',
                 'customer_name' => $data['customer_name'],
-                'status' => Order::STATUS_PENDING,
+                'status' => OrderStatus::Pending->value,
                 'total_amount' => 0,
             ]);
 

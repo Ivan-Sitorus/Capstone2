@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StockResource\Forms;
 
+use App\Enums\BatchMode;
 use App\Models\Ingredient;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -38,7 +39,7 @@ class StockForm
                 Select::make('batch_mode')
                     ->label('Prioritas Batch')
                     ->options(Ingredient::batchModes())
-                    ->default(Ingredient::BATCH_MODE_FEFO)
+                    ->default(BatchMode::Fefo->value)
                     ->required()
                     ->native(false),
                 Repeater::make('batches')
@@ -62,8 +63,8 @@ class StockForm
                             ->label('Tanggal Kadaluarsa')
                             ->nullable()
                             ->native(false)
-                            ->required(fn ($get) => $get('../../batch_mode') === Ingredient::BATCH_MODE_FEFO)
-                            ->helperText(fn ($get) => $get('../../batch_mode') === Ingredient::BATCH_MODE_FEFO
+                            ->required(fn ($get) => $get('../../batch_mode') === BatchMode::Fefo->value)
+                            ->helperText(fn ($get) => $get('../../batch_mode') === BatchMode::Fefo->value
                                 ? 'Wajib diisi untuk mode FEFO'
                                 : null),
                         DateTimePicker::make('received_at')

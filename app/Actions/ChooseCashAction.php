@@ -2,6 +2,7 @@
 
 namespace App\Actions;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -10,7 +11,7 @@ class ChooseCashAction
 {
     public function handle(Order $order): JsonResponse
     {
-        if ($order->status !== Order::STATUS_PENDING) {
+        if ($order->status !== OrderStatus::Pending->value) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
         DB::transaction(function () use ($order) {
