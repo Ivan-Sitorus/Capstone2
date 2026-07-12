@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cashier;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\InventoryService;
+use App\Services\OrderProcessingService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -13,6 +14,10 @@ use Inertia\Inertia;
 
 class CashierOrderController extends Controller
 {
+    public function __construct(
+        protected OrderProcessingService $orderProcessingService
+    ) {}
+
     public function show(Order $order)
     {
         $order->load(['items.menu', 'cafeTable', 'cashier']);
@@ -74,7 +79,6 @@ class CashierOrderController extends Controller
             return response()->json(['message' => 'Transisi status tidak valid.'], 409);
         }
 
-        // Blok selesai jika bayar_nanti
         if ($request->status === Order::STATUS_SELESAI && $order->payment_method === 'bayar_nanti') {
             return response()->json(['message' => 'Pesanan belum lunas. Konfirmasi pembayaran terlebih dahulu.'], 409);
         }
@@ -132,80 +136,34 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Pembayaran dikonfirmasi.']);
     }
 
-    public function confirmCash(Order $order, InventoryService $inventoryService)
+    public function confirmCash(Order $order)
     {
         if ($order->status !== Order::STATUS_PENDING || $order->payment_method !== 'cash') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
 
-        $order->load('items.menu');
-        $items = $order->items->map(fn($i) => ['menu_id' => $i->menu_id, 'quantity' => $i->quantity])->toArray();
-        $fulfillment = $inventoryService->canFulfillOrder($items);
-
-        if (! $fulfillment['can_fulfill']) {
-            $first = $fulfillment['insufficient_ingredients'][0];
-            $name = $first['ingredient_name'] ?? $first['menu_name'] ?? 'item';
-            return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
-        }
-
         try {
-            DB::transaction(function () use ($order, $inventoryService) {
-                $order->update([
-                    'status' => Order::STATUS_DIPROSES,
-                    'cashier_id' => Auth::id(),
-                    'processed_at' => now(),
-                ]);
-
-                $inventoryService->processSaleForOrder($order, Auth::id());
-            });
+            return response()->json($this->orderProcessingService->confirmCash($order));
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
             return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
-
-        
-
-        return response()->json(['message' => 'Pembayaran cash dikonfirmasi.']);
     }
 
-    public function confirmQris(Order $order, InventoryService $inventoryService)
+    public function confirmQris(Order $order)
     {
         if ($order->status !== Order::STATUS_PENDING || $order->payment_method !== 'qris') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
 
-        $order->load('items.menu');
-        $items = $order->items->map(fn($i) => ['menu_id' => $i->menu_id, 'quantity' => $i->quantity])->toArray();
-        $fulfillment = $inventoryService->canFulfillOrder($items);
-
-        if (! $fulfillment['can_fulfill']) {
-            $first = $fulfillment['insufficient_ingredients'][0];
-            $name = $first['ingredient_name'] ?? $first['menu_name'] ?? 'item';
-            return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
-        }
-
         try {
-            DB::transaction(function () use ($order, $inventoryService) {
-                // Hapus file bukti setelah dikonfirmasi
-                if ($order->payment_proof) {
-                    Storage::disk('public')->delete($order->payment_proof);
-                }
-
-                $order->update([
-                    'status' => Order::STATUS_DIPROSES,
-                    'cashier_id' => Auth::id(),
-                    'payment_proof' => null,
-                    'processed_at' => now(),
-                ]);
-
-                $inventoryService->processSaleForOrder($order, Auth::id());
-            });
+            return response()->json($this->orderProcessingService->confirmQris($order));
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
             return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
-
-        
-
-        return response()->json(['message' => 'Pembayaran QRIS dikonfirmasi.']);
     }
 
     public function rejectQris(Request $request, Order $order)
@@ -227,57 +185,22 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Bukti QRIS ditolak.']);
     }
 
-    /**
-     * Accept QRIS payment proof and advance order to diproses.
-     */
-
-    /**
-     * Accept QRIS payment proof and advance order to diproses.
-     */
-    public function acceptQrisProof(Order $order, InventoryService $inventoryService)
+    public function acceptQrisProof(Order $order)
     {
         if ($order->qris_status !== 'proof_submitted') {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
         }
 
-        $order->load('items.menu');
-        $items = $order->items->map(fn($i) => ['menu_id' => $i->menu_id, 'quantity' => $i->quantity])->toArray();
-        $fulfillment = $inventoryService->canFulfillOrder($items);
-
-        if (! $fulfillment['can_fulfill']) {
-            $first = $fulfillment['insufficient_ingredients'][0];
-            $name = $first['ingredient_name'] ?? $first['menu_name'] ?? 'item';
-            return back()->with('error', "Stok '{$name}' tidak mencukupi. Silakan coba lagi.");
-        }
-
         try {
-            DB::transaction(function () use ($order, $inventoryService) {
-                if ($order->payment_proof) {
-                    Storage::disk('public')->delete($order->payment_proof);
-                }
-
-                $order->update([
-                    'qris_status'   => 'accepted',
-                    'status'        => Order::STATUS_DIPROSES,
-                    'cashier_id'    => Auth::id(),
-                    'payment_proof' => null,
-                    'processed_at'  => now(),
-                ]);
-
-                $inventoryService->processSaleForOrder($order, Auth::id());
-            });
+            $this->orderProcessingService->acceptQrisProof($order);
+            return response()->json(['message' => 'Bukti QRIS diterima. Pesanan diproses.']);
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
             return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
-
-        
-
-        return response()->json(['message' => 'Bukti QRIS diterima. Pesanan diproses.']);
     }
 
-    /**
-     * Reject QRIS payment proof with a required reason.
-     */
     public function rejectQrisProof(Request $request, Order $order)
     {
         if ($order->qris_status !== 'proof_submitted') {
@@ -286,24 +209,14 @@ class CashierOrderController extends Controller
 
         $request->validate(['reason' => 'required|string|max:500']);
 
-        DB::transaction(function () use ($request, $order) {
-            if ($order->payment_proof) {
-                Storage::disk('public')->delete($order->payment_proof);
-            }
-
-            $order->update([
-                'qris_status'    => 'rejected',
-                'payment_proof'  => null,
-                'rejection_note' => $request->reason,
-            ]);
-        });
-
-        return response()->json(['message' => 'Bukti QRIS ditolak.']);
+        try {
+            $this->orderProcessingService->rejectQrisProof($order, $request->reason);
+            return response()->json(['message' => 'Bukti QRIS ditolak.']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
-    /**
-     * Request the customer to resubmit their QRIS payment proof.
-     */
     public function requestQrisResubmit(Request $request, Order $order)
     {
         if ($order->qris_status !== 'proof_submitted') {
@@ -312,19 +225,12 @@ class CashierOrderController extends Controller
 
         $request->validate(['reason' => 'required|string|max:500']);
 
-        DB::transaction(function () use ($request, $order) {
-            if ($order->payment_proof) {
-                Storage::disk('public')->delete($order->payment_proof);
-            }
-
-            $order->update([
-                'qris_status'    => 'resubmit_requested',
-                'payment_proof'  => null,
-                'rejection_note' => $request->reason,
-            ]);
-        });
-
-        return response()->json(['message' => 'Pengunggahan ulang bukti QRIS diminta.']);
+        try {
+            $this->orderProcessingService->requestQrisResubmit($order, $request->reason);
+            return response()->json(['message' => 'Pengunggahan ulang bukti QRIS diminta.']);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
     }
 
     public function whatsappLink(Request $request, Order $order, WhatsAppReceiptService $waService)
