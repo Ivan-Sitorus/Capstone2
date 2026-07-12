@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,11 +12,8 @@ class Order extends Model
     use HasFactory;
 
     const STATUS_PENDING = 'pending';
-
     const STATUS_DIPROSES = 'diproses';
-
     const STATUS_SELESAI = 'selesai';
-
     const STATUS_DIBATALKAN = 'dibatalkan';
 
     protected static function boot(): void
