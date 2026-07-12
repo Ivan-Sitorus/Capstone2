@@ -18,13 +18,6 @@ class StockReconciliationService
         return sprintf('ADJ-%s-%d', $dateKey, $todayCount + 1);
     }
 
-    private function generateCode(): string
-    {
-        $dateKey = now()->format('dmy');
-        $todayCount = \App\Models\StockAdjustment::whereDate('created_at', today())->count();
-        return sprintf('ADJ-%s-%d', $dateKey, $todayCount + 1);
-    }
-
     public function createManualAdjustment(
         string $adjustableType,
         ?int $ingredientId = null,
@@ -106,7 +99,7 @@ class StockReconciliationService
             $quantityAfter = (float) Ingredient::findOrFail($ingredientId)->getTotalStock();
 
             $adjustment = StockAdjustment::create([
-                'code' => $this->generateCode(),
+                'code' => self::generateAdjustmentCode(),
                 'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT,
                 'ingredient_id' => $ingredientId,
                 'adjustment_type' => $adjustmentType,
@@ -149,7 +142,7 @@ class StockReconciliationService
         float $quantityBefore,
     ): StockAdjustment {
         $adjustment = StockAdjustment::create([
-            'code' => $this->generateCode(),
+            'code' => self::generateAdjustmentCode(),
             'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_INGREDIENT,
             'ingredient_id' => $ingredientId,
             'adjustment_type' => StockAdjustment::TYPE_DECREASE,
@@ -198,7 +191,7 @@ class StockReconciliationService
             $notes = $category ? "[{$category}] {$reason}" : $reason;
 
             $adjustment = StockAdjustment::create([
-                'code' => $this->generateCode(),
+                'code' => self::generateAdjustmentCode(),
                 'adjustable_type' => StockAdjustment::ADJUSTABLE_TYPE_MENU,
                 'menu_id' => $menu->id,
                 'adjustment_type' => $adjustmentType,
