@@ -10,6 +10,14 @@ class Ingredient extends Model
 {
     use SoftDeletes;
 
+    protected $fillable = [
+        'name',
+        'unit',
+        'low_stock_threshold',
+        'batch_mode',
+        'unit_id',
+    ];
+
     const UNITS = [
         'gram' => 'Gram (g)',
         'kg' => 'Kilogram (kg)',
@@ -23,28 +31,11 @@ class Ingredient extends Model
 
     const BATCH_MODE_FIFO = 'fifo';
     const BATCH_MODE_FEFO = 'fefo';
-    const BATCH_MODE_CUSTOM = 'custom';
-
-    protected $fillable = [
-        'name',
-        'unit',
-        'low_stock_threshold',
-        'batch_mode',
-    ];
-
-    protected function casts(): array
-    {
-        return [
-            'low_stock_threshold' => 'decimal:2',
-        ];
-    }
-
     public static function batchModes(): array
     {
         return [
             self::BATCH_MODE_FEFO => 'FEFO (First Expired First Out)',
             self::BATCH_MODE_FIFO => 'FIFO (First In First Out)',
-            self::BATCH_MODE_CUSTOM => 'Custom (Manual Order)',
         ];
     }
 

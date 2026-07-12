@@ -73,7 +73,7 @@ class StockResource extends Resource
                     ->suffix(fn ($get) => $get('unit') ? ' '.$get('unit') : ''),
                 Select::make('batch_mode')
                     ->label('Prioritas Batch')
-                    ->options(array_slice(Ingredient::batchModes(), 0, 2))
+                    ->options(Ingredient::batchModes())
                     ->default(Ingredient::BATCH_MODE_FEFO)
                     ->required()
                     ->native(false),

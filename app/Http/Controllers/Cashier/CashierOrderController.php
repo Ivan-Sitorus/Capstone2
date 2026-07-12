@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Cashier;
 
 use App\Events\OrderQrisReviewed;
 use App\Http\Controllers\Controller;
-use App\Jobs\BroadcastPendingCount;
 use App\Models\Order;
 use App\Services\InventoryService;
 use Illuminate\Http\Request;
@@ -58,8 +57,6 @@ class CashierOrderController extends Controller
             'cashier_id'     => Auth::id(),
             'cancelled_at'   => now(),
         ]);
-
-        BroadcastPendingCount::dispatch();
 
         return response()->json(['message' => 'Pesanan dibatalkan.']);
     }
@@ -115,7 +112,7 @@ class CashierOrderController extends Controller
             return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
 
-        BroadcastPendingCount::dispatch();
+        
 
         return response()->json(['message' => 'Status diperbarui.']);
     }
@@ -131,7 +128,7 @@ class CashierOrderController extends Controller
             'payment_method' => $request->payment_method,
             'cashier_id' => Auth::id(),
         ]);
-        BroadcastPendingCount::dispatch();
+        
 
         return response()->json(['message' => 'Pembayaran dikonfirmasi.']);
     }
@@ -166,7 +163,7 @@ class CashierOrderController extends Controller
             return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
 
-        BroadcastPendingCount::dispatch();
+        
 
         return response()->json(['message' => 'Pembayaran cash dikonfirmasi.']);
     }
@@ -207,7 +204,7 @@ class CashierOrderController extends Controller
             return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
 
-        BroadcastPendingCount::dispatch();
+        
 
         return response()->json(['message' => 'Pembayaran QRIS dikonfirmasi.']);
     }
@@ -274,9 +271,7 @@ class CashierOrderController extends Controller
             return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
 
-        broadcast(new OrderQrisReviewed($order, 'accepted', null));
-
-        BroadcastPendingCount::dispatch();
+        
 
         return response()->json(['message' => 'Bukti QRIS diterima. Pesanan diproses.']);
     }
@@ -304,8 +299,6 @@ class CashierOrderController extends Controller
             ]);
         });
 
-        broadcast(new OrderQrisReviewed($order, 'rejected', $request->reason));
-
         return response()->json(['message' => 'Bukti QRIS ditolak.']);
     }
 
@@ -331,8 +324,6 @@ class CashierOrderController extends Controller
                 'rejection_note' => $request->reason,
             ]);
         });
-
-        broadcast(new OrderQrisReviewed($order, 'resubmit_requested', $request->reason));
 
         return response()->json(['message' => 'Pengunggahan ulang bukti QRIS diminta.']);
     }

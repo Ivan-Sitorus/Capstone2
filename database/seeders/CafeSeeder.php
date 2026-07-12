@@ -265,7 +265,6 @@ class CafeSeeder extends Seeder
         // 7–9. Orders + OrderItems + Payments/Receivables
         $orderData = $this->seedOrders();
         $this->seedOrderItems($orderData);
-        $this->seedPayments($orderData);
         $this->seedReceivables($orderData);
 
         // 10. StockMovements from Orders (FEFO deduction)
@@ -308,7 +307,6 @@ class CafeSeeder extends Seeder
         DB::table('stock_movements')->truncate();
         DB::table('stock_adjustments')->truncate();
         DB::table('receivables')->truncate();
-        DB::table('payments')->truncate();
         DB::table('order_items')->truncate();
         DB::table('orders')->truncate();
         DB::table('menu_ingredients')->truncate();
@@ -650,39 +648,7 @@ class CafeSeeder extends Seeder
     }
 
     // ──────────────────────────────────────────────────────────────
-    //  9. Payments (~270)
-    // ──────────────────────────────────────────────────────────────
-
-    private function seedPayments(array $orderData): void
-    {
-        $rng = $this->rng(456);
-        $rows = [];
-        foreach ($orderData as $orderId => $data) {
-            if ($data['payment_method'] === 'bayar_nanti') {
-                continue;
-            }
-            $pm = $data['payment_method'];
-            $gatewayMethod = $pm === 'qris' ? 'qris' : 'cash';
-
-            $rows[] = [
-                'order_id' => $orderId,
-                'payment_method' => $gatewayMethod,
-                'payment_gateway' => 'manual',
-                'transaction_id' => 'TXN-'.Str::upper(Str::random(8)),
-                'amount' => $data['total_amount'],
-                'status' => 'success',
-                'paid_at' => $data['created_at'],
-                'created_at' => $data['created_at'],
-                'updated_at' => $data['created_at'],
-            ];
-        }
-        if (!empty($rows)) {
-            DB::table('payments')->insert($rows);
-        }
-    }
-
-    // ──────────────────────────────────────────────────────────────
-    //  10. Receivables (~30)
+    //  9. Receivables (~30)
     // ──────────────────────────────────────────────────────────────
 
     private function seedReceivables(array $orderData): void

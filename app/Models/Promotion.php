@@ -50,16 +50,6 @@ class Promotion extends Model
         ];
     }
 
-    public function rules()
-    {
-        return $this->hasMany(PromotionRule::class);
-    }
-
-    public function appliedPromotions()
-    {
-        return $this->hasMany(AppliedPromotion::class);
-    }
-
     public function isActive(): bool
     {
         $today = now()->startOfDay();
@@ -79,15 +69,6 @@ class Promotion extends Model
 
     public function isApplicableTo(int $menuId, int $categoryId): bool
     {
-        $rules = $this->rules;
-
-        if ($rules->isEmpty()) {
-            return true;
-        }
-
-        return $rules->contains(function (PromotionRule $rule) use ($menuId, $categoryId) {
-            return ($rule->applicable_type === 'menu' && (int) $rule->applicable_id === $menuId)
-                || ($rule->applicable_type === 'category' && (int) $rule->applicable_id === $categoryId);
-        });
+        return true;
     }
 }
