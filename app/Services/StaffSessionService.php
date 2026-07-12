@@ -19,7 +19,6 @@ class StaffSessionService
     {
         $type = match ($user->role) {
             'cashier' => 'cashier',
-            'kitchen' => 'kitchen',
             default => null,
         };
 

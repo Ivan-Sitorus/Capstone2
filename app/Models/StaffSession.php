@@ -48,9 +48,4 @@ class StaffSession extends Model
     {
         return $query->where('type', 'cashier');
     }
-
-    public function scopeKitchen($query)
-    {
-        return $query->where('type', 'kitchen');
-    }
 }
