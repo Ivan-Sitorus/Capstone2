@@ -164,6 +164,15 @@ class StockAdjustmentResource extends Resource
             : ($adj->ingredient?->unit ?? '');
     }
 
+    public static function formatNumber(float $value): string
+    {
+        return number_format(
+            abs($value),
+            abs($value) != (int) abs($value) ? 2 : 0,
+            ',', '.'
+        );
+    }
+
     public static function formatQty($state, $record, string $prefix): string
     {
         $adj = static::resolveRecord($record, $prefix);

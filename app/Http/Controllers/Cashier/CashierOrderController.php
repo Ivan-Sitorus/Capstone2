@@ -17,9 +17,9 @@ class CashierOrderController extends Controller
 {
     public function __construct(
         protected OrderProcessingService $orderProcessingService
-    ) {}
+    ): void {}
 
-    public function show(Order $order)
+    public function show(Order $order): \Inertia\Response
     {
         $order->load(['items.menu', 'cafeTable', 'cashier']);
 
@@ -48,7 +48,7 @@ class CashierOrderController extends Controller
         ]);
     }
 
-    public function cancel(Request $request, Order $order)
+    public function cancel(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
         if (in_array($order->status, [OrderStatus::Selesai->value, OrderStatus::Dibatalkan->value])) {
             return response()->json(['message' => 'Pesanan ini tidak dapat dibatalkan.'], 409);
@@ -66,7 +66,7 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Pesanan dibatalkan.']);
     }
 
-    public function updateStatus(Request $request, Order $order, InventoryService $inventoryService)
+    public function updateStatus(Request $request, Order $order, InventoryService $inventoryService): \Illuminate\Http\JsonResponse
     {
         $request->validate(['status' => 'required|string|in:diproses,selesai']);
 
@@ -121,7 +121,7 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Status diperbarui.']);
     }
 
-    public function confirmPayment(Request $request, Order $order)
+    public function confirmPayment(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
         if ($order->payment_method !== 'bayar_nanti') {
             return response()->json(['message' => 'Sudah lunas.'], 409);
@@ -137,7 +137,7 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Pembayaran dikonfirmasi.']);
     }
 
-    public function confirmCash(Order $order)
+    public function confirmCash(Order $order): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
         if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'cash') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
@@ -152,7 +152,7 @@ class CashierOrderController extends Controller
         }
     }
 
-    public function confirmQris(Order $order)
+    public function confirmQris(Order $order): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
         if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'qris') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
@@ -167,7 +167,7 @@ class CashierOrderController extends Controller
         }
     }
 
-    public function rejectQris(Request $request, Order $order)
+    public function rejectQris(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
         if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'qris') {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
@@ -186,7 +186,7 @@ class CashierOrderController extends Controller
         return response()->json(['message' => 'Bukti QRIS ditolak.']);
     }
 
-    public function acceptQrisProof(Order $order)
+    public function acceptQrisProof(Order $order): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
     {
         if ($order->qris_status !== 'proof_submitted') {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
@@ -202,7 +202,7 @@ class CashierOrderController extends Controller
         }
     }
 
-    public function rejectQrisProof(Request $request, Order $order)
+    public function rejectQrisProof(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
         if ($order->qris_status !== 'proof_submitted') {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
@@ -218,7 +218,7 @@ class CashierOrderController extends Controller
         }
     }
 
-    public function requestQrisResubmit(Request $request, Order $order)
+    public function requestQrisResubmit(Request $request, Order $order): \Illuminate\Http\JsonResponse
     {
         if ($order->qris_status !== 'proof_submitted') {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
@@ -234,7 +234,7 @@ class CashierOrderController extends Controller
         }
     }
 
-    public function whatsappLink(Request $request, Order $order, WhatsAppReceiptService $waService)
+    public function whatsappLink(Request $request, Order $order, WhatsAppReceiptService $waService): \Illuminate\Http\JsonResponse
     {
         $request->validate([
             'phone' => 'required|string',

@@ -12,22 +12,22 @@ use Inertia\Inertia;
 
 class AuthController extends Controller
 {
-    public function showLogin()
+    public function showLogin(): \Inertia\Response
     {
         return Inertia::render('Auth/Login');
     }
 
-    public function showCustomerLogin()
+    public function showCustomerLogin(): \Illuminate\Http\RedirectResponse
     {
         return redirect()->route('customer.menu');
     }
 
-    public function customerLogin(Request $request)
+    public function customerLogin(Request $request): \Illuminate\Http\RedirectResponse
     {
         return redirect()->route('customer.menu');
     }
 
-    public function login(Request $request)
+    public function login(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'email' => 'required|email',
@@ -76,7 +76,7 @@ class AuthController extends Controller
         return Inertia::location(route('kasir.pesanan-baru'));
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): \Illuminate\Http\RedirectResponse
     {
         $guard = 'web';
         $user = Auth::guard($guard)->user();

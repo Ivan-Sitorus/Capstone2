@@ -9,7 +9,7 @@ use Inertia\Inertia;
 
 class CashierDashboardController extends Controller
 {
-    public function index()
+    public function index(): \Inertia\Response
     {
         $today = today();
 
