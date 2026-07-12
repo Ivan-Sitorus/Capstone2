@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Helpers\TextInputHelper;
 use App\Filament\Resources\CategoryResource\Pages\ListCategories;
 use App\Models\Category;
 use Filament\Actions\DeleteAction;
@@ -44,7 +43,6 @@ class CategoryResource extends Resource
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->maxLength(100)
-                ->extraInputAttributes(TextInputHelper::string(100)),
         ]);
     }
 

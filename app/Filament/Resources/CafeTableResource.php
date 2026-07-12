@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Resources\CafeTableResource\Pages\ListCafeTables;
 use App\Models\CafeTable;
 use Filament\Actions\Action;
@@ -44,7 +43,6 @@ class CafeTableResource extends Resource
                 ->maxValue(99)
                 ->unique(ignoreRecord: true)
                 ->extraAttributes(
-                    NumberInputHelper::integer(99)
                 ),
         ]);
     }

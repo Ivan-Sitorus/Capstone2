@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Helpers\NumberInputHelper;
-use App\Filament\Helpers\TextInputHelper;
 use App\Filament\Resources\MenuResource\Pages\ListMenus;
 use App\Filament\Resources\MenuResource\RelationManagers\IngredientsRelationManager;
 use App\Models\Ingredient;
@@ -56,7 +54,6 @@ class MenuResource extends Resource
                 ->required()
                 ->maxLength(255)
                 ->live(onBlur: true)
-                ->extraInputAttributes(TextInputHelper::string()),
             Select::make("category_id")
                 ->label("Kategori Menu")
                 ->relationship("category", "name")
@@ -88,7 +85,6 @@ class MenuResource extends Resource
                 ->type("text")
                 ->minValue(0.01)
                 ->stripCharacters(".")
-                ->extraInputAttributes(NumberInputHelper::integer())
                 ->prefix("Rp"),
             Toggle::make("is_available")
                 ->label("Tersedia")
@@ -108,7 +104,6 @@ class MenuResource extends Resource
                     },
                 ])
                 ->stripCharacters(".")
-                ->extraInputAttributes(NumberInputHelper::integer())
                 ->prefix("Rp")
                 ->placeholder("Kosongkan jika tidak ada"),
             Repeater::make("menuIngredients")

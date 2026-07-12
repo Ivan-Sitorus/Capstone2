@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Helpers\NumberInputHelper;
-use App\Filament\Helpers\TextInputHelper;
 use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Models\User;
@@ -39,14 +37,12 @@ class UserResource extends Resource
                 ->label('Nama Lengkap')
                 ->required()
                 ->maxLength(255)
-                ->extraInputAttributes(TextInputHelper::string()),
             TextInput::make('email')
                 ->label('Email')
                 ->email()
                 ->required()
                 ->unique(ignoreRecord: true)
                 ->maxLength(255)
-                ->extraInputAttributes(TextInputHelper::string()),
             TextInput::make('password')
                 ->label('Password')
                 ->password()
@@ -66,7 +62,6 @@ class UserResource extends Resource
                 ->label('No. HP')
                 ->nullable()
                 ->maxLength(20)
-                ->extraInputAttributes(NumberInputHelper::integer()),
         ]);
     }
 

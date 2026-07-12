@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Helpers\NumberInputHelper;
-use App\Filament\Helpers\TextInputHelper;
 use App\Filament\Resources\PromotionResource\Pages\EditPromotion;
 use App\Filament\Resources\PromotionResource\Pages\ListPromotions;
 use App\Models\Category;
@@ -48,7 +46,6 @@ class PromotionResource extends Resource
                 ->label('Promotion Name')
                 ->required()
                 ->maxLength(255)
-                ->extraInputAttributes(TextInputHelper::string()),
             Select::make('type')
                 ->label('Promotion Type')
                 ->options([
@@ -66,7 +63,6 @@ class PromotionResource extends Resource
                 ->type('text')
                 ->prefix('Rp / %')
                 ->stripCharacters('.')
-                ->extraInputAttributes(NumberInputHelper::integer(99999999))
                 ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 0, ',', '.') : ''),
             TextInput::make('min_purchase')
@@ -75,7 +71,6 @@ class PromotionResource extends Resource
                 ->type('text')
                 ->prefix('Rp')
                 ->stripCharacters('.')
-                ->extraInputAttributes(NumberInputHelper::integer(99999999))
                 ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 0, ',', '.') : ''),
             DatePicker::make('start_date')
@@ -103,7 +98,6 @@ class PromotionResource extends Resource
                 ->nullable()
                 ->type('text')
                 ->stripCharacters('.')
-                ->extraInputAttributes(NumberInputHelper::integer(999999))
                 ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 0, ',', '.') : ''),
             TextInput::make('usage_count')
@@ -113,7 +107,6 @@ class PromotionResource extends Resource
                 ->dehydrated(false)
                 ->type('text')
                 ->stripCharacters('.')
-                ->extraInputAttributes(NumberInputHelper::integer(999999))
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 0, ',', '.') : ''),
             Textarea::make('description')
                 ->label('Description')

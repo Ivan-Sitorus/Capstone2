@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Resources\StockAdjustmentResource\Pages\ListStockAdjustments;
 use App\Filament\Resources\StockAdjustmentResource\RelationManagers\MovementsRelationManager;
 use App\Models\IngredientBatch;
@@ -190,8 +189,6 @@ class StockAdjustmentResource extends Resource
                         : '')
                 )
                 ->extraAttributes(fn (Get $get) => $get('adjustable_type') === StockAdjustment::ADJUSTABLE_TYPE_MENU
-                    ? NumberInputHelper::integer()
-                    : NumberInputHelper::decimal()),
             Textarea::make('reason')
                 ->label('Catatan')
                 ->rows(3)

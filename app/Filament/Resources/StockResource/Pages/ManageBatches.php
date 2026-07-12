@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\StockResource\Pages;
 
-use App\Filament\Helpers\NumberInputHelper;
 use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
@@ -103,7 +102,6 @@ class ManageBatches extends Page implements HasTable
                             ->type('text')
                             ->stripCharacters('.')
                             ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                            ->extraInputAttributes(NumberInputHelper::decimal())
                             ->suffix(fn () => ' '.$this->record->unit),
                         DatePicker::make('expiry_date')
                             ->label('Tanggal Kedaluwarsa')
@@ -124,7 +122,6 @@ class ManageBatches extends Page implements HasTable
                             ->minValue(0)
                             ->type('text')
                             ->stripCharacters('.')
-                            ->extraInputAttributes(NumberInputHelper::integer())
                             ->prefix('Rp'),
                         Toggle::make('allow_expired_usage')
                             ->label('Bisa dipakai meskipun kedaluwarsa')
@@ -163,7 +160,6 @@ class ManageBatches extends Page implements HasTable
                             ->type('text')
                             ->stripCharacters('.')
                             ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                            ->extraInputAttributes(NumberInputHelper::decimal())
                             ->suffix(fn () => ' '.$this->record->unit),
                         DatePicker::make('expiry_date')
                             ->label('Tanggal Kedaluwarsa')
@@ -184,7 +180,6 @@ class ManageBatches extends Page implements HasTable
                             ->minValue(0)
                             ->type('text')
                             ->stripCharacters('.')
-                            ->extraInputAttributes(NumberInputHelper::integer())
                             ->prefix('Rp'),
                         Toggle::make('allow_expired_usage')
                             ->label('Bisa dipakai meskipun kedaluwarsa')

@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Helpers\NumberInputHelper;
-use App\Filament\Helpers\TextInputHelper;
 use App\Filament\Resources\ReceivableResource\Pages\CreateReceivable;
 use App\Filament\Resources\ReceivableResource\Pages\EditReceivable;
 use App\Filament\Resources\ReceivableResource\Pages\ListReceivables;
@@ -78,7 +76,6 @@ class ReceivableResource extends Resource
                 ->label('Nama Pelanggan')
                 ->required()
                 ->maxLength(255)
-                ->extraInputAttributes(TextInputHelper::string()),
             TextInput::make('amount')
                 ->label('Jumlah Total')
                 ->required()
@@ -86,7 +83,6 @@ class ReceivableResource extends Resource
                 ->prefix('Rp')
                 ->disabled()
                 ->dehydrated(true)
-                ->extraInputAttributes(NumberInputHelper::decimal())
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
             DatePicker::make('invoice_date')
                 ->label('Tanggal Invoice')
@@ -117,7 +113,6 @@ class ReceivableResource extends Resource
                 ->type('text')
                 ->prefix('Rp')
                 ->stripCharacters('.')
-                ->extraInputAttributes(NumberInputHelper::decimal())
                 ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
                 ->live()

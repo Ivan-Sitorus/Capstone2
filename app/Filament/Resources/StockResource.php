@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Helpers\NumberInputHelper;
-use App\Filament\Helpers\TextInputHelper;
 use App\Filament\Resources\StockResource\Pages\ListStocks;
 use App\Filament\Resources\StockResource\Pages\ManageBatches;
 use App\Filament\Resources\StockResource\Pages\ViewStockHistory;
@@ -55,7 +53,6 @@ class StockResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true)
-                    ->extraInputAttributes(TextInputHelper::string()),
                 Select::make('unit')
                     ->label('Unit')
                     ->options(Ingredient::UNITS)
@@ -66,7 +63,6 @@ class StockResource extends Resource
                 TextInput::make('low_stock_threshold')
                     ->label('Peringatan Stok Rendah')
                     ->type('text')
-                    ->extraInputAttributes(NumberInputHelper::decimal())
                     ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
                     ->stripCharacters('.')
                     ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
@@ -93,7 +89,6 @@ class StockResource extends Resource
                             ->type('text')
                             ->stripCharacters('.')
                             ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                            ->extraInputAttributes(NumberInputHelper::decimal())
                             ->suffix(fn ($get) => $get('../../unit') ? ' '.$get('../../unit') : ''),
                         DatePicker::make('expiry_date')
                             ->label('Tanggal Kadaluarsa')
@@ -115,7 +110,6 @@ class StockResource extends Resource
                             ->minValue(0)
                             ->type('text')
                             ->stripCharacters('.')
-                            ->extraInputAttributes(NumberInputHelper::integer())
                             ->prefix(fn ($get) => $get('../../unit') ? 'Rp/'.$get('../../unit') : 'Rp'),
                     ])
                     ->defaultItems(0)
