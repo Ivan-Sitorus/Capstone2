@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StockMovement extends Model
 {
@@ -47,32 +48,32 @@ class StockMovement extends Model
         });
     }
 
-    public function ingredient()
+    public function ingredient(): BelongsTo
     {
         return $this->belongsTo(Ingredient::class);
     }
 
-    public function ingredientBatch()
+    public function ingredientBatch(): BelongsTo
     {
         return $this->belongsTo(IngredientBatch::class);
     }
 
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function orderItem()
+    public function orderItem(): BelongsTo
     {
         return $this->belongsTo(OrderItem::class);
     }
 
-    public function stockAdjustment()
+    public function stockAdjustment(): BelongsTo
     {
         return $this->belongsTo(StockAdjustment::class);
     }
 
-    public function recordedBy()
+    public function recordedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'recorded_by');
     }

@@ -5,6 +5,7 @@ namespace App\Models;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -38,27 +39,27 @@ class User extends Authenticatable implements FilamentUser
         ];
     }
 
-    public function orders()
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'customer_id');
     }
 
-    public function cashierOrders()
+    public function cashierOrders(): HasMany
     {
         return $this->hasMany(Order::class, 'cashier_id');
     }
 
-    public function processedOrders()
+    public function processedOrders(): HasMany
     {
         return $this->hasMany(Order::class, 'processed_by');
     }
 
-    public function reportedStockAdjustments()
+    public function reportedStockAdjustments(): HasMany
     {
         return $this->hasMany(StockAdjustment::class, 'reported_by');
     }
 
-    public function stockMovements()
+    public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class, 'recorded_by');
     }

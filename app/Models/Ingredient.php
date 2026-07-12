@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ingredient extends Model
@@ -40,28 +42,28 @@ class Ingredient extends Model
         ];
     }
 
-    public function batches()
+    public function batches(): HasMany
     {
         return $this->hasMany(IngredientBatch::class);
     }
 
-    public function menus()
+    public function menus(): BelongsToMany
     {
         return $this->belongsToMany(Menu::class, 'menu_ingredients')
             ->withPivot('quantity_used');
     }
 
-    public function menuIngredients()
+    public function menuIngredients(): HasMany
     {
         return $this->hasMany(MenuIngredient::class);
     }
 
-    public function stockMovements()
+    public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class);
     }
 
-    public function stockAdjustments()
+    public function stockAdjustments(): HasMany
     {
         return $this->hasMany(StockAdjustment::class);
     }

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PromotionRule extends Model
 {
@@ -12,7 +13,7 @@ class PromotionRule extends Model
         'value',
     ];
 
-    public function promotion()
+    public function promotion(): BelongsTo
     {
         return $this->belongsTo(Promotion::class);
     }

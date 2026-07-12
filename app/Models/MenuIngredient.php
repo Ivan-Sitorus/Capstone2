@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class MenuIngredient extends Model
 {
@@ -22,17 +23,17 @@ class MenuIngredient extends Model
         ];
     }
 
-    public function menu()
+    public function menu(): BelongsTo
     {
         return $this->belongsTo(Menu::class);
     }
 
-    public function ingredient()
+    public function ingredient(): BelongsTo
     {
         return $this->belongsTo(Ingredient::class);
     }
 
-    public function unit()
+    public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
     }

@@ -9,6 +9,7 @@ use chillerlan\QRCode\Output\QROutputInterface;
 use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CafeTable extends Model
 {
@@ -21,7 +22,7 @@ class CafeTable extends Model
         return [];
     }
 
-    public function orders()
+    public function orders(): HasMany
     {
         return $this->hasMany(Order::class, 'table_id');
     }

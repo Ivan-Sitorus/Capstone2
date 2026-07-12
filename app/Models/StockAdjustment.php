@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class StockAdjustment extends Model
 {
@@ -107,22 +109,22 @@ class StockAdjustment extends Model
         return $this->adjustable_type === self::ADJUSTABLE_TYPE_MENU;
     }
 
-    public function ingredient()
+    public function ingredient(): BelongsTo
     {
         return $this->belongsTo(Ingredient::class);
     }
 
-    public function menu()
+    public function menu(): BelongsTo
     {
         return $this->belongsTo(Menu::class);
     }
 
-    public function reportedBy()
+    public function reportedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'reported_by');
     }
 
-    public function stockMovements()
+    public function stockMovements(): HasMany
     {
         return $this->hasMany(StockMovement::class);
     }

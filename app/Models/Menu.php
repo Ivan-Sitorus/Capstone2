@@ -5,6 +5,9 @@ namespace App\Models;
 use App\Services\MenuImageService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Menu extends Model
@@ -74,23 +77,23 @@ class Menu extends Model
         return $minServings ?? 0;
     }
 
-    public function category()
+    public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function orderItems()
+    public function orderItems(): HasMany
     {
         return $this->hasMany(OrderItem::class);
     }
 
-    public function ingredients()
+    public function ingredients(): BelongsToMany
     {
         return $this->belongsToMany(Ingredient::class, 'menu_ingredients')
             ->withPivot('quantity_used');
     }
 
-    public function menuIngredients()
+    public function menuIngredients(): HasMany
     {
         return $this->hasMany(MenuIngredient::class);
     }

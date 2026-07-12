@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AppliedPromotion extends Model
 {
@@ -22,12 +23,12 @@ class AppliedPromotion extends Model
         ];
     }
 
-    public function order()
+    public function order(): BelongsTo
     {
         return $this->belongsTo(Order::class);
     }
 
-    public function promotion()
+    public function promotion(): BelongsTo
     {
         return $this->belongsTo(Promotion::class);
     }
