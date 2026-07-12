@@ -52,7 +52,7 @@ class StockResource extends Resource
                     ->label('Nama Bahan')
                     ->required()
                     ->maxLength(255)
-                    ->unique(ignoreRecord: true)
+                    ->unique(ignoreRecord: true),
                 Select::make('unit')
                     ->label('Unit')
                     ->options(Ingredient::UNITS)

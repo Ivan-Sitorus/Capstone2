@@ -45,7 +45,7 @@ class PromotionResource extends Resource
             TextInput::make('name')
                 ->label('Promotion Name')
                 ->required()
-                ->maxLength(255)
+                ->maxLength(255),
             Select::make('type')
                 ->label('Promotion Type')
                 ->options([

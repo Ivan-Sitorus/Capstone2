@@ -36,13 +36,12 @@ class UserResource extends Resource
             TextInput::make('name')
                 ->label('Nama Lengkap')
                 ->required()
-                ->maxLength(255)
+                ->maxLength(255),
             TextInput::make('email')
                 ->label('Email')
                 ->email()
                 ->required()
-                ->unique(ignoreRecord: true)
-                ->maxLength(255)
+                ->maxLength(255),
             TextInput::make('password')
                 ->label('Password')
                 ->password()

@@ -33,10 +33,6 @@ return [
         'null' => [
             'driver' => 'echo',
         ],
-            'client_options' => [
-                // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
-            ],
-        ],
 
         'pusher' => [
             'driver' => 'pusher',
