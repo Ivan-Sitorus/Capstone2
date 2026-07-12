@@ -10,7 +10,6 @@ use App\Http\Controllers\Cashier\CashierRiwayatController;
 use App\Http\Controllers\Customer\CustomerMenuController;
 use App\Http\Controllers\Customer\CustomerOrderController;
 use App\Http\Controllers\Customer\CustomerPaymentController;
-use App\Http\Controllers\Kitchen\KitchenController;
 use App\Http\Controllers\ReceiptController;
 use App\Models\Order;
 use Illuminate\Support\Facades\Route;
@@ -44,18 +43,6 @@ Route::prefix('kasir')->middleware(['auth:web', 'role:cashier,admin'])->group(fu
     Route::get('/pesanan-menunggu', CashierPendingCountController::class)->name('kasir.pesanan-menunggu');
 });
 
-// Kitchen auth
-Route::get('/dapur/login', [AuthController::class, 'showKitchenLogin'])->name('dapur.login');
-Route::post('/dapur/login', [AuthController::class, 'login'])->name('dapur.login.attempt');
-
-// Kitchen
-Route::middleware(['auth:kitchen', 'role:kitchen,admin'])->group(function () {
-    Route::get('/dapur', [KitchenController::class, 'index'])->name('dapur.beranda');
-    Route::get('/dapur/riwayat-pesanan', [KitchenController::class, 'riwayat'])->name('dapur.riwayat-pesanan');
-    Route::patch('/dapur/pesanan/{order}/proses', [KitchenController::class, 'bump'])->name('dapur.proses');
-});
-
-// Customer — entry point via QR scan
 Route::get('/pesan', [CustomerMenuController::class, 'showIdentitas'])->name('pelanggan.identitas');
 
 // Customer pages

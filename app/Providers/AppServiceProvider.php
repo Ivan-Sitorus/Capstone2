@@ -3,8 +3,6 @@
 namespace App\Providers;
 
 use App\Models\Menu;
-use App\Models\MenuIngredient;
-use App\Observers\MenuIngredientObserver;
 use App\Observers\MenuObserver;
 use App\Services\MenuImageService;
 use Filament\Support\Assets\Css;
@@ -29,16 +27,13 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Menu::observe(MenuObserver::class);
-        MenuIngredient::observe(MenuIngredientObserver::class);
 
         FilamentAsset::register([
             Css::make('financial-table', __DIR__.'/../../resources/css/filament/financial-table.css'),
         ]);
 
         Authenticate::redirectUsing(function (Request $request) {
-            return $request->is('dapur') || $request->is('dapur/*')
-                ? route('dapur.login')
-                : route('kasir.login');
+            return route('kasir.login');
         });
     }
 }

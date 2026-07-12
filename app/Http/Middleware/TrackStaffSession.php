@@ -13,7 +13,7 @@ class TrackStaffSession
     /**
      * Handle an incoming request.
      *
-     * Only maintains existing sessions for cashier and kitchen staff.
+     * Only maintains existing sessions for cashier staff.
      * - Closes expired sessions (idle > 30 min)
      * - Updates last_activity_at (throttled to once per 60s)
      *
@@ -28,7 +28,7 @@ class TrackStaffSession
 
         $user = Auth::user();
 
-        if (! in_array($user->role, ['cashier', 'kitchen'], true)) {
+        if (! in_array($user->role, ['cashier'], true)) {
             return $next($request);
         }
 
