@@ -157,7 +157,7 @@ class CustomerOrderController extends Controller
                 ])
             : collect();
 
-        return Inertia::render('Pelanggan/Riwayat/Index', compact('orders'));
+        return Inertia::render('Pelanggan/Riwayat/Index', ['orders' => $orders]);
     }
 
     public function status(string $code)

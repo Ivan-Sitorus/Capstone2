@@ -66,6 +66,9 @@ class CustomerMenuController extends Controller
             }
         }
 
-        return Inertia::render('Pelanggan/Menu/Index', compact('categories', 'table'));
+        return Inertia::render('Pelanggan/Menu/Index', [
+            'categories' => $categories,
+            'table' => $table,
+        ]);
     }
 }
