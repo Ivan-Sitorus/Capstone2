@@ -146,4 +146,21 @@ class CustomerPaymentController extends Controller
             'rejection_note' => $order->rejection_note,
         ];
     }
+
+    public function choose(Request $request, Order $order): JsonResponse
+    {
+        return $request->input('payment_method') === 'qris'
+            ? $this->chooseQris($request, $order)
+            : $this->chooseCash($request, $order);
+    }
+
+    public function showQris(Order $order): Response
+    {
+        return $this->showQrisUpload($order);
+    }
+
+    public function uploadQris(Request $request, Order $order): JsonResponse
+    {
+        return $this->uploadQrisProof($request, $order);
+    }
 }

@@ -34,6 +34,17 @@ class CustomerMenuController extends Controller
         return Inertia::render('Pelanggan/Identitas', ['table' => $table]);
     }
 
+    public function submitIdentitas(Request $request)
+    {
+        $request->validate([
+            'customer_name' => 'required|string|max:255',
+            'customer_phone' => 'required|string|max:20',
+            'table_id' => 'nullable|integer|exists:cafe_tables,id',
+        ]);
+
+        return redirect()->route('customer.menu');
+    }
+
     public function index(Request $request)
     {
         $categories = Cache::remember('customer_menu_v2', 300, function () {

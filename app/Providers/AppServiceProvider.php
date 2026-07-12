@@ -10,7 +10,9 @@ use App\Services\MenuImageService;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Auth\Middleware\Authenticate;
+use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -22,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Route::bind('orderCode', function (string $value): Order {
+            return Order::where('order_code', $value)->firstOrFail();
+        });
+
         Menu::observe(MenuObserver::class);
         MenuIngredient::observe(MenuIngredientObserver::class);
 

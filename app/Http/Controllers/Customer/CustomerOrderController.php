@@ -4,9 +4,6 @@ namespace App\Http\Controllers\Customer;
 
 use Exception;
 use App\Http\Controllers\Controller;
-use App\Jobs\BroadcastPendingCount;
-use App\Models\Menu;
-use App\Models\Order;
 use App\Models\CafeTable;
 use App\Services\OrderPromotionService;
 use Illuminate\Http\JsonResponse;
@@ -112,9 +109,6 @@ class CustomerOrderController extends Controller
 
             $orderPromotionService->persistOrderPromotions($order, $appliedPromotions);
 
-            // Broadcast ke kasir via queue — tidak memblokir response
-            BroadcastPendingCount::dispatch()->afterCommit();
-
             return response()->json([
                 'order_code'   => $order->order_code,
                 'total_amount' => $order->total_amount,
@@ -182,5 +176,10 @@ class CustomerOrderController extends Controller
                 'created_at'     => $order->created_at->toISOString(),
             ],
         ]);
+    }
+
+    public function showStatus(Order $order): \Inertia\Response
+    {
+        return $this->status($order->order_code);
     }
 }

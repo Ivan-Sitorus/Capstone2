@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Cashier;
 
-use App\Events\OrderQrisReviewed;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\InventoryService;

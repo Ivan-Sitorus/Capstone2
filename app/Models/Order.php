@@ -28,6 +28,13 @@ class Order extends Model
         });
     }
 
+    public static function generateCode(): string
+    {
+        $date = now();
+        $orderNumber = static::whereDate('created_at', $date)->count() + 1;
+        return 'ORD-'.$date->format('dmy').'-'.str_pad($orderNumber, 4, '0', STR_PAD_LEFT);
+    }
+
     protected static function booted(): void
     {
         static::created(function (self $order) {
@@ -101,6 +108,11 @@ class Order extends Model
     public function receivable()
     {
         return $this->hasOne(Receivable::class);
+    }
+
+    public function appliedPromotions()
+    {
+        return $this->hasMany(AppliedPromotion::class);
     }
 
     public function processedBy()

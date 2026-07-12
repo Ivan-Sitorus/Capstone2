@@ -71,4 +71,9 @@ class Promotion extends Model
     {
         return true;
     }
+
+    public function rules()
+    {
+        return $this->hasMany(PromotionRule::class);
+    }
 }
