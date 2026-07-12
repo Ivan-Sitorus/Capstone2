@@ -10,7 +10,7 @@ use Inertia\Inertia;
 
 class CashierRiwayatController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): \Inertia\Response
     {
         $orders = Order::with(['cashier' => fn ($q) => $q->select('id', 'name')])
             ->select('id', 'order_code', 'cashier_id', 'customer_name', 'total_amount', 'payment_method', 'status', 'created_at')

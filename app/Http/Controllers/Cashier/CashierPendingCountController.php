@@ -7,7 +7,7 @@ use App\Models\Order;
 
 class CashierPendingCountController extends Controller
 {
-    public function __invoke()
+    public function __invoke(): \Illuminate\Http\JsonResponse
     {
         return response()->json(['count' => Order::cashierPendingCount()])
             ->header('Cache-Control', 'no-store');

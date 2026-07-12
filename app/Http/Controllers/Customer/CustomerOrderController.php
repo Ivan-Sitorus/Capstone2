@@ -17,7 +17,7 @@ class CustomerOrderController extends Controller
         return app(PlaceCustomerOrderAction::class)->handle($request, $orderPromotionService);
     }
 
-    public function riwayat(Request $request)
+    public function riwayat(Request $request): \Inertia\Response
     {
         // Riwayat berdasarkan nomor telepon di sessionStorage (dikirim via query param)
         $phone = $request->query('phone');

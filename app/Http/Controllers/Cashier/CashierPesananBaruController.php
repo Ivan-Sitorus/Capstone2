@@ -11,7 +11,7 @@ use Inertia\Inertia;
 
 class CashierPesananBaruController extends Controller
 {
-    public function index()
+    public function index(): \Inertia\Response
     {
         // Cache 5 menit — menu jarang berubah, admin bisa clear cache jika update menu
         $categories = Cache::remember('menu_categories_cashier', 300, fn () => Category::with([
@@ -24,7 +24,7 @@ class CashierPesananBaruController extends Controller
         return Inertia::render('Kasir/PesananBaru', ['categories' => $categories]);
     }
 
-    public function store(StoreOrderRequest $request, PlaceCashierOrderAction $action)
+    public function store(StoreOrderRequest $request, PlaceCashierOrderAction $action): \Illuminate\Http\RedirectResponse
     {
         try {
             $result = $action->handle($request);

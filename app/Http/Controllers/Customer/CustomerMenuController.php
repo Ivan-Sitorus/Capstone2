@@ -20,7 +20,7 @@ class CustomerMenuController extends Controller
         );
     }
 
-    public function showIdentitas(Request $request)
+    public function showIdentitas(Request $request): \Inertia\Response
     {
         $table = $this->findTable($request->query('table'));
 
@@ -34,7 +34,7 @@ class CustomerMenuController extends Controller
         return Inertia::render('Pelanggan/Identitas', ['table' => $table]);
     }
 
-    public function submitIdentitas(Request $request)
+    public function submitIdentitas(Request $request): \Illuminate\Http\RedirectResponse
     {
         $request->validate([
             'customer_name' => 'required|string|max:255',
@@ -45,7 +45,7 @@ class CustomerMenuController extends Controller
         return redirect()->route('customer.menu');
     }
 
-    public function index(Request $request)
+    public function index(Request $request): \Inertia\Response
     {
         $categories = Cache::remember('customer_menu_v2', 300, function () {
             return Category::with([

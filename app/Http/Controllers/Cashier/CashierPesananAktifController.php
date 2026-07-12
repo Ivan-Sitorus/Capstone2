@@ -9,7 +9,7 @@ use Inertia\Inertia;
 
 class CashierPesananAktifController extends Controller
 {
-    public function index()
+    public function index(): \Inertia\Response
     {
         $orders = Order::with(['items.menu', 'cafeTable', 'cashier'])
             ->whereNotIn('status', [OrderStatus::Selesai->value, OrderStatus::Dibatalkan->value])
