@@ -8,7 +8,7 @@ use Inertia\Inertia;
 
 class ReceiptController extends Controller
 {
-    public function show(string $orderCode)
+    public function show(string $orderCode): \Inertia\Response
     {
         $order = Order::with(['items.menu', 'cafeTable', 'cashier'])
             ->where('order_code', $orderCode)
@@ -17,14 +17,14 @@ class ReceiptController extends Controller
         return $this->renderReceipt($order);
     }
 
-    public function showByUuid(Order $order)
+    public function showByUuid(Order $order): \Inertia\Response
     {
         $order->load(['items.menu', 'cafeTable', 'cashier']);
 
         return $this->renderReceipt($order);
     }
 
-    private function renderReceipt(Order $order)
+    private function renderReceipt(Order $order): \Inertia\Response
     {
         // Hitung diskon (selisih total dari unit_price * qty vs subtotal)
         $items = $order->items->map(fn ($i) => [

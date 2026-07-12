@@ -17,7 +17,7 @@ class CashierOrderController extends Controller
 {
     public function __construct(
         protected OrderProcessingService $orderProcessingService
-    ): void {}
+    ) {}
 
     public function show(Order $order): \Inertia\Response
     {

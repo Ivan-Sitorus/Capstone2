@@ -60,7 +60,7 @@ class CustomerOrderController extends Controller
         return Inertia::render('Pelanggan/Riwayat/Index', ['orders' => $orders]);
     }
 
-    public function status(string $code)
+    public function status(string $code): \Inertia\Response
     {
         $order = Order::select(['id', 'order_code', 'status', 'total_amount', 'payment_method', 'created_at'])
             ->where('order_code', $code)
