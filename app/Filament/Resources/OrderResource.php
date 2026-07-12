@@ -5,20 +5,15 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\Pages\ViewOrder;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
+use App\Filament\Resources\OrderResource\Tables\OrderTable;
 use App\Models\Order;
-use Filament\Actions\Action;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\RepeatableEntry\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class OrderResource extends Resource
 {
@@ -121,94 +116,7 @@ class OrderResource extends Resource
 
     public static function table(Table $table): Table
     {
-        return $table
-            ->columns([
-                TextColumn::make('order_code')
-                    ->label('Kode Pesanan')
-                    ->searchable()
-                    ->sortable()
-                    ->copyable(),
-                TextColumn::make('customer_name')
-                    ->label('Pelanggan')
-                    ->searchable()
-                    ->default('Guest'),
-                TextColumn::make('cashier.name')
-                    ->label('Kasir')
-                    ->searchable()
-                    ->default('-'),
-                TextColumn::make('total_amount')
-                    ->label('Total')
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
-                    ->sortable(),
-                TextColumn::make('payment_method')
-                    ->label('Metode')
-                    ->badge()
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'cash' => 'Tunai',
-                        'qris' => 'QRIS',
-                        'bayar_nanti' => 'Bayar Nanti',
-                        default => '-',
-                    }),
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'diproses' => 'info',
-                        'selesai' => 'success',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending' => 'Pending',
-                        'diproses' => 'Diproses',
-                        'selesai' => 'Selesai',
-                        default => $state,
-                    }),
-                TextColumn::make('created_at')
-                    ->label('Waktu')
-                    ->dateTime('d M Y, H:i:s')
-                    ->sortable(),
-            ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->with(['items.menu', 'cashier']))
-            ->filters([
-                SelectFilter::make('status')
-                    ->label('Status')
-                    ->options([
-                        'pending' => 'Pending',
-                        'diproses' => 'Diproses',
-                        'selesai' => 'Selesai',
-                    ]),
-                SelectFilter::make('payment_method')
-                    ->label('Metode Bayar')
-                    ->options([
-                        'cash' => 'Tunai',
-                        'qris' => 'QRIS',
-                        'bayar_nanti' => 'Bayar Nanti',
-                    ]),
-                Filter::make('today')
-                    ->label('Hari Ini')
-                    ->query(fn (Builder $query): Builder => $query->whereDate('created_at', today()))
-                    ->toggle(),
-                Filter::make('this_week')
-                    ->label('Minggu Ini')
-                    ->query(fn (Builder $query): Builder => $query->whereBetween('created_at', [
-                        now()->startOfWeek(),
-                        now()->endOfWeek(),
-                    ]))
-                    ->toggle(),
-            ])
-            ->recordActions([
-                Action::make('view')
-                    ->label('Lihat')
-                    ->icon('heroicon-o-eye')
-                    ->record(fn (Order $record): Order => $record->loadMissing('items.menu'))
-                    ->infolist(static::getInfolistComponents())
-                    ->modalAutofocus(false)
-                    ->modalSubmitAction(false)
-                    ->modalCancelActionLabel('Tutup'),
-            ])
-            ->toolbarActions([])
-            ->defaultSort('created_at', 'desc');
+        return OrderTable::configure($table);
     }
 
     public static function getRelations(): array

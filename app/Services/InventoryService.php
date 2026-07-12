@@ -16,6 +16,10 @@ use Illuminate\Support\Facades\Log;
 
 class InventoryService
 {
+    public function __construct(
+        protected UnitConversionService $unitConversionService,
+    ) {}
+
     public function processSaleForOrder(Order $order, ?int $recordedBy = null): array
     {
         $alreadyProcessed = StockMovement::query()
@@ -157,7 +161,7 @@ class InventoryService
                         $fromUnit = Unit::find($menuIngredient->unit_id);
                         $toUnit = Unit::find($ingredient->unit_id);
                         if ($fromUnit && $toUnit) {
-                            $requiredQuantity = app(UnitConversionService::class)->convert($requiredQuantity, $fromUnit, $toUnit);
+                            $requiredQuantity = $this->unitConversionService->convert($requiredQuantity, $fromUnit, $toUnit);
                         }
                     }
 
@@ -191,7 +195,7 @@ class InventoryService
                 $fromUnit = Unit::find($context['recipeUnitId']);
                 $toUnit = Unit::find($ingredient->unit_id);
                 if ($fromUnit && $toUnit) {
-                    $converted = app(UnitConversionService::class)->convert($requiredQuantity, $fromUnit, $toUnit);
+                    $converted = $this->unitConversionService->convert($requiredQuantity, $fromUnit, $toUnit);
                     Log::info("Unit conversion: {$requiredQuantity} {$fromUnit->name} → {$converted} {$toUnit->name} for ingredient {$ingredient->name}");
                     $requiredQuantity = $converted;
                 }
