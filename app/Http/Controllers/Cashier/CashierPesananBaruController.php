@@ -16,11 +16,24 @@ class CashierPesananBaruController extends Controller
     public function index(): Response
     {
         // Cache 5 menit — menu jarang berubah, admin bisa clear cache jika update menu
-        $categories = Cache::remember('menu_categories_cashier', 300, fn () => Category::with([
-            'menus' => fn ($q) => $q->orderBy('name'),
+        $categories = Cache::remember('menu_categories_cashier_v2', 300, fn () => Category::with([
+            'menus' => fn ($q) => $q->orderBy('name')
+                ->with(['menuIngredients.ingredient.batches' => fn ($q) => $q
+                    ->where('quantity', '>', 0)
+                    ->where(fn ($q) => $q
+                        ->whereNull('expiry_date')
+                        ->orWhere('expiry_date', '>', now())
+                        ->orWhere('allow_expired_usage', true)
+                    ),
+                ]),
         ])
             ->orderBy('name')
             ->get()
+            ->each(function ($category) {
+                $category->menus->each(function ($menu) {
+                    $menu->available_stock = $menu->computeAvailableServings();
+                });
+            })
         );
 
         return Inertia::render('Kasir/PesananBaru', ['categories' => $categories]);

@@ -26,7 +26,7 @@ class Menu extends Model
         'unit',
     ];
 
-    protected $appends = ['image_url', 'stock'];
+    protected $appends = ['image_url'];
 
     protected function casts(): array
     {
@@ -51,7 +51,14 @@ class Menu extends Model
         return $this->image ? url('storage/' . $this->image) : null;
     }
 
-    public function getStockAttribute(): ?float
+    /**
+     * Calculate how many servings can be made from current stock.
+     * NOT an accessor — must be called explicitly when stock display is needed.
+     * Use with eager-loaded batches to avoid N+1 queries.
+     *
+     * @return ?float
+     */
+    public function computeAvailableServings(): ?float
     {
         $ingredients = $this->menuIngredients()->with('ingredient')->get();
         if ($ingredients->isEmpty()) {

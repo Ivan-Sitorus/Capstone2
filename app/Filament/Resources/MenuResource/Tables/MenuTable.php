@@ -17,6 +17,7 @@ class MenuTable
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with('menuIngredients.ingredient.batches'))
             ->searchPlaceholder("Cari Nama Menu")
             ->columns([
                 TextColumn::make("name")
@@ -35,16 +36,15 @@ class MenuTable
                     ->label("Diskon Mahasiswa")
                     ->formatStateUsing(fn ($state) => $state ? "Rp".number_format($state, 0, ",", ".") : "-")
                     ->sortable(),
-                TextColumn::make("stock")
+                TextColumn::make("available_servings")
                     ->label("Sisa Jual")
+                    ->getStateUsing(fn ($record) => $record->computeAvailableServings())
                     ->formatStateUsing(fn ($state) => $state === null ? "-" : number_format($state, 0, ",", "."))
                     ->color(fn ($state) => match (true) {
                         $state === null || $state > 10 => "success",
                         $state > 0 => "warning",
                         default => "danger",
-                    })
-                    ->badge()
-                    ->sortable(),
+                    }),
                 TextColumn::make("is_available")
                     ->label("Tersedia")
                     ->badge()

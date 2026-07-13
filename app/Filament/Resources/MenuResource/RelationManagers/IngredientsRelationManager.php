@@ -48,6 +48,7 @@ class IngredientsRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with('ingredient.batches'))
             ->columns([
                 TextColumn::make("ingredient.name")
                     ->label("Bahan")
@@ -59,10 +60,17 @@ class IngredientsRelationManager extends RelationManager
                     ->formatStateUsing(fn ($state, $record) => $state . " " . ($record->unit?->abbreviation ?? "")),
                 TextColumn::make("ingredient.total_stock")
                     ->label("Stok Tersedia")
-                    ->getStateUsing(fn ($record) => number_format($record->ingredient?->getTotalStock() ?? 0, 2))
+                    ->getStateUsing(function ($record) {
+                        $stock = $record->ingredient->batches->sum('quantity');
+                        return number_format($stock, 2);
+                    })
                     ->suffix(fn ($record) => " ".($record->ingredient->unit ?? ""))
                     ->badge()
-                    ->color(fn ($record) => ($record->ingredient?->getTotalStock() ?? 0) < (float) ($record->ingredient->low_stock_threshold ?? 0) ? "danger" : "success"),
+                    ->color(function ($record) {
+                        $stock = $record->ingredient->batches->sum('quantity');
+                        return $stock < (float) ($record->ingredient->low_stock_threshold ?? 0)
+                            ? "danger" : "success";
+                    }),
             ])
             ->headerActions([
                 CreateAction::make(),
