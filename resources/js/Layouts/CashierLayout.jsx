@@ -48,21 +48,6 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
         setPendingCount(initialCount ?? 0);
     }, [initialCount]);
 
-    useEffect(() => {
-        // WebSocket via Laravel Reverb — zero polling, push-based update
-        if (!window.Echo) return;
-
-        const channel = window.Echo.channel('orders');
-
-        channel.listen('.OrderStatusUpdated', (e) => {
-            setPendingCount(e.pendingCount);
-        });
-
-        return () => {
-            window.Echo.leaveChannel('orders');
-        };
-    }, []);
-
     // Ambil pending count fresh setiap halaman dibuka — hindari angka stale
     // dari cache prefetch Inertia saat berpindah menu
     useEffect(() => {

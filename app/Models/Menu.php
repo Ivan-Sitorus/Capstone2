@@ -105,29 +105,6 @@ class Menu extends Model
         return $this->hasMany(MenuIngredient::class);
     }
 
-    public function calculateCost(): float
-    {
-        $this->loadMissing('menuIngredients.ingredient');
-
-        $totalCost = 0.0;
-
-        foreach ($this->menuIngredients as $menuIngredient) {
-            $ingredient = $menuIngredient->ingredient;
-
-            if (! $ingredient) {
-                continue;
-            }
-
-            $averageCost = (float) ($ingredient->batches()
-                ->where('quantity', '>', 0)
-                ->avg('cost_per_unit') ?? 0);
-
-            $totalCost += $averageCost * (float) $menuIngredient->quantity_used;
-        }
-
-        return round($totalCost, 2);
-    }
-
     public function hasRecipe(): bool
     {
         return $this->menuIngredients()->exists();

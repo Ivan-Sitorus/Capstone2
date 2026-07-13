@@ -104,7 +104,7 @@ class InventoryService
                         $requiredQuantity = (float) $menuIngredient->quantity_used * $quantity;
 
                         $deduction = $this->deductIngredientStock(
-                            ingredientId: (int) $ingredient->id,
+                            ingredient: $ingredient,
                             requiredQuantity: $requiredQuantity,
                             context: array_merge($itemContext, [
                                 'notes' => "Order usage for menu {$menu->name}",
@@ -133,8 +133,9 @@ class InventoryService
 
     public function decreaseStockForIngredient(int $ingredientId, float $quantity, array $context = []): array
     {
-        return DB::transaction(function () use ($ingredientId, $quantity, $context) {
-            return $this->deductIngredientStock($ingredientId, $quantity, $context);
+        $ingredient = Ingredient::findOrFail($ingredientId);
+        return DB::transaction(function () use ($ingredient, $quantity, $context) {
+            return $this->deductIngredientStock($ingredient, $quantity, $context);
         });
     }
 
@@ -186,9 +187,8 @@ class InventoryService
         ];
     }
 
-    private function deductIngredientStock(int $ingredientId, float $requiredQuantity, array $context = []): array
+    private function deductIngredientStock(Ingredient $ingredient, float $requiredQuantity, array $context = []): array
     {
-        $ingredient = Ingredient::findOrFail($ingredientId);
 
         // Unit conversion: if recipe unit differs from ingredient storage unit
         if (isset($context['recipeUnitId'])) {
@@ -203,7 +203,7 @@ class InventoryService
             }
         }
 
-        $query = IngredientBatch::where('ingredient_id', $ingredientId)
+        $query = IngredientBatch::where('ingredient_id', $ingredient->id)
             ->where('quantity', '>', 0)
             ->where(function ($q) {
                 $q->whereNull('expiry_date')
@@ -255,7 +255,7 @@ class InventoryService
             $remainingToDeduct -= $deductFromThisBatch;
 
             StockMovement::create([
-                'ingredient_id' => $ingredientId,
+                'ingredient_id' => $ingredient->id,
                 'ingredient_batch_id' => $batch->id,
                 'order_id' => $context['order_id'] ?? null,
                 'order_item_id' => $context['order_item_id'] ?? null,

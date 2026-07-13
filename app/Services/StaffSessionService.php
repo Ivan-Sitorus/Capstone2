@@ -7,6 +7,7 @@ use App\Models\Order;
 use App\Models\StaffSession;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 class StaffSessionService
 {
@@ -50,20 +51,12 @@ class StaffSessionService
     {
         $threshold = now()->subMinutes($idleMinutes);
 
-        $expiredSessions = StaffSession::where('is_active', true)
+        return StaffSession::where('is_active', true)
             ->where('last_activity_at', '<', $threshold)
-            ->get();
-
-        $closedCount = 0;
-
-        foreach ($expiredSessions as $session) {
-            $session->ended_at = $session->last_activity_at;
-            $session->is_active = false;
-            $session->save();
-            $closedCount++;
-        }
-
-        return $closedCount;
+            ->update([
+                'ended_at' => DB::raw('last_activity_at'),
+                'is_active' => false,
+            ]);
     }
 
     public function getActiveSession(User $user): ?StaffSession

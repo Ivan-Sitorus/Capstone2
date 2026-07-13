@@ -13,6 +13,6 @@ class CreateMenu extends CreateRecord
     protected function afterCreate(): void
     {
         Cache::forget('customer_menu_v2');
-        Cache::forget('menu_categories_cashier');
+        Cache::forget('menu_categories_cashier_v2');
     }
 }

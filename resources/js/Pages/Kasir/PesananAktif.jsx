@@ -36,16 +36,11 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
             router.reload({ only: ['orders', 'counts'] });
         };
 
-        if (window.Echo) {
-            window.Echo.channel('orders').listen('.OrderStatusUpdated', reload);
-        }
-
         const id = setInterval(reload, 5_000);
         const onVisible = () => { if (document.visibilityState === 'visible') reload(); };
         document.addEventListener('visibilitychange', onVisible);
 
         return () => {
-            if (window.Echo) window.Echo.leaveChannel('orders');
             clearInterval(id);
             document.removeEventListener('visibilitychange', onVisible);
         };
