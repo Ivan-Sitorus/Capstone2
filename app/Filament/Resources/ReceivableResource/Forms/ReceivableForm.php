@@ -22,7 +22,7 @@ class ReceivableForm
                 ->schema([
                     Select::make('menu_id')
                         ->label('Menu')
-                        ->options(fn () => Menu::where('is_available', true)->orderBy('name')->pluck('name', 'id'))
+                        ->options(fn () => Menu::where('status', 'active')->orderBy('name')->pluck('name', 'id'))
                         ->searchable()
                         ->required()
                         ->native(false),

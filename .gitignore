@@ -33,3 +33,4 @@ Thumbs.db
 /supervisord.pid
 /.sisyphus/
 .vercel
+.codebase_skripsi

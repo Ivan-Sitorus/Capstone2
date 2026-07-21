@@ -3,9 +3,12 @@
 namespace App\Filament\Resources\StockAdjustmentResource\Tables;
 
 use App\Models\StockAdjustment;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class StockAdjustmentTable
 {
@@ -85,6 +88,24 @@ class StockAdjustmentTable
                     ->sortable(),
             ])
             ->filters([
+                Filter::make('adjusted_at')
+                    ->label('Rentang Waktu')
+                    ->form([
+                        DatePicker::make('adjusted_from')
+                            ->label('Dari'),
+                        DatePicker::make('adjusted_until')
+                            ->label('Sampai'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when(
+                            $data['adjusted_from'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('adjusted_at', '>=', $date),
+                        )
+                        ->when(
+                            $data['adjusted_until'],
+                            fn (Builder $query, $date): Builder => $query->whereDate('adjusted_at', '<=', $date),
+                        ),
+                    ),
                 SelectFilter::make('adjustable_type')
                     ->label('Jenis')
                     ->options(StockAdjustment::ADJUSTABLE_TYPES),

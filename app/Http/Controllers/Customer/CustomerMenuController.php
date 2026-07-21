@@ -49,11 +49,12 @@ class CustomerMenuController extends Controller
 
     public function index(Request $request): Response
     {
-        $categories = Cache::remember('customer_menu_v2', 300, function () {
+        $categories = Cache::remember('customer_menu_v3', 300, function () {
             return Category::with([
-                'menus' => fn ($q) => $q
-                    ->select(['id', 'category_id', 'name', 'price', 'image', 'is_available'])
-                    ->orderBy('name'),
+                    'menus' => fn ($q) => $q
+                        ->select(['id', 'category_id', 'name', 'price', 'image', 'status'])
+                        ->where('status', 'active')
+                        ->orderBy('name'),
             ])
                 ->select(['id', 'name'])
                 ->orderBy('name')

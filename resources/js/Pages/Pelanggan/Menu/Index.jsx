@@ -25,7 +25,7 @@ const C = {
 
 function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false, isMahasiswa = false }) {
     const cashback = Number(menu.cashback ?? 0);
-    const soldOut  = menu.is_available === false;
+    const soldOut  = menu.status !== 'active';
 
     return (
         <article className="w9-card" style={{

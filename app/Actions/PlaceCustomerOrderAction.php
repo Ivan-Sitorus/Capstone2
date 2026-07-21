@@ -73,7 +73,7 @@ class PlaceCustomerOrderAction
             foreach ($request->items as $item) {
                 $menu = $menus->get($item['menu_id']);
 
-                if (!$menu || !$menu->is_available) {
+                if (!$menu || $menu->status !== 'active') {
                     throw new Exception("Menu " . ($menu?->name ?? "#{$item['menu_id']}") . " tidak tersedia.");
                 }
 

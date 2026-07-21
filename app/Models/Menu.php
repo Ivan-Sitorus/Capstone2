@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Builder;
 
 class Menu extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
     protected $fillable = [
         'category_id',
         'name',
@@ -20,7 +20,7 @@ class Menu extends Model
         'price',
         'cashback',
         'image',
-        'is_available',
+        'status',
         'is_student_discount',
         'student_price',
         'unit',
@@ -34,7 +34,7 @@ class Menu extends Model
             'price' => 'integer',
             'cashback' => 'integer',
             'student_price' => 'integer',
-            'is_available' => 'boolean',
+            'status' => 'string',
             'is_student_discount' => 'boolean',
         ];
     }
@@ -49,6 +49,16 @@ class Menu extends Model
     public function getImageUrlAttribute(): ?string
     {
         return $this->image ? url('storage/' . $this->image) : null;
+    }
+
+    public function scopeActive(Builder $query): void
+    {
+        $query->where('status', 'active');
+    }
+
+    public function scopeInactive(Builder $query): void
+    {
+        $query->where('status', 'inactive');
     }
 
     /**

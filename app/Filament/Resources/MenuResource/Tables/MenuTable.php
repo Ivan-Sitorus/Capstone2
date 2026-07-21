@@ -8,7 +8,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
-use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -45,22 +44,24 @@ class MenuTable
                         $state > 0 => "warning",
                         default => "danger",
                     }),
-                TextColumn::make("is_available")
-                    ->label("Tersedia")
+                TextColumn::make("status")
+                    ->label("Status")
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state ? "Tersedia" : "Tidak")
-                    ->color(fn ($state) => $state ? "success" : "danger"),
+                    ->formatStateUsing(fn ($state) => $state === 'active' ? 'Aktif' : 'Nonaktif')
+                    ->color(fn ($state) => $state === 'active' ? 'success' : 'danger'),
             ])
             ->filters([
                 SelectFilter::make("category")
                     ->relationship("category", "name")
                     ->label("Kategori Menu")
                     ->placeholder("Semua"),
-                TernaryFilter::make("is_available")
-                    ->label("Tersedia")
-                    ->placeholder("Semua")
-                    ->trueLabel("Tersedia")
-                    ->falseLabel("Tidak Tersedia"),
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'active' => 'Aktif',
+                        'inactive' => 'Nonaktif',
+                    ])
+                    ->default('active'),
                 SelectFilter::make("ingredient")
                     ->label("Bahan Baku")
                     ->placeholder("Semua")

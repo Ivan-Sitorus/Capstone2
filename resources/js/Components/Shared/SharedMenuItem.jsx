@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCart = false, quantity = 0, onIncrement, onDecrement, stock }) {
     const isCustomer = variant === 'customer';
-    const isAdminDisabled = menu.is_available === false;
+    const isAdminDisabled = menu.status !== 'active';
     const isUnlimitedStock = stock !== undefined && stock >= 999999;
     const isStockOut = !isUnlimitedStock && stock !== undefined && stock <= 0;
     const isUnavailable = isAdminDisabled || isStockOut;

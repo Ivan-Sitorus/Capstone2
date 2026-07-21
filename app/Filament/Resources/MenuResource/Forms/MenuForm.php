@@ -10,7 +10,6 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
@@ -56,10 +55,14 @@ class MenuForm
                 ->minValue(0.01)
                 ->stripCharacters(".")
                 ->prefix("Rp"),
-            Toggle::make("is_available")
-                ->label("Tersedia")
-                ->default(true)
-                ->inline(false),
+            Select::make('status')
+                ->label('Status')
+                ->options([
+                    'active' => 'Aktif',
+                    'inactive' => 'Nonaktif',
+                ])
+                ->default('active')
+                ->required(),
             TextInput::make("student_price")
                 ->label("Diskon Mahasiswa")
                 ->type("text")

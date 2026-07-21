@@ -215,4 +215,25 @@ class StockAdjustmentFlowTest extends TestCase
         $stockAfterCancel = (float) $ingredient->fresh()->getTotalStock();
         $this->assertSame($stockBeforeCancel - 20, $stockAfterCancel);
     }
+
+    public function test_increase_adjustment_requires_existing_batch(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Tidak ada batch');
+
+        $ingredient = Ingredient::create([
+            'name' => 'Test No Batch',
+            'unit' => 'gram',
+            'is_active' => true,
+        ]);
+
+        app(StockReconciliationService::class)
+            ->createManualAdjustment(
+                adjustableType: 'ingredient',
+                ingredientId: $ingredient->id,
+                quantity: 10,
+                adjustmentType: 'increase',
+                reason: 'Should fail — no batch',
+            );
+    }
 }
