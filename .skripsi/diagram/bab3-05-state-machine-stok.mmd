@@ -1,0 +1,35 @@
+stateDiagram-v2
+    [*] --> StokTersedia: Pembelian bahan
+    
+    state StokTersedia {
+        [*] --> FEFO
+        [*] --> FIFO
+        [*] --> Custom
+        FEFO --> BatchKadaluarsa: expiry_date terdekat
+        FIFO --> BatchTerlama: received_at terlama
+        Custom --> UrutanManual: custom_order
+    }
+    
+    StokTersedia --> StokBerkurang: Pesanan masuk
+    StokTersedia --> StokBertambah: Pembelian baru
+    StokTersedia --> Penyesuaian: Manual adjustment
+    
+    StokBerkurang --> StokHabis: quantity = 0
+    StokBerkurang --> StokTersedia: Masih ada sisa
+    
+    StokHabis --> StokTersedia: Restock / pembelian
+    
+    state Penyesuaian {
+        [*] --> StockMovement: immutable record
+        StockMovement --> [*]
+    }
+    
+    state StokMenipis: quantity < low_stock_threshold
+    StokTersedia --> StokMenipis: Di bawah threshold
+    StokMenipis --> StokTersedia: Restock
+    
+    note right of StokBerkurang
+        Deduksi menggunakan
+        pessimistic locking
+        (lockForUpdate)
+    end note

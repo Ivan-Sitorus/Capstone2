@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Batches - Wireframe</title>
+  <link rel="stylesheet" href="chalk.css">
+  <style>
+    body { background: #f5f5f5; margin: 0; font-family: monospace; padding: 24px; }
+    .sidebar { width: 220px; background: #1a1a2e; min-height: 100vh; position: fixed; left: 0; top: 0; padding: 16px; }
+    .content { margin-left: 260px; }
+    .sidebar-item { padding: 10px 12px; color: #9aa3af; margin-bottom: 4px; }
+    .sidebar-item.active { background: #3b6fd4; color: #fff; }
+    .sidebar-item.logo { color: #fff; font-size: 18px; margin-bottom: 20px; }
+    th { background: #f0f0f0; text-align: left; }
+    td, th { padding: 10px 16px; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-item logo">W9 Cafe</div>
+    <div class="sidebar-item">Dashboard</div>
+    <div class="sidebar-item active">Stok</div>
+    <div class="sidebar-item">Penyesuaian Stok</div>
+    <div class="sidebar-item">Menu</div>
+  </div>
+  <div class="content">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="font-size:20px;">&larr;</div>
+      <div class="wf-h1" style="margin:0;">Batch Stok - Kopi Robusta</div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;margin:20px 0;">
+      <div class="wf-box" style="padding:8px 16px;border:1px solid #000;">Cari batch...</div>
+      <div class="wf-btn" style="background:#000;color:#fff;padding:8px 16px;">+ Tambah Batch</div>
+    </div>
+
+    <div class="wf-card">
+      <table style="width:100%;border-collapse:collapse;">
+        <tr><th>Batch ID</th><th>Jumlah</th><th>Tgl Kadaluarsa</th><th>Diterima</th><th>Harga/Unit</th><th>Aksi</th></tr>
+        <tr><td>#1</td><td>5.0 kg</td><td>2026-08-15</td><td>2026-05-01 10:30</td><td>Rp 45.000</td><td>Edit | Hapus</td></tr>
+        <tr><td>#2</td><td>3.0 kg</td><td>2026-09-20</td><td>2026-05-10 14:00</td><td>Rp 42.000</td><td>Edit | Hapus</td></tr>
+        <tr><td>#3</td><td>2.5 kg</td><td>2026-07-01</td><td>2026-05-15 09:00</td><td>Rp 48.000</td><td>Edit | Hapus</td></tr>
+      </table>
+    </div>
+
+    <!-- Create Batch Modal -->
+    <div style="margin-top:24px;">
+      <div class="wf-h3">Tambah Batch Baru</div>
+      <div class="wf-card" style="padding:20px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div>
+            <div class="wf-annotation">Jumlah</div>
+            <div class="wf-box" style="padding:8px 12px;border:1px solid #000;">5.0 kg</div>
+          </div>
+          <div>
+            <div class="wf-annotation">Tanggal Kadaluarsa</div>
+            <div class="wf-box" style="padding:8px 12px;border:1px solid #000;">2026-10-01</div>
+          </div>
+          <div>
+            <div class="wf-annotation">Diterima Tanggal</div>
+            <div class="wf-box" style="padding:8px 12px;border:1px solid #000;">2026-05-20 08:00</div>
+          </div>
+          <div>
+            <div class="wf-annotation">Harga per Unit</div>
+            <div class="wf-box" style="padding:8px 12px;border:1px solid #000;">Rp 50.000</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:16px;">
+          <div class="wf-btn" style="background:#000;color:#fff;padding:8px 16px;">Simpan</div>
+          <div class="wf-btn" style="border:1px solid #000;padding:8px 16px;">Batal</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

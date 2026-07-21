@@ -1,0 +1,32 @@
+%%{init: {"flowchart": {"nodeSpacing": 15, "rankSpacing": 20, "padding": 5}}}%%
+graph TB
+    subgraph Actors["Aktor"]
+        ADMIN(["Admin"])
+        KASIR(["Kasir"])
+        PELANGGAN(["Pelanggan"])
+    end
+
+    subgraph System["W9 Cafe POS"]
+        direction TB
+        subgraph Frontend["Layer Presentasi"]
+            WEB["Web App (React + Inertia)"]
+            MOBILE["Mobile PWA (React)"]
+            FILAMENT["Admin Panel (Filament)"]
+        end
+
+        subgraph Backend["Layer Aplikasi (Laravel)"]
+            API["Backend API (Laravel)"]
+        end
+    end
+
+    subgraph Storage["Layer Data"]
+        DB[("Database (PostgreSQL)")]
+    end
+
+    ADMIN -->|"Mengelola Operasional"| FILAMENT
+    KASIR -->|"Memproses transaksi"| WEB
+    PELANGGAN -->|"Melihat dan memesan lewat ponsel"| MOBILE
+    FILAMENT --> API
+    WEB --> API
+    MOBILE --> API
+    API --> DB

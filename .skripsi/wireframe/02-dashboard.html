@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard - Wireframe</title>
+  <link rel="stylesheet" href="chalk.css">
+  <style>
+    body { background: #f5f5f5; margin: 0; font-family: monospace; padding: 24px; }
+    .sidebar { width: 220px; background: #1a1a2e; min-height: 100vh; position: fixed; left: 0; top: 0; padding: 16px; }
+    .content { margin-left: 260px; }
+    .sidebar-item { padding: 10px 12px; color: #9aa3af; margin-bottom: 4px; }
+    .sidebar-item.active { background: #3b6fd4; color: #fff; }
+    .sidebar-item.logo { color: #fff; font-size: 18px; margin-bottom: 20px; }
+    .stat-card { background: #fff; border: 1px solid #ddd; padding: 16px 24px; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-item logo">W9 Cafe</div>
+    <div class="sidebar-item active">Dashboard</div>
+    <div class="sidebar-item">Stok</div>
+    <div class="sidebar-item">Penyesuaian Stok</div>
+    <div class="sidebar-item">Menu</div>
+    <div class="sidebar-item">Kategori</div>
+    <div class="sidebar-item" style="margin-top:40px;color:#e85454;">Keluar</div>
+  </div>
+  <div class="content">
+    <div class="wf-h1">Dashboard</div>
+    <div class="wf-annotation">Selamat datang! Berikut ringkasan hari ini.</div>
+
+    <div style="display:flex;gap:16px;margin:24px 0;">
+      <div class="stat-card" style="flex:1;">Total Bahan Baku <strong style="display:block;font-size:24px;">45</strong></div>
+      <div class="stat-card" style="flex:1;">Total Batch Stok <strong style="display:block;font-size:24px;">128</strong></div>
+      <div class="stat-card" style="flex:1;">Menu Aktif <strong style="display:block;font-size:24px;">32</strong></div>
+    </div>
+
+    <div class="wf-h2">Stok Menipis</div>
+    <div class="wf-card">
+      <table style="width:100%;border-collapse:collapse;">
+        <tr style="background:#f0f0f0;text-align:left;">
+          <th style="padding:10px 16px;">Bahan Baku</th>
+          <th style="padding:10px 16px;">Stok</th>
+          <th style="padding:10px 16px;">Threshold</th>
+          <th style="padding:10px 16px;">Unit</th>
+        </tr>
+        <tr style="border-bottom:1px solid #eee;"><td style="padding:10px 16px;">Kopi Robusta</td><td style="padding:10px 16px;">0.5</td><td style="padding:10px 16px;">2.0</td><td style="padding:10px 16px;">kg</td></tr>
+        <tr style="border-bottom:1px solid #eee;"><td style="padding:10px 16px;">Susu Fresh</td><td style="padding:10px 16px;">1.0</td><td style="padding:10px 16px;">5.0</td><td style="padding:10px 16px;">liter</td></tr>
+        <tr style="border-bottom:1px solid #eee;"><td style="padding:10px 16px;">Gula Aren</td><td style="padding:10px 16px;">0.8</td><td style="padding:10px 16px;">3.0</td><td style="padding:10px 16px;">kg</td></tr>
+      </table>
+    </div>
+  </div>
+</body>
+</html>

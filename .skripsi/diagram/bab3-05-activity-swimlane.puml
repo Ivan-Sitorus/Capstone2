@@ -1,0 +1,51 @@
+@startuml
+title Proses Deduksi Stok
+
+' Deklarasi swimlane di awal
+|Admin|
+|Sistem|
+
+|Sistem|
+start
+
+:Pemeriksaan idempotensi;
+if (StockMovement sudah ada?) then (ya)
+  stop
+else (tidak)
+  :Muat data order & items;
+endif
+
+if (Items tidak kosong?) then (kosong)
+  stop
+else (ada)
+  :Mulai transaksi database;
+  :Pre-load menu + ingredients;
+endif
+
+:Mulai loop setiap item;
+
+if (Menu punya resep?) then (ya)
+  :Hitung quantity_used x qty;
+  :Lock IngredientBatch (lockForUpdate);
+  if (Stok cukup?) then (tidak)
+    :Throw Exception;
+    stop
+  else (ya)
+    :Urut batch sesuai mode (FEFO/FIFO);
+    :Deduct batch -> save -> StockMovement;
+    :RecordDailyIngredientUsage;
+  endif
+else (tidak - punya MenuStock)
+  :Lock MenuStockBatch (lockForUpdate);
+  if (Stok cukup?) then (tidak)
+    :Throw Exception;
+    stop
+  else (ya)
+    :MenuStockService::deductMenuStockBatch;
+    :Broadcast StockUpdated event;
+  endif
+endif
+
+:Commit transaksi;
+stop
+@enduml

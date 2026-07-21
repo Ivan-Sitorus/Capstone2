@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Pemakaian Harian - Wireframe</title>
+  <link rel="stylesheet" href="chalk.css">
+  <style>
+    body { background: #f5f5f5; margin: 0; font-family: monospace; padding: 24px; }
+    .sidebar { width: 220px; background: #1a1a2e; min-height: 100vh; position: fixed; left: 0; top: 0; padding: 16px; }
+    .content { margin-left: 260px; }
+    .sidebar-item { padding: 10px 12px; color: #9aa3af; margin-bottom: 4px; }
+    .sidebar-item.active { background: #3b6fd4; color: #fff; }
+    .sidebar-item.logo { color: #fff; font-size: 18px; margin-bottom: 20px; }
+    th { background: #f0f0f0; text-align: left; }
+    td, th { padding: 10px 16px; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-item logo">W9 Cafe</div>
+    <div class="sidebar-item">Dashboard</div>
+    <div class="sidebar-item">Stok</div>
+    <div class="sidebar-item">Penyesuaian Stok</div>
+    <div class="sidebar-item">Menu</div>
+    <div class="sidebar-item">Kategori</div>
+  </div>
+  <div class="content">
+    <div class="wf-h1">Laporan Pemakaian Harian</div>
+    <div class="wf-annotation">Data pemakaian bahan baku per tanggal (read-only)</div>
+
+    <div style="display:flex;gap:12px;margin:16px 0;">
+      <div>
+        <div class="wf-annotation">Dari Tanggal</div>
+        <div class="wf-box" style="padding:8px 12px;border:1px solid #000;">2026-05-01</div>
+      </div>
+      <div>
+        <div class="wf-annotation">Sampai Tanggal</div>
+        <div class="wf-box" style="padding:8px 12px;border:1px solid #000;">2026-05-20</div>
+      </div>
+      <div>
+        <div class="wf-annotation">Bahan Baku</div>
+        <div class="wf-box" style="padding:8px 12px;border:1px solid #000;">Semua</div>
+      </div>
+    </div>
+
+    <div class="wf-card">
+      <table style="width:100%;border-collapse:collapse;">
+        <tr><th>Tanggal</th><th>Bahan Baku</th><th>Unit</th><th>Jumlah Digunakan</th></tr>
+        <tr><td>2026-05-20</td><td>Kopi Robusta</td><td>kg</td><td>1.2</td></tr>
+        <tr><td>2026-05-20</td><td>Susu Fresh</td><td>liter</td><td>2.5</td></tr>
+        <tr><td>2026-05-20</td><td>Gula Aren</td><td>kg</td><td>0.8</td></tr>
+        <tr><td>2026-05-19</td><td>Kopi Robusta</td><td>kg</td><td>0.9</td></tr>
+        <tr><td>2026-05-19</td><td>Bubuk Coklat</td><td>gram</td><td>150</td></tr>
+        <tr><td>2026-05-19</td><td>Susu Fresh</td><td>liter</td><td>1.8</td></tr>
+      </table>
+    </div>
+    <div class="wf-annotation" style="margin-top:8px;">Menampilkan 6 dari 45 catatan pemakaian</div>
+  </div>
+</body>
+</html>

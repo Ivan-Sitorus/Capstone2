@@ -1,0 +1,36 @@
+flowchart TD
+    subgraph Admin["Admin"]
+        A1[Membuka halaman penyesuaian stok]
+        A2[Memilih bahan baku]
+        A3[Memilih tipe: increase atau decrease]
+        A4[Mengisi jumlah dan alasan]
+        A5[Mengklik Simpan]
+        A6[Melihat stok berubah]
+    end
+
+    subgraph Sistem["Sistem"]
+        S1[Menerima input]
+        S2[Validasi: jumlah > 0]
+        S3[Mencatat penyesuaian dan pergerakan stok]
+        S4[Memperbarui kuantitas batch]
+        S5[Mengirim notifikasi sukses]
+    end
+
+    subgraph Database["Database"]
+        D1[INSERT stock_adjustments]
+        D2[INSERT stock_movements]
+        D3[UPDATE ingredient_batches]
+        D4[COMMIT]
+    end
+
+    A1 --> A2 --> A3 --> A4 --> A5
+    A5 --> S1
+    S1 --> S2
+    S2 --> S3
+    S3 --> D1
+    D1 --> D2
+    D2 --> D3
+    D3 --> D4
+    D4 --> S4
+    S4 --> S5
+    S5 --> A6

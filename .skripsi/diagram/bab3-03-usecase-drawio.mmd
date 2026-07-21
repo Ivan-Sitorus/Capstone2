@@ -1,0 +1,36 @@
+%%{init: {"flowchart": {"nodeSpacing": 25, "rankSpacing": 25, "padding": 8}}}%%
+flowchart LR
+    Admin(("Admin"))
+    Sistem(("Sistem"))
+
+    subgraph INVENTORI["Sistem Manajemen Inventori"]
+        direction TB
+        UC1("Mengelola Bahan Baku")
+        UC2("Mengelola Batch Stok")
+        UC3("Menyesuaikan Stok Manual")
+        UC4("Atur Resep Menu")
+        UC5("Mengelola Stok Menu")
+        UC7("Melihat Laporan Harian")
+        UC8("Melihat Riwayat Stok")
+    end
+
+    subgraph OTOMATIS["Proses Otomatis"]
+        UC6("Deduksi Stok Otomatis")
+        UC9("Buat MenuStock Otomatis")
+    end
+
+    Admin --> UC1
+    Admin --> UC2
+    Admin --> UC3
+    Admin --> UC4
+    Admin --> UC5
+    Admin --> UC7
+    Admin --> UC8
+
+    Sistem --> UC6
+    Sistem --> UC9
+
+    UC3 -.->|include| UC2
+    UC4 -.->|include| UC1
+    UC5 -.->|include| UC9
+    UC9 -.->|extend| UC6

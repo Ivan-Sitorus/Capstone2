@@ -1,0 +1,43 @@
+%%{init: {"flowchart": {"nodeSpacing": 20, "rankSpacing": 25, "padding": 10}}}%%
+flowchart TB
+    START([Mulai]) --> ITEM_LOOP[Memeriksa setiap\nitem pesanan]
+
+    ITEM_LOOP --> CEK_RECIPE{Menu punya\nresep bahan?}
+
+    %% Jalur Resep
+    CEK_RECIPE -->|Ya| INGREDIENT_LOOP[Untuk setiap bahan\ndalam resep]
+    INGREDIENT_LOOP --> CALC_QTY[Hitung jumlah bahan\nyang dibutuhkan]
+    CALC_QTY --> DEDUCT_ING["Kurangi stok bahan baku\n(urutkan batch sesuai\nmode FEFO atau FIFO)"]
+    DEDUCT_ING --> SUM_CHECK{Stok total\nmencukupi?}
+    SUM_CHECK -->|Tidak| ROLLBACK(["Batalkan:\ntransaksi gagal"])
+
+    %% Jalur Resep - Loop Batch
+    SUM_CHECK -->|Ya| BATCH_WORK["Kurangi stok dari\nsatu per satu batch\nhingga kebutuhan terpenuhi"]
+    BATCH_WORK --> BATCH_NEXT{Batch berikutnya\nmasih perlu\ndiproses?}
+    BATCH_NEXT -->|Ya| BATCH_WORK
+    BATCH_NEXT -->|Tidak| USAGE["Catat pemakaian\nharian bahan baku"]
+    USAGE --> INGREDIENT_LAGI{Bahan berikutnya\nmasih ada?}
+    INGREDIENT_LAGI -->|Ya| INGREDIENT_LOOP
+    INGREDIENT_LAGI -->|Tidak| ITEM_CEK{Item pesanan\nberikutnya masih\nada?}
+
+    %% Jalur MenuStock - Loop Batch
+    CEK_RECIPE -->|Tidak\nproduk jadi| LOCK_MS["Kurangi stok produk jadi\n(urutkan batch sesuai\nmode FEFO atau FIFO)"]
+    LOCK_MS --> SUM_MS{Stok total\nmencukupi?}
+    SUM_MS -->|Tidak| ROLLBACK
+    SUM_MS -->|Ya| MS_WORK["Kurangi stok dari\nsatu per satu batch\nhingga kebutuhan terpenuhi"]
+    MS_WORK --> MS_NEXT{Batch berikutnya\nmasih perlu\ndiproses?}
+    MS_NEXT -->|Ya| MS_WORK
+    MS_NEXT -->|Tidak| ITEM_CEK
+
+    %% Loop items
+    ITEM_CEK -->|Ya| ITEM_LOOP
+    ITEM_CEK -->|Tidak| KOMIT["Simpan perubahan"]
+    KOMIT --> SUCCESS([Selesai])
+
+    classDef start fill:#1a1a2e,color:#fff;
+    classDef endNode fill:#1a1a2e,color:#fff;
+    classDef decision fill:#f0f0f0,stroke:#333;
+    classDef rollback fill:#dc3545,color:#fff;
+    class START,SUCCESS start;
+    class ROLLBACK rollback;
+    class CEK_RECIPE,SUM_CHECK,BATCH_NEXT,INGREDIENT_LAGI,ITEM_CEK,SUM_MS,MS_NEXT decision;
