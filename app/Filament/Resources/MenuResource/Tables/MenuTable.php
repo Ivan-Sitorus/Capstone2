@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\MenuResource\Tables;
 
 use App\Models\Ingredient;
+use Filament\Actions\Action;
 use Filament\Actions\EditAction;
-use Filament\Actions\DeleteAction;
 use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -16,7 +16,10 @@ class MenuTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->modifyQueryUsing(fn ($query) => $query->with('menuIngredients.ingredient.batches'))
+            ->modifyQueryUsing(fn ($query) => $query
+                ->with('menuIngredients.ingredient.batches')
+                ->where('status', 'active')
+            )
             ->searchPlaceholder("Cari Nama Menu")
             ->columns([
                 TextColumn::make("name")
@@ -61,7 +64,7 @@ class MenuTable
                         'active' => 'Aktif',
                         'inactive' => 'Nonaktif',
                     ])
-                    ->default('active'),
+                    ->placeholder('Semua'),
                 SelectFilter::make("ingredient")
                     ->label("Bahan Baku")
                     ->placeholder("Semua")
@@ -86,8 +89,14 @@ class MenuTable
                                 ->send();
                         }
                     }),
-                DeleteAction::make()
-                    ->modalDescription("Apakah Anda yakin ingin melakukan ini? Seluruh data pesanan menu ini tetap aman dan tidak berubah."),
+                Action::make('nonaktifkan')
+                    ->label('Nonaktifkan')
+                    ->icon('heroicon-o-archive-box')
+                    ->color('warning')
+                    ->requiresConfirmation()
+                    ->modalHeading('Nonaktifkan Menu')
+                    ->modalDescription('Menu akan dinonaktifkan dan tidak muncul di POS serta pelanggan. Data pesanan lama tetap aman.')
+                    ->action(fn (\App\Models\Menu $record) => $record->update(['status' => 'inactive'])),
             ]);
     }
 }
