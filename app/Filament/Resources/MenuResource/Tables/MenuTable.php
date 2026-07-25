@@ -20,6 +20,7 @@ class MenuTable
                 ->with('menuIngredients.ingredient.batches')
             )
             ->searchPlaceholder("Cari Nama Menu")
+            ->defaultSort('name', 'asc')
             ->columns([
                 TextColumn::make("name")
                     ->label("Nama Menu")
@@ -62,7 +63,8 @@ class MenuTable
                     ->options([
                         'active' => 'Aktif',
                         'inactive' => 'Nonaktif',
-                    ])
+                    ]),
+            ])
                     ->default('active'),
                 SelectFilter::make("ingredient")
                     ->label("Bahan Baku")
