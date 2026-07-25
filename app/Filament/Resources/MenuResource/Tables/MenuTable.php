@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MenuResource\Tables;
 
 use App\Models\Ingredient;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Support\Icons\Heroicon;
@@ -36,7 +37,7 @@ class MenuTable
                     ->formatStateUsing(fn ($state) => "Rp".number_format($state, 0, ",", "."))
                     ->sortable(),
                 TextColumn::make("student_price")
-                    ->label("Diskon Mahasiswa")
+                    ->label("Harga Diskon")
                     ->formatStateUsing(fn ($state) => $state ? "Rp".number_format($state, 0, ",", ".") : "-")
                     ->sortable(),
                 TextColumn::make("available_servings")
@@ -79,36 +80,46 @@ class MenuTable
                     ),
             ])
             ->recordActions([
-                EditAction::make()->modal()
-                    ->before(function (EditAction $action, \App\Models\Menu $record) {
-                        if (! $record->menuIngredients()->exists()) {
+                ActionGroup::make([
+                    EditAction::make()->modal()
+                        ->before(function (EditAction $action, \App\Models\Menu $record) {
+                            if (! $record->menuIngredients()->exists()) {
+                                Notification::make()
+                                    ->warning()
+                                    ->title("Belum ada bahan baku")
+                                    ->body("Menu \"{$record->name}\" belum memiliki bahan baku. Tambahkan bahan baku terlebih dahulu agar stok dapat terdeduksi saat menu terjual.")
+                                    ->send();
+                            }
+                        }),
+                    Action::make('toggle_status')
+                        ->label(fn (\App\Models\Menu $record) => 
+                            $record->status === 'active' ? 'Nonaktifkan' : 'Aktifkan')
+                        ->icon(fn (\App\Models\Menu $record) => 
+                            $record->status === 'active' 
+                                ? Heroicon::OutlinedArchiveBox 
+                                : Heroicon::OutlinedCheckCircle)
+                        ->color(fn (\App\Models\Menu $record) => 
+                            $record->status === 'active' ? 'warning' : 'success')
+                        ->requiresConfirmation()
+                        ->modalHeading(fn (\App\Models\Menu $record) => 
+                            $record->status === 'active' ? 'Nonaktifkan Menu' : 'Aktifkan Menu')
+                        ->modalDescription(fn (\App\Models\Menu $record) => 
+                            $record->status === 'active' 
+                                ? 'Menu akan dinonaktifkan dan tidak muncul di POS serta pelanggan. Data pesanan lama tetap aman.'
+                                : 'Menu akan diaktifkan kembali dan muncul di POS serta pelanggan.')
+                        ->action(function (\App\Models\Menu $record) {
+                            $status = $record->status === 'active' ? 'inactive' : 'active';
+                            $record->update(['status' => $status]);
                             Notification::make()
-                                ->warning()
-                                ->title("Belum ada bahan baku")
-                                ->body("Menu \"{$record->name}\" belum memiliki bahan baku. Tambahkan bahan baku terlebih dahulu agar stok dapat terdeduksi saat menu terjual.")
+                                ->success()
+                                ->title($status === 'active' ? 'Menu diaktifkan' : 'Menu dinonaktifkan')
+                                ->body("\"{$record->name}\" berhasil " . ($status === 'active' ? 'diaktifkan' : 'dinonaktifkan'))
                                 ->send();
-                        }
-                    }),
-                Action::make('toggle_status')
-                    ->label(fn (\App\Models\Menu $record) => 
-                        $record->status === 'active' ? 'Nonaktifkan' : 'Aktifkan')
-                    ->icon(fn (\App\Models\Menu $record) => 
-                        $record->status === 'active' 
-                            ? Heroicon::OutlinedArchiveBox 
-                            : Heroicon::OutlinedCheckCircle)
-                    ->color(fn (\App\Models\Menu $record) => 
-                        $record->status === 'active' ? 'warning' : 'success')
-                    ->requiresConfirmation()
-                    ->modalHeading(fn (\App\Models\Menu $record) => 
-                        $record->status === 'active' ? 'Nonaktifkan Menu' : 'Aktifkan Menu')
-                    ->modalDescription(fn (\App\Models\Menu $record) => 
-                        $record->status === 'active' 
-                            ? 'Menu akan dinonaktifkan dan tidak muncul di POS serta pelanggan. Data pesanan lama tetap aman.'
-                            : 'Menu akan diaktifkan kembali dan muncul di POS serta pelanggan.')
-                    ->action(fn (\App\Models\Menu $record) => 
-                        $record->update([
-                            'status' => $record->status === 'active' ? 'inactive' : 'active'
-                        ])),
+                        }),
+                ])
+                ->icon(Heroicon::OutlinedEllipsisVertical)
+                ->color('gray')
+                ->tooltip('Aksi'),
             ]);
     }
 }
