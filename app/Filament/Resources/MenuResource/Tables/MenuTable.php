@@ -65,7 +65,7 @@ class MenuTable
                         'inactive' => 'Nonaktif',
                     ]),
             ])
-                    ->default('active'),
+            ->recordActions([
                 SelectFilter::make("ingredient")
                     ->label("Bahan Baku")
                     ->placeholder("Semua")
