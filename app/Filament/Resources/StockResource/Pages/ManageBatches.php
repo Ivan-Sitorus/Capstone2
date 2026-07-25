@@ -21,6 +21,8 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Pages\Page;
+use Filament\Schemas\Components\EmbeddedTable;
+use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -36,8 +38,6 @@ class ManageBatches extends Page implements HasTable
 
     protected static string $resource = StockResource::class;
 
-    protected string $view = 'filament.pages.manage-batches';
-
     public Ingredient $record;
 
     public bool $showDepleted = false;
@@ -50,6 +50,13 @@ class ManageBatches extends Page implements HasTable
     public function getTitle(): string|Htmlable
     {
         return "Batch Stok - {$this->record->name}";
+    }
+
+    public function content(Schema $schema): Schema
+    {
+        return $schema->components([
+            EmbeddedTable::make(),
+        ]);
     }
 
     public function table(Table $table): Table
