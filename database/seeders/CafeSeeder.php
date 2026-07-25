@@ -432,13 +432,9 @@ class CafeSeeder extends Seeder
             $menu = Menu::create([
                 'category_id' => $catId,
                 'name' => $name,
-                'description' => $def['desc'],
                 'price' => $def['price'],
-                'cashback' => $def['cashback'],
-                'is_available' => true,
-                'is_student_discount' => true,
-                'student_price' => $def['price'] - $def['cashback'],
-                'image' => null,
+                'discounted_price' => $def['price'] - $def['cashback'],
+                'status' => 'active',
             ]);
             $this->menuIds[$name] = $menu->id;
         }
