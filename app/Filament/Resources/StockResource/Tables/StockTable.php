@@ -4,6 +4,7 @@ namespace App\Filament\Resources\StockResource\Tables;
 
 use App\Models\Ingredient;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
@@ -69,31 +70,34 @@ class StockTable
                     ->query(fn ($query) => $query->whereRaw('(SELECT COALESCE(SUM(quantity), 0) FROM ingredient_batches WHERE ingredient_batches.ingredient_id = ingredients.id) < low_stock_threshold')),
             ])
             ->recordActions([
-                Action::make('batches')
-                    ->label('Stok Bahan')
-                    ->icon(Heroicon::OutlinedCube)
-                    ->url(fn ($record) => \App\Filament\Resources\StockResource::getUrl('batches', ['record' => $record])),
-                Action::make('history')
-                    ->label('Riwayat Pemakaian')
-                    ->icon(Heroicon::OutlinedClock)
-                    ->url(fn ($record) => \App\Filament\Resources\StockResource::getUrl('history', ['record' => $record])),
-                EditAction::make()->modal(),
-                DeleteAction::make()
-                    ->before(function (DeleteAction $action, Ingredient $record) {
-                        $activeCount = $record->menuIngredients()
-                            ->whereHas('menu', fn ($q) => $q->whereNull('deleted_at'))
-                            ->count();
-                        
-                        if ($activeCount > 0) {
-                            Notification::make()
-                                ->danger()
-                                ->title("Bahan baku '{$record->name}' tidak dapat dihapus")
-                                ->body("Masih digunakan oleh {$activeCount} menu. Gunakan filter Bahan Baku di halaman Menu untuk melihat daftarnya.")
-                                ->send();
+                ActionGroup::make([
+                    Action::make('batches')
+                        ->label('Stok Bahan')
+                        ->icon(Heroicon::OutlinedCube)
+                        ->url(fn ($record) => \App\Filament\Resources\StockResource::getUrl('batches', ['record' => $record])),
+                    Action::make('history')
+                        ->label('Riwayat Pemakaian')
+                        ->icon(Heroicon::OutlinedClock)
+                        ->url(fn ($record) => \App\Filament\Resources\StockResource::getUrl('history', ['record' => $record])),
+                    EditAction::make()->modal(),
+                    DeleteAction::make()
+                        ->before(function (DeleteAction $action, Ingredient $record) {
+                            $activeCount = $record->menuIngredients()
+                                ->whereHas('menu', fn ($q) => $q->whereNull('deleted_at'))
+                                ->count();
+                            
+                            if ($activeCount > 0) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title("Bahan baku '{$record->name}' tidak dapat dihapus")
+                                    ->body("Masih digunakan oleh {$activeCount} menu. Gunakan filter Bahan Baku di halaman Menu untuk melihat daftarnya.")
+                                    ->send();
 
-                            $action->cancel();
-                        }
-                    }),
+                                $action->cancel();
+                            }
+                        }),
+                ])
+                ->icon(Heroicon::OutlinedEllipsisVertical),
             ])
             ->defaultSort('nearest_expiry', 'asc');
     }
