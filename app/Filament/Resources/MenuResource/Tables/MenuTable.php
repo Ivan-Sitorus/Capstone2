@@ -88,14 +88,26 @@ class MenuTable
                                 ->send();
                         }
                     }),
-                Action::make('nonaktifkan')
-                    ->label('Nonaktifkan')
-                    ->icon('heroicon-o-archive-box')
-                    ->color('warning')
+                Action::make('toggle_status')
+                    ->label(fn (\App\Models\Menu $record) => 
+                        $record->status === 'active' ? 'Nonaktifkan' : 'Aktifkan')
+                    ->icon(fn (\App\Models\Menu $record) => 
+                        $record->status === 'active' 
+                            ? 'heroicon-o-archive-box' 
+                            : 'heroicon-o-check-circle')
+                    ->color(fn (\App\Models\Menu $record) => 
+                        $record->status === 'active' ? 'warning' : 'success')
                     ->requiresConfirmation()
-                    ->modalHeading('Nonaktifkan Menu')
-                    ->modalDescription('Menu akan dinonaktifkan dan tidak muncul di POS serta pelanggan. Data pesanan lama tetap aman.')
-                    ->action(fn (\App\Models\Menu $record) => $record->update(['status' => 'inactive'])),
+                    ->modalHeading(fn (\App\Models\Menu $record) => 
+                        $record->status === 'active' ? 'Nonaktifkan Menu' : 'Aktifkan Menu')
+                    ->modalDescription(fn (\App\Models\Menu $record) => 
+                        $record->status === 'active' 
+                            ? 'Menu akan dinonaktifkan dan tidak muncul di POS serta pelanggan. Data pesanan lama tetap aman.'
+                            : 'Menu akan diaktifkan kembali dan muncul di POS serta pelanggan.')
+                    ->action(fn (\App\Models\Menu $record) => 
+                        $record->update([
+                            'status' => $record->status === 'active' ? 'inactive' : 'active'
+                        ])),
             ]);
     }
 }
