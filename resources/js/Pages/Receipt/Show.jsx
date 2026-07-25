@@ -22,8 +22,6 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
         document.title = `Struk #${order.order_code} | ${cafe.name}`;
     }, []);
 
-    const totalQty = order.items.reduce((s, i) => s + i.quantity, 0);
-
     const paymentLabel =
         order.payment_method === 'bayar_nanti'
             ? 'Bayar Nanti'
@@ -141,29 +139,7 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
                         </div>
 
                         <div className="px-6 pt-3 pb-4 border-b-2 border-dashed border-gray-200">
-                            {order.discount > 0 && (
-                                <>
-                                    <div className="flex justify-between items-center py-1.5">
-                                        <span className="text-sm text-gray-500">
-                                            Subtotal ({totalQty} item)
-                                        </span>
-                                        <span className="text-sm text-gray-500">
-                                            {formatRupiah(order.raw_total)}
-                                        </span>
-                                    </div>
-
-                                    <div className="flex justify-between items-center py-1.5">
-                                        <span className="text-sm text-green-600">
-                                            Diskon
-                                        </span>
-                                        <span className="text-sm font-semibold text-green-600">
-                                            - {formatRupiah(order.discount)}
-                                        </span>
-                                    </div>
-                                </>
-                            )}
-
-                            <div className="flex justify-between items-center py-2 border-t border-gray-200 mt-1">
+                            <div className="flex justify-between items-center py-2">
                                 <span className="text-base font-bold text-gray-900">
                                     Total
                                 </span>

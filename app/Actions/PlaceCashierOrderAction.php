@@ -8,7 +8,6 @@ use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\InventoryService;
-use App\Services\OrderPromotionService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,7 +16,6 @@ use Ramsey\Uuid\Uuid;
 class PlaceCashierOrderAction
 {
     public function __construct(
-        protected OrderPromotionService $orderPromotionService,
         protected InventoryService $inventoryService,
     ) {}
 
@@ -28,8 +26,6 @@ class PlaceCashierOrderAction
 
         $attempt = function () use ($request, &$uuid, &$orderModel) {
             DB::transaction(function () use ($request, &$uuid, &$orderModel) {
-                $selectedPromotionIds = $request->input('promotion_ids', []);
-
                 $order = Order::create([
                     'uuid' => $uuid,
                     'cashier_id' => Auth::id(),
@@ -42,7 +38,6 @@ class PlaceCashierOrderAction
 
                 $isMahasiswa = (bool) $request->input('is_mahasiswa', false);
                 $total = 0;
-                $appliedPromotions = [];
                 $itemsToInsert = [];
 
                 $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
@@ -51,36 +46,28 @@ class PlaceCashierOrderAction
                 foreach ($request->items as $item) {
                     $menu = $menus->get($item['menu_id']);
 
-                    $lineCalculation = $this->orderPromotionService->calculateLine(
-                        $menu,
-                        (int) $item['quantity'],
-                        $isMahasiswa,
-                        $selectedPromotionIds,
-                    );
+                    $unitPrice = ($isMahasiswa && $menu->is_student_discount && $menu->student_price !== null)
+                        ? $menu->student_price
+                        : $menu->price;
+                    $subtotal = $unitPrice * (int) $item['quantity'];
 
                     $itemsToInsert[] = [
                         'order_id' => $order->id,
                         'menu_id' => $menu->id,
                         'quantity' => $item['quantity'],
-                        'unit_price' => $lineCalculation['unit_price'],
-                        'subtotal' => $lineCalculation['subtotal'],
+                        'unit_price' => $unitPrice,
+                        'subtotal' => $subtotal,
                         'created_at' => now(),
                         'updated_at' => now(),
                     ];
 
-                    if ($lineCalculation['applied_promotion'] !== null) {
-                        $appliedPromotions[] = $lineCalculation['applied_promotion'];
-                    }
-
-                    $total += $lineCalculation['subtotal'];
+                    $total += $subtotal;
                 }
 
                 OrderItem::insert($itemsToInsert);
 
                 $order->update(['total_amount' => $total]);
                 $orderModel = $order;
-
-                $this->orderPromotionService->persistOrderPromotions($order, $appliedPromotions);
 
                 $this->inventoryService->processSaleForOrder($order, Auth::id());
             });

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Customer;
 use App\Actions\PlaceCustomerOrderAction;
 use App\Enums\OrderStatus;
 use App\Http\Controllers\Controller;
-use App\Services\OrderPromotionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,9 +12,9 @@ use Inertia\Response;
 
 class CustomerOrderController extends Controller
 {
-    public function store(Request $request, OrderPromotionService $orderPromotionService): JsonResponse
+    public function store(Request $request): JsonResponse
     {
-        return app(PlaceCustomerOrderAction::class)->handle($request, $orderPromotionService);
+        return app(PlaceCustomerOrderAction::class)->handle($request);
     }
 
     public function riwayat(Request $request): Response

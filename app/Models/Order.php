@@ -111,11 +111,6 @@ class Order extends Model
         return $this->hasOne(Receivable::class);
     }
 
-    public function appliedPromotions(): HasMany
-    {
-        return $this->hasMany(AppliedPromotion::class);
-    }
-
     public function processedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'processed_by');

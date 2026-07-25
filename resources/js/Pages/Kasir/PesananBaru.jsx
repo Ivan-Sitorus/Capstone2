@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { v7 as uuidv7 } from 'uuid';
-import { Search, X, Banknote, Lock, User, CircleCheck, Clock, Printer, Percent, MessageSquare, ShoppingCart } from 'lucide-react';
+import { Search, X, Banknote, Lock, User, CircleCheck, Clock, Printer, MessageSquare, ShoppingCart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -15,7 +15,7 @@ import { formatRupiah, formatDate, formatTime } from '@/helpers';
 import { cn } from '@/lib/utils';
 import useCartStore from '@/Store/cartStore';
 
-export default function PesananBaru({ categories, promotions }) {
+export default function PesananBaru({ categories }) {
     // ── Zustand cashier cart ──────────────────────────────────────────────
     const cartItems = useCartStore(s => s.cashierItems);
     const cashierAddItem = useCartStore(s => s.cashierAddItem);
@@ -349,28 +349,6 @@ export default function PesananBaru({ categories, promotions }) {
                                         variant="cashier"
                                     />
                                 ))
-                            )}
-
-                            {promotions && promotions.length > 0 && cartItems.length > 0 && (
-                                <div className="py-3 border-t border-border mt-2">
-                                    <div className="flex items-center gap-1.5 mb-2">
-                                        <Percent size={14} className="text-primary" />
-                                        <span className="text-xs font-semibold uppercase tracking-wide text-primary">
-                                            Promo Aktif
-                                        </span>
-                                        <span className="text-[10px] rounded-full px-1.5 py-px font-semibold bg-primary/10 text-primary">
-                                            {promotions.length}
-                                        </span>
-                                    </div>
-                                    {promotions.map(promo => (
-                                        <div key={promo.id} className="flex items-center justify-between text-xs text-muted-foreground">
-                                            <span className="truncate">{promo.name}</span>
-                                            <span className="text-[11px] font-semibold shrink-0 mt-0.5 text-green-600">
-                                                Aktif
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
                             )}
 
                             <div className="h-32 shrink-0" />
