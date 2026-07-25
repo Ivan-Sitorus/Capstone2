@@ -82,9 +82,9 @@ class StockTable
                     EditAction::make()->modal(),
                     DeleteAction::make()
                         ->before(function (DeleteAction $action, Ingredient $record) {
-                            $activeCount = $record->menuIngredients()
-                                ->whereHas('menu', fn ($q) => $q->whereNull('deleted_at'))
-                                ->count();
+                        $activeCount = $record->menuIngredients()
+                            ->whereHas('menu')
+                            ->count();
                             
                             if ($activeCount > 0) {
                                 Notification::make()
