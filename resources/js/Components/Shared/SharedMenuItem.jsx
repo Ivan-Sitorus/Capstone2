@@ -12,9 +12,7 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
     const isUnavailable = isAdminDisabled || isStockOut;
     const isCashier = variant === 'cashier';
 
-    const displayPrice = menu.is_student_discount && menu.student_price
-        ? Number(menu.student_price)
-        : Number(menu.price);
+    const displayPrice = menu.discounted_price ?? menu.price;
 
     const handleAdd = (e) => {
         if (isUnavailable) return;
@@ -72,7 +70,7 @@ export default function SharedMenuItem({ menu, onAdd, variant = 'cashier', inCar
                     {menu.name}
                 </span>
 
-                {isCustomer && menu.is_student_discount && menu.student_price && (
+                {isCustomer && menu.discounted_price && menu.discounted_price > 0 && (
                     <span className="text-[11px] text-muted-foreground line-through">
                         {formatRupiah(menu.price)}
                     </span>

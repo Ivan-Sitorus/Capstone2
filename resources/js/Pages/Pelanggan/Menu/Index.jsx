@@ -23,8 +23,7 @@ const C = {
     shadowLift:  '0 8px 24px -2px rgba(0,0,0,0.10)',
 };
 
-function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false, isMahasiswa = false }) {
-    const cashback = Number(menu.cashback ?? 0);
+function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false }) {
     const soldOut  = menu.status !== 'active';
 
     return (
@@ -112,22 +111,6 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                 }}>
                     {formatRupiah(Number(menu.price))}
                 </p>
-
-                {isMahasiswa && cashback > 0 && (
-                    <p style={{
-                        fontSize:   10,
-                        fontWeight: 500,
-                        color:      C.success,
-                        fontFamily: F,
-                        display:    'flex',
-                        alignItems: 'center',
-                        gap:        4,
-                        margin:     0,
-                    }}>
-                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.success, flexShrink: 0 }} />
-                        Cashback {formatRupiah(cashback)}
-                    </p>
-                )}
 
                 <div style={{ marginTop: 'auto', paddingTop: 10 }}>
                     {soldOut ? (
@@ -458,7 +441,6 @@ export default function CustomerMenu({ categories, table }) {
                                 <MenuItemCard
                                     key={menu.id} menu={menu} priority={idx < 4}
                                     cartItem={cartMap[menu.id]}
-                                    isMahasiswa={!!customer?.isMahasiswa}
                                     onAdd={() => addItem(menu)}
                                     onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
                                     onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
@@ -486,10 +468,9 @@ export default function CustomerMenu({ categories, table }) {
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                                     {group.menus.map(menu => (
                                         <MenuItemCard
-                                            key={menu.id} menu={menu}
-                                            cartItem={cartMap[menu.id]}
-                                            isMahasiswa={!!customer?.isMahasiswa}
-                                            onAdd={() => addItem(menu)}
+                                        key={menu.id} menu={menu}
+                                        cartItem={cartMap[menu.id]}
+                                        onAdd={() => addItem(menu)}
                                             onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
                                             onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
                                         />

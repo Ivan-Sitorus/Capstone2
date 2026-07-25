@@ -18,11 +18,7 @@ class OrderPromotionService
         bool $isMahasiswa = false,
         array $selectedPromotionIds = [],
     ): array {
-        $cashback = ($isMahasiswa && (float) $menu->cashback > 0)
-            ? (float) $menu->cashback
-            : 0.0;
-
-        $unitPrice = max(0.0, (float) $menu->price - $cashback);
+        $unitPrice = $menu->discounted_price ?? $menu->price;
 
         $bestPromotion = null;
         $bestDiscountAmount = 0.0;

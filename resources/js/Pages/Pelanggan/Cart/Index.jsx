@@ -34,10 +34,10 @@ export default function CustomerCart() {
         } catch (_) {}
     }, []);
 
-    const totalCashback = isMahasiswa
-        ? items.reduce((s, i) => s + (i.cashback ?? 0) * i.quantity, 0)
+    const totalDiscount = isMahasiswa
+        ? items.reduce((s, i) => s + ((i.price - (i.discounted_price ?? i.price)) * i.quantity), 0)
         : 0;
-    const grandTotal = total - totalCashback;
+    const grandTotal = total - totalDiscount;
 
     const handleIncrement = (menuId) => {
         const item = items.find(i => i.menuId === menuId);
@@ -170,9 +170,8 @@ export default function CustomerCart() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 4 }}>
 
                             {items.map((item) => {
-                                const cb       = isMahasiswa ? (item.cashback ?? 0) : 0;
-                                const effPrice = item.price - cb;
-                                const subtotal = effPrice * item.quantity;
+                                const discountedPrice = isMahasiswa ? (item.discounted_price ?? item.price) : item.price;
+                                const subtotal = discountedPrice * item.quantity;
                                 return (
                                     <article key={item.menuId} style={{
                                         background: 'rgba(255,255,255,0.90)',
@@ -204,7 +203,7 @@ export default function CustomerCart() {
                                                 {item.name}
                                             </h3>
                                             <p style={{ fontSize: 11, color: C.textSecond, fontFamily: F, margin: '0 0 4px' }}>
-                                                {formatRupiah(effPrice)} × {item.quantity}
+                                                {formatRupiah(discountedPrice)} × {item.quantity}
                                             </p>
                                             <p style={{ fontSize: 14, fontWeight: 700, color: C.textPrimary, fontFamily: F, margin: 0 }}>
                                                 {formatRupiah(subtotal)}
@@ -267,10 +266,10 @@ export default function CustomerCart() {
                                         <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>Subtotal</span>
                                         <span style={{ fontSize: 13, color: C.textPrimary, fontFamily: F }}>{formatRupiah(total)}</span>
                                     </div>
-                                    {isMahasiswa && totalCashback > 0 && (
+                                    {isMahasiswa && totalDiscount > 0 && (
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>Cashback Mahasiswa</span>
-                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>− {formatRupiah(totalCashback)}</span>
+                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>Diskon Mahasiswa</span>
+                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>− {formatRupiah(totalDiscount)}</span>
                                         </div>
                                     )}
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>

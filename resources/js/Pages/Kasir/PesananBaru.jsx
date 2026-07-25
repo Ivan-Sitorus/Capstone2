@@ -68,8 +68,8 @@ export default function PesananBaru({ categories, promotions }) {
 
     const totalQty = cartItems.reduce((s, i) => s + i.quantity, 0);
     const total = cartItems.reduce((s, i) => s + i.price * i.quantity, 0);
-    const totalCashback = isMahasiswa ? cartItems.reduce((s, i) => s + (i.cashback ?? 0) * i.quantity, 0) : 0;
-    const grandTotal = total - totalCashback;
+    const totalDiscount = isMahasiswa ? cartItems.reduce((s, i) => s + ((i.price - (i.discounted_price ?? i.price)) * i.quantity), 0) : 0;
+    const grandTotal = total - totalDiscount;
 
     const menuGridColumns = isPortrait
         ? 'repeat(auto-fill, minmax(170px, 1fr))'
@@ -255,10 +255,12 @@ export default function PesananBaru({ categories, promotions }) {
                                         <span className="text-sm text-muted-foreground">Subtotal</span>
                                         <span className="text-sm font-medium">{formatRupiah(total)}</span>
                                     </div>
-                                    {isMahasiswa && totalCashback > 0 && (
-                                        <div className="flex justify-between mb-1">
-                                            <span className="text-sm text-green-600">Cashback Mahasiswa</span>
-                                            <span className="text-sm font-semibold text-green-600">- {formatRupiah(totalCashback)}</span>
+                                    {isMahasiswa && totalDiscount > 0 && (
+                                            <span className="text-sm text-green-600">Diskon Mahasiswa</span>
+                                            <span className="text-sm font-semibold text-green-600">- {formatRupiah(totalDiscount)}</span>
+                            {isMahasiswa && totalDiscount > 0 && (
+                                    <span className="text-sm text-green-600">Diskon Mahasiswa</span>
+                                    <span className="text-sm font-semibold text-green-600">- {formatRupiah(totalDiscount)}</span>
                                         </div>
                                     )}
                                     <div className="flex justify-between py-2 border-t border-border mb-3">

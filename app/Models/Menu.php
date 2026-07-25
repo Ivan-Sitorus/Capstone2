@@ -17,11 +17,9 @@ class Menu extends Model
         'category_id',
         'name',
         'price',
-        'cashback',
+        'discounted_price',
         'image',
         'status',
-        'is_student_discount',
-        'student_price',
     ];
 
     protected $appends = ['image_url'];
@@ -30,10 +28,8 @@ class Menu extends Model
     {
         return [
             'price' => 'integer',
-            'cashback' => 'integer',
-            'student_price' => 'integer',
+            'discounted_price' => 'integer',
             'status' => 'string',
-            'is_student_discount' => 'boolean',
         ];
     }
 
@@ -118,8 +114,8 @@ class Menu extends Model
         return $this->menuIngredients()->exists();
     }
 
-    public function getEffectivePriceAttribute()
+    public function getEffectivePriceAttribute(): int
     {
-        return $this->student_price ?? $this->price;
+        return $this->discounted_price ?? $this->price;
     }
 }

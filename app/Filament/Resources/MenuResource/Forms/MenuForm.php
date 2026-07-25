@@ -63,16 +63,16 @@ class MenuForm
                 ])
                 ->default('active')
                 ->required(),
-            TextInput::make("student_price")
-                ->label("Diskon Mahasiswa")
+            TextInput::make("discounted_price")
+                ->label("Harga Diskon")
                 ->type("text")
                 ->minValue(0)
                 ->rules([
                     fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
                         $price = (int) str_replace(".", "", $get("price") ?? "0");
-                        $studentPrice = (int) str_replace(".", "", $value ?? "0");
-                        if ($studentPrice > $price) {
-                            $fail("Diskon mahasiswa tidak boleh lebih besar dari harga menu (Rp ".number_format($price, 0, ",", ".").").");
+                        $discountedPrice = (int) str_replace(".", "", $value ?? "0");
+                        if ($discountedPrice > $price) {
+                            $fail("Harga diskon tidak boleh lebih besar dari harga menu (Rp ".number_format($price, 0, ",", ".").").");
                         }
                     },
                 ])
