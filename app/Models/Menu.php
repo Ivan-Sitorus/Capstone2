@@ -16,14 +16,12 @@ class Menu extends Model
     protected $fillable = [
         'category_id',
         'name',
-        'description',
         'price',
         'cashback',
         'image',
         'status',
         'is_student_discount',
         'student_price',
-        'unit',
     ];
 
     protected $appends = ['image_url'];

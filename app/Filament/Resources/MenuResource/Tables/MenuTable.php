@@ -117,9 +117,7 @@ class MenuTable
                                 ->send();
                         }),
                 ])
-                ->icon(Heroicon::OutlinedEllipsisVertical)
-                ->color('gray')
-                ->tooltip('Aksi'),
+                ->icon(Heroicon::OutlinedEllipsisVertical),
             ]);
     }
 }
