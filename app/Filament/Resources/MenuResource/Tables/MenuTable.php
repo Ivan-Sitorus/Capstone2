@@ -6,6 +6,7 @@ use App\Models\Ingredient;
 use Filament\Actions\Action;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -93,8 +94,8 @@ class MenuTable
                         $record->status === 'active' ? 'Nonaktifkan' : 'Aktifkan')
                     ->icon(fn (\App\Models\Menu $record) => 
                         $record->status === 'active' 
-                            ? 'heroicon-o-archive-box' 
-                            : 'heroicon-o-check-circle')
+                            ? Heroicon::OutlinedArchiveBox 
+                            : Heroicon::OutlinedCheckCircle)
                     ->color(fn (\App\Models\Menu $record) => 
                         $record->status === 'active' ? 'warning' : 'success')
                     ->requiresConfirmation()
