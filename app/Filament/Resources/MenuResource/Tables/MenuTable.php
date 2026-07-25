@@ -18,7 +18,6 @@ class MenuTable
         return $table
             ->modifyQueryUsing(fn ($query) => $query
                 ->with('menuIngredients.ingredient.batches')
-                ->where('status', 'active')
             )
             ->searchPlaceholder("Cari Nama Menu")
             ->columns([
@@ -64,7 +63,7 @@ class MenuTable
                         'active' => 'Aktif',
                         'inactive' => 'Nonaktif',
                     ])
-                    ->placeholder('Semua'),
+                    ->default('active'),
                 SelectFilter::make("ingredient")
                     ->label("Bahan Baku")
                     ->placeholder("Semua")
