@@ -22,14 +22,4 @@ return new class extends Migration
             $table->string('customer_name', 100)->nullable(false)->change();
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('receivables', function (Blueprint $table) {
-            $table->string('customer_name', 100)->nullable(false)->change();
-        });
-    }
 };
