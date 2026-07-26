@@ -11,6 +11,7 @@ trait HasOrderStatusBadge
             'diproses' => 'info',
             'selesai' => 'success',
             'dibatalkan' => 'danger',
+            'belum_lunas' => 'warning',
             default => 'gray',
         };
     }
@@ -22,6 +23,7 @@ trait HasOrderStatusBadge
             'diproses' => 'Diproses',
             'selesai' => 'Selesai',
             'dibatalkan' => 'Dibatalkan',
+            'belum_lunas' => 'Belum Lunas',
             default => $state,
         };
     }

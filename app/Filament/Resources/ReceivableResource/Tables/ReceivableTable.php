@@ -5,14 +5,11 @@ namespace App\Filament\Resources\ReceivableResource\Tables;
 use App\Models\Receivable;
 use Filament\Actions\ViewAction;
 use Filament\Actions\Action;
-use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 
 class ReceivableTable
 {
@@ -35,11 +32,6 @@ class ReceivableTable
                     ->label('Tanggal Invoice')
                     ->date('d M Y')
                     ->sortable(),
-                TextColumn::make('due_date')
-                    ->label('Jatuh Tempo')
-                    ->date('d M Y')
-                    ->sortable()
-                    ->color(fn (Receivable $record): ?string => $record->isOverdue() ? 'danger' : null),
                 TextColumn::make('amount')
                     ->label('Jumlah')
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
@@ -72,23 +64,6 @@ class ReceivableTable
                         Receivable::STATUS_PAID => 'Lunas',
                         Receivable::STATUS_OVERDUE => 'Jatuh Tempo',
                     ]),
-                Filter::make('due_date')
-                    ->label('Rentang Jatuh Tempo')
-                    ->schema([
-                        DatePicker::make('from'),
-                        DatePicker::make('until'),
-                    ])
-                    ->query(function (Builder $query, array $data): Builder {
-                        return $query
-                            ->when(
-                                $data['from'] ?? null,
-                                fn (Builder $query, $date): Builder => $query->whereDate('due_date', '>=', $date),
-                            )
-                            ->when(
-                                $data['until'] ?? null,
-                                fn (Builder $query, $date): Builder => $query->whereDate('due_date', '<=', $date),
-                            );
-                    }),
             ])
             ->recordActions([
                 ViewAction::make(),
@@ -102,6 +77,6 @@ class ReceivableTable
                     ->requiresConfirmation(),
             ])
             ->toolbarActions([])
-            ->defaultSort('due_date', 'asc');
+            ->defaultSort('invoice_date', 'asc');
     }
 }

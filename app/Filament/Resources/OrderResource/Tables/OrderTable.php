@@ -39,11 +39,6 @@ class OrderTable
                     ->label('Metode')
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => OrderResource::getPaymentLabel($state)),
-                TextColumn::make('payment_status')
-                    ->label('Status Bayar')
-                    ->badge()
-                    ->color(fn (?string $state): string => OrderResource::getPaymentStatusColor($state))
-                    ->formatStateUsing(fn (?string $state): string => OrderResource::getPaymentStatusLabel($state)),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
