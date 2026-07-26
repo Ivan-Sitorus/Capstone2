@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\PiutangResource\Tables;
 
 use App\Enums\OrderStatus;
-use App\Filament\Resources\OrderResource;
+use App\Filament\Resources\PiutangResource;
 use App\Models\Order;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -93,8 +93,8 @@ class PiutangTable
                     ->modalCancelActionLabel('Tutup'),
                     Action::make('riwayat_bayar')
                         ->label('Riwayat Bayar')
-                        ->icon('heroicon-o-banknotes')
-                        ->url(fn (Order $record) => OrderResource::getUrl('view', ['record' => $record])),
+                        ->icon(Heroicon::OutlinedBanknotes)
+                        ->url(fn (Order $record) => PiutangResource::getUrl('riwayat-bayar', ['record' => $record])),
                 ])
                 ->icon(Heroicon::OutlinedEllipsisVertical),
             ])

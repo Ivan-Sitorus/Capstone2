@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PiutangResource\Pages\ListPiutangs;
+use App\Filament\Resources\PiutangResource\Pages\RiwayatBayar;
 use App\Filament\Resources\PiutangResource\Tables\PiutangTable;
 use App\Models\Order;
 use BackedEnum;
@@ -38,6 +39,7 @@ class PiutangResource extends Resource
     {
         return [
             'index' => ListPiutangs::route('/'),
+            'riwayat-bayar' => RiwayatBayar::route('/{record}/pembayaran'),
         ];
     }
 }
