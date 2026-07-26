@@ -28,10 +28,6 @@ class Receivable extends Model
         self::STATUS_CANCELLED,
     ];
 
-    protected $attributes = [
-        'paid_amount' => 0,
-    ];
-
     protected $fillable = [
         'customer_name',
         'amount',

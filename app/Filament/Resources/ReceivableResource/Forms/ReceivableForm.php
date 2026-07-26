@@ -66,7 +66,7 @@ class ReceivableForm
                 ->native(false),
             TextInput::make('paid_amount')
                 ->label('Jumlah Dibayar')
-                ->nullable()
+                ->required()
                 ->type('text')
                 ->prefix('Rp')
                 ->stripCharacters('.')
