@@ -44,9 +44,8 @@ class ReceivableTable
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         Receivable::STATUS_PAID => 'success',
-                        Receivable::STATUS_PARTIAL => 'warning',
-                        Receivable::STATUS_OVERDUE => 'danger',
-                        default => 'gray',
+                        Receivable::STATUS_CANCELLED => 'danger',
+                        default => 'warning',
                     })
                     ->formatStateUsing(fn (string $state): string => ucfirst($state))
                     ->sortable(),
@@ -56,9 +55,8 @@ class ReceivableTable
                     ->label('Status')
                     ->options([
                         Receivable::STATUS_PENDING => 'Pending',
-                        Receivable::STATUS_PARTIAL => 'Cicilan',
                         Receivable::STATUS_PAID => 'Lunas',
-                        Receivable::STATUS_OVERDUE => 'Jatuh Tempo',
+                        Receivable::STATUS_CANCELLED => 'Dibatalkan',
                     ]),
             ])
             ->recordActions([
