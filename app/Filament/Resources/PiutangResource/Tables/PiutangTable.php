@@ -6,7 +6,9 @@ use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\DatePicker;
+use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -81,10 +83,17 @@ class PiutangTable
                     ),
             ])
             ->recordActions([
-                Action::make('view')
-                    ->label('Detail')
-                    ->icon('heroicon-o-eye')
-                    ->url(fn (Order $record) => OrderResource::getUrl('view', ['record' => $record])),
+                ActionGroup::make([
+                    Action::make('detail')
+                        ->label('Detail')
+                        ->icon('heroicon-o-eye')
+                        ->url(fn (Order $record) => OrderResource::getUrl('view', ['record' => $record])),
+                    Action::make('riwayat_bayar')
+                        ->label('Riwayat Bayar')
+                        ->icon('heroicon-o-banknotes')
+                        ->url(fn (Order $record) => OrderResource::getUrl('view', ['record' => $record])),
+                ])
+                ->icon(Heroicon::OutlinedEllipsisVertical),
             ])
             ->defaultSort('created_at', 'desc');
     }
