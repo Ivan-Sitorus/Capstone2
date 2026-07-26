@@ -4,10 +4,9 @@ namespace App\Filament\Resources\ReceivableResource\Forms;
 
 use App\Models\Menu;
 use App\Models\Receivable;
-use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
@@ -50,7 +49,6 @@ class ReceivableForm
                 }),
             TextInput::make('customer_name')
                 ->label('Nama Pelanggan')
-                ->required()
                 ->maxLength(255),
             TextInput::make('amount')
                 ->label('Jumlah Total')
@@ -60,32 +58,15 @@ class ReceivableForm
                 ->disabled()
                 ->dehydrated(true)
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
-            DatePicker::make('invoice_date')
+            DateTimePicker::make('invoice_date')
                 ->label('Tanggal Invoice')
                 ->required()
                 ->default(now())
+                ->seconds(true)
                 ->native(false),
-            DatePicker::make('due_date')
-                ->label('Jatuh Tempo')
-                ->required()
-                ->default(now()->addDays(30))
-                ->native(false),
-            Select::make('status')
-                ->label('Status')
-                ->options([
-                    Receivable::STATUS_PENDING => 'Pending',
-                    Receivable::STATUS_PARTIAL => 'Cicilan',
-                    Receivable::STATUS_PAID => 'Lunas',
-                    Receivable::STATUS_OVERDUE => 'Jatuh Tempo',
-                ])
-                ->required()
-                ->default(Receivable::STATUS_PENDING)
-                ->native(false)
-                ->live()
-                ->disabled(fn ($get) => (int) $get('paid_amount') > 0),
             TextInput::make('paid_amount')
                 ->label('Jumlah Dibayar')
-                ->required()
+                ->nullable()
                 ->type('text')
                 ->prefix('Rp')
                 ->stripCharacters('.')
@@ -97,11 +78,6 @@ class ReceivableForm
                         $set('status', 'partial');
                     }
                 }),
-            Textarea::make('notes')
-                ->label('Catatan')
-                ->rows(3)
-                ->maxLength(500)
-                ->columnSpanFull(),
         ])->columns(2);
     }
 }
