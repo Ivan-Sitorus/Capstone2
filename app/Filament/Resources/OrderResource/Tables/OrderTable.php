@@ -35,19 +35,6 @@ class OrderTable
                     ->label('Total')
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
-                TextColumn::make('paid_amount')
-                    ->label('Dibayar')
-                    ->getStateUsing(function (Order $record) {
-                        return (float) $record->orderPayments->sum('amount');
-                    })
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
-                TextColumn::make('remaining_amount')
-                    ->label('Sisa')
-                    ->getStateUsing(function (Order $record) {
-                        return (float) $record->total_amount - (float) $record->orderPayments->sum('amount');
-                    })
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
-                    ->color(fn ($state) => $state > 0 ? 'danger' : 'success'),
                 TextColumn::make('payment_method')
                     ->label('Metode')
                     ->badge()
@@ -62,7 +49,7 @@ class OrderTable
                     ->dateTime('d M Y, H:i:s')
                     ->sortable(),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->with(['items.menu', 'cashier', 'orderPayments']))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['items.menu', 'cashier']))
             ->filters([
                 SelectFilter::make('status')
                     ->label('Status')
@@ -77,12 +64,6 @@ class OrderTable
                         'cash' => 'Tunai',
                         'qris' => 'QRIS',
                         'bayar_nanti' => 'Bayar Nanti',
-                    ]),
-                SelectFilter::make('payment_status')
-                    ->label('Status Bayar')
-                    ->options([
-                        'lunas' => 'Lunas',
-                        'belum_lunas' => 'Belum Lunas',
                     ]),
                 Filter::make('today')
                     ->label('Hari Ini')
