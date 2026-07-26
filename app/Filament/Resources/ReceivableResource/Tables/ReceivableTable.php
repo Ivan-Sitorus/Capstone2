@@ -28,10 +28,6 @@ class ReceivableTable
                     ->label('Pelanggan')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('invoice_date')
-                    ->label('Tanggal Invoice')
-                    ->date('d M Y')
-                    ->sortable(),
                 TextColumn::make('amount')
                     ->label('Jumlah')
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
@@ -77,6 +73,6 @@ class ReceivableTable
                     ->requiresConfirmation(),
             ])
             ->toolbarActions([])
-            ->defaultSort('invoice_date', 'asc');
+            ->defaultSort('created_at', 'desc');
     }
 }
