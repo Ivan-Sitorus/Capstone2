@@ -79,7 +79,7 @@ class OrderTable
             ])
             ->recordActions([
                 Action::make('view')
-                    ->label('Lihat')
+                    ->label('Detail')
                     ->icon(Heroicon::OutlinedEye)
                     ->record(fn (Order $record): Order => $record->loadMissing('items.menu'))
                     ->infolist(static::getInfolistComponents())

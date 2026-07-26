@@ -84,10 +84,9 @@ class PiutangTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    Action::make('detail')
+                    \Filament\Tables\Actions\ViewAction::make()
                         ->label('Detail')
-                        ->icon('heroicon-o-eye')
-                        ->url(fn (Order $record) => OrderResource::getUrl('view', ['record' => $record])),
+                        ->icon('heroicon-o-eye'),
                     Action::make('riwayat_bayar')
                         ->label('Riwayat Bayar')
                         ->icon('heroicon-o-banknotes')
