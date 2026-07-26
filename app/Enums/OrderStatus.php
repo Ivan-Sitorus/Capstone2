@@ -8,6 +8,7 @@ enum OrderStatus: string
     case Diproses = 'diproses';
     case Selesai = 'selesai';
     case Dibatalkan = 'dibatalkan';
+    case BelumLunas = 'belum_lunas';
 
     public function label(): string
     {
@@ -16,6 +17,7 @@ enum OrderStatus: string
             self::Diproses => 'Diproses',
             self::Selesai => 'Selesai',
             self::Dibatalkan => 'Dibatalkan',
+            self::BelumLunas => 'Belum Lunas',
         };
     }
 
@@ -26,6 +28,7 @@ enum OrderStatus: string
             self::Diproses => 'info',
             self::Selesai => 'success',
             self::Dibatalkan => 'danger',
+            self::BelumLunas => 'danger',
         };
     }
 }
