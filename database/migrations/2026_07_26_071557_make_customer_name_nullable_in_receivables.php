@@ -29,9 +29,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('receivables', function (Blueprint $table) {
-            $table->string('customer_name', 100)->nullable()->change();
-        });
-            //
+            $table->string('customer_name', 100)->nullable(false)->change();
         });
     }
 };
