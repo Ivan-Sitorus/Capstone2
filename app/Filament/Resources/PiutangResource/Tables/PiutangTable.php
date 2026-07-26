@@ -49,6 +49,11 @@ class PiutangTable
                     })
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->color(fn ($state) => $state > 0 ? 'danger' : 'success'),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (string $state): string => \App\Filament\Resources\OrderResource::getStatusColor($state))
+                    ->formatStateUsing(fn (string $state): string => \App\Filament\Resources\OrderResource::getStatusLabel($state)),
             ])
             ->recordActions([
                 Action::make('view')
