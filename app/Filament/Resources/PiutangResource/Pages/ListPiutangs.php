@@ -5,6 +5,7 @@ namespace App\Filament\Resources\PiutangResource\Pages;
 use App\Filament\Resources\PiutangResource;
 use App\Models\Menu;
 use App\Models\Order;
+use App\Models\User;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -33,6 +34,12 @@ class ListPiutangs extends ListRecords
                 ->icon('heroicon-o-plus')
                 ->modalHeading('Buat Piutang Baru')
                 ->form([
+                    Select::make('cashier_id')
+                        ->label('Kasir')
+                        ->options(fn () => User::whereIn('role', ['cashier', 'admin'])->orderBy('name')->pluck('name', 'id'))
+                        ->default(fn () => auth()->id())
+                        ->searchable()
+                        ->required(),
                     TextInput::make('customer_name')
                         ->label('Nama Pelanggan')
                         ->required()
@@ -74,6 +81,7 @@ class ListPiutangs extends ListRecords
                     }
 
                     $order = Order::create([
+                        'cashier_id' => $data['cashier_id'],
                         'customer_name' => $data['customer_name'],
                         'total_amount' => $total,
                         'payment_method' => 'piutang',
