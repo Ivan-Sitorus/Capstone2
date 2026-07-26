@@ -8,8 +8,9 @@ use App\Models\Order;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\ViewAction;
-use Filament\Forms\Components\DatePicker;
+use Filament\Infolists\Infolist;
 use Filament\Support\Icons\Heroicon;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -87,7 +88,10 @@ class PiutangTable
                 ActionGroup::make([
                 ViewAction::make()
                     ->label('Detail')
-                    ->icon('heroicon-o-eye'),
+                    ->icon('heroicon-o-eye')
+                    ->infolist(fn (Infolist $infolist): Infolist => $infolist
+                        ->schema(\App\Filament\Resources\OrderResource::getInfolistComponents())
+                    ),
                     Action::make('riwayat_bayar')
                         ->label('Riwayat Bayar')
                         ->icon('heroicon-o-banknotes')
