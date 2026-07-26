@@ -77,6 +77,7 @@ class Order extends Model
         'resubmit_count',
         'qris_status',
         'whatsapp_phone',
+        'payment_status',
     ];
 
     protected function casts(): array
@@ -88,6 +89,7 @@ class Order extends Model
             'processed_at' => 'datetime',
             'completed_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'payment_status' => 'string',
         ];
     }
 
@@ -155,6 +157,34 @@ class Order extends Model
     public function isQrisResubmitable(): bool
     {
         return $this->resubmit_count < 3 && $this->qris_status === 'resubmit_requested';
+    }
+
+    public function orderPayments(): HasMany
+    {
+        return $this->hasMany(OrderPayment::class);
+    }
+
+    public function recalculatePaymentStatus(): void
+    {
+        $this->load('orderPayments');
+
+        if ($this->payment_method !== 'piutang') {
+            return;
+        }
+
+        $totalPaid = (float) $this->orderPayments->sum('amount');
+
+        if ($totalPaid > (float) $this->total_amount) {
+            throw new \RuntimeException('Total pembayaran melebihi harga pesanan.');
+        }
+
+        $this->payment_status = $totalPaid >= (float) $this->total_amount ? 'lunas' : 'belum_lunas';
+
+        if ($this->payment_status === 'lunas') {
+            $this->status = 'selesai';
+        }
+
+        $this->saveQuietly();
     }
 
     public function getReceiptUrlAttribute(): string

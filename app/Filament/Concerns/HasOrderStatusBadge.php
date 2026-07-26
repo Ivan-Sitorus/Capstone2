@@ -32,6 +32,25 @@ trait HasOrderStatusBadge
             'cash' => 'Tunai',
             'qris' => 'QRIS',
             'bayar_nanti' => 'Bayar Nanti',
+            'piutang' => 'Piutang',
+            default => '-',
+        };
+    }
+
+    public static function getPaymentStatusColor(?string $state): string
+    {
+        return match ($state) {
+            'lunas' => 'success',
+            'belum_lunas' => 'danger',
+            default => 'gray',
+        };
+    }
+
+    public static function getPaymentStatusLabel(?string $state): string
+    {
+        return match ($state) {
+            'lunas' => 'Lunas',
+            'belum_lunas' => 'Belum Lunas',
             default => '-',
         };
     }

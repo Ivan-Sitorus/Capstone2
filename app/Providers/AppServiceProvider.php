@@ -9,6 +9,8 @@ use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Auth\Middleware\Authenticate;
 use App\Models\Order;
+use App\Models\OrderPayment;
+use App\Observers\OrderPaymentObserver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Menu::observe(MenuObserver::class);
+        OrderPayment::observe(OrderPaymentObserver::class);
 
         FilamentAsset::register([
             Css::make('financial-table', __DIR__.'/../../resources/css/filament/financial-table.css'),

@@ -71,6 +71,10 @@ class OrderResource extends Resource
                     TextEntry::make($p.'payment_method')->label('Metode')
                         ->badge()
                         ->formatStateUsing(fn (?string $state): string => self::getPaymentLabel($state)),
+                    TextEntry::make($p.'payment_status')->label('Status Bayar')
+                        ->badge()
+                        ->color(fn (?string $state): string => self::getPaymentStatusColor($state))
+                        ->formatStateUsing(fn (?string $state): string => self::getPaymentStatusLabel($state)),
                     TextEntry::make($p.'total_amount')->label('Total')->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
                     TextEntry::make($p.'status')->label('Status Pesanan')
                         ->badge()
