@@ -58,12 +58,6 @@ class ReceivableForm
                 ->disabled()
                 ->dehydrated(true)
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
-            DateTimePicker::make('invoice_date')
-                ->label('Tanggal Invoice')
-                ->required()
-                ->default(now())
-                ->seconds(true)
-                ->native(false),
             TextInput::make('paid_amount')
                 ->label('Jumlah Dibayar')
                 ->required()

@@ -31,10 +31,8 @@ class Receivable extends Model
     protected $fillable = [
         'customer_name',
         'amount',
-        'invoice_date',
-        'due_date',
-        'status',
         'paid_amount',
+        'status',
         'notes',
         'order_id',
     ];
@@ -42,8 +40,6 @@ class Receivable extends Model
     protected function casts(): array
     {
         return [
-            'invoice_date' => 'date',
-            'due_date' => 'date',
             'amount' => 'integer',
             'paid_amount' => 'integer',
         ];
@@ -52,13 +48,6 @@ class Receivable extends Model
     public function getRemainingAmountAttribute(): float
     {
         return max(0, (float) $this->amount - (float) $this->paid_amount);
-    }
-
-    public function isOverdue(): bool
-    {
-        return $this->status !== self::STATUS_PAID
-            && $this->due_date !== null
-            && $this->due_date->lessThan(now());
     }
 
     public function recordPayment(float $amount, ?string $method = null, ?int $recordedBy = null, ?string $notes = null): void

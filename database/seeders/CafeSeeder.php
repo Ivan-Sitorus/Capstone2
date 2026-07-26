@@ -660,8 +660,6 @@ class CafeSeeder extends Seeder
                 'order_id' => $orderId,
                 'customer_name' => $data['customer_name'] ?? 'Event Customer',
                 'amount' => $data['total_amount'],
-                'invoice_date' => $createdAt->toDateString(),
-                'due_date' => $createdAt->copy()->addDays(30)->toDateString(),
                 'status' => 'pending',
                 'paid_amount' => 0,
                 'notes' => "Auto-generated from Order #{$data['order_code']}",
