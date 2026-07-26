@@ -35,6 +35,21 @@ class OrderTable
                     ->label('Total')
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
+                TextColumn::make('paid_amount')
+                    ->label('Dibayar')
+                    ->getStateUsing(function (Order $record) {
+                        return (float) $record->orderPayments->sum('amount');
+                    })
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                    ->visible(fn (Order $record) => $record->payment_method === 'piutang' || $record->status === 'belum_lunas'),
+                TextColumn::make('remaining_amount')
+                    ->label('Sisa')
+                    ->getStateUsing(function (Order $record) {
+                        return (float) $record->total_amount - (float) $record->orderPayments->sum('amount');
+                    })
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                    ->color(fn ($state) => $state > 0 ? 'danger' : 'success')
+                    ->visible(fn (Order $record) => $record->payment_method === 'piutang' || $record->status === 'belum_lunas'),
                 TextColumn::make('payment_method')
                     ->label('Metode')
                     ->badge()
@@ -64,6 +79,12 @@ class OrderTable
                         'cash' => 'Tunai',
                         'qris' => 'QRIS',
                         'bayar_nanti' => 'Bayar Nanti',
+                    ]),
+                SelectFilter::make('payment_status')
+                    ->label('Status Bayar')
+                    ->options([
+                        'lunas' => 'Lunas',
+                        'belum_lunas' => 'Belum Lunas',
                     ]),
                 Filter::make('today')
                     ->label('Hari Ini')
