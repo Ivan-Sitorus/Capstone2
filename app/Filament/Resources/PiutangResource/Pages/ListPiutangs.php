@@ -14,7 +14,7 @@ class ListPiutangs extends ListRecords
         return 'Piutang';
     }
 
-    protected function getBreadcrumb(): ?string
+    public function getBreadcrumb(): ?string
     {
         return 'Piutang';
     }
