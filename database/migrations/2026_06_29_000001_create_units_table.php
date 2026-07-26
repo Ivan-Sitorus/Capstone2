@@ -26,8 +26,6 @@ return new class extends Migration
             ['name' => 'liter', 'abbreviation' => 'L', 'unit_type' => 'volume', 'conversion_factor' => 1000],
             ['name' => 'pcs', 'abbreviation' => 'pcs', 'unit_type' => 'count', 'conversion_factor' => 1],
             ['name' => 'sachet', 'abbreviation' => 'sct', 'unit_type' => 'count', 'conversion_factor' => 1],
-            ['name' => 'sdm', 'abbreviation' => 'sdm', 'unit_type' => 'volume', 'conversion_factor' => 15],
-            ['name' => 'sdt', 'abbreviation' => 'sdt', 'unit_type' => 'volume', 'conversion_factor' => 5],
         ];
 
         foreach ($units as $u) {
@@ -44,8 +42,7 @@ return new class extends Migration
         $getId = fn($n) => DB::table('units')->where('name', $n)->value('id');
         DB::table('units')->where('name', 'kg')->update(['base_unit_id' => $getId('gram')]);
         DB::table('units')->where('name', 'liter')->update(['base_unit_id' => $getId('ml')]);
-        DB::table('units')->where('name', 'sdm')->update(['base_unit_id' => $getId('ml')]);
-        DB::table('units')->where('name', 'sdt')->update(['base_unit_id' => $getId('ml')]);
+
     }
 
     public function down(): void

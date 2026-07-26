@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('menu_stocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('menu_id')->constrained('menus')->cascadeOnDelete();
-            $table->enum('unit', ['gram', 'kg', 'ml', 'liter', 'pcs', 'sachet', 'sdm', 'sdt']);
+            $table->enum('unit', ['gram', 'kg', 'ml', 'liter', 'pcs', 'sachet']);
             $table->decimal('low_stock_threshold', 12, 2)->default(0);
             $table->boolean('is_active')->default(true);
             $table->string('batch_mode')->default('fefo');

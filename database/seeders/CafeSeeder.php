@@ -276,7 +276,7 @@ class CafeSeeder extends Seeder
 
         // 12. Assign unit_id to ingredients
         $unitMap = [];
-        foreach (['gram','kg','ml','liter','pcs','sachet','sdm','sdt'] as $u) {
+        foreach (['gram','kg','ml','liter','pcs','sachet'] as $u) {
             $unitMap[$u] = DB::table('units')->where('name', $u)->value('id');
         }
         foreach (Ingredient::all() as $ingredient) {

@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('ingredients', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('unit', ['gram', 'kg', 'ml', 'liter', 'pcs', 'sachet', 'sdm', 'sdt']);
+            $table->enum('unit', ['gram', 'kg', 'ml', 'liter', 'pcs', 'sachet']);
             $table->decimal('low_stock_threshold', 12, 2)->default(0);
             $table->string('batch_mode')->default('fefo');
             $table->timestamps();

@@ -25,10 +25,7 @@ return new class extends Migration
             ['from' => 'gram', 'to' => 'kg', 'factor' => 0.001],
             ['from' => 'liter', 'to' => 'ml', 'factor' => 1000],
             ['from' => 'ml', 'to' => 'liter', 'factor' => 0.001],
-            ['from' => 'sdm', 'to' => 'ml', 'factor' => 15],
-            ['from' => 'ml', 'to' => 'sdm', 'factor' => 1 / 15],
-            ['from' => 'sdt', 'to' => 'ml', 'factor' => 5],
-            ['from' => 'ml', 'to' => 'sdt', 'factor' => 0.2],
+
         ];
 
         foreach ($convs as $c) {

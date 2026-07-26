@@ -28,8 +28,6 @@ class Ingredient extends Model
         'liter' => 'Liter (L)',
         'pcs' => 'Buah / Pcs',
         'sachet' => 'Sachet',
-        'sdm' => 'Sendok Makan (sdm)',
-        'sdt' => 'Sendok Teh (sdt)',
     ];
 
     const BATCH_MODE_FIFO = 'fifo';

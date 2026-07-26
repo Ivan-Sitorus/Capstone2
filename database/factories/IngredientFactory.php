@@ -22,7 +22,7 @@ class IngredientFactory extends Factory
 
         return [
             'name' => fake()->randomElement($names),
-            'unit' => fake()->randomElement(['gram', 'kg', 'ml', 'liter', 'pcs', 'sachet', 'sdm', 'sdt']),
+            'unit' => fake()->randomElement(['gram', 'kg', 'ml', 'liter', 'pcs', 'sachet']),
             'low_stock_threshold' => fake()->randomFloat(2, 0, 50),
         ];
     }
