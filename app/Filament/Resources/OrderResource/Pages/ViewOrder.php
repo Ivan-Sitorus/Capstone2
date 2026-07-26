@@ -34,7 +34,7 @@ class ViewOrder extends ViewRecord
                 ->label('Catat Pembayaran')
                 ->icon(Heroicon::OutlinedCurrencyDollar)
                 ->color('success')
-                ->visible(fn (Order $record): bool => $record->payment_method === 'piutang' && $record->payment_status === 'belum_lunas')
+                ->visible(fn (Order $record): bool => $record->payment_method === 'piutang' && $record->status === 'belum_lunas')
                 ->form([
                     TextInput::make('amount')
                         ->label('Jumlah Pembayaran')
