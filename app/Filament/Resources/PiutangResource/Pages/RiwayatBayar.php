@@ -78,8 +78,8 @@ class RiwayatBayar extends Page implements HasTable
             ->query(OrderPayment::where('order_id', $this->order->id))
             ->columns([
                 TextColumn::make('payment_date')
-                    ->label('Tanggal')
-                    ->dateTime('d M Y, H:i')
+                    ->label('Waktu')
+                    ->dateTime('d M Y, H:i:s')
                     ->sortable(),
                 TextColumn::make('amount')
                     ->label('Jumlah')
