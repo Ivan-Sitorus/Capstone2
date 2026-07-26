@@ -6,7 +6,10 @@ use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use Filament\Actions\Action;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -16,9 +19,13 @@ class PiutangTable
     {
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query
-                ->where('status', OrderStatus::BelumLunas->value)
-                ->with('cashier')
+                ->where(function (Builder $q) {
+                    $q->where('payment_method', 'piutang')
+                      ->orWhere('status', OrderStatus::BelumLunas->value);
+                })
+                ->with('cashier', 'orderPayments')
             )
+            ->searchPlaceholder('Cari Kode Pesanan')
             ->columns([
                 TextColumn::make('order_code')
                     ->label('Kode Pesanan')
@@ -54,6 +61,24 @@ class PiutangTable
                     ->badge()
                     ->color(fn (string $state): string => \App\Filament\Resources\OrderResource::getStatusColor($state))
                     ->formatStateUsing(fn (string $state): string => \App\Filament\Resources\OrderResource::getStatusLabel($state)),
+            ])
+            ->filters([
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'belum_lunas' => 'Belum Lunas',
+                        'selesai' => 'Lunas',
+                    ]),
+                Filter::make('created_at')
+                    ->label('Rentang Waktu')
+                    ->form([
+                        DatePicker::make('created_from')->label('Dari'),
+                        DatePicker::make('created_until')->label('Sampai'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when($data['created_from'], fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))
+                        ->when($data['created_until'], fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date))
+                    ),
             ])
             ->recordActions([
                 Action::make('view')

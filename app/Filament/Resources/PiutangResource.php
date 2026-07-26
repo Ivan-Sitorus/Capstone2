@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\PiutangResource\Pages\CreatePiutang;
 use App\Filament\Resources\PiutangResource\Pages\ListPiutangs;
 use App\Filament\Resources\PiutangResource\Tables\PiutangTable;
 use App\Models\Order;
@@ -30,7 +31,7 @@ class PiutangResource extends Resource
         return PiutangTable::configure($table);
     }
 
-    public static function canCreate(): bool { return false; }
+    public static function canCreate(): bool { return true; }
     public static function canEdit($record): bool { return false; }
     public static function canDelete($record): bool { return false; }
 
@@ -38,6 +39,7 @@ class PiutangResource extends Resource
     {
         return [
             'index' => ListPiutangs::route('/'),
+            'create' => CreatePiutang::route('/create'),
         ];
     }
 }
