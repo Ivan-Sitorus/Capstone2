@@ -40,16 +40,14 @@ class OrderTable
                     ->getStateUsing(function (Order $record) {
                         return (float) $record->orderPayments->sum('amount');
                     })
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
-                    ->visible(fn (Order $record) => $record->payment_method === 'piutang' || $record->status === 'belum_lunas'),
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
                 TextColumn::make('remaining_amount')
                     ->label('Sisa')
                     ->getStateUsing(function (Order $record) {
                         return (float) $record->total_amount - (float) $record->orderPayments->sum('amount');
                     })
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
-                    ->color(fn ($state) => $state > 0 ? 'danger' : 'success')
-                    ->visible(fn (Order $record) => $record->payment_method === 'piutang' || $record->status === 'belum_lunas'),
+                    ->color(fn ($state) => $state > 0 ? 'danger' : 'success'),
                 TextColumn::make('payment_method')
                     ->label('Metode')
                     ->badge()
@@ -64,7 +62,7 @@ class OrderTable
                     ->dateTime('d M Y, H:i:s')
                     ->sortable(),
             ])
-            ->modifyQueryUsing(fn (Builder $query) => $query->with(['items.menu', 'cashier']))
+            ->modifyQueryUsing(fn (Builder $query) => $query->with(['items.menu', 'cashier', 'orderPayments']))
             ->filters([
                 SelectFilter::make('status')
                     ->label('Status')
