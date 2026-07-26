@@ -70,8 +70,9 @@ class ManageBatches extends Page implements HasTable
                 TextColumn::make('batch_code')
                     ->label('Kode Batch')
                     ->default('-'),
-                TextColumn::make('id')
-                    ->label('ID Batch')
+                TextColumn::make('received_at')
+                    ->label('Waktu Diterima')
+                    ->dateTime('d M Y, H:i:s')
                     ->sortable(),
                 TextColumn::make('quantity')
                     ->label('Jumlah')
@@ -82,10 +83,6 @@ class ManageBatches extends Page implements HasTable
                     ->date('d M Y')
                     ->sortable()
                     ->color(fn ($record) => $record->expiry_date && $record->expiry_date->isPast() ? 'danger' : null),
-                TextColumn::make('received_at')
-                    ->label('Waktu Diterima')
-                    ->dateTime('d M Y, H:i:s')
-                    ->sortable(),
                 TextColumn::make('cost_per_unit')
                     ->label('Harga/Unit')
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
@@ -103,6 +100,13 @@ class ManageBatches extends Page implements HasTable
                     ->action(fn () => $this->showDepleted = !$this->showDepleted),
                 CreateAction::make()
                     ->model(IngredientBatch::class)
+                    ->mutateFormDataBeforeCreate(function (array $data) {
+                        if (($data['total_harga'] ?? 0) > 0 && ($data['quantity'] ?? 0) > 0) {
+                            $data['cost_per_unit'] = $data['total_harga'] / $data['quantity'];
+                        }
+                        unset($data['total_harga']);
+                        return $data;
+                    })
                     ->form([
                         TextInput::make('quantity')
                             ->label('Jumlah')
@@ -125,11 +129,11 @@ class ManageBatches extends Page implements HasTable
                             ->required()
                             ->default(now())
                             ->native(false),
-                        TextInput::make('cost_per_unit')
-                            ->label('Harga per Unit')
+                        TextInput::make('total_harga')
+                            ->label('Total Harga')
                             ->required()
-                            ->numeric()
                             ->minValue(0)
+                            ->numeric()
                             ->type('text')
                             ->stripCharacters('.')
                             ->prefix('Rp'),
@@ -161,6 +165,17 @@ class ManageBatches extends Page implements HasTable
             ])
             ->recordActions([
                 EditAction::make()
+                    ->mutateFormDataBeforeFill(function (array $data, IngredientBatch $record) {
+                        $data['total_harga'] = $record->cost_per_unit * $record->quantity;
+                        return $data;
+                    })
+                    ->mutateFormDataBeforeSave(function (array $data) {
+                        if (($data['total_harga'] ?? 0) > 0 && ($data['quantity'] ?? 0) > 0) {
+                            $data['cost_per_unit'] = $data['total_harga'] / $data['quantity'];
+                        }
+                        unset($data['total_harga']);
+                        return $data;
+                    })
                     ->form([
                         TextInput::make('quantity')
                             ->label('Jumlah')
@@ -183,11 +198,11 @@ class ManageBatches extends Page implements HasTable
                             ->required()
                             ->default(now())
                             ->native(false),
-                        TextInput::make('cost_per_unit')
-                            ->label('Harga per Unit')
+                        TextInput::make('total_harga')
+                            ->label('Total Harga')
                             ->required()
-                            ->numeric()
                             ->minValue(0)
+                            ->numeric()
                             ->type('text')
                             ->stripCharacters('.')
                             ->prefix('Rp'),
