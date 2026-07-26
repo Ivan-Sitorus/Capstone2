@@ -21,6 +21,8 @@ class PiutangResource extends Resource
 
     protected static ?string $navigationLabel = 'Piutang';
 
+    protected static ?string $slug = 'piutang';
+
     protected static ?int $navigationSort = 2;
 
     public static function table(Table $table): Table

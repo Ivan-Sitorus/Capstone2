@@ -80,3 +80,7 @@ Route::prefix('customer')->middleware('auth:web')->group(function () {
 // Receipt (public — no auth required)
 Route::get('/receipt/{order:code}', fn (Order $order) => redirect()->route('receipt.show-by-uuid', ['order' => $order->uuid], 301));
 Route::get('/struk-pesanan/{order:uuid}', [ReceiptController::class, 'showByUuid'])->name('receipt.show-by-uuid');
+
+// Redirect old receivables to piutang
+Route::redirect('/admin/receivables', '/admin/piutang', 301);
+Route::redirect('/admin/receivables/{any}', '/admin/piutang/{any}', 301)->where('any', '.*');
