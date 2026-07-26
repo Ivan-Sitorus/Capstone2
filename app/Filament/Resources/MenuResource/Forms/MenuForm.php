@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MenuResource\Forms;
 
 use App\Filament\Resources\MenuResource;
 use App\Models\Ingredient;
+use App\Models\Unit;
 use App\Services\MenuImageService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
@@ -96,23 +97,90 @@ class MenuForm
                         ->live()
                         ->placeholder("Pilih bahan baku...")
                         ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".$record->unit.")"),
+                    Select::make("unit_id")
+                        ->label("Satuan")
+                        ->options(function (Get $get): array {
+                            $ingredientId = $get('ingredient_id');
+                            if (! $ingredientId) {
+                                return [];
+                            }
+
+                            $ingredient = Ingredient::find($ingredientId);
+                            if (! $ingredient) {
+                                return [];
+                            }
+
+                            $unitType = $ingredient->unit?->unit_type ?? null;
+                            if (! $unitType) {
+                                return [];
+                            }
+
+                            // For count type (butir, pcs, sachet, buah) → only the ingredient's own unit
+                            if ($unitType === 'count') {
+                                $unit = $ingredient->unit;
+                                return $unit ? [$unit->id => $unit->abbreviation] : [];
+                            }
+
+                            // For weight/volume → show compatible units
+                            return Unit::where('unit_type', $unitType)
+                                ->pluck('abbreviation', 'id')
+                                ->toArray();
+                        })
+                        ->disabled(function (Get $get): bool {
+                            $ingredientId = $get('ingredient_id');
+                            if (! $ingredientId) {
+                                return false;
+                            }
+                            $ingredient = Ingredient::find($ingredientId);
+                            if (! $ingredient) {
+                                return false;
+                            }
+                            $unit = $ingredient->unit;
+                            return $unit && $unit->unit_type === 'count';
+                        })
+                        ->default(function (Get $get, ?\App\Models\MenuIngredient $record) {
+                            if ($record && $record->unit_id) {
+                                return $record->unit_id;
+                            }
+                            $ingredientId = $get('ingredient_id');
+                            if (! $ingredientId) {
+                                return null;
+                            }
+                            $ingredient = Ingredient::find($ingredientId);
+                            if (! $ingredient) {
+                                return null;
+                            }
+
+                            // Auto-select the ingredient's native unit for count/weight/volume
+                            $unit = $ingredient->unit;
+                            return $unit?->id ?? null;
+                        })
+                        ->searchable()
+                        ->preload()
+                        ->live(),
                     TextInput::make("quantity_used")
                         ->label("Jumlah per Porsi")
                         ->required()
                         ->numeric()
-                        ->minValue(0.01)
-                        ->step(0.01)
-                        ->suffix(fn (Get $get): ?string => $get("ingredient_id")
-                            ? " ".(Ingredient::find($get("ingredient_id"))?->unit ?? "")
-                            : null),
-                    Select::make("unit_id")
-                        ->label("Satuan")
-                        ->options(fn (Get $get): array => MenuResource::getCompatibleUnitOptions($get("ingredient_id")))
-                        ->searchable()
-                        ->preload()
-                        ->default(fn (Get $get, ?\App\Models\MenuIngredient $record) =>
-                            $record ? $record->unit_id : null
-                        ),
+                        ->minValue(0.001)
+                        ->step(function (Get $get): float {
+                            $unitId = $get('unit_id');
+                            if (! $unitId) {
+                                return 0.001;
+                            }
+                            $unit = Unit::find($unitId);
+                            if (! $unit) {
+                                return 0.001;
+                            }
+                            return in_array($unit->name, ['gram', 'ml']) ? 1 : 0.001;
+                        })
+                        ->suffix(function (Get $get): ?string {
+                            $unitId = $get('unit_id');
+                            if (! $unitId) {
+                                return null;
+                            }
+                            return Unit::find($unitId)?->abbreviation ?? null;
+                        }),
                 ]),
         ]);
     }
