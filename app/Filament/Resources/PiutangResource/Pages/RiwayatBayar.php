@@ -6,6 +6,8 @@ use App\Filament\Resources\PiutangResource;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -59,7 +61,13 @@ class RiwayatBayar extends Page implements HasTable
                         ->label('Sisa')
                         ->state('Rp' . number_format($remaining, 0, ',', '.'))
                         ->color($remaining > 0 ? 'danger' : 'success'),
-                ])->columns(3),
+                    TextEntry::make('status')
+                        ->label('Status')
+                        ->state($this->order->status)
+                        ->badge()
+                        ->color(fn () => $this->order->status === 'selesai' ? 'success' : 'warning')
+                        ->formatStateUsing(fn () => $this->order->status === 'selesai' ? 'Lunas' : 'Belum Lunas'),
+                ])->columns(4),
             EmbeddedTable::make(),
         ]);
     }
@@ -88,7 +96,40 @@ class RiwayatBayar extends Page implements HasTable
                     }),
             ])
             ->defaultSort('payment_date', 'desc')
-            ->recordActions([]);
+            ->recordActions([
+                EditAction::make()
+                    ->modalHeading('Edit Pembayaran')
+                    ->form([
+                        TextInput::make('amount')
+                            ->label('Jumlah')
+                            ->required()
+                            ->numeric()
+                            ->minValue(1)
+                            ->prefix('Rp'),
+                        Select::make('payment_method')
+                            ->label('Metode')
+                            ->options([
+                                'cash' => 'Tunai',
+                                'transfer' => 'Transfer',
+                                'qris' => 'QRIS',
+                            ])
+                            ->required(),
+                        DateTimePicker::make('payment_date')
+                            ->label('Tanggal')
+                            ->required(),
+                    ])
+                    ->after(function () {
+                        $this->order->refresh();
+                        $this->order->recalculatePaymentStatus();
+                    }),
+                DeleteAction::make()
+                    ->modalHeading('Hapus Pembayaran')
+                    ->modalDescription('Yakin ingin menghapus pembayaran ini? Data tidak bisa dikembalikan.')
+                    ->after(function () {
+                        $this->order->refresh();
+                        $this->order->recalculatePaymentStatus();
+                    }),
+            ]);
     }
 
     protected function getHeaderActions(): array
