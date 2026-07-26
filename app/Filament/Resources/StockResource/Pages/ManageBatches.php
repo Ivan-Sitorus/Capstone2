@@ -100,13 +100,6 @@ class ManageBatches extends Page implements HasTable
                     ->action(fn () => $this->showDepleted = !$this->showDepleted),
                 CreateAction::make()
                     ->model(IngredientBatch::class)
-                    ->mutateFormDataBeforeCreate(function (array $data) {
-                        if (($data['total_harga'] ?? 0) > 0 && ($data['quantity'] ?? 0) > 0) {
-                            $data['cost_per_unit'] = $data['total_harga'] / $data['quantity'];
-                        }
-                        unset($data['total_harga']);
-                        return $data;
-                    })
                     ->form([
                         TextInput::make('quantity')
                             ->label('Jumlah')
@@ -165,15 +158,15 @@ class ManageBatches extends Page implements HasTable
             ])
             ->recordActions([
                 EditAction::make()
-                    ->mutateFormDataBeforeFill(function (array $data, IngredientBatch $record) {
-                        $data['total_harga'] = $record->cost_per_unit * $record->quantity;
-                        return $data;
-                    })
-                    ->mutateFormDataBeforeSave(function (array $data) {
-                        if (($data['total_harga'] ?? 0) > 0 && ($data['quantity'] ?? 0) > 0) {
-                            $data['cost_per_unit'] = $data['total_harga'] / $data['quantity'];
+                    ->mutateRecordDataUsing(function (array $data, IngredientBatch $record): array {
+                        if (array_key_exists('total_harga', $data)) {
+                            if (($data['total_harga'] ?? 0) > 0 && ($data['quantity'] ?? 0) > 0) {
+                                $data['cost_per_unit'] = $data['total_harga'] / $data['quantity'];
+                            }
+                            unset($data['total_harga']);
+                        } else {
+                            $data['total_harga'] = $record->cost_per_unit * $record->quantity;
                         }
-                        unset($data['total_harga']);
                         return $data;
                     })
                     ->form([
