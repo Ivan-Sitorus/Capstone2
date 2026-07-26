@@ -7,6 +7,7 @@ use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Components\DatePicker;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -84,9 +85,9 @@ class PiutangTable
             ])
             ->recordActions([
                 ActionGroup::make([
-                    \Filament\Tables\Actions\ViewAction::make()
-                        ->label('Detail')
-                        ->icon('heroicon-o-eye'),
+                ViewAction::make()
+                    ->label('Detail')
+                    ->icon('heroicon-o-eye'),
                     Action::make('riwayat_bayar')
                         ->label('Riwayat Bayar')
                         ->icon('heroicon-o-banknotes')
