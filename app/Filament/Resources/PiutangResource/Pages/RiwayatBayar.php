@@ -124,7 +124,7 @@ class RiwayatBayar extends Page implements HasTable
                     }),
                 DeleteAction::make()
                     ->modalHeading('Hapus Pembayaran')
-                    ->modalDescription('Yakin ingin menghapus pembayaran ini? Data tidak bisa dikembalikan.')
+                    ->modalDescription('Yakin ingin menghapus pembayaran ini? Sisa pembayaran akan dihitung ulang sehingga status pembayaran tetap sesuai.')
                     ->after(function () {
                         $this->order->refresh();
                         $this->order->recalculatePaymentStatus();
