@@ -12,19 +12,13 @@ class Receivable extends Model
 {
     public const STATUS_PENDING = 'pending';
 
-    public const STATUS_PARTIAL = 'partial';
-
     public const STATUS_PAID = 'paid';
-
-    public const STATUS_OVERDUE = 'overdue';
 
     public const STATUS_CANCELLED = 'cancelled';
 
     public const STATUSES = [
         self::STATUS_PENDING,
-        self::STATUS_PARTIAL,
         self::STATUS_PAID,
-        self::STATUS_OVERDUE,
         self::STATUS_CANCELLED,
     ];
 
@@ -70,19 +64,9 @@ class Receivable extends Model
         if ((float)$this->paid_amount >= (float)$this->amount) {
             $this->status = 'paid';
         } elseif ($this->paid_amount > 0) {
-            $this->status = 'partial';
+            $this->status = 'belum_lunas';
         }
         $this->save();
-    }
-
-    /**
-     * Scope to filter overdue receivables.
-     */
-    public function scopeOverdue(Builder $query): void
-    {
-        $query->where('status', '!=', self::STATUS_PAID)
-            ->whereNotNull('due_date')
-            ->where('due_date', '<', now());
     }
 
     /**

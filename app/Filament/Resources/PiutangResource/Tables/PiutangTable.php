@@ -15,7 +15,6 @@ class PiutangTable
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query
                 ->where('status', OrderStatus::BelumLunas->value)
-                ->where('payment_method', 'bayar_nanti')
             )
             ->columns([
                 TextColumn::make('order_code')
