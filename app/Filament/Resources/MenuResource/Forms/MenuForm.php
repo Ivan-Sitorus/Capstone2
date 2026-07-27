@@ -161,6 +161,7 @@ class MenuForm
                         ->required()
                         ->numeric()
                         ->minValue(0.001)
+                        ->maxValue(999999)
                         ->step(function (Get $get): float {
                             $unitId = $get('unit_id');
                             if (! $unitId) {

@@ -30,7 +30,7 @@ class StoreOrderRequest extends FormRequest
             'uuid' => 'nullable|uuid|unique:orders,uuid',
             'items' => 'required|array|min:1',
             'items.*.menu_id' => 'required|integer|exists:menus,id',
-            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.quantity' => 'required|integer|min:1|max:999999',
             'payment_method' => 'required|in:cash,qris,bayar_nanti',
             'customer_name' => 'nullable|string|max:100',
         ];
