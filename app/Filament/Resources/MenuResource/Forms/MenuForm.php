@@ -110,21 +110,19 @@ class MenuForm
                                 return [];
                             }
 
-                            $unitType = $ingredient->unit?->unit_type ?? null;
-                            if (! $unitType) {
-                                return [];
-                            }
-
-                            // For count type (butir, pcs, sachet, buah) → only the ingredient's own unit
-                            if ($unitType === 'count') {
-                                $unit = $ingredient->unit;
-                                return $unit ? [$unit->id => $unit->abbreviation] : [];
-                            }
-
-                            // For weight/volume → show compatible units
-                            return Unit::where('unit_type', $unitType)
-                                ->pluck('abbreviation', 'id')
-                                ->toArray();
+                        $unitType = \App\Models\Unit::where('name', $ingredient->unit)->value('unit_type');
+                        if (!$unitType) return [];
+                        
+                        // For count type (butir, pcs, sachet, buah) → only the ingredient's own unit
+                        if ($unitType === 'count') {
+                            $unit = \App\Models\Unit::where('name', $ingredient->unit)->first();
+                            return $unit ? [$unit->id => $unit->abbreviation] : [];
+                        }
+                        
+                        // For weight/volume → show compatible units
+                        return \App\Models\Unit::where('unit_type', $unitType)
+                            ->pluck('abbreviation', 'id')
+                            ->toArray();
                         })
                         ->disabled(function (Get $get): bool {
                             $ingredientId = $get('ingredient_id');
@@ -135,7 +133,7 @@ class MenuForm
                             if (! $ingredient) {
                                 return false;
                             }
-                            $unit = $ingredient->unit;
+                            $unit = \App\Models\Unit::where('name', $ingredient->unit)->first();
                             return $unit && $unit->unit_type === 'count';
                         })
                         ->default(function (Get $get, ?\App\Models\MenuIngredient $record) {
@@ -152,7 +150,7 @@ class MenuForm
                             }
 
                             // Auto-select the ingredient's native unit for count/weight/volume
-                            $unit = $ingredient->unit;
+                            $unit = \App\Models\Unit::where('name', $ingredient->unit)->first();
                             return $unit?->id ?? null;
                         })
                         ->searchable()
