@@ -52,8 +52,8 @@ class MenuForm
             TextInput::make("price")
                 ->label("Harga")
                 ->required()
-                ->numeric()
-                ->minValue(0.01)
+                ->integer()
+                ->minValue(1)
                 ->prefix("Rp"),
             Select::make('status')
                 ->label('Status')
@@ -65,12 +65,12 @@ class MenuForm
                 ->required(),
             TextInput::make("discounted_price")
                 ->label("Harga Diskon")
-                ->numeric()
+                ->integer()
                 ->minValue(0)
                 ->rules([
                     fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
-                        $price = (float) ($get("price") ?? 0);
-                        $discountedPrice = (float) ($value ?? 0);
+                        $price = (int) ($get("price") ?? 0);
+                        $discountedPrice = (int) ($value ?? 0);
                         if ($discountedPrice > $price) {
                             $fail("Harga diskon tidak boleh lebih besar dari harga menu (Rp ".number_format($price, 0, ",", ".").").");
                         }
