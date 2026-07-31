@@ -160,7 +160,17 @@ class MenuForm
                         ->label("Jumlah per Porsi")
                         ->required()
                         ->numeric()
-                        ->minValue(0.001)
+                        ->minValue(function (Get $get): float {
+                            $unitId = $get('unit_id');
+                            if (! $unitId) {
+                                return 0.001;
+                            }
+                            $unit = Unit::find($unitId);
+                            if (! $unit) {
+                                return 0.001;
+                            }
+                            return in_array($unit->name, ['gram', 'ml']) ? 1 : 0.001;
+                        })
                         ->maxValue(999999)
                         ->step(function (Get $get): float {
                             $unitId = $get('unit_id');
