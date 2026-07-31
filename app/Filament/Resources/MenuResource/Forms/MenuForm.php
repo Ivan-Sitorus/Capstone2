@@ -52,9 +52,8 @@ class MenuForm
             TextInput::make("price")
                 ->label("Harga")
                 ->required()
-                ->type("text")
+                ->numeric()
                 ->minValue(0.01)
-                ->stripCharacters(".")
                 ->prefix("Rp"),
             Select::make('status')
                 ->label('Status')
@@ -66,18 +65,17 @@ class MenuForm
                 ->required(),
             TextInput::make("discounted_price")
                 ->label("Harga Diskon")
-                ->type("text")
+                ->numeric()
                 ->minValue(0)
                 ->rules([
                     fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
-                        $price = (int) str_replace(".", "", $get("price") ?? "0");
-                        $discountedPrice = (int) str_replace(".", "", $value ?? "0");
+                        $price = (float) ($get("price") ?? 0);
+                        $discountedPrice = (float) ($value ?? 0);
                         if ($discountedPrice > $price) {
                             $fail("Harga diskon tidak boleh lebih besar dari harga menu (Rp ".number_format($price, 0, ",", ".").").");
                         }
                     },
                 ])
-                ->stripCharacters(".")
                 ->prefix("Rp")
                 ->placeholder("Kosongkan jika tidak ada"),
             Repeater::make("menuIngredients")
@@ -99,6 +97,8 @@ class MenuForm
                         ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".$record->unit.")"),
                     Select::make("unit_id")
                         ->label("Satuan")
+                        ->required()
+                        ->dehydrated()
                         ->options(function (Get $get): array {
                             $ingredientId = $get('ingredient_id');
                             if (! $ingredientId) {
@@ -158,31 +158,12 @@ class MenuForm
                         ->live(),
                     TextInput::make("quantity_used")
                         ->label("Jumlah per Porsi")
+                        ->disabled(fn (Get $get): bool => ! $get('unit_id'))
                         ->required()
                         ->numeric()
-                        ->minValue(function (Get $get): float {
-                            $unitId = $get('unit_id');
-                            if (! $unitId) {
-                                return 0.001;
-                            }
-                            $unit = Unit::find($unitId);
-                            if (! $unit) {
-                                return 0.001;
-                            }
-                            return in_array($unit->name, ['gram', 'ml']) ? 1 : 0.001;
-                        })
+                        ->minValue(fn (Get $get): float => in_array(Unit::find($get('unit_id'))?->name, ['gram', 'ml']) ? 1 : 0.001)
                         ->maxValue(999999)
-                        ->step(function (Get $get): float {
-                            $unitId = $get('unit_id');
-                            if (! $unitId) {
-                                return 0.001;
-                            }
-                            $unit = Unit::find($unitId);
-                            if (! $unit) {
-                                return 0.001;
-                            }
-                            return in_array($unit->name, ['gram', 'ml']) ? 1 : 0.001;
-                        })
+                        ->step(fn (Get $get): float => in_array(Unit::find($get('unit_id'))?->name, ['gram', 'ml']) ? 1 : 0.001)
                         ->suffix(function (Get $get): ?string {
                             $unitId = $get('unit_id');
                             if (! $unitId) {
