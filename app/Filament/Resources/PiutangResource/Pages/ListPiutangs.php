@@ -11,6 +11,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Pages\ListRecords;
+use Filament\Schemas\Components\Utilities\Get;
 
 class ListPiutangs extends ListRecords
 {
@@ -59,8 +60,22 @@ class ListPiutangs extends ListRecords
                                 ->numeric()
                                 ->minValue(1)
                                 ->default(1),
+                            Select::make('price_type')
+                                ->label('Jenis Harga')
+                                ->options(function (Get $get): array {
+                                    $menu = Menu::find($get('menu_id'));
+                                    if ($menu && $menu->discounted_price) {
+                                        return [
+                                            'normal'   => 'Normal (Rp ' . number_format($menu->price, 0, ',', '.') . ')',
+                                            'discount' => 'Diskon (Rp ' . number_format($menu->discounted_price, 0, ',', '.') . ')',
+                                        ];
+                                    }
+                                    return ['normal' => 'Normal'];
+                                })
+                                ->default('normal')
+                                ->live(),
                         ])
-                        ->columns(2)
+                        ->columns(3)
                         ->minItems(1)
                         ->required(),
                     TextInput::make('paid_amount')
@@ -73,11 +88,20 @@ class ListPiutangs extends ListRecords
                 ->action(function (array $data) {
                     $menuIds = array_column($data['items'], 'menu_id');
                     $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
+
+                    $resolveUnitPrice = function (array $item, \App\Models\Menu $menu): int {
+                        if (($item['price_type'] ?? 'normal') === 'discount' && $menu->discounted_price) {
+                            return $menu->discounted_price;
+                        }
+                        return $menu->price ?? 0;
+                    };
+
                     $total = 0;
 
                     foreach ($data['items'] as $item) {
                         $menu = $menus->get($item['menu_id']);
-                        $total += ($menu->price ?? 0) * $item['quantity'];
+                        $unitPrice = $resolveUnitPrice($item, $menu);
+                        $total += $unitPrice * $item['quantity'];
                     }
 
                     $order = Order::create([
@@ -92,12 +116,13 @@ class ListPiutangs extends ListRecords
                     $items = [];
                     foreach ($data['items'] as $item) {
                         $menu = $menus->get($item['menu_id']);
+                        $unitPrice = $resolveUnitPrice($item, $menu);
                         $items[] = [
                             'order_id' => $order->id,
                             'menu_id' => $item['menu_id'],
                             'quantity' => $item['quantity'],
-                            'unit_price' => $menu->price ?? 0,
-                            'subtotal' => ($menu->price ?? 0) * $item['quantity'],
+                            'unit_price' => $unitPrice,
+                            'subtotal' => $unitPrice * $item['quantity'],
                             'created_at' => now(),
                             'updated_at' => now(),
                         ];
