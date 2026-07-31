@@ -34,3 +34,6 @@ Thumbs.db
 /.sisyphus/
 .vercel
 .codebase_skripsi
+
+# Playwright MCP
+.playwright-mcp/
