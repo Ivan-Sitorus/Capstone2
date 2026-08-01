@@ -27,6 +27,23 @@ class IngredientBatch extends Model
     public const STATUS_ACTIVE = 'active';
     public const STATUS_INACTIVE = 'inactive';
 
+    protected static function booted(): void
+    {
+        static::creating(function (self $batch) {
+            if (blank($batch->batch_code)) {
+                $batch->batch_code = self::generateBatchCode();
+            }
+        });
+    }
+
+    public static function generateBatchCode(): string
+    {
+        $date = now();
+        $number = static::whereDate('received_at', $date)->count() + 1;
+
+        return 'BCH-'.$date->format('dmy').'-'.str_pad($number, 3, '0', STR_PAD_LEFT);
+    }
+
     protected $fillable = [
         'batch_code',
         'ingredient_id',
