@@ -381,6 +381,11 @@ class ManageBatches extends Page implements HasTable
                 ->stripCharacters('.')
                 ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                 ->live()
+                ->afterStateUpdated(function (Set $set, Get $get, mixed $state): void {
+                    if ($get('sudah_lunas')) {
+                        $set('total_dibayar', $state ?? 0);
+                    }
+                })
                 ->prefix('Rp'),
         ];
 
