@@ -5,6 +5,7 @@ namespace App\Filament\Pages;
 use App\Filament\Widgets\PemakaianBahanBakuWidget;
 use App\Filament\Widgets\PenjualanChartWidget;
 use App\Filament\Widgets\PiutangStats;
+use App\Filament\Widgets\StokExpiredWidget;
 use App\Filament\Widgets\StokMenipisWidget;
 use App\Filament\Widgets\TransactionStats;
 use App\Filament\Widgets\UtangStats;
@@ -19,6 +20,7 @@ class Dashboard extends BaseDashboard
             PiutangStats::class,
             UtangStats::class,
             StokMenipisWidget::class,
+            StokExpiredWidget::class,
             PenjualanChartWidget::class,
             PemakaianBahanBakuWidget::class,
         ];
