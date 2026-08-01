@@ -100,7 +100,11 @@ class MenuSeeder extends Seeder
             IngredientBatch::create([
                 'ingredient_id' => $ingredient->id,
                 'quantity' => 50,
+                'initial_quantity' => 50,
                 'cost_per_unit' => $price * 0.3,
+                'total_cost' => 50 * ($price * 0.3),
+                'supplier_name' => 'Toko Bahan Kue Sari',
+                'payment_status' => 'lunas',
                 'received_at' => now(),
                 'expiry_date' => now()->addMonths(6),
             ]);

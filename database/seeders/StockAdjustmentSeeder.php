@@ -33,7 +33,11 @@ class StockAdjustmentSeeder extends Seeder
                 $batch = IngredientBatch::create([
                     'ingredient_id' => $ing->id,
                     'quantity' => 100,
+                    'initial_quantity' => 100,
                     'cost_per_unit' => 5000,
+                    'total_cost' => 100 * 5000,
+                    'supplier_name' => 'CV Tani Makmur',
+                    'payment_status' => 'lunas',
                     'received_at' => now(),
                     'expiry_date' => now()->addMonths(6),
                 ]);

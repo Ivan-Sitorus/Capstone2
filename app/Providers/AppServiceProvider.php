@@ -8,8 +8,10 @@ use App\Services\MenuImageService;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Auth\Middleware\Authenticate;
+use App\Models\BatchPayment;
 use App\Models\Order;
 use App\Models\OrderPayment;
+use App\Observers\BatchPaymentObserver;
 use App\Observers\OrderPaymentObserver;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
 
         Menu::observe(MenuObserver::class);
         OrderPayment::observe(OrderPaymentObserver::class);
+        BatchPayment::observe(BatchPaymentObserver::class);
 
         FilamentAsset::register([
             Css::make('financial-table', __DIR__.'/../../resources/css/filament/financial-table.css'),

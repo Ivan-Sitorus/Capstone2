@@ -220,6 +220,16 @@ class CafeSeeder extends Seeder
         'air_mineral_gelas' => [1500, 40, 72, 24],
     ];
 
+    /** Supplier names for ingredient batches (already-paid purchases) */
+    public const SUPPLIERS = [
+        'PT Sumber Berkah' => 'PT Sumber Berkah',
+        'CV Tani Makmur' => 'CV Tani Makmur',
+        'Toko Bahan Kue Sari' => 'Toko Bahan Kue Sari',
+        'UD Segar Abadi' => 'UD Segar Abadi',
+        'PT Kopi Nusantara' => 'PT Kopi Nusantara',
+        'CV Susu Sejahtera' => 'CV Susu Sejahtera',
+    ];
+
     /** @var array<string, int> category key → DB id */
     private array $categoryIds = [];
 
@@ -387,12 +397,18 @@ class CafeSeeder extends Seeder
                     ? (clone $receivedAt)->addDays(max(7, (int) ($expiryMonths * 30)))
                     : (clone $receivedAt)->addMonths((int) $expiryMonths);
 
+                $unitCost = round($cost * $rng->float(0.85, 1.15), 2);
+
                 $rows[] = [
                     'ingredient_id' => $ingId,
                     'quantity' => $qty,
                     'expiry_date' => $expiry->toDateString(),
                     'received_at' => $receivedAt->toDateTimeString(),
-                    'cost_per_unit' => round($cost * $rng->float(0.85, 1.15), 2),
+                    'cost_per_unit' => $unitCost,
+                    'initial_quantity' => $qty,
+                    'supplier_name' => $rng->pick(array_keys(self::SUPPLIERS)),
+                    'total_cost' => round($qty * $unitCost, 2),
+                    'payment_status' => 'lunas',
                     'custom_order' => null,
                     'status' => 'active',
                     'batch_code' => sprintf('BCH-%s-%d', $receivedAt->format('dmy'), ++$batchSeq),

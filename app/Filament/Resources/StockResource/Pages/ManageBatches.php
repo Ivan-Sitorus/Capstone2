@@ -65,6 +65,7 @@ class ManageBatches extends Page implements HasTable
 
         return $table
             ->query(fn () => IngredientBatch::where('ingredient_id', $this->record->id)
+                ->with('batchPayments')
                 ->when(!$this->showDepleted, fn ($q) => $q->where('quantity', '>', 0)))
             ->columns([
                 TextColumn::make('batch_code')
@@ -74,8 +75,13 @@ class ManageBatches extends Page implements HasTable
                     ->label('Waktu Diterima')
                     ->dateTime('d M Y, H:i:s')
                     ->sortable(),
-                TextColumn::make('quantity')
+                TextColumn::make('initial_quantity')
                     ->label('Jumlah')
+                    ->state(fn (IngredientBatch $record) => $record->initial_quantity ?? $record->quantity)
+                    ->formatStateUsing(fn ($state) => number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.').' '.$unit)
+                    ->sortable(),
+                TextColumn::make('quantity')
+                    ->label('Sisa')
                     ->formatStateUsing(fn ($state) => number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.').' '.$unit)
                     ->sortable(),
                 TextColumn::make('expiry_date')
@@ -87,6 +93,24 @@ class ManageBatches extends Page implements HasTable
                     ->label('Harga/Unit')
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
+                TextColumn::make('supplier_name')
+                    ->label('Supplier')
+                    ->default('-')
+                    ->searchable(),
+                TextColumn::make('utang')
+                    ->label('Sisa Utang')
+                    ->state(function (IngredientBatch $record): float {
+                        $totalCost = (float) ($record->total_cost ?? 0);
+                        $paid = (float) $record->batchPayments->sum('amount');
+                        return max(0, $totalCost - $paid);
+                    })
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                    ->color(fn ($state) => $state > 0 ? 'warning' : 'success'),
+                TextColumn::make('payment_status')
+                    ->label('Status Utang')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => $state === 'lunas' ? 'Lunas' : 'Belum Lunas')
+                    ->color(fn (?string $state): string => $state === 'lunas' ? 'success' : 'warning'),
                 TextColumn::make('allow_expired_usage')
                     ->label('')
                     ->default('')
@@ -123,6 +147,10 @@ class ManageBatches extends Page implements HasTable
                             ->required()
                             ->default(now())
                             ->native(false),
+                        TextInput::make('supplier_name')
+                            ->label('Supplier')
+                            ->maxLength(255)
+                            ->placeholder('Nama supplier...'),
                         TextInput::make('total_harga')
                             ->label('Total Harga')
                             ->required()
@@ -132,6 +160,10 @@ class ManageBatches extends Page implements HasTable
                             ->type('text')
                             ->stripCharacters('.')
                             ->prefix('Rp'),
+                        Toggle::make('sudah_lunas')
+                            ->label('Sudah Lunas')
+                            ->helperText('Centang jika utang ke supplier langsung dibayar tunai saat pembelian')
+                            ->default(false),
                         Toggle::make('allow_expired_usage')
                             ->label('Bisa dipakai meskipun kedaluwarsa')
                             ->helperText('Batch ini tetap bisa dipakai FEFO walau sudah kedaluwarsa')
@@ -139,6 +171,15 @@ class ManageBatches extends Page implements HasTable
                             ->default(false),
                     ])
                     ->using(function (array $data): IngredientBatch {
+                        $totalCost = (float) ($data['total_harga'] ?? 0);
+                        $initialQty = (float) ($data['quantity'] ?? 0);
+
+                        $data['total_cost'] = $totalCost > 0 ? $totalCost : null;
+                        $data['initial_quantity'] = $data['quantity'];
+                        $data['cost_per_unit'] = $initialQty > 0 ? $totalCost / $initialQty : 0;
+                        $data['payment_status'] = ! empty($data['sudah_lunas']) ? 'lunas' : 'belum_lunas';
+                        unset($data['total_harga'], $data['sudah_lunas']);
+
                         $batch = $this->record->batches()->create($data);
 
                         // Auto-record purchase stock movement
@@ -159,16 +200,15 @@ class ManageBatches extends Page implements HasTable
                     }),
             ])
             ->recordActions([
+                Action::make('riwayat_bayar_batch')
+                    ->label('Riwayat Bayar')
+                    ->icon(Heroicon::OutlinedBanknotes)
+                    ->color('info')
+                    ->url(fn (IngredientBatch $record) => StockResource::getUrl('riwayat-bayar-batch', ['record' => $record])),
                 EditAction::make()
                     ->mutateRecordDataUsing(function (array $data, IngredientBatch $record): array {
-                        if (array_key_exists('total_harga', $data)) {
-                            if (($data['total_harga'] ?? 0) > 0 && ($data['quantity'] ?? 0) > 0) {
-                                $data['cost_per_unit'] = $data['total_harga'] / $data['quantity'];
-                            }
-                            unset($data['total_harga']);
-                        } else {
-                            $data['total_harga'] = $record->cost_per_unit * $record->quantity;
-                        }
+                        $data['total_harga'] = (float) ($record->total_cost ?? 0);
+                        $data['sudah_lunas'] = $record->payment_status === 'lunas';
                         return $data;
                     })
                     ->form([
@@ -194,6 +234,9 @@ class ManageBatches extends Page implements HasTable
                             ->required()
                             ->default(now())
                             ->native(false),
+                        TextInput::make('supplier_name')
+                            ->label('Supplier')
+                            ->maxLength(255),
                         TextInput::make('total_harga')
                             ->label('Total Harga')
                             ->required()
@@ -203,6 +246,9 @@ class ManageBatches extends Page implements HasTable
                             ->type('text')
                             ->stripCharacters('.')
                             ->prefix('Rp'),
+                        Toggle::make('sudah_lunas')
+                            ->label('Sudah Lunas')
+                            ->helperText('Centang jika utang ke supplier sudah dilunasi'),
                         Toggle::make('allow_expired_usage')
                             ->label('Bisa dipakai meskipun kedaluwarsa')
                             ->helperText('Batch ini tetap bisa dipakai FEFO walau sudah kedaluwarsa'),
@@ -241,6 +287,17 @@ class ManageBatches extends Page implements HasTable
                             ->title('Penyesuaian stok otomatis tercatat')
                             ->body($note)
                             ->send();
+                    })
+                    ->using(function (array $data, $livewire, IngredientBatch $record, $table): void {
+                        $totalCost = (float) ($data['total_harga'] ?? 0);
+                        $initialQty = (float) ($record->initial_quantity ?: $record->quantity);
+
+                        $data['total_cost'] = $totalCost > 0 ? $totalCost : null;
+                        $data['cost_per_unit'] = $initialQty > 0 ? $totalCost / $initialQty : 0;
+                        $data['payment_status'] = ! empty($data['sudah_lunas']) ? 'lunas' : 'belum_lunas';
+                        unset($data['total_harga'], $data['sudah_lunas']);
+
+                        $record->update($data);
                     }),
                 DeleteAction::make()
                     ->before(function (DeleteAction $action, IngredientBatch $record) {

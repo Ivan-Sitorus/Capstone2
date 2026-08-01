@@ -56,6 +56,7 @@ class StockResource extends Resource
             'index' => ListStocks::route('/'),
             'batches' => ManageBatches::route('/{record}/batches'),
             'history' => ViewStockHistory::route('/{record}/history'),
+            'riwayat-bayar-batch' => \App\Filament\Resources\StockResource\Pages\RiwayatBayarBatch::route('/{record}/riwayat-bayar'),
         ];
     }
 }

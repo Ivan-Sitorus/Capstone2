@@ -103,7 +103,11 @@ class CashFlowIngredientSeeder extends Seeder
             IngredientBatch::create([
                 'ingredient_id' => $saved[$b['name']]->id,
                 'quantity' => $b['qty'],
+                'initial_quantity' => $b['qty'],
                 'cost_per_unit' => $b['cpu'],
+                'total_cost' => $b['qty'] * $b['cpu'],
+                'supplier_name' => 'PT Sumber Berkah',
+                'payment_status' => 'lunas',
                 'received_at' => Carbon::parse($b['date'])->setHour(8)->setMinute(0),
                 'expiry_date' => Carbon::parse($b['date'])->addDays(rand(30, 180)),
             ]);
