@@ -12,6 +12,7 @@ use App\Models\StockMovement;
 use App\Filament\Resources\StockAdjustmentResource;
 use App\Services\StockReconciliationService;
 use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -166,12 +167,13 @@ class ManageBatches extends Page implements HasTable
                     }),
             ])
             ->recordActions([
-                Action::make('riwayat_bayar_batch')
-                    ->label('Riwayat Bayar')
-                    ->icon(Heroicon::OutlinedBanknotes)
-                    ->color('info')
-                    ->url(fn (IngredientBatch $record) => StockResource::getUrl('riwayat-bayar-batch', ['record' => $record])),
-                EditAction::make()
+                ActionGroup::make([
+                    Action::make('riwayat_bayar_batch')
+                        ->label('Riwayat Bayar')
+                        ->icon(Heroicon::OutlinedBanknotes)
+                        ->color('info')
+                        ->url(fn (IngredientBatch $record) => StockResource::getUrl('riwayat-bayar-batch', ['record' => $record])),
+                    EditAction::make()
                     ->mutateRecordDataUsing(function (array $data, IngredientBatch $record): array {
                         $data['total_harga'] = (float) ($record->total_cost ?? 0);
                         return $data;
@@ -272,67 +274,8 @@ class ManageBatches extends Page implements HasTable
                             ]);
                         }
                     }),
-                Action::make('mark_expired')
-                    ->label('Tandai Kedaluwarsa')
-                    ->icon(Heroicon::OutlinedXCircle)
-                    ->color('danger')
-                    ->visible(fn (IngredientBatch $record): bool =>
-                        $record->expiry_date
-                        && $record->expiry_date->isPast()
-                        && (float) $record->quantity > 0
-                    )
-                    ->requiresConfirmation()
-                    ->modalHeading('Tandai Batch Kedaluwarsa')
-                    ->modalDescription(fn (IngredientBatch $record): string =>
-                        "Batch {$record->batch_code} sudah kedaluwarsa sejak "
-                        . $record->expiry_date->format('d M Y')
-                        . ". Stok sisa {$record->quantity} " . ($record->ingredient?->unit ?? '')
-                        . " akan dihapus dan dicatat sebagai waste."
-                    )
-                    ->modalSubmitActionLabel('Ya, Tandai')
-                    ->action(function (IngredientBatch $record) {
-                        $unit = $record->ingredient?->unit ?? '';
-                        $batchCode = $record->batch_code ?? '#'.$record->id;
-                        $qty = (float) $record->quantity;
-
-                        $adjustment = StockAdjustment::create([
-                            'code' => StockReconciliationService::generateAdjustmentCode(),
-                            'adjustable_type' => AdjustableType::Ingredient->value,
-                            'ingredient_id' => $record->ingredient_id,
-                            'adjustment_type' => StockAdjustment::TYPE_DECREASE,
-                            'category' => StockAdjustment::CAT_EXPIRED,
-                            'quantity' => $qty,
-                            'quantity_before' => $qty,
-                            'quantity_after' => 0,
-                            'reason' => "Batch {$batchCode} kedaluwarsa: {$qty} {$unit}",
-                            'reported_by' => Auth::id(),
-                            'adjusted_at' => now(),
-                            'status' => StockAdjustment::STATUS_ACTIVE,
-                        ]);
-
-                        StockMovement::create([
-                            'ingredient_id' => $record->ingredient_id,
-                            'ingredient_batch_id' => $record->id,
-                            'stock_adjustment_id' => $adjustment->id,
-                            'movement_type' => 'waste',
-                            'source_type' => 'stock_adjustment',
-                            'source_id' => (string) $adjustment->id,
-                            'quantity_before' => $qty,
-                            'quantity_change' => -$qty,
-                            'quantity_after' => 0,
-                            'unit_cost' => $record->cost_per_unit,
-                            'notes' => "Batch {$batchCode} kedaluwarsa",
-                            'recorded_by' => Auth::id(),
-                        ]);
-
-                        $record->update(['quantity' => 0, 'status' => IngredientBatch::STATUS_INACTIVE]);
-
-                        Notification::make()
-                            ->success()
-                            ->title('Batch ditandai kedaluwarsa')
-                            ->body("Stok {$batchCode} telah dihapus dan dicatat di Penyesuaian Stok.")
-                            ->send();
-                    }),
+                ])
+                ->icon(Heroicon::OutlinedEllipsisVertical),
             ])
             ->toolbarActions([])
             ->defaultSort('expiry_date', 'asc');
