@@ -61,6 +61,8 @@ class StockAdjustmentForm
                 ->label('Jumlah')
                 ->required()
                 ->numeric(fn (Get $get) => $get('adjustable_type') === AdjustableType::Menu->value)
+                ->extraInputAttributes(\App\Filament\Forms\Components\QuantityInput::inputAttributes())
+                ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\QuantityInput::normalizeState($state))
                 ->prefix(fn (Get $get) => $get('adjustment_type') === StockAdjustment::TYPE_DECREASE ? '-' : '+')
                 ->suffix(fn (Get $get) => $get('adjustable_type') === AdjustableType::Menu->value
                     ? ' porsi'
