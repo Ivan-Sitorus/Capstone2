@@ -9,6 +9,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class PiutangStats extends StatsOverviewWidget
 {
+    protected int | string | array $columnSpan = 2;
+
     protected function getStats(): array
     {
         $piutangOrders = Order::with('orderPayments')

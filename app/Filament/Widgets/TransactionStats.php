@@ -8,6 +8,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class TransactionStats extends StatsOverviewWidget
 {
+    protected int | string | array $columnSpan = 2;
+
     protected function getStats(): array
     {
         $today = today();

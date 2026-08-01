@@ -8,6 +8,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class StokMenipisWidget extends StatsOverviewWidget
 {
+    protected int | string | array $columnSpan = 1;
+
     protected function getStats(): array
     {
         $ingredientCount = IngredientBatch::query()

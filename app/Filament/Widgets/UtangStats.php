@@ -8,6 +8,8 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class UtangStats extends StatsOverviewWidget
 {
+    protected int | string | array $columnSpan = 2;
+
     protected function getStats(): array
     {
         $unpaidBatches = IngredientBatch::with('batchPayments')
