@@ -163,6 +163,7 @@ class MenuForm
                         ->numeric()
                         ->type('text')
                         ->extraInputAttributes(\App\Filament\Forms\Components\QuantityInput::inputAttributes())
+                        ->mutateStateForValidationUsing(\App\Filament\Forms\Components\QuantityInput::validationNormalizer())
                         ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\QuantityInput::normalizeState($state))
                         ->minValue(fn (Get $get): float => in_array(Unit::find($get('unit_id'))?->name, ['gram', 'ml']) ? 1 : 0.001)
                         ->maxValue(999999)

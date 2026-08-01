@@ -349,6 +349,7 @@ class ManageBatches extends Page implements HasTable
                 ->step(fn () => in_array($this->record->unit, ['gram', 'ml']) ? 1 : 0.001)
                 ->type('text')
                 ->extraInputAttributes(\App\Filament\Forms\Components\QuantityInput::inputAttributes())
+                ->mutateStateForValidationUsing(\App\Filament\Forms\Components\QuantityInput::validationNormalizer())
                 ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\QuantityInput::normalizeState($state))
                 ->suffix(fn () => ' '.$this->record->unit),
             DatePicker::make('expiry_date')
