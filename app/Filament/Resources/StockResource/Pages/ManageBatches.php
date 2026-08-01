@@ -24,6 +24,8 @@ use Filament\Resources\Pages\Page;
 use Filament\Schemas\Components\EmbeddedTable;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
@@ -124,61 +126,16 @@ class ManageBatches extends Page implements HasTable
                     ->action(fn () => $this->showDepleted = !$this->showDepleted),
                 CreateAction::make()
                     ->model(IngredientBatch::class)
-                    ->form([
-                        TextInput::make('quantity')
-                            ->label('Jumlah')
-                            ->required()
-                            ->minValue(0)
-                            ->maxValue(999999)
-                            ->step(fn () => in_array($this->record->unit, ['gram', 'ml']) ? 1 : 0.001)
-                            ->type('text')
-                            ->stripCharacters('.')
-                            ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                            ->suffix(fn () => ' '.$this->record->unit),
-                        DatePicker::make('expiry_date')
-                            ->label('Tanggal Kedaluwarsa')
-                            ->native(false)
-                            ->required(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
-                            ->helperText(fn () => $this->record->batch_mode === BatchMode::Fefo->value
-                                ? 'Wajib untuk mode FEFO'
-                                : null),
-                        DateTimePicker::make('received_at')
-                            ->label('Waktu Diterima')
-                            ->required()
-                            ->default(now())
-                            ->native(false),
-                        TextInput::make('supplier_name')
-                            ->label('Supplier')
-                            ->maxLength(255)
-                            ->placeholder('Nama supplier...'),
-                        TextInput::make('total_harga')
-                            ->label('Total Harga')
-                            ->required()
-                            ->minValue(0)
-                            ->maxValue(999999)
-                            ->numeric()
-                            ->type('text')
-                            ->stripCharacters('.')
-                            ->prefix('Rp'),
-                        Toggle::make('sudah_lunas')
-                            ->label('Sudah Lunas')
-                            ->helperText('Centang jika utang ke supplier langsung dibayar tunai saat pembelian')
-                            ->default(false),
-                        Toggle::make('allow_expired_usage')
-                            ->label('Bisa dipakai meskipun kedaluwarsa')
-                            ->helperText('Batch ini tetap bisa dipakai FEFO walau sudah kedaluwarsa')
-                            ->visible(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
-                            ->default(false),
-                    ])
+                    ->form($this->batchFormFields(isCreate: true))
                     ->using(function (array $data): IngredientBatch {
                         $totalCost = (float) ($data['total_harga'] ?? 0);
                         $initialQty = (float) ($data['quantity'] ?? 0);
+                        $totalDibayar = (float) ($data['total_dibayar'] ?? 0);
 
                         $data['total_cost'] = $totalCost > 0 ? $totalCost : null;
                         $data['initial_quantity'] = $data['quantity'];
                         $data['cost_per_unit'] = $initialQty > 0 ? $totalCost / $initialQty : 0;
-                        $data['payment_status'] = ! empty($data['sudah_lunas']) ? 'lunas' : 'belum_lunas';
-                        unset($data['total_harga'], $data['sudah_lunas']);
+                        unset($data['total_harga'], $data['sudah_lunas'], $data['total_dibayar']);
 
                         $batch = $this->record->batches()->create($data);
 
@@ -196,6 +153,15 @@ class ManageBatches extends Page implements HasTable
                             'notes' => 'Pembelian batch '.($batch->batch_code ?? $batch->id),
                         ]);
 
+                        // Record initial supplier payment if any — observer auto-sets payment_status
+                        if ($totalDibayar > 0) {
+                            $batch->batchPayments()->create([
+                                'amount' => $totalDibayar,
+                                'payment_date' => now(),
+                                'payment_method' => 'cash',
+                            ]);
+                        }
+
                         return $batch;
                     }),
             ])
@@ -208,53 +174,25 @@ class ManageBatches extends Page implements HasTable
                 EditAction::make()
                     ->mutateRecordDataUsing(function (array $data, IngredientBatch $record): array {
                         $data['total_harga'] = (float) ($record->total_cost ?? 0);
-                        $data['sudah_lunas'] = $record->payment_status === 'lunas';
                         return $data;
                     })
-                    ->form([
-                        TextInput::make('quantity')
-                            ->label('Jumlah')
-                            ->required()
-                            ->minValue(0)
-                            ->maxValue(999999)
-                            ->step(fn () => in_array($this->record->unit, ['gram', 'ml']) ? 1 : 0.001)
-                            ->type('text')
-                            ->stripCharacters('.')
-                            ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
-                            ->suffix(fn () => ' '.$this->record->unit),
-                        DatePicker::make('expiry_date')
-                            ->label('Tanggal Kedaluwarsa')
-                            ->native(false)
-                            ->required(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
-                            ->helperText(fn () => $this->record->batch_mode === BatchMode::Fefo->value
-                                ? 'Wajib untuk mode FEFO'
-                                : null),
-                        DateTimePicker::make('received_at')
-                            ->label('Waktu Diterima')
-                            ->required()
-                            ->default(now())
-                            ->native(false),
-                        TextInput::make('supplier_name')
-                            ->label('Supplier')
-                            ->maxLength(255),
-                        TextInput::make('total_harga')
-                            ->label('Total Harga')
-                            ->required()
-                            ->minValue(0)
-                            ->maxValue(999999)
-                            ->numeric()
-                            ->type('text')
-                            ->stripCharacters('.')
-                            ->prefix('Rp'),
-                        Toggle::make('sudah_lunas')
-                            ->label('Sudah Lunas')
-                            ->helperText('Centang jika utang ke supplier sudah dilunasi'),
-                        Toggle::make('allow_expired_usage')
-                            ->label('Bisa dipakai meskipun kedaluwarsa')
-                            ->helperText('Batch ini tetap bisa dipakai FEFO walau sudah kedaluwarsa'),
-                    ])
+                    ->form($this->batchFormFields())
                     ->before(function (EditAction $action, IngredientBatch $record) {
                         $data = $action->getData();
+
+                        // Guard: total harga cannot go below already-paid amount
+                        $newTotal = (float) str_replace(',', '.', $data['total_harga'] ?? $record->total_cost ?? 0);
+                        $totalPaid = (float) $record->batchPayments()->sum('amount');
+                        if ($totalPaid > $newTotal) {
+                            Notification::make()
+                                ->danger()
+                                ->title('Total harga tidak boleh kurang dari total dibayar')
+                                ->body('Total sudah dibayar: Rp' . number_format($totalPaid, 0, ',', '.') . '. Naikkan total harga atau hapus pembayaran di Riwayat Bayar.')
+                                ->send();
+                            $action->cancel();
+                            return;
+                        }
+
                         $rawQty = $data['quantity'] ?? null;
                         if ($rawQty === null) return;
                         $newQty = (float) str_replace(',', '.', $rawQty);
@@ -294,10 +232,10 @@ class ManageBatches extends Page implements HasTable
 
                         $data['total_cost'] = $totalCost > 0 ? $totalCost : null;
                         $data['cost_per_unit'] = $initialQty > 0 ? $totalCost / $initialQty : 0;
-                        $data['payment_status'] = ! empty($data['sudah_lunas']) ? 'lunas' : 'belum_lunas';
-                        unset($data['total_harga'], $data['sudah_lunas']);
+                        unset($data['total_harga'], $data['sudah_lunas'], $data['total_dibayar']);
 
                         $record->update($data);
+                        $record->recalculatePaymentStatus();
                     }),
                 DeleteAction::make()
                     ->before(function (DeleteAction $action, IngredientBatch $record) {
@@ -398,6 +336,89 @@ class ManageBatches extends Page implements HasTable
             ])
             ->toolbarActions([])
             ->defaultSort('expiry_date', 'asc');
+    }
+
+    private function batchFormFields(bool $isCreate = false): array
+    {
+        $fields = [
+            TextInput::make('quantity')
+                ->label('Jumlah')
+                ->required()
+                ->minValue(0)
+                ->maxValue(999999)
+                ->step(fn () => in_array($this->record->unit, ['gram', 'ml']) ? 1 : 0.001)
+                ->type('text')
+                ->stripCharacters('.')
+                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->suffix(fn () => ' '.$this->record->unit),
+            DatePicker::make('expiry_date')
+                ->label('Tanggal Kedaluwarsa')
+                ->native(false)
+                ->required(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
+                ->helperText(fn () => $this->record->batch_mode === BatchMode::Fefo->value
+                    ? 'Wajib untuk mode FEFO'
+                    : null),
+            DateTimePicker::make('received_at')
+                ->label('Waktu Diterima')
+                ->required()
+                ->default(now())
+                ->native(false),
+            TextInput::make('supplier_name')
+                ->label('Supplier')
+                ->maxLength(255)
+                ->placeholder('Nama supplier...'),
+            TextInput::make('total_harga')
+                ->label('Total Harga')
+                ->required()
+                ->minValue(0)
+                ->maxValue(999999)
+                ->numeric()
+                ->type('text')
+                ->stripCharacters('.')
+                ->live()
+                ->prefix('Rp'),
+        ];
+
+        if ($isCreate) {
+            $fields[] = TextInput::make('total_dibayar')
+                ->label('Total Dibayar')
+                ->numeric()
+                ->minValue(0)
+                ->default(0)
+                ->type('text')
+                ->stripCharacters('.')
+                ->prefix('Rp')
+                ->disabled(fn (Get $get): bool => (bool) $get('sudah_lunas'))
+                ->dehydrated()
+                ->rules([
+                    fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get): void {
+                        $totalHarga = (float) str_replace('.', '', (string) ($get('total_harga') ?? 0));
+                        if ((float) $value > $totalHarga) {
+                            $fail('Total dibayar tidak boleh melebihi total harga (Rp ' . number_format($totalHarga, 0, ',', '.') . ').');
+                        }
+                    },
+                ]);
+            $fields[] = Toggle::make('sudah_lunas')
+                ->label('Sudah Lunas')
+                ->helperText('Centang jika utang langsung lunas — Total Dibayar otomatis terisi total harga')
+                ->live()
+                ->default(false)
+                ->afterStateUpdated(function (Set $set, Get $get, bool $state): void {
+                    if ($state) {
+                        $set('total_dibayar', $get('total_harga') ?? 0);
+                    } else {
+                        $set('total_dibayar', 0);
+                    }
+                });
+        }
+
+        $fields[] = Toggle::make('allow_expired_usage')
+            ->label('Bisa dipakai meskipun kedaluwarsa')
+            ->helperText('Batch ini tetap bisa dipakai FEFO walau sudah kedaluwarsa')
+            ->visible(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
+            ->default(false);
+
+        return $fields;
     }
 
     protected function getHeaderActions(): array
