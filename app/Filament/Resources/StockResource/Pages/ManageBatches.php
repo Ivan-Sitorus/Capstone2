@@ -348,7 +348,9 @@ class ManageBatches extends Page implements HasTable
                 ->maxValue(999999)
                 ->step(fn () => in_array($this->record->unit, ['gram', 'ml']) ? 1 : 0.001)
                 ->type('text')
-                ->stripCharacters('.')
+                ->extraInputAttributes([
+                    'oninput' => "this.value = this.value.replace(/[^0-9.,]/g, '').replace(/([.,].*)[.,]/g, '$1').slice(0, 10)",
+                ])
                 ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                 ->suffix(fn () => ' '.$this->record->unit),
             DatePicker::make('expiry_date')
@@ -374,7 +376,7 @@ class ManageBatches extends Page implements HasTable
                 ->maxValue(999999)
                 ->numeric()
                 ->type('text')
-                ->stripCharacters('.')
+                ->mask('999999')
                 ->live()
                 ->prefix('Rp'),
         ];
@@ -386,7 +388,7 @@ class ManageBatches extends Page implements HasTable
                 ->minValue(0)
                 ->default(0)
                 ->type('text')
-                ->stripCharacters('.')
+                ->mask('999999')
                 ->prefix('Rp')
                 ->disabled(fn (Get $get): bool => (bool) $get('sudah_lunas'))
                 ->dehydrated()
