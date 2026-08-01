@@ -33,6 +33,10 @@ class ViewReceivable extends ViewRecord
                         ->label('Jumlah Pembayaran')
                         ->required()
                         ->numeric()
+                        ->type('text')
+                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
+                        ->stripCharacters('.')
+                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                         ->minValue(1)
                         ->maxValue(fn (Receivable $record): float => (float) $record->remaining_amount),
                     Select::make('payment_method')

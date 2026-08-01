@@ -54,6 +54,10 @@ class MenuForm
                 ->required()
                 ->integer()
                 ->minValue(1)
+                ->type('text')
+                ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
+                ->stripCharacters('.')
+                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                 ->prefix("Rp"),
             Select::make('status')
                 ->label('Status')
@@ -67,10 +71,14 @@ class MenuForm
                 ->label("Harga Diskon")
                 ->integer()
                 ->minValue(0)
+                ->type('text')
+                ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
+                ->stripCharacters('.')
+                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                 ->rules([
                     fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
-                        $price = (int) ($get("price") ?? 0);
-                        $discountedPrice = (int) ($value ?? 0);
+                        $price = (int) str_replace('.', '', (string) ($get("price") ?? 0));
+                        $discountedPrice = (int) str_replace('.', '', (string) ($value ?? 0));
                         if ($discountedPrice > $price) {
                             $fail("Harga diskon tidak boleh lebih besar dari harga menu (Rp ".number_format($price, 0, ",", ".").").");
                         }
@@ -162,9 +170,11 @@ class MenuForm
                         ->required()
                         ->numeric()
                         ->type('text')
-                        ->extraInputAttributes(\App\Filament\Forms\Components\QuantityInput::inputAttributes())
-                        ->mutateStateForValidationUsing(\App\Filament\Forms\Components\QuantityInput::validationNormalizer())
-                        ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\QuantityInput::normalizeState($state))
+                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(3))
+                        ->stripCharacters('.')
+                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 3))
+                        ->mutateStateForValidationUsing(\App\Filament\Forms\Components\NumericInput::validationNormalizer())
+                        ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\NumericInput::normalizeState($state))
                         ->minValue(fn (Get $get): float => in_array(Unit::find($get('unit_id'))?->name, ['gram', 'ml']) ? 1 : 0.001)
                         ->maxValue(999999)
                         ->step(fn (Get $get): float => in_array(Unit::find($get('unit_id'))?->name, ['gram', 'ml']) ? 1 : 0.001)

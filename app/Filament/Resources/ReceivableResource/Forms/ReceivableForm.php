@@ -28,6 +28,10 @@ class ReceivableForm
                     TextInput::make('quantity')
                         ->label('Jumlah')
                         ->numeric()
+                        ->type('text')
+                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
+                        ->stripCharacters('.')
+                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                         ->default(1)
                         ->minValue(1)
                         ->required(),
@@ -63,8 +67,10 @@ class ReceivableForm
                 ->required()
                 ->type('text')
                 ->prefix('Rp')
+                ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
                 ->stripCharacters('.')
-                ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
+                ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\NumericInput::normalizeState($state))
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
                 ->live()
                 ->afterStateUpdated(function ($state, Set $set) {

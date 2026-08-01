@@ -35,6 +35,12 @@ class IngredientsRelationManager extends RelationManager
                 ->label("Jumlah per Porsi")
                 ->required()
                 ->numeric()
+                ->type('text')
+                ->mask(\App\Filament\Forms\Components\NumericInput::mask(3))
+                ->stripCharacters('.')
+                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 3))
+                ->mutateStateForValidationUsing(\App\Filament\Forms\Components\NumericInput::validationNormalizer())
+                ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\NumericInput::normalizeState($state))
                 ->minValue(0.01)
                 ->step(0.01),
             Select::make("unit_id")

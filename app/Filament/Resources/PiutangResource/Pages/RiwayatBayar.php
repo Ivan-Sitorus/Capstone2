@@ -104,6 +104,10 @@ class RiwayatBayar extends Page implements HasTable
                             ->label('Jumlah')
                             ->required()
                             ->numeric()
+                            ->type('text')
+                            ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
+                            ->stripCharacters('.')
+                            ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                             ->minValue(1)
                             ->prefix('Rp'),
                         Select::make('payment_method')
@@ -144,6 +148,10 @@ class RiwayatBayar extends Page implements HasTable
                         ->label('Jumlah')
                         ->required()
                         ->numeric()
+                        ->type('text')
+                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
+                        ->stripCharacters('.')
+                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                         ->minValue(1)
                         ->prefix('Rp'),
                     Select::make('payment_method')

@@ -56,8 +56,11 @@ class StockForm
                             ->minValue(0)
                             ->step(0.1)
                             ->type('text')
+                            ->mask(\App\Filament\Forms\Components\NumericInput::mask(3))
                             ->stripCharacters('.')
-                            ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
+                            ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 3))
+                            ->mutateStateForValidationUsing(\App\Filament\Forms\Components\NumericInput::validationNormalizer())
+                            ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\NumericInput::normalizeState($state))
                             ->suffix(fn ($get) => $get('../../unit') ? ' '.$get('../../unit') : ''),
                         DatePicker::make('expiry_date')
                             ->label('Tanggal Kadaluarsa')
@@ -78,7 +81,9 @@ class StockForm
                             ->numeric()
                             ->minValue(0)
                             ->type('text')
+                            ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
                             ->stripCharacters('.')
+                            ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                             ->prefix(fn ($get) => $get('../../unit') ? 'Rp/'.$get('../../unit') : 'Rp'),
                     ])
                     ->defaultItems(0)

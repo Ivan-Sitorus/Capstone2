@@ -58,6 +58,10 @@ class ListPiutangs extends ListRecords
                                 ->label('Jumlah')
                                 ->required()
                                 ->numeric()
+                                ->type('text')
+                                ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
+                                ->stripCharacters('.')
+                                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                                 ->minValue(1)
                                 ->default(1),
                             Select::make('price_type')
@@ -81,6 +85,10 @@ class ListPiutangs extends ListRecords
                     TextInput::make('paid_amount')
                         ->label('Sudah Dibayar')
                         ->numeric()
+                        ->type('text')
+                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
+                        ->stripCharacters('.')
+                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                         ->minValue(0)
                         ->default(0)
                         ->prefix('Rp'),

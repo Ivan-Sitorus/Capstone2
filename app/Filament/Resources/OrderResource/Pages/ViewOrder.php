@@ -40,6 +40,10 @@ class ViewOrder extends ViewRecord
                         ->label('Jumlah Pembayaran')
                         ->required()
                         ->numeric()
+                        ->type('text')
+                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
+                        ->stripCharacters('.')
+                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                         ->minValue(1)
                         ->maxValue(fn (Order $record): float => max(0, (float) $record->total_amount - (float) $record->orderPayments->sum('amount'))),
                     Select::make('payment_method')
