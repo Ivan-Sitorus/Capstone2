@@ -20,12 +20,12 @@ class DashboardStatsWidget extends StatsOverviewWidget
 
     private function rangeFrom(): string
     {
-        return $this->from ?? now()->subDays(6)->toDateString();
+        return $this->from ? Carbon::parse($this->from)->toDateString() : now()->subDays(6)->toDateString();
     }
 
     private function rangeUntil(): string
     {
-        return $this->until ?? now()->toDateString();
+        return $this->until ? Carbon::parse($this->until)->toDateString() : now()->toDateString();
     }
 
     #[On('dashboard-filters-changed')]
@@ -40,8 +40,10 @@ class DashboardStatsWidget extends StatsOverviewWidget
         $today = today();
 
         // Penjualan & Transaksi use filter range
-        $totalRange = (float) Order::whereBetween('created_at', [$this->rangeFrom(), $this->rangeUntil() . ' 23:59:59'])->sum('total_amount');
-        $countRange = Order::whereBetween('created_at', [$this->rangeFrom(), $this->rangeUntil() . ' 23:59:59'])->count();
+        $fromDate = $this->rangeFrom();
+        $untilDate = Carbon::parse($this->rangeUntil())->endOfDay();
+        $totalRange = (float) Order::whereBetween('created_at', [$fromDate, $untilDate])->sum('total_amount');
+        $countRange = Order::whereBetween('created_at', [$fromDate, $untilDate])->count();
 
         // Piutang — always current status (no date filter)
         $piutangOrders = Order::with('orderPayments')
