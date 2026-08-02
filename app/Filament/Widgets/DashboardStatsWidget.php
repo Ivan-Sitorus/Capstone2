@@ -7,19 +7,43 @@ use App\Models\IngredientBatch;
 use App\Models\Order;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\On;
 
 class DashboardStatsWidget extends StatsOverviewWidget
 {
     protected int | array | null $columns = 4;
 
+    public ?string $from = null;
+    public ?string $until = null;
+
+    private function rangeFrom(): string
+    {
+        return $this->from ?? now()->subDays(6)->toDateString();
+    }
+
+    private function rangeUntil(): string
+    {
+        return $this->until ?? now()->toDateString();
+    }
+
+    #[On('dashboard-filters-changed')]
+    public function applyRange(string $from, string $until): void
+    {
+        $this->from = $from;
+        $this->until = $until;
+    }
+
     protected function getStats(): array
     {
         $today = today();
 
-        $totalToday = (float) Order::whereDate('created_at', $today)->sum('total_amount');
-        $countToday = Order::whereDate('created_at', $today)->count();
+        // Penjualan & Transaksi use filter range
+        $totalRange = (float) Order::whereBetween('created_at', [$this->rangeFrom(), $this->rangeUntil() . ' 23:59:59'])->sum('total_amount');
+        $countRange = Order::whereBetween('created_at', [$this->rangeFrom(), $this->rangeUntil() . ' 23:59:59'])->count();
 
+        // Piutang — always current status (no date filter)
         $piutangOrders = Order::with('orderPayments')
             ->where(function ($query) {
                 $query->where('payment_method', 'piutang')
@@ -60,13 +84,16 @@ class DashboardStatsWidget extends StatsOverviewWidget
             ->distinct('ingredient_id')
             ->count('ingredient_id');
 
+        $desc = 'Periode ' . Carbon::parse($this->rangeFrom())->format('d M Y')
+              . ' – ' . Carbon::parse($this->rangeUntil())->format('d M Y');
+
         return [
-            Stat::make('Penjualan Hari Ini', 'Rp ' . number_format($totalToday, 0, ',', '.'))
-                ->description('Total pendapatan hari ini')
+            Stat::make('Penjualan', 'Rp ' . number_format($totalRange, 0, ',', '.'))
+                ->description($desc)
                 ->color('success')
                 ->icon('heroicon-o-banknotes'),
-            Stat::make('Transaksi Hari Ini', $countToday)
-                ->description('Jumlah order hari ini')
+            Stat::make('Transaksi', $countRange)
+                ->description($desc)
                 ->color('info')
                 ->icon('heroicon-o-shopping-cart'),
             Stat::make('Total Piutang', 'Rp ' . number_format($totalPiutang, 0, ',', '.'))
