@@ -2,7 +2,6 @@
 
 namespace App\Filament\Widgets;
 
-use App\Enums\OrderStatus;
 use App\Models\IngredientBatch;
 use App\Models\Order;
 use Filament\Widgets\StatsOverviewWidget;
@@ -45,35 +44,6 @@ class DashboardStatsWidget extends StatsOverviewWidget
         $totalRange = (float) Order::whereBetween('created_at', [$fromDate, $untilDate])->sum('total_amount');
         $countRange = Order::whereBetween('created_at', [$fromDate, $untilDate])->count();
 
-        // Piutang — always current status (no date filter)
-        $piutangOrders = Order::with('orderPayments')
-            ->where(function ($query) {
-                $query->where('payment_method', 'piutang')
-                    ->orWhere('status', OrderStatus::BelumLunas->value);
-            })
-            ->get();
-        $totalPiutang = 0;
-        foreach ($piutangOrders as $order) {
-            $paid = (float) $order->orderPayments->sum('amount');
-            $totalPiutang += max(0, (float) $order->total_amount - $paid);
-        }
-
-        $unpaidBatches = IngredientBatch::with('batchPayments')
-            ->where('payment_status', 'belum_lunas')
-            ->where('total_cost', '>', 0)
-            ->get();
-        $totalUtang = 0;
-        $supplierCount = 0;
-        $suppliers = [];
-        foreach ($unpaidBatches as $batch) {
-            $paid = (float) $batch->batchPayments->sum('amount');
-            $totalUtang += max(0, (float) $batch->total_cost - $paid);
-            if ($batch->supplier_name) {
-                $suppliers[$batch->supplier_name] = true;
-            }
-        }
-        $supplierCount = count($suppliers);
-
         $stokMenipis = IngredientBatch::query()
             ->whereNotNull('initial_quantity')
             ->where('quantity', '>', 0)
@@ -98,22 +68,6 @@ class DashboardStatsWidget extends StatsOverviewWidget
                 ->description($desc)
                 ->color('info')
                 ->icon('heroicon-o-shopping-cart'),
-            Stat::make('Total Piutang', 'Rp ' . number_format($totalPiutang, 0, ',', '.'))
-                ->description('Sisa tagihan belum lunas')
-                ->color('warning')
-                ->icon('heroicon-o-currency-dollar'),
-            Stat::make('Piutang Aktif', $piutangOrders->count())
-                ->description('Jumlah order belum lunas')
-                ->color('danger')
-                ->icon('heroicon-o-document-text'),
-            Stat::make('Total Utang Supplier', 'Rp ' . number_format($totalUtang, 0, ',', '.'))
-                ->description('Sisa utang bahan baku')
-                ->color('danger')
-                ->icon('heroicon-o-truck'),
-            Stat::make('Supplier Belum Lunas', $supplierCount)
-                ->description('Jumlah supplier berutang')
-                ->color('warning')
-                ->icon('heroicon-o-users'),
             Stat::make('Stok Menipis', $stokMenipis)
                 ->description('Bahan baku dengan stok < 20%')
                 ->color($stokMenipis > 0 ? 'danger' : 'success')

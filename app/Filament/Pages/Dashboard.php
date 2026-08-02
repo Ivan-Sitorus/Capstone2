@@ -5,6 +5,8 @@ namespace App\Filament\Pages;
 use App\Filament\Widgets\DashboardStatsWidget;
 use App\Filament\Widgets\PemakaianBahanBakuWidget;
 use App\Filament\Widgets\PenjualanChartWidget;
+use App\Filament\Widgets\TopBahanBakuWidget;
+use App\Filament\Widgets\TopMenuWidget;
 use Filament\Forms\Components\DatePicker;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
@@ -56,6 +58,8 @@ class Dashboard extends BaseDashboard
             DashboardStatsWidget::class,
             PenjualanChartWidget::class,
             PemakaianBahanBakuWidget::class,
+            TopMenuWidget::class,
+            TopBahanBakuWidget::class,
         ];
     }
 
