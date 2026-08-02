@@ -256,12 +256,12 @@ export default function PesananBaru({ categories }) {
                                         <span className="text-sm font-medium">{formatRupiah(total)}</span>
                                     </div>
                                     {isMahasiswa && totalDiscount > 0 && (
-                                            <span className="text-sm text-green-600">Diskon Mahasiswa</span>
-                                            <span className="text-sm font-semibold text-green-600">- {formatRupiah(totalDiscount)}</span>
-                            {isMahasiswa && totalDiscount > 0 && (
-                                    <span className="text-sm text-green-600">Diskon Mahasiswa</span>
-                                    <span className="text-sm font-semibold text-green-600">- {formatRupiah(totalDiscount)}</span>
-                                        </div>
+                                        <>
+                                            <div className="flex justify-between">
+                                                <span className="text-sm text-green-600">Diskon Mahasiswa</span>
+                                                <span className="text-sm font-semibold text-green-600">- {formatRupiah(totalDiscount)}</span>
+                                            </div>
+                                        </>
                                     )}
                                     <div className="flex justify-between py-2 border-t border-border mb-3">
                                         <span className="text-base font-bold">Total</span>
