@@ -2,12 +2,12 @@
 
 namespace App\Filament\Widgets;
 
+use App\Models\Ingredient;
 use App\Models\IngredientBatch;
 use App\Models\Order;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
 
 class DashboardStatsWidget extends StatsOverviewWidget
@@ -44,12 +44,12 @@ class DashboardStatsWidget extends StatsOverviewWidget
         $totalRange = (float) Order::whereBetween('created_at', [$fromDate, $untilDate])->sum('total_amount');
         $countRange = Order::whereBetween('created_at', [$fromDate, $untilDate])->count();
 
-        $stokMenipis = IngredientBatch::query()
-            ->whereNotNull('initial_quantity')
-            ->where('quantity', '>', 0)
-            ->whereColumn('quantity', '<', DB::raw('initial_quantity * 0.2'))
-            ->distinct('ingredient_id')
-            ->count('ingredient_id');
+        $stokMenipis = \App\Models\Ingredient::query()
+            ->select('id', 'name', 'low_stock_threshold')
+            ->withSum('batches as total_stock', 'quantity')
+            ->get()
+            ->filter(fn ($ingredient) => (float) ($ingredient->total_stock ?? 0) < (float) $ingredient->low_stock_threshold)
+            ->count();
         $stokExpired = IngredientBatch::query()
             ->where('quantity', '>', 0)
             ->whereDate('expiry_date', '<', today()->toDateString())
@@ -69,7 +69,7 @@ class DashboardStatsWidget extends StatsOverviewWidget
                 ->color('info')
                 ->icon('heroicon-o-shopping-cart'),
             Stat::make('Stok Menipis', $stokMenipis)
-                ->description('Bahan baku dengan stok < 20%')
+                ->description('Bahan baku di bawah peringatan stok rendah')
                 ->color($stokMenipis > 0 ? 'danger' : 'success')
                 ->icon('heroicon-o-exclamation-triangle'),
             Stat::make('Stok Kedaluwarsa', $stokExpired)
