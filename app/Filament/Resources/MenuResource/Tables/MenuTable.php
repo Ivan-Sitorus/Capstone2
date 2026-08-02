@@ -50,9 +50,7 @@ class MenuTable
                         default => "danger",
                     }),
                 TextColumn::make("status")
-                    ->label(new \Illuminate\Support\HtmlString(
-                        '<span style="display:inline-flex;align-items:flex-start;gap:6px">Status <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="height:12px;width:12px;margin-top:2px;color:#9CA3AF" title="Aktif: menu tampil di POS &amp; aplikasi pelanggan. Nonaktif: menu disembunyikan, tidak bisa dipesan."><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg></span>'
-                    ))
+                    ->label(self::infoLabel('Status', 'Aktif: menu tampil di POS & aplikasi pelanggan. Nonaktif: menu disembunyikan, tidak bisa dipesan.'))
                     ->badge()
                     ->formatStateUsing(fn ($state) => $state === 'active' ? 'Aktif' : 'Nonaktif')
                     ->color(fn ($state) => $state === 'active' ? 'success' : 'danger')
@@ -125,5 +123,29 @@ class MenuTable
                 ])
                 ->icon(Heroicon::OutlinedEllipsisVertical),
             ]);
+    }
+
+    /**
+     * Label header kolom + ikon info yang konsisten dengan hintIcon form.
+     * Memakai generate_icon_html (helper yang sama dengan Icon::make / hintIcon)
+     * sehingga tampilan ikon & tooltip identik di seluruh Filament.
+     */
+    private static function infoLabel(string $text, string $tooltip): \Illuminate\Contracts\Support\Htmlable
+    {
+        $icon = \Filament\Support\generate_icon_html(
+            \Filament\Support\Icons\Heroicon::OutlinedInformationCircle,
+            attributes: new \Illuminate\View\ComponentAttributeBag([
+                'x-tooltip' => '{ content: ' . \Illuminate\Support\Js::from($tooltip) . ', theme: $store.theme, allowHTML: false }',
+                'title' => $tooltip,
+            ]),
+            size: \Filament\Support\Enums\IconSize::Small,
+        );
+
+        return new \Illuminate\Support\HtmlString(
+            '<span style="display:inline-flex;align-items:flex-start;gap:6px">'
+            . e($text)
+            . ($icon?->toHtml() ?? '')
+            . '</span>'
+        );
     }
 }
