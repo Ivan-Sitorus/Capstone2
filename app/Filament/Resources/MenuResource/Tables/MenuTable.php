@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MenuResource\Tables;
 
+use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\Ingredient;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -41,7 +42,7 @@ class MenuTable
                     ->formatStateUsing(fn ($state) => $state ? "Rp".number_format($state, 0, ",", ".") : "-")
                     ->sortable(),
                 TextColumn::make("available_servings")
-                    ->label("Sisa Jual")
+                    ->label(ColumnInfoTooltip::label('Sisa Jual', "Sisa porsi yang bisa dibuat dari stok tersedia.\nMenu dengan bahan baku yang sama bisa saling mengurangi sisa jual."))
                     ->getStateUsing(fn ($record) => $record->computeAvailableServings())
                     ->formatStateUsing(fn ($state) => $state === null ? "-" : number_format($state, 0, ",", "."))
                     ->color(fn ($state) => match (true) {
@@ -50,14 +51,13 @@ class MenuTable
                         default => "danger",
                     }),
                 TextColumn::make("status")
-                    ->label(self::infoLabel('Status', 'Aktif: menu tampil di POS & aplikasi pelanggan. Nonaktif: menu disembunyikan, tidak bisa dipesan.'))
+                    ->label(ColumnInfoTooltip::label('Status', "Aktif: Menu tampil di kasir dan pelanggan, bisa dipesan.\nNonaktif: Menu tidak tampil di kasir dan pelanggan, tidak bisa dipesan."))
                     ->badge()
                     ->formatStateUsing(fn ($state) => $state === 'active' ? 'Aktif' : 'Nonaktif')
                     ->color(fn ($state) => $state === 'active' ? 'success' : 'danger')
                     ->tooltip(fn ($state) => $state === 'active'
                         ? 'Aktif: menu tampil di POS & aplikasi pelanggan'
-                        : 'Nonaktif: menu disembunyikan, tidak bisa dipesan')
-                    ->headerTooltip('Status menu: Aktif = tampil di POS & pelanggan. Nonaktif = disembunyikan.')
+                        : 'Nonaktif: menu disembunyikan, tidak bisa dipesan'),
             ])
             ->filters([
                 SelectFilter::make("category")
@@ -123,29 +123,5 @@ class MenuTable
                 ])
                 ->icon(Heroicon::OutlinedEllipsisVertical),
             ]);
-    }
-
-    /**
-     * Label header kolom + ikon info yang konsisten dengan hintIcon form.
-     * Memakai generate_icon_html (helper yang sama dengan Icon::make / hintIcon)
-     * sehingga tampilan ikon & tooltip identik di seluruh Filament.
-     */
-    private static function infoLabel(string $text, string $tooltip): \Illuminate\Contracts\Support\Htmlable
-    {
-        $icon = \Filament\Support\generate_icon_html(
-            \Filament\Support\Icons\Heroicon::OutlinedInformationCircle,
-            attributes: new \Illuminate\View\ComponentAttributeBag([
-                'x-tooltip' => '{ content: ' . \Illuminate\Support\Js::from($tooltip) . ', theme: $store.theme, allowHTML: false }',
-                'title' => $tooltip,
-            ]),
-            size: \Filament\Support\Enums\IconSize::Small,
-        );
-
-        return new \Illuminate\Support\HtmlString(
-            '<span style="display:inline-flex;align-items:flex-start;gap:6px">'
-            . e($text)
-            . ($icon?->toHtml() ?? '')
-            . '</span>'
-        );
     }
 }
