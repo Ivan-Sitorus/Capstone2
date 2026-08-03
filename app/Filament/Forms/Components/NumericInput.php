@@ -2,6 +2,7 @@
 
 namespace App\Filament\Forms\Components;
 
+use Filament\Forms\Components\TextInput;
 use Filament\Support\RawJs;
 
 /**
@@ -11,6 +12,26 @@ use Filament\Support\RawJs;
  */
 class NumericInput
 {
+    /**
+     * Terapkan konfigurasi numeric lengkap ke TextInput:
+     * numeric() (keyboard angka + validasi) + type text (agar mask & maxLength jalan)
+     * + mask ribuan/desimal + strip titik + batas karakter + normalisasi koma→titik.
+     *
+     * @param  int  $maxDigits  jumlah digit integer (mis. 6 = max 999.999, 9 = max 999.999.999)
+     * @param  int  $precision  digit desimal (0 = integer, 3 = max 3 desimal)
+     */
+    public static function apply(TextInput $input, int $maxDigits = 6, int $precision = 0): TextInput
+    {
+        return $input
+            ->numeric()
+            ->type('text')
+            ->mask(static::mask($precision))
+            ->stripCharacters('.')
+            ->maxLength(static::maxLength($maxDigits, $precision))
+            ->mutateStateForValidationUsing(static::validationNormalizer())
+            ->dehydrateStateUsing(fn ($state) => static::normalizeState($state));
+    }
+
     /**
      * Mask Alpine $money dengan format Indonesia:
      * - ribuan separator: '.'  (muncul otomatis, mis. 15000 → 15.000)

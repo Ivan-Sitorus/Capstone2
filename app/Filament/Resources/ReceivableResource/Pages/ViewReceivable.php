@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ReceivableResource\Pages;
 
+use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Receivable;
 use Filament\Actions;
@@ -29,14 +30,9 @@ class ViewReceivable extends ViewRecord
                 ->color('success')
                 ->visible(fn (Receivable $record): bool => ! in_array($record->status, [Receivable::STATUS_PAID, Receivable::STATUS_CANCELLED]))
                 ->form([
-                    TextInput::make('amount')
+                    NumericInput::apply(TextInput::make('amount'), maxDigits: 9)
                         ->label('Jumlah Pembayaran')
                         ->required()
-                        ->numeric()
-                        ->type('text')
-                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                        ->stripCharacters('.')
-                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                         ->minValue(1)
                         ->maxValue(fn (Receivable $record): float => (float) $record->remaining_amount),
                     Select::make('payment_method')

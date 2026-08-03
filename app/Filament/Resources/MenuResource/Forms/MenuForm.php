@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MenuResource\Forms;
 
+use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\MenuResource;
 use App\Models\Ingredient;
 use App\Models\Unit;
@@ -50,15 +51,11 @@ class MenuForm
                 ->saveUploadedFileUsing(function ($file) {
                     return app(MenuImageService::class)->convertAndStore($file);
                 }),
-            TextInput::make("price")
+            NumericInput::apply(TextInput::make("price"), maxDigits: 9)
                 ->label("Harga")
                 ->required()
                 ->integer()
                 ->minValue(1)
-                ->type('text')
-                ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                ->stripCharacters('.')
-                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                 ->prefix("Rp"),
             Select::make('status')
                 ->label('Status')
@@ -68,14 +65,10 @@ class MenuForm
                 ])
                 ->default('active')
                 ->required(),
-            TextInput::make("discounted_price")
+            NumericInput::apply(TextInput::make("discounted_price"), maxDigits: 9)
                 ->label("Harga Diskon")
                 ->integer()
                 ->minValue(0)
-                ->type('text')
-                ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                ->stripCharacters('.')
-                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                 ->rules([
                     fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
                         $price = (int) str_replace('.', '', (string) ($get("price") ?? 0));
@@ -180,17 +173,10 @@ class MenuForm
                         ->searchable()
                         ->preload()
                         ->live(),
-                    TextInput::make("quantity_used")
+                    NumericInput::apply(TextInput::make("quantity_used"), maxDigits: 6, precision: 3)
                         ->label("Jumlah per Porsi")
                         ->disabled(fn (Get $get): bool => ! $get('unit_id'))
                         ->required()
-                        ->numeric()
-                        ->type('text')
-                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(3))
-                        ->stripCharacters('.')
-                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 3))
-                        ->mutateStateForValidationUsing(\App\Filament\Forms\Components\NumericInput::validationNormalizer())
-                        ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\NumericInput::normalizeState($state))
                         ->minValue(fn (Get $get): float => in_array(Unit::find($get('unit_id'))?->name, ['gram', 'ml']) ? 1 : 0.001)
                         ->maxValue(999999)
                         ->step(fn (Get $get): float => in_array(Unit::find($get('unit_id'))?->name, ['gram', 'ml']) ? 1 : 0.001)

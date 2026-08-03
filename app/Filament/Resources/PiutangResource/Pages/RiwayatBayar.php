@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PiutangResource\Pages;
 
+use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\PiutangResource;
 use App\Models\Order;
 use App\Models\OrderPayment;
@@ -100,14 +101,9 @@ class RiwayatBayar extends Page implements HasTable
                 EditAction::make()
                     ->modalHeading('Edit Pembayaran')
                     ->form([
-                        TextInput::make('amount')
+                        NumericInput::apply(TextInput::make('amount'), maxDigits: 9)
                             ->label('Jumlah')
                             ->required()
-                            ->numeric()
-                            ->type('text')
-                            ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                            ->stripCharacters('.')
-                            ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                             ->minValue(1)
                             ->prefix('Rp'),
                         Select::make('payment_method')
@@ -144,14 +140,9 @@ class RiwayatBayar extends Page implements HasTable
                 ->icon('heroicon-o-plus')
                 ->modalHeading('Catat Pembayaran Baru')
                 ->form([
-                    TextInput::make('amount')
+                    NumericInput::apply(TextInput::make('amount'), maxDigits: 9)
                         ->label('Jumlah')
                         ->required()
-                        ->numeric()
-                        ->type('text')
-                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                        ->stripCharacters('.')
-                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                         ->minValue(1)
                         ->prefix('Rp'),
                     Select::make('payment_method')

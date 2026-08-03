@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\StockResource\Forms;
 
 use App\Enums\BatchMode;
+use App\Filament\Forms\Components\NumericInput;
 use App\Models\Ingredient;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\DateTimePicker;
@@ -30,12 +31,9 @@ class StockForm
                     ->searchable()
                     ->native(false)
                     ->live(),
-                TextInput::make('low_stock_threshold')
+                NumericInput::apply(TextInput::make('low_stock_threshold'), maxDigits: 6, precision: 3)
                     ->label('Peringatan Stok Rendah')
-                    ->type('text')
                     ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
-                    ->stripCharacters('.')
-                    ->dehydrateStateUsing(fn ($state) => is_string($state) ? (float) str_replace(',', '.', $state) : $state)
                     ->suffix(fn ($get) => $get('unit') ? ' '.$get('unit') : ''),
                 Select::make('batch_mode')
                     ->label('Prioritas Batch')
@@ -52,17 +50,11 @@ class StockForm
                     ->columnSpanFull()
                     ->columns(1)
                     ->schema([
-                        TextInput::make('quantity')
+                        NumericInput::apply(TextInput::make('quantity'), maxDigits: 6, precision: 3)
                             ->label('Jumlah')
                             ->required()
                             ->minValue(0)
                             ->step(0.1)
-                            ->type('text')
-                            ->mask(\App\Filament\Forms\Components\NumericInput::mask(3))
-                            ->stripCharacters('.')
-                            ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 3))
-                            ->mutateStateForValidationUsing(\App\Filament\Forms\Components\NumericInput::validationNormalizer())
-                            ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\NumericInput::normalizeState($state))
                             ->suffix(fn ($get) => $get('../../unit') ? ' '.$get('../../unit') : ''),
                         DatePicker::make('expiry_date')
                             ->label('Tanggal Kadaluarsa')
@@ -77,15 +69,10 @@ class StockForm
                             ->nullable()
                             ->default(now())
                             ->native(false),
-                        TextInput::make('cost_per_unit')
+                        NumericInput::apply(TextInput::make('cost_per_unit'), maxDigits: 9)
                             ->label('Harga per Unit')
                             ->required()
-                            ->numeric()
                             ->minValue(0)
-                            ->type('text')
-                            ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                            ->stripCharacters('.')
-                            ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                             ->prefix(fn ($get) => $get('../../unit') ? 'Rp/'.$get('../../unit') : 'Rp'),
                     ])
                     ->defaultItems(0)

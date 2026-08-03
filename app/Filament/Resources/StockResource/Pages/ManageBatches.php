@@ -4,6 +4,7 @@ namespace App\Filament\Resources\StockResource\Pages;
 
 use App\Enums\BatchMode;
 use App\Enums\AdjustableType;
+use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
@@ -284,18 +285,12 @@ class ManageBatches extends Page implements HasTable
     private function batchFormFields(bool $isCreate = false): array
     {
         $fields = [
-            TextInput::make('quantity')
+            NumericInput::apply(TextInput::make('quantity'), maxDigits: 6, precision: 3)
                 ->label('Jumlah')
                 ->required()
                 ->minValue(0)
                 ->maxValue(999999)
                 ->step(fn () => in_array($this->record->unit, ['gram', 'ml']) ? 1 : 0.001)
-                ->type('text')
-                ->mask(\App\Filament\Forms\Components\NumericInput::mask(3))
-                ->stripCharacters('.')
-                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 3))
-                ->mutateStateForValidationUsing(\App\Filament\Forms\Components\NumericInput::validationNormalizer())
-                ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\NumericInput::normalizeState($state))
                 ->suffix(fn () => ' '.$this->record->unit),
             DatePicker::make('expiry_date')
                 ->label('Tanggal Kedaluwarsa')
@@ -313,16 +308,11 @@ class ManageBatches extends Page implements HasTable
                 ->label('Supplier')
                 ->maxLength(255)
                 ->placeholder('Nama supplier...'),
-            TextInput::make('total_harga')
+            NumericInput::apply(TextInput::make('total_harga'), maxDigits: 9)
                 ->label('Total Harga')
                 ->required()
                 ->minValue(0)
-                ->maxValue(999999)
-                ->numeric()
-                ->type('text')
-                ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                ->stripCharacters('.')
-                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
+                ->maxValue(999999999)
                 ->live()
                 ->afterStateUpdated(function (Set $set, Get $get, mixed $state): void {
                     if ($get('sudah_lunas')) {
@@ -333,15 +323,10 @@ class ManageBatches extends Page implements HasTable
         ];
 
         if ($isCreate) {
-            $fields[] = TextInput::make('total_dibayar')
+            $fields[] = NumericInput::apply(TextInput::make('total_dibayar'), maxDigits: 9)
                 ->label('Total Dibayar')
-                ->numeric()
                 ->minValue(0)
                 ->default(0)
-                ->type('text')
-                ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                ->stripCharacters('.')
-                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                 ->prefix('Rp')
                 ->disabled(fn (Get $get): bool => (bool) $get('sudah_lunas'))
                 ->dehydrated()

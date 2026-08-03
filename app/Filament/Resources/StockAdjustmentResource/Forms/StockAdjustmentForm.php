@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\StockAdjustmentResource\Forms;
 
 use App\Enums\AdjustableType;
+use App\Filament\Forms\Components\NumericInput;
 use App\Models\Ingredient;
 use App\Models\StockAdjustment;
 use Filament\Forms\Components\DateTimePicker;
@@ -57,16 +58,9 @@ class StockAdjustmentForm
                 ->required()
                 ->disabled(fn (Get $get) => ! filled($get('adjustment_type')))
                 ->native(false),
-            TextInput::make('quantity')
+            NumericInput::apply(TextInput::make('quantity'), maxDigits: 6, precision: 3)
                 ->label('Jumlah')
                 ->required()
-                ->numeric(fn (Get $get) => $get('adjustable_type') === AdjustableType::Menu->value)
-                ->type('text')
-                ->mask(\App\Filament\Forms\Components\NumericInput::mask(3))
-                ->stripCharacters('.')
-                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 3))
-                ->mutateStateForValidationUsing(\App\Filament\Forms\Components\NumericInput::validationNormalizer())
-                ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\NumericInput::normalizeState($state))
                 ->prefix(fn (Get $get) => $get('adjustment_type') === StockAdjustment::TYPE_DECREASE ? '-' : '+')
                 ->suffix(fn (Get $get) => $get('adjustable_type') === AdjustableType::Menu->value
                     ? ' porsi'

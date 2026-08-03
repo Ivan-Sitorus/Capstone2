@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\OrderResource\Pages;
 
+use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use Filament\Actions;
@@ -36,14 +37,9 @@ class ViewOrder extends ViewRecord
                 ->color('success')
                 ->visible(fn (Order $record): bool => $record->payment_method === 'piutang' && $record->status === 'belum_lunas')
                 ->form([
-                    TextInput::make('amount')
+                    NumericInput::apply(TextInput::make('amount'), maxDigits: 9)
                         ->label('Jumlah Pembayaran')
                         ->required()
-                        ->numeric()
-                        ->type('text')
-                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                        ->stripCharacters('.')
-                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                         ->minValue(1)
                         ->maxValue(fn (Order $record): float => max(0, (float) $record->total_amount - (float) $record->orderPayments->sum('amount'))),
                     Select::make('payment_method')

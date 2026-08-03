@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\ReceivableResource\Forms;
 
+use App\Filament\Forms\Components\NumericInput;
 use App\Models\Menu;
 use App\Models\Receivable;
 use Filament\Forms\Components\DateTimePicker;
@@ -25,13 +26,8 @@ class ReceivableForm
                         ->searchable()
                         ->required()
                         ->native(false),
-                    TextInput::make('quantity')
+                    NumericInput::apply(TextInput::make('quantity'), maxDigits: 5)
                         ->label('Jumlah')
-                        ->numeric()
-                        ->type('text')
-                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                        ->stripCharacters('.')
-                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                         ->default(1)
                         ->minValue(1)
                         ->required(),
@@ -62,15 +58,10 @@ class ReceivableForm
                 ->disabled()
                 ->dehydrated(true)
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : ''),
-            TextInput::make('paid_amount')
+            NumericInput::apply(TextInput::make('paid_amount'), maxDigits: 9)
                 ->label('Jumlah Dibayar')
                 ->required()
-                ->type('text')
                 ->prefix('Rp')
-                ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                ->stripCharacters('.')
-                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
-                ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\NumericInput::normalizeState($state))
                 ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
                 ->live()
                 ->afterStateUpdated(function ($state, Set $set) {

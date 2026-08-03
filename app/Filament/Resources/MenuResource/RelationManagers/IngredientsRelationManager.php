@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MenuResource\RelationManagers;
 
+use App\Filament\Forms\Components\NumericInput;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -31,18 +32,11 @@ class IngredientsRelationManager extends RelationManager
                 ->preload()
                 ->live()
                 ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".$record->unit.")"),
-            TextInput::make("quantity_used")
+            NumericInput::apply(TextInput::make("quantity_used"), maxDigits: 6, precision: 3)
                 ->label("Jumlah per Porsi")
                 ->required()
-                ->numeric()
-                ->type('text')
-                ->mask(\App\Filament\Forms\Components\NumericInput::mask(3))
-                ->stripCharacters('.')
-                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 3))
-                ->mutateStateForValidationUsing(\App\Filament\Forms\Components\NumericInput::validationNormalizer())
-                ->dehydrateStateUsing(fn ($state) => \App\Filament\Forms\Components\NumericInput::normalizeState($state))
-                ->minValue(0.01)
-                ->step(0.01),
+                ->minValue(0.001)
+                ->step(0.001),
             Select::make("unit_id")
                 ->label("Satuan")
                 ->options(fn (Get $get): array => self::getCompatibleUnitOptions($get("ingredient_id")))

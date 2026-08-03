@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\PiutangResource\Pages;
 
+use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\PiutangResource;
 use App\Models\Menu;
 use App\Models\Order;
@@ -54,14 +55,9 @@ class ListPiutangs extends ListRecords
                                 ->required()
                                 ->searchable()
                                 ->live(),
-                            TextInput::make('quantity')
+                            NumericInput::apply(TextInput::make('quantity'), maxDigits: 5)
                                 ->label('Jumlah')
                                 ->required()
-                                ->numeric()
-                                ->type('text')
-                                ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                                ->stripCharacters('.')
-                                ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                                 ->minValue(1)
                                 ->default(1),
                             Select::make('price_type')
@@ -82,13 +78,8 @@ class ListPiutangs extends ListRecords
                         ->columns(3)
                         ->minItems(1)
                         ->required(),
-                    TextInput::make('paid_amount')
+                    NumericInput::apply(TextInput::make('paid_amount'), maxDigits: 9)
                         ->label('Sudah Dibayar')
-                        ->numeric()
-                        ->type('text')
-                        ->mask(\App\Filament\Forms\Components\NumericInput::mask(0))
-                        ->stripCharacters('.')
-                        ->maxLength(\App\Filament\Forms\Components\NumericInput::maxLength(6, 0))
                         ->minValue(0)
                         ->default(0)
                         ->prefix('Rp'),
