@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StockResource\Tables;
 
+use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\Ingredient;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -59,7 +60,7 @@ class StockTable
                         $query->orderByRaw('(SELECT COALESCE(SUM(quantity), 0) FROM ingredient_batches WHERE ingredient_batches.ingredient_id = ingredients.id) '.$direction);
                     }),
                 TextColumn::make('batch_mode')
-                    ->label('Prioritas Batch')
+                    ->label(ColumnInfoTooltip::label('Prioritas Batch', "FEFO: Batch stok dengan kedaluwarsa terdekat dipakai lebih dulu\nFIFO: Batch stok dengan waktu diterima paling awal dipakai lebih dulu"))
                     ->badge()
                     ->color(fn ($state) => $state === 'fifo' ? 'info' : 'warning')
                     ->formatStateUsing(fn ($state) => strtoupper($state)),

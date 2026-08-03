@@ -369,7 +369,7 @@ class ManageBatches extends Page implements HasTable
 
         $fields[] = Toggle::make('allow_expired_usage')
             ->label('Bisa dipakai meskipun kedaluwarsa')
-            ->helperText('Batch ini tetap bisa dipakai FEFO walau sudah kedaluwarsa')
+            ->helperText('Jika tidak diaktifkan, batch ini otomatis tidak bisa dipakai jika sudah kedaluwarsa')
             ->visible(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
             ->default(false);
 

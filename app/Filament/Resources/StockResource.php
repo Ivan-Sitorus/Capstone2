@@ -31,7 +31,7 @@ class StockResource extends Resource
 
     protected static ?string $label = 'Bahan Baku';
 
-    protected static ?string $slug = 'stok';
+    protected static ?string $slug = 'bahan-baku';
 
     protected static ?int $navigationSort = 1;
 

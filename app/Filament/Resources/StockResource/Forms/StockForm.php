@@ -10,6 +10,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
+use Illuminate\Support\HtmlString;
 
 class StockForm
 {
@@ -41,7 +42,8 @@ class StockForm
                     ->options(Ingredient::batchModes())
                     ->default(BatchMode::Fefo->value)
                     ->required()
-                    ->native(false),
+                    ->native(false)
+                    ->helperText(new HtmlString("FEFO: Batch stok dengan kedaluwarsa terdekat dipakai lebih dulu<br>FIFO: Batch stok dengan waktu diterima paling awal dipakai lebih dulu")),
                 Repeater::make('batches')
                     ->relationship('batches')
                     ->label('Stok Awal (Batch)')
