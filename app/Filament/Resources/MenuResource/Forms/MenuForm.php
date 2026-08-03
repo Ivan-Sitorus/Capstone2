@@ -12,6 +12,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class MenuForm
@@ -102,7 +103,22 @@ class MenuForm
                         ->preload()
                         ->live()
                         ->placeholder("Pilih bahan baku...")
-                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".$record->unit.")"),
+                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".$record->unit.")")
+                        ->afterStateUpdated(function (Set $set, Get $get): void {
+                            $ingredientId = $get('ingredient_id');
+                            if (! $ingredientId) {
+                                $set('unit_id', null);
+                                return;
+                            }
+                            $ingredient = Ingredient::find($ingredientId);
+                            if (! $ingredient) {
+                                $set('unit_id', null);
+                                return;
+                            }
+                            // Auto-select the ingredient's native unit (count/weight/volume)
+                            $unit = \App\Models\Unit::where('name', $ingredient->unit)->first();
+                            $set('unit_id', $unit?->id ?? null);
+                        }),
                     Select::make("unit_id")
                         ->label("Satuan")
                         ->required()

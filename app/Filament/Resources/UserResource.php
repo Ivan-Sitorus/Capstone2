@@ -24,6 +24,8 @@ class UserResource extends Resource
 
     protected static ?string $navigationLabel = 'Akun Staff';
 
+    protected static ?string $label = 'Akun Staff';
+
     protected static ?string $pluralLabel = 'Akun Staff';
 
     protected static ?string $slug = 'akun-staff';
