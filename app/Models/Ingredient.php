@@ -21,6 +21,13 @@ class Ingredient extends Model
         'unit_id',
     ];
 
+    protected function casts(): array
+    {
+        return [
+            'low_stock_threshold' => 'decimal:3',
+        ];
+    }
+
     const UNITS = [
         'gram' => 'Gram (g)',
         'kg' => 'Kilogram (kg)',

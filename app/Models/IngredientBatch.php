@@ -65,8 +65,8 @@ class IngredientBatch extends Model
         return [
             'expiry_date' => 'date',
             'received_at' => 'datetime',
-            'quantity' => 'decimal:2',
-            'cost_per_unit' => 'decimal:2',
+            'quantity' => 'decimal:3',
+            'cost_per_unit' => 'decimal:3',
             'custom_order' => 'integer',
             'status' => 'string',
             'allow_expired_usage' => 'boolean',

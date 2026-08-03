@@ -19,7 +19,7 @@ class MenuIngredient extends Model
     protected function casts(): array
     {
         return [
-            "quantity_used" => "decimal:2",
+            "quantity_used" => "decimal:3",
         ];
     }
 

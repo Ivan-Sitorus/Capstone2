@@ -71,9 +71,9 @@ class StockAdjustment extends Model
     protected function casts(): array
     {
         return [
-            'quantity' => 'decimal:2',
-            'quantity_before' => 'decimal:2',
-            'quantity_after' => 'decimal:2',
+            'quantity' => 'decimal:3',
+            'quantity_before' => 'decimal:3',
+            'quantity_after' => 'decimal:3',
             'adjusted_at' => 'datetime',
             'category' => 'string',
             'status' => 'string',

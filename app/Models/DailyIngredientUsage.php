@@ -19,7 +19,7 @@ class DailyIngredientUsage extends Model
     {
         return [
             'usage_date' => 'date',
-            'jumlah_digunakan' => 'decimal:2',
+            'jumlah_digunakan' => 'decimal:3',
         ];
     }
 
