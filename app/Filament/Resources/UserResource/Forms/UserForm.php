@@ -36,10 +36,6 @@ class UserForm
                 ])
                 ->required()
                 ->default('cashier'),
-            TextInput::make('phone')
-                ->label('No. HP')
-                ->nullable()
-                ->maxLength(20),
         ]);
     }
 }
