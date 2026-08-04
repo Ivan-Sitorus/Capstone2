@@ -2,12 +2,12 @@
 
 namespace Database\Seeders;
 
-use App\Models\StaffSession;
+use App\Models\CashierHistory;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
-class StaffSessionSeeder extends Seeder
+class CashierHistorySeeder extends Seeder
 {
     public function run(): void
     {
@@ -69,7 +69,7 @@ class StaffSessionSeeder extends Seeder
             'updated_at' => $now,
         ];
 
-        StaffSession::insert($sessions);
+        CashierHistory::insert($sessions);
 
         $this->command->info(
             count($sessions) . ' sesi login kasir berhasil di-seed untuk ' .

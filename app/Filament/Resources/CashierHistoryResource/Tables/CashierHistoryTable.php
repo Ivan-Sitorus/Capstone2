@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\StaffSessionResource\Tables;
+namespace App\Filament\Resources\CashierHistoryResource\Tables;
 
-use App\Filament\Resources\StaffSessionResource;
-use App\Models\StaffSession;
-use App\Services\StaffSessionService;
+use App\Filament\Resources\CashierHistoryResource;
+use App\Models\CashierHistory;
+use App\Services\CashierHistoryService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
@@ -15,13 +15,13 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class StaffSessionTable
+class CashierHistoryTable
 {
     public static function configure(Table $table): Table
     {
         return $table
             ->query(
-                StaffSession::with('user')
+                CashierHistory::with('user')
                     ->orderByDesc('started_at')
             )
             ->columns([
@@ -54,7 +54,7 @@ class StaffSessionTable
                     ->sortable(),
                 TextColumn::make('order_count')
                     ->label('Jumlah Pesanan')
-                    ->getStateUsing(fn ($record) => app(StaffSessionService::class)->getOrderCount($record)),
+                    ->getStateUsing(fn ($record) => app(CashierHistoryService::class)->getOrderCount($record)),
             ])
             ->filters([
                 Filter::make('email')
@@ -116,7 +116,7 @@ class StaffSessionTable
                 Action::make('view')
                     ->label('Detail')
                     ->icon(Heroicon::OutlinedEye)
-                    ->url(fn (StaffSession $record) => StaffSessionResource::getUrl('view', ['record' => $record])),
+                    ->url(fn (CashierHistory $record) => CashierHistoryResource::getUrl('view', ['record' => $record])),
             ])
             ->defaultSort('started_at', 'desc');
     }

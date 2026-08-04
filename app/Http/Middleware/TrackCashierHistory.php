@@ -2,16 +2,16 @@
 
 namespace App\Http\Middleware;
 
-use App\Services\StaffSessionService;
+use App\Services\CashierHistoryService;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class TrackStaffSession
+class TrackCashierHistory
 {
     public function __construct(
-        protected StaffSessionService $staffSessionService
+        protected CashierHistoryService $cashierHistoryService
     ) {}
     /**
      * Handle an incoming request.
@@ -35,12 +35,12 @@ class TrackStaffSession
             return $next($request);
         }
 
-        $this->staffSessionService->closeExpiredSessions(30);
+        $this->cashierHistoryService->closeExpiredSessions(30);
 
-        $activeSession = $this->staffSessionService->getActiveSession($user);
+        $activeSession = $this->cashierHistoryService->getActiveSession($user);
 
         if ($activeSession) {
-            $this->staffSessionService->updateActivity($activeSession);
+            $this->cashierHistoryService->updateActivity($activeSession);
         }
         // No else — session creation is AuthController's job
 

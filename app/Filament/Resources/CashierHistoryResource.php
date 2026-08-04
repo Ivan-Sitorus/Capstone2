@@ -2,31 +2,33 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\StaffSessionResource\Pages\ListStaffSessions;
-use App\Filament\Resources\StaffSessionResource\Pages\ViewStaffSession;
-use App\Filament\Resources\StaffSessionResource\Tables\StaffSessionTable;
-use App\Models\StaffSession;
+use App\Filament\Resources\CashierHistoryResource\Pages\ListCashierHistories;
+use App\Filament\Resources\CashierHistoryResource\Pages\ViewCashierHistory;
+use App\Filament\Resources\CashierHistoryResource\Tables\CashierHistoryTable;
+use App\Models\CashierHistory;
 use Filament\Resources\Resource;
 use BackedEnum;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use UnitEnum;
 
-class StaffSessionResource extends Resource
+class CashierHistoryResource extends Resource
 {
-    protected static ?string $model = StaffSession::class;
+    protected static ?string $model = CashierHistory::class;
 
     protected static string | BackedEnum | null $navigationIcon = Heroicon::OutlinedClock;
 
     protected static string | UnitEnum | null $navigationGroup = 'Staff';
 
-    protected static ?string $navigationLabel = 'Riwayat Login Staff';
+    protected static ?string $navigationLabel = 'Riwayat Kasir';
+
+    protected static ?string $slug = 'riwayat-kasir';
 
     protected static ?int $navigationSort = 2;
 
     public static function table(Table $table): Table
     {
-        return StaffSessionTable::configure($table);
+        return CashierHistoryTable::configure($table);
     }
 
     public static function canCreate(): bool
@@ -47,8 +49,8 @@ class StaffSessionResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListStaffSessions::route('/'),
-            'view'  => ViewStaffSession::route('/{record}'),
+            'index' => ListCashierHistories::route('/'),
+            'view'  => ViewCashierHistory::route('/{record}'),
         ];
     }
 }

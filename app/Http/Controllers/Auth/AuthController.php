@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Services\StaffSessionService;
+use App\Services\CashierHistoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +15,7 @@ use Inertia\Response;
 class AuthController extends Controller
 {
     public function __construct(
-        protected StaffSessionService $staffSessionService
+        protected CashierHistoryService $cashierHistoryService
     ) {}
     public function showLogin(): Response
     {
@@ -72,7 +72,7 @@ class AuthController extends Controller
 
         $user = Auth::guard($guard)->user();
 
-        $this->staffSessionService->startSession($user);
+        $this->cashierHistoryService->startSession($user);
 
         if ($user->role === 'admin') {
             return redirect()->to('/admin');
@@ -87,9 +87,9 @@ class AuthController extends Controller
         $user = Auth::guard($guard)->user();
 
         if ($user && $user->role === 'cashier') {
-            $activeSession = $this->staffSessionService->getActiveSession($user);
+            $activeSession = $this->cashierHistoryService->getActiveSession($user);
             if ($activeSession) {
-                $this->staffSessionService->endSession($activeSession);
+                $this->cashierHistoryService->endSession($activeSession);
             }
         }
 

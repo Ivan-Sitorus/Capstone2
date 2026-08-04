@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Filament\Resources\StaffSessionResource\Pages;
+namespace App\Filament\Resources\CashierHistoryResource\Pages;
 
-use App\Filament\Resources\StaffSessionResource;
+use App\Filament\Resources\CashierHistoryResource;
+use App\Models\CashierHistory;
 use App\Models\Order;
-use App\Models\StaffSession;
-use App\Services\StaffSessionService;
+use App\Services\CashierHistoryService;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\Page;
@@ -18,15 +18,15 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 
-class ViewStaffSession extends Page implements HasTable
+class ViewCashierHistory extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static string $resource = StaffSessionResource::class;
+    protected static string $resource = CashierHistoryResource::class;
 
-    public StaffSession $record;
+    public CashierHistory $record;
 
-    public function mount(StaffSession $record): void
+    public function mount(CashierHistory $record): void
     {
         $this->record = $record;
     }
@@ -61,7 +61,7 @@ class ViewStaffSession extends Page implements HasTable
                         ->state($session->ended_at?->format('d M Y, H:i') ?? 'Masih Aktif'),
                     TextEntry::make('order_count')
                         ->label('Jumlah Pesanan')
-                        ->state(app(StaffSessionService::class)->getOrderCount($session)),
+                        ->state(app(CashierHistoryService::class)->getOrderCount($session)),
                 ])
                 ->columns(3),
             EmbeddedTable::make(),

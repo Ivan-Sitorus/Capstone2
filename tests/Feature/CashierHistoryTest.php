@@ -2,26 +2,26 @@
 
 namespace Tests\Feature;
 
-use App\Http\Middleware\TrackStaffSession;
+use App\Http\Middleware\TrackCashierHistory;
 use App\Models\Order;
-use App\Models\StaffSession;
+use App\Models\CashierHistory;
 use App\Models\User;
-use App\Services\StaffSessionService;
+use App\Services\CashierHistoryService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
 use Tests\TestCase;
 
-class StaffSessionTest extends TestCase
+class CashierHistoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    private StaffSessionService $service;
+    private CashierHistoryService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new StaffSessionService();
+        $this->service = new CashierHistoryService();
     }
 
     /** @test */
@@ -31,7 +31,7 @@ class StaffSessionTest extends TestCase
 
         $session = $this->service->startSession($user);
 
-        $this->assertInstanceOf(StaffSession::class, $session);
+        $this->assertInstanceOf(CashierHistory::class, $session);
         $this->assertEquals('cashier', $session->type);
         $this->assertNotNull($session->id);
         $this->assertEquals($user->id, $session->user_id);
@@ -40,7 +40,7 @@ class StaffSessionTest extends TestCase
         $this->assertNotNull($session->last_activity_at);
         $this->assertNull($session->ended_at);
 
-        $this->assertDatabaseHas('staff_sessions', [
+        $this->assertDatabaseHas('cashier_historys', [
             'user_id' => $user->id,
             'type' => 'cashier',
             'is_active' => true,
@@ -54,7 +54,7 @@ class StaffSessionTest extends TestCase
 
         $session = $this->service->startSession($user);
 
-        $this->assertInstanceOf(StaffSession::class, $session);
+        $this->assertInstanceOf(CashierHistory::class, $session);
         $this->assertEquals('kitchen', $session->type);
         $this->assertNotNull($session->id);
         $this->assertEquals($user->id, $session->user_id);
@@ -63,7 +63,7 @@ class StaffSessionTest extends TestCase
         $this->assertNotNull($session->last_activity_at);
         $this->assertNull($session->ended_at);
 
-        $this->assertDatabaseHas('staff_sessions', [
+        $this->assertDatabaseHas('cashier_historys', [
             'user_id' => $user->id,
             'type' => 'kitchen',
             'is_active' => true,
@@ -79,7 +79,7 @@ class StaffSessionTest extends TestCase
 
         $this->assertNull($session);
 
-        $this->assertDatabaseMissing('staff_sessions', [
+        $this->assertDatabaseMissing('cashier_historys', [
             'user_id' => $user->id,
         ]);
     }
@@ -92,7 +92,7 @@ class StaffSessionTest extends TestCase
         session()->start();
         $sessionId = session()->getId();
 
-        $oldCashierSession = StaffSession::create([
+        $oldCashierSession = CashierHistory::create([
             'user_id' => $user->id,
             'type' => 'cashier',
             'session_id' => $sessionId,
@@ -101,7 +101,7 @@ class StaffSessionTest extends TestCase
             'is_active' => true,
         ]);
 
-        $oldKitchenSession = StaffSession::create([
+        $oldKitchenSession = CashierHistory::create([
             'user_id' => $user->id,
             'type' => 'kitchen',
             'session_id' => $sessionId,
@@ -112,17 +112,17 @@ class StaffSessionTest extends TestCase
 
         $newSession = $this->service->startSession($user);
 
-        $this->assertDatabaseHas('staff_sessions', [
+        $this->assertDatabaseHas('cashier_historys', [
             'id' => $oldCashierSession->id,
             'is_active' => false,
         ]);
-        $this->assertNotNull(StaffSession::find($oldCashierSession->id)->ended_at);
+        $this->assertNotNull(CashierHistory::find($oldCashierSession->id)->ended_at);
 
-        $this->assertDatabaseHas('staff_sessions', [
+        $this->assertDatabaseHas('cashier_historys', [
             'id' => $oldKitchenSession->id,
             'is_active' => false,
         ]);
-        $this->assertNotNull(StaffSession::find($oldKitchenSession->id)->ended_at);
+        $this->assertNotNull(CashierHistory::find($oldKitchenSession->id)->ended_at);
 
         $this->assertTrue($newSession->is_active);
         $this->assertNull($newSession->ended_at);
@@ -133,7 +133,7 @@ class StaffSessionTest extends TestCase
     {
         $user = User::factory()->create(['role' => 'cashier']);
 
-        $session = StaffSession::create([
+        $session = CashierHistory::create([
             'user_id' => $user->id,
             'type' => 'cashier',
             'started_at' => now(),
@@ -153,7 +153,7 @@ class StaffSessionTest extends TestCase
     public function test_close_expired_sessions(): void
     {
         $cashierUser = User::factory()->create(['role' => 'cashier']);
-        StaffSession::create([
+        CashierHistory::create([
             'user_id' => $cashierUser->id,
             'type' => 'cashier',
             'started_at' => now()->subHours(2),
@@ -162,7 +162,7 @@ class StaffSessionTest extends TestCase
         ]);
 
         $kitchenUser = User::factory()->create(['role' => 'kitchen']);
-        StaffSession::create([
+        CashierHistory::create([
             'user_id' => $kitchenUser->id,
             'type' => 'kitchen',
             'started_at' => now()->subHours(2),
@@ -174,11 +174,11 @@ class StaffSessionTest extends TestCase
 
         $this->assertEquals(2, $closedCount);
 
-        $this->assertDatabaseMissing('staff_sessions', [
+        $this->assertDatabaseMissing('cashier_historys', [
             'user_id' => $cashierUser->id,
             'is_active' => true,
         ]);
-        $this->assertDatabaseMissing('staff_sessions', [
+        $this->assertDatabaseMissing('cashier_historys', [
             'user_id' => $kitchenUser->id,
             'is_active' => true,
         ]);
@@ -188,7 +188,7 @@ class StaffSessionTest extends TestCase
     public function test_close_expired_sessions_only_when_idle(): void
     {
         $cashierUser = User::factory()->create(['role' => 'cashier']);
-        StaffSession::create([
+        CashierHistory::create([
             'user_id' => $cashierUser->id,
             'type' => 'cashier',
             'started_at' => now()->subHours(2),
@@ -197,7 +197,7 @@ class StaffSessionTest extends TestCase
         ]);
 
         $kitchenUser = User::factory()->create(['role' => 'kitchen']);
-        StaffSession::create([
+        CashierHistory::create([
             'user_id' => $kitchenUser->id,
             'type' => 'kitchen',
             'started_at' => now()->subHours(2),
@@ -209,11 +209,11 @@ class StaffSessionTest extends TestCase
 
         $this->assertEquals(0, $closedCount);
 
-        $this->assertDatabaseHas('staff_sessions', [
+        $this->assertDatabaseHas('cashier_historys', [
             'user_id' => $cashierUser->id,
             'is_active' => true,
         ]);
-        $this->assertDatabaseHas('staff_sessions', [
+        $this->assertDatabaseHas('cashier_historys', [
             'user_id' => $kitchenUser->id,
             'is_active' => true,
         ]);
@@ -224,7 +224,7 @@ class StaffSessionTest extends TestCase
     {
         $user = User::factory()->create(['role' => 'cashier']);
 
-        $session = StaffSession::create([
+        $session = CashierHistory::create([
             'user_id' => $user->id,
             'type' => 'cashier',
             'started_at' => now(),
@@ -234,7 +234,7 @@ class StaffSessionTest extends TestCase
 
         $activeSession = $this->service->getActiveSession($user);
 
-        $this->assertInstanceOf(StaffSession::class, $activeSession);
+        $this->assertInstanceOf(CashierHistory::class, $activeSession);
         $this->assertEquals($session->id, $activeSession->id);
         $this->assertTrue($activeSession->is_active);
     }
@@ -244,7 +244,7 @@ class StaffSessionTest extends TestCase
     {
         $cashier = User::factory()->create(['role' => 'cashier']);
 
-        $session = StaffSession::create([
+        $session = CashierHistory::create([
             'user_id' => $cashier->id,
             'type' => 'cashier',
             'started_at' => now()->subHours(2),
@@ -268,7 +268,7 @@ class StaffSessionTest extends TestCase
     {
         $kitchen = User::factory()->create(['role' => 'kitchen']);
 
-        $session = StaffSession::create([
+        $session = CashierHistory::create([
             'user_id' => $kitchen->id,
             'type' => 'kitchen',
             'started_at' => now()->subHours(3),
@@ -299,7 +299,7 @@ class StaffSessionTest extends TestCase
     {
         $cashier = User::factory()->create(['role' => 'cashier']);
 
-        $session = StaffSession::create([
+        $session = CashierHistory::create([
             'user_id' => $cashier->id,
             'type' => 'cashier',
             'started_at' => now()->subHours(2),
@@ -324,7 +324,7 @@ class StaffSessionTest extends TestCase
 
         $cashier2 = User::factory()->create(['role' => 'cashier']);
 
-        $endedSession = StaffSession::create([
+        $endedSession = CashierHistory::create([
             'user_id' => $cashier2->id,
             'type' => 'cashier',
             'started_at' => now()->subHours(4),
@@ -360,7 +360,7 @@ class StaffSessionTest extends TestCase
     {
         $cashier = User::factory()->create(['role' => 'cashier']);
 
-        $session = StaffSession::create([
+        $session = CashierHistory::create([
             'user_id' => $cashier->id,
             'type' => 'cashier',
             'started_at' => now()->subHours(2),
@@ -390,7 +390,7 @@ class StaffSessionTest extends TestCase
 
         $user = User::factory()->create(['role' => 'cashier']);
 
-        $session = StaffSession::create([
+        $session = CashierHistory::create([
             'user_id' => $user->id,
             'type' => 'cashier',
             'started_at' => now()->subMinutes(10),
@@ -400,7 +400,7 @@ class StaffSessionTest extends TestCase
 
         $this->actingAs($user);
 
-        $middleware = app(TrackStaffSession::class);
+        $middleware = app(TrackCashierHistory::class);
         $request = Request::create('/test', 'GET');
 
         $middleware->handle($request, fn ($req) => response('ok'));
@@ -423,7 +423,7 @@ class StaffSessionTest extends TestCase
 
         $cashierUser = User::factory()->create(['role' => 'cashier']);
 
-        $oldCashierSession = StaffSession::create([
+        $oldCashierSession = CashierHistory::create([
             'user_id' => $cashierUser->id,
             'type' => 'cashier',
             'started_at' => now()->subHours(2),
@@ -433,7 +433,7 @@ class StaffSessionTest extends TestCase
 
         $kitchenUser = User::factory()->create(['role' => 'kitchen']);
 
-        $oldKitchenSession = StaffSession::create([
+        $oldKitchenSession = CashierHistory::create([
             'user_id' => $kitchenUser->id,
             'type' => 'kitchen',
             'started_at' => now()->subHours(2),
@@ -443,16 +443,16 @@ class StaffSessionTest extends TestCase
 
         $this->actingAs($cashierUser);
 
-        $middleware = app(TrackStaffSession::class);
+        $middleware = app(TrackCashierHistory::class);
         $request = Request::create('/test', 'GET');
 
         $middleware->handle($request, fn ($req) => response('ok'));
 
-        $this->assertFalse(StaffSession::find($oldCashierSession->id)->is_active);
-        $this->assertNotNull(StaffSession::find($oldCashierSession->id)->ended_at);
+        $this->assertFalse(CashierHistory::find($oldCashierSession->id)->is_active);
+        $this->assertNotNull(CashierHistory::find($oldCashierSession->id)->ended_at);
 
-        $this->assertFalse(StaffSession::find($oldKitchenSession->id)->is_active);
-        $this->assertNotNull(StaffSession::find($oldKitchenSession->id)->ended_at);
+        $this->assertFalse(CashierHistory::find($oldKitchenSession->id)->is_active);
+        $this->assertNotNull(CashierHistory::find($oldKitchenSession->id)->ended_at);
 
         Carbon::setTestNow();
     }
@@ -464,12 +464,12 @@ class StaffSessionTest extends TestCase
 
         $this->actingAs($user);
 
-        $middleware = app(TrackStaffSession::class);
+        $middleware = app(TrackCashierHistory::class);
         $request = Request::create('/test', 'GET');
 
         $middleware->handle($request, fn ($req) => response('ok'));
 
-        $this->assertDatabaseMissing('staff_sessions', [
+        $this->assertDatabaseMissing('cashier_historys', [
             'user_id' => $user->id,
         ]);
     }
@@ -481,7 +481,7 @@ class StaffSessionTest extends TestCase
 
         $user = User::factory()->create(['role' => 'cashier']);
 
-        $session = StaffSession::create([
+        $session = CashierHistory::create([
             'user_id' => $user->id,
             'type' => 'cashier',
             'started_at' => now()->subMinutes(10),
@@ -491,7 +491,7 @@ class StaffSessionTest extends TestCase
 
         $this->actingAs($user);
 
-        $middleware = app(TrackStaffSession::class);
+        $middleware = app(TrackCashierHistory::class);
         $request = Request::create('/test', 'GET');
 
         $middleware->handle($request, fn ($req) => response('ok'));
@@ -528,7 +528,7 @@ class StaffSessionTest extends TestCase
 
         $response->assertSessionHasNoErrors();
 
-        $this->assertDatabaseHas('staff_sessions', [
+        $this->assertDatabaseHas('cashier_historys', [
             'user_id' => $user->id,
             'type' => 'cashier',
             'is_active' => true,
@@ -548,7 +548,7 @@ class StaffSessionTest extends TestCase
             'password' => 'password',
         ]);
 
-        $session = StaffSession::where('user_id', $user->id)
+        $session = CashierHistory::where('user_id', $user->id)
             ->where('is_active', true)
             ->first();
 

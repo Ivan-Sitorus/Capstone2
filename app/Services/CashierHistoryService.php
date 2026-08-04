@@ -3,13 +3,13 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Models\CashierHistory;
 use App\Models\Order;
-use App\Models\StaffSession;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
-class StaffSessionService
+class CashierHistoryService
 {
     /**
      * Start a new session for the given user.
@@ -17,7 +17,7 @@ class StaffSessionService
      * Closes any existing active sessions on the SAME device (session_id)
      * before creating a new one. Sessions on OTHER devices remain active.
      */
-    public function startSession(User $user): ?StaffSession
+    public function startSession(User $user): ?CashierHistory
     {
         $type = match ($user->role) {
             'cashier' => 'cashier',
@@ -30,7 +30,7 @@ class StaffSessionService
 
         $this->closeAllSessionsForUser($user);
 
-        return StaffSession::create([
+        return CashierHistory::create([
             'user_id' => $user->id,
             'type' => $type,
             'session_id' => session()->getId(),
@@ -40,7 +40,7 @@ class StaffSessionService
         ]);
     }
 
-    public function endSession(StaffSession $session): void
+    public function endSession(CashierHistory $session): void
     {
         $session->ended_at = now();
         $session->is_active = false;
@@ -51,7 +51,7 @@ class StaffSessionService
     {
         $threshold = now()->subMinutes($idleMinutes);
 
-        return StaffSession::where('is_active', true)
+        return CashierHistory::where('is_active', true)
             ->where('last_activity_at', '<', $threshold)
             ->update([
                 'ended_at' => DB::raw('last_activity_at'),
@@ -59,14 +59,14 @@ class StaffSessionService
             ]);
     }
 
-    public function getActiveSession(User $user): ?StaffSession
+    public function getActiveSession(User $user): ?CashierHistory
     {
-        return StaffSession::where('user_id', $user->id)
+        return CashierHistory::where('user_id', $user->id)
             ->where('is_active', true)
             ->first();
     }
 
-    public function getOrderCount(StaffSession $session): int
+    public function getOrderCount(CashierHistory $session): int
     {
         $endTime = $session->ended_at ?? now();
 
@@ -82,7 +82,7 @@ class StaffSessionService
             ->count();
     }
 
-    public function updateActivity(StaffSession $session): void
+    public function updateActivity(CashierHistory $session): void
     {
         $lastActivity = Carbon::parse($session->last_activity_at);
 
@@ -102,7 +102,7 @@ class StaffSessionService
      */
     private function closeAllSessionsForUser(User $user): void
     {
-        StaffSession::where('user_id', $user->id)
+        CashierHistory::where('user_id', $user->id)
             ->where('is_active', true)
             ->where('session_id', session()->getId())
             ->update([
