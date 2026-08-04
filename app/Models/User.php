@@ -57,9 +57,4 @@ class User extends Authenticatable implements FilamentUser
     {
         return $this->hasMany(StockAdjustment::class, 'reported_by');
     }
-
-    public function stockMovements(): HasMany
-    {
-        return $this->hasMany(StockMovement::class, 'recorded_by');
-    }
 }

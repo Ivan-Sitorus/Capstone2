@@ -24,15 +24,15 @@ import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
 const STATUS_CONFIG = {
   pending:   { variant: 'secondary',   label: 'Pending' },
-  diproses:  { variant: 'default',     label: 'Diproses' },
-  selesai:   { variant: 'default',     label: 'Selesai' },
+  processing:  { variant: 'default',     label: 'Diproses' },
+  completed:   { variant: 'default',     label: 'Selesai' },
   completed: { variant: 'default',     label: 'Selesai' },
   cancelled: { variant: 'destructive', label: 'Dibatalkan' },
   unpaid:    { variant: 'secondary',   label: 'Belum Dibayar' },
   paid:      { variant: 'default',     label: 'Dibayar' },
 };
 
-const METHOD_LABELS = { cash: 'Tunai', qris: 'QRIS', bayar_nanti: 'Bayar Nanti' };
+const METHOD_LABELS = { cash: 'Tunai', qris: 'QRIS', pay_later: 'Bayar Nanti' };
 const TODAY = new Date().toISOString().split('T')[0];
 
 export default function RiwayatTable({

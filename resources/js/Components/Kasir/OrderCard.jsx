@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 const METHOD_META = {
     cash:        { label: 'Tunai',       bg: '#FEF9EC', color: '#B45309', Icon: Banknote },
     qris:        { label: 'QRIS',        bg: '#EEF2FF', color: '#3B6FD4', Icon: QrCode   },
-    bayar_nanti: { label: 'Bayar Nanti', bg: '#EEF2FF', color: '#3B6FD4', Icon: Clock    },
+    pay_later: { label: 'Bayar Nanti', bg: '#EEF2FF', color: '#3B6FD4', Icon: Clock    },
 };
 
 import StatusBadge from '@/Components/Common/StatusBadge';
@@ -17,8 +17,8 @@ import QrisReviewModal from '@/Components/Cashier/QrisReviewModal';
 
 const STATUS_META = {
     pending:  { dot: '#D08068', label: 'Menunggu'  },
-    diproses: { dot: '#D4A64A', label: 'Diproses' },
-    selesai:  { dot: '#4D9B6A', label: 'Selesai'  },
+    processing: { dot: '#D4A64A', label: 'Diproses' },
+    completed:  { dot: '#4D9B6A', label: 'Selesai'  },
 };
 
 export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone, onConfirmPayment, onCancel }) {

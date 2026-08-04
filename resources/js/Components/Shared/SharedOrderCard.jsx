@@ -27,8 +27,8 @@ const URGENCY_STYLES = {
 /* ── Bump button labels per status ────────────────────────────── */
 const BUMP_LABEL = {
     pending:  '→ Ambil',
-    diproses: '✔ Selesai',
-    selesai:  'Selesai',
+    processing: '✔ Selesai',
+    completed:  'Selesai',
 };
 
 /* ── Component ────────────────────────────────────────────────── */

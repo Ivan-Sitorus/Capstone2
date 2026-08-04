@@ -8,8 +8,8 @@ const BG = '#F7F5F2';
 
 const STATUS_MAP = {
     pending:  { label: 'Pending',  dot: '#FBBF24', bg: 'rgba(251,191,36,0.10)',  border: 'rgba(251,191,36,0.20)'  },
-    diproses: { label: 'Diproses', dot: '#60A5FA', bg: 'rgba(96,165,250,0.10)',  border: 'rgba(96,165,250,0.20)'  },
-    selesai:  { label: 'Selesai',  dot: '#4ADE80', bg: 'rgba(74,222,128,0.10)', border: 'rgba(74,222,128,0.20)' },
+    processing: { label: 'Diproses', dot: '#60A5FA', bg: 'rgba(96,165,250,0.10)',  border: 'rgba(96,165,250,0.20)'  },
+    completed:  { label: 'Selesai',  dot: '#4ADE80', bg: 'rgba(74,222,128,0.10)', border: 'rgba(74,222,128,0.20)' },
 };
 
 function getPaymentLabel(method) {
