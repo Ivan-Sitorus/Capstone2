@@ -12,10 +12,10 @@ return new class extends Migration
             $table->id();
             $table->foreignId('category_id')->constrained('categories')->restrictOnDelete();
             $table->string('name');
-            $table->unsignedBigInteger('price')->default(0);
+            $table->integer('price')->default(0);
             $table->string('image')->nullable();
             $table->string('status')->default('active');
-            $table->unsignedBigInteger('discounted_price')->nullable();
+            $table->integer('discounted_price')->nullable();
             $table->timestamps();
         });
     }

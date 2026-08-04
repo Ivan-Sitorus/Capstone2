@@ -2,7 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\StockAdjustmentResource\Actions\CancelAdjustmentAction;
+use App\Enums\AdjustableType;
+use App\Enums\AdjustmentCategory;
+use App\Enums\AdjustmentType;
 use App\Filament\Resources\StockAdjustmentResource\Actions\DetailAdjustmentAction;
 use App\Filament\Resources\StockAdjustmentResource\Forms\StockAdjustmentForm;
 use App\Filament\Resources\StockAdjustmentResource\Pages\ListStockAdjustments;
@@ -54,18 +56,12 @@ class StockAdjustmentResource extends Resource
                     TextEntry::make($p.'adjusted_at')->label('Waktu')->dateTime('d M Y, H:i:s'),
                     TextEntry::make($p.'adjustment_type')->label('Tipe')
                         ->badge()
-                        ->color(fn (string $state): string => $state === 'increase' ? 'success' : 'danger')
-                        ->formatStateUsing(fn (string $state): string => $state === 'increase' ? 'Penambahan' : 'Pengurangan'),
-                    TextEntry::make($p.'status')->label('Status')
-                        ->badge()
-                        ->color(fn (?string $state): string => $state === 'cancelled' ? 'danger' : 'success')
-                        ->formatStateUsing(fn (?string $state): string => $state === 'cancelled' ? 'Dibatalkan' : 'Aktif'),
+                        ->color(fn (AdjustmentType $state): string => $state === AdjustmentType::Increase ? 'success' : 'danger')
+                        ->formatStateUsing(fn (AdjustmentType $state): string => $state === AdjustmentType::Increase ? 'Penambahan' : 'Pengurangan'),
                     TextEntry::make($p.'category')->label('Kategori')
-                        ->formatStateUsing(fn ($state) => StockAdjustment::DECREASE_CATEGORIES[$state]
-                            ?? StockAdjustment::INCREASE_CATEGORIES[$state]
-                            ?? $state),
+                        ->formatStateUsing(fn (?AdjustmentCategory $state): string => $state?->label() ?? '-'),
                     TextEntry::make($p.'adjustable_type')->label('Jenis')
-                        ->formatStateUsing(fn ($state) => StockAdjustment::ADJUSTABLE_TYPES[$state] ?? $state),
+                        ->formatStateUsing(fn (?AdjustableType $state): string => $state === AdjustableType::Ingredient ? 'Bahan Baku' : 'Menu'),
                     TextEntry::make($p.'ingredient.name')->label('Bahan Baku')->default('-'),
                     TextEntry::make($p.'menu.name')->label('Menu')->default('-'),
                     TextEntry::make($p.'quantity')->label('Jumlah')
@@ -73,7 +69,7 @@ class StockAdjustmentResource extends Resource
                             $state, $record, $p
                         ))
                         ->color(fn ($state, $record): string =>
-                            static::getAdjustmentType($record, $p) === 'decrease' ? 'danger' : 'success'),
+                            static::getAdjustmentType($record, $p) === AdjustmentType::Decrease ? 'danger' : 'success'),
                     TextEntry::make($p.'quantity_before')->label('Sebelum')
                         ->formatStateUsing(fn ($state, $record): string =>
                             number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.')
@@ -85,16 +81,12 @@ class StockAdjustmentResource extends Resource
                             . ' ' . static::getUnit($record, $p)
                         ),
                     TextEntry::make($p.'reason')->label('Catatan Penyesuaian')->default('-')->columnSpanFull(),
-                    TextEntry::make($p.'cancel_reason')->label('Alasan Dibatalkan')
-                        ->default('-')
-                        ->columnSpanFull()
-                        ->visible(fn (?string $state): bool => filled($state)),
                     TextEntry::make($p.'reportedBy.name')->label('Dilaporkan Oleh')->default('-'),
                 ]),
             Section::make('Bahan Baku Terpengaruh')
                 ->columnSpanFull()
                 ->visible(fn ($record): bool =>
-                    static::getAdjustableType($record, $p) === 'menu'
+                    static::getAdjustableType($record, $p) === AdjustableType::Menu
                 )
                 ->schema([
                     RepeatableEntry::make($p.'stockMovements')
@@ -144,16 +136,16 @@ class StockAdjustmentResource extends Resource
         return $prefix ? $record?->{str_replace('.', '', $prefix)} : $record;
     }
 
-    public static function getAdjustableType($record, string $prefix): string
+    public static function getAdjustableType($record, string $prefix): ?AdjustableType
     {
         $adj = static::resolveRecord($record, $prefix);
-        return $adj?->adjustable_type ?? 'ingredient';
+        return $adj?->adjustable_type ?? AdjustableType::Ingredient;
     }
 
-    public static function getAdjustmentType($record, string $prefix): string
+    public static function getAdjustmentType($record, string $prefix): ?AdjustmentType
     {
         $adj = static::resolveRecord($record, $prefix);
-        return $adj?->adjustment_type ?? 'increase';
+        return $adj?->adjustment_type ?? AdjustmentType::Increase;
     }
 
     public static function getUnit($record, string $prefix): string
@@ -179,7 +171,7 @@ class StockAdjustmentResource extends Resource
     public static function formatQty($state, $record, string $prefix): string
     {
         $adj = static::resolveRecord($record, $prefix);
-        $isIncrease = $adj?->adjustment_type === StockAdjustment::TYPE_INCREASE;
+        $isIncrease = $adj?->adjustment_type === AdjustmentType::Increase;
         $sign = $isIncrease ? '+' : '-';
         $num = number_format(
             abs((float) $state),

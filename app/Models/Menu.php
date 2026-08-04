@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\MenuStatus;
 use App\Services\MenuImageService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -29,7 +30,7 @@ class Menu extends Model
         return [
             'price' => 'integer',
             'discounted_price' => 'integer',
-            'status' => 'string',
+            'status' => MenuStatus::class,
         ];
     }
 
@@ -47,12 +48,12 @@ class Menu extends Model
 
     public function scopeActive(Builder $query): void
     {
-        $query->where('status', 'active');
+        $query->where('status', MenuStatus::Active);
     }
 
     public function scopeInactive(Builder $query): void
     {
-        $query->where('status', 'inactive');
+        $query->where('status', MenuStatus::Inactive);
     }
 
     /**

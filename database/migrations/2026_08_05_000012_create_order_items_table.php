@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
             $table->foreignId('menu_id')->constrained('menus')->restrictOnDelete();
             $table->integer('quantity');
-            $table->unsignedBigInteger('unit_price');
+            $table->integer('unit_price');
             $table->unsignedBigInteger('subtotal');
             $table->timestamps();
 

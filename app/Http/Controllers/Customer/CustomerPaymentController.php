@@ -47,11 +47,6 @@ class CustomerPaymentController extends Controller
         return app(\App\Actions\ChooseQrisAction::class)->handle($order);
     }
 
-    public function showCashStatus(Order $order): RedirectResponse
-    {
-        return redirect('/pelanggan/riwayat');
-    }
-
     public function showQrisUpload(Order $order): Response
     {
         if (in_array($order->status, [OrderStatus::Processing->value, OrderStatus::Completed->value])) {

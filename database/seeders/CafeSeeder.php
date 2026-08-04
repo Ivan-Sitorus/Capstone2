@@ -384,7 +384,6 @@ class CafeSeeder extends Seeder
                     'total_cost' => (int) round($qty * $unitCost),
                     'payment_status' => 'lunas',
                     'custom_order' => null,
-                    'status' => 'active',
                     'batch_code' => sprintf('BCH-%s-%d', $receivedAt->format('dmy'), ++$batchSeq),
                 ];
             }
@@ -424,7 +423,6 @@ class CafeSeeder extends Seeder
                 'name' => $name,
                 'price' => $def['price'],
                 'discounted_price' => $def['price'] - $def['cashback'],
-                'status' => 'active',
             ]);
             $this->menuIds[$name] = $menu->id;
         }
@@ -763,7 +761,7 @@ class CafeSeeder extends Seeder
         $seqDate = Carbon::create(2025, 6, 15);
 
         // --- 8 increase adjustments ---
-        $increaseCategories = ['koreksi_stok', 'koreksi_stok', 'koreksi_stok', 'koreksi_stok', 'koreksi_stok', 'lainnya', 'lainnya', 'lainnya'];
+        $increaseCategories = ['correction', 'correction', 'correction', 'correction', 'correction', 'other', 'other', 'other'];
         foreach ($increaseCategories as $i => $cat) {
             $ingKey = $rng->pick($ingKeys);
             $ingId = $this->ingredientIds[$ingKey];
@@ -786,8 +784,6 @@ class CafeSeeder extends Seeder
                 'quantity_before' => $currentStock,
                 'quantity_after' => round($newStock, 2),
                 'reason' => $this->adjustmentReason($cat),
-                'status' => 'active',
-                'cancel_reason' => null,
                 'reported_by' => $adminId,
                 'adjusted_at' => $adjustedAt,
                 'code' => $code,
@@ -824,8 +820,6 @@ class CafeSeeder extends Seeder
                 'quantity_before' => $currentStock,
                 'quantity_after' => round($newStock, 2),
                 'reason' => $this->adjustmentReason($cat),
-                'status' => 'active',
-                'cancel_reason' => null,
                 'reported_by' => $adminId,
                 'adjusted_at' => $adjustedAt,
                 'code' => $code,
@@ -835,38 +829,6 @@ class CafeSeeder extends Seeder
 
             // Reflect decrease in batch cache
             $this->deductFromBatch($ingId, $adjQty);
-        }
-
-        // --- 3 cancelled adjustments ---
-        for ($c = 0; $c < 3; $c++) {
-            $ingKey = $rng->pick($ingKeys);
-            $ingId = $this->ingredientIds[$ingKey];
-            $currentStock = $this->getTotalStock($ingId);
-            $adjType = $rng->pick(['increase', 'decrease']);
-            $adjQty = $rng->float(0.5, 5);
-            $adjustedAt = (clone $seqDate)->addDays($rng->int(60, 360))->setTime($rng->int(8, 16), $rng->int(0, 59), 0);
-            $adjDateKey = $adjustedAt->format('dmy');
-            $dailyAdjCounter[$adjDateKey] = ($dailyAdjCounter[$adjDateKey] ?? 0) + 1;
-            $code = sprintf('ADJ-%s-%d', $adjDateKey, $dailyAdjCounter[$adjDateKey]);
-
-            $rows[] = [
-                'adjustable_type' => 'ingredient',
-                'ingredient_id' => $ingId,
-                'menu_id' => null,
-                'adjustment_type' => $adjType,
-                'category' => 'koreksi_stok',
-                'quantity' => round($adjQty, 2),
-                'quantity_before' => $currentStock,
-                'quantity_after' => $currentStock, // cancelled: no effect
-                'reason' => 'Dibatalkan karena kesalahan input',
-                'status' => 'cancelled',
-                'cancel_reason' => 'Kesalahan input — dibatalkan oleh admin',
-                'reported_by' => $adminId,
-                'adjusted_at' => $adjustedAt,
-                'code' => $code,
-                'created_at' => $adjustedAt,
-                'updated_at' => $adjustedAt,
-            ];
         }
 
         DB::table('stock_adjustments')->insert($rows);
@@ -906,10 +868,6 @@ class CafeSeeder extends Seeder
 
         $movements = [];
         foreach ($adjustments as $adj) {
-            if ($adj->status === 'cancelled') {
-                continue; // cancelled adjustments don't generate movements
-            }
-
             $movementType = $adj->adjustment_type === 'increase'
                 ? 'adjustment_increase'
                 : 'adjustment_decrease';
@@ -965,7 +923,6 @@ class CafeSeeder extends Seeder
             'cost_per_unit' => self::BATCH_CONFIG[
                 array_search($ingredientId, $this->ingredientIds)
             ][0] ?? 0,
-            'status' => 'active',
         ];
     }
 
@@ -996,8 +953,8 @@ class CafeSeeder extends Seeder
             'damaged' => 'Bahan rusak — tidak layak pakai',
             'spilled' => 'Bahan tumpah saat persiapan',
             'complaint' => 'Komplain pelanggan — penggantian',
-            'koreksi_stok' => 'Koreksi stok setelah stock opname',
-            'lainnya' => 'Penyesuaian stok rutin',
+            'correction' => 'Koreksi stok setelah stock opname',
+            'other' => 'Penyesuaian stok rutin',
             default => 'Penyesuaian stok',
         };
     }

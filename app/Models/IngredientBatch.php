@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\BatchStatus;
+use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -24,8 +26,6 @@ class IngredientBatch extends Model
             });
     }
 
-    public const STATUS_ACTIVE = 'active';
-    public const STATUS_INACTIVE = 'inactive';
 
     protected static function booted(): void
     {
@@ -68,7 +68,8 @@ class IngredientBatch extends Model
             'quantity' => 'decimal:3',
             'cost_per_unit' => 'integer',
             'custom_order' => 'integer',
-            'status' => 'string',
+            'status' => BatchStatus::class,
+            'payment_status' => PaymentStatus::class,
             'allow_expired_usage' => 'boolean',
             'initial_quantity' => 'decimal:3',
             'total_cost' => 'integer',
@@ -78,12 +79,12 @@ class IngredientBatch extends Model
 
     public function isActive(): bool
     {
-        return $this->status === self::STATUS_ACTIVE;
+        return $this->status === BatchStatus::Active;
     }
 
     public function isInactive(): bool
     {
-        return $this->status === self::STATUS_INACTIVE;
+        return $this->status === BatchStatus::Inactive;
     }
 
     public function ingredient(): BelongsTo
@@ -118,8 +119,8 @@ class IngredientBatch extends Model
         }
 
         $this->payment_status = $totalPaid >= $totalCost && $totalCost > 0
-            ? 'lunas'
-            : 'unpaid';
+            ? PaymentStatus::Paid
+            : PaymentStatus::Unpaid;
 
         $this->saveQuietly();
     }

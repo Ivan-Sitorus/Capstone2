@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Enums\AdjustableType;
+use App\Enums\AdjustmentCategory;
+use App\Enums\AdjustmentType;
 use App\Models\Ingredient;
 use App\Models\Menu;
 use App\Models\StockAdjustment;
@@ -37,7 +39,7 @@ class StockReconciliationService
             throw new RuntimeException('Jumlah penyesuaian harus lebih dari 0.');
         }
 
-        if (! in_array($adjustmentType, StockAdjustment::TYPES, true)) {
+        if (! in_array($adjustmentType, array_column(AdjustmentType::cases(), 'value'), true)) {
             throw new RuntimeException('Tipe penyesuaian tidak valid.');
         }
 
@@ -79,7 +81,7 @@ class StockReconciliationService
             $ingredient = Ingredient::with('batches')->findOrFail($ingredientId);
             $quantityBefore = (float) $ingredient->getTotalStock();
 
-            if ($adjustmentType === StockAdjustment::TYPE_DECREASE) {
+            if ($adjustmentType === AdjustmentType::Decrease->value) {
                 $adjustment = $this->createDecreaseIngredient(
                     $ingredient, $ingredientId, $quantity, $category, $reason, $reportedBy, $adjustedAt, $quantityBefore,
                 );
@@ -147,7 +149,7 @@ class StockReconciliationService
             'code' => self::generateAdjustmentCode(),
             'adjustable_type' => AdjustableType::Ingredient->value,
             'ingredient_id' => $ingredientId,
-            'adjustment_type' => StockAdjustment::TYPE_DECREASE,
+            'adjustment_type' => AdjustmentType::Decrease->value,
             'category' => $category,
             'quantity' => -$quantity,
             'quantity_before' => $quantityBefore,
@@ -193,7 +195,7 @@ class StockReconciliationService
                 'menu_id' => $menu->id,
                 'adjustment_type' => $adjustmentType,
                 'category' => $category,
-                'quantity' => $adjustmentType === StockAdjustment::TYPE_DECREASE ? -$quantity : $quantity,
+                'quantity' => $adjustmentType === AdjustmentType::Decrease->value ? -$quantity : $quantity,
                 'quantity_before' => 0,
                 'quantity_after' => 0,
                 'reason' => $reason,
@@ -201,7 +203,7 @@ class StockReconciliationService
                 'adjusted_at' => $adjustedAt ?? now(),
             ]);
 
-            if ($adjustmentType === StockAdjustment::TYPE_DECREASE) {
+            if ($adjustmentType === AdjustmentType::Decrease->value) {
                 foreach ($menu->menuIngredients as $mi) {
                     $deductQty = (float) $mi->quantity_used * $quantity;
 

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('quantity_before', 10, 3);
             $table->decimal('quantity_change', 10, 3);
             $table->decimal('quantity_after', 10, 3);
-            $table->unsignedBigInteger('unit_cost')->nullable();
+            $table->integer('unit_cost')->nullable();
             $table->string('reference')->nullable();
             $table->timestamps();
 

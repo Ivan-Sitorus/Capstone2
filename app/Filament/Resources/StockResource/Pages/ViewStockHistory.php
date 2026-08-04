@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources\StockResource\Pages;
 
+use App\Enums\AdjustmentCategory;
 use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
-use App\Models\StockAdjustment;
 use App\Models\StockMovement;
 use Filament\Actions\Action;
 use Filament\Resources\Pages\ListRecords;
@@ -58,19 +58,16 @@ class ViewStockHistory extends ListRecords
                     ->label('Jenis Pemakaian')
                     ->badge()
                     ->color(fn (StockMovement $record): string => match (true) {
-                        $record->source_type === 'stock_adjustment_reversal' => 'gray',
                         $record->movement_type === 'sale' => 'primary',
                         $record->movement_type === 'purchase' => 'success',
-                        $record->stockAdjustment?->category === StockAdjustment::CAT_EXPIRED => 'danger',
+                        $record->stockAdjustment?->category === AdjustmentCategory::Expired => 'danger',
                         $record->movement_type === 'waste' => 'danger',
                         $record->movement_type === 'purchase' => 'success',
                         in_array($record->movement_type, ['adjustment_increase', 'adjustment_decrease']) => 'warning',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (StockMovement $record): string => match (true) {
-                        $record->source_type === 'stock_adjustment_reversal'
-                            => 'Pembatalan Penyesuaian',
-                        $record->stockAdjustment?->category === StockAdjustment::CAT_EXPIRED
+                        $record->stockAdjustment?->category === AdjustmentCategory::Expired
                             => 'Kedaluwarsa',
                         $record->movement_type === 'sale' => 'Penjualan',
                         $record->movement_type === 'purchase' => 'Pembelian',
@@ -84,9 +81,7 @@ class ViewStockHistory extends ListRecords
                             => 'Stok berkurang karena ada pesanan penjualan',
                         $record->movement_type === 'purchase'
                             => 'Stok bertambah karena ada pembelian',
-                        $record->source_type === 'stock_adjustment_reversal'
-                            => 'Kembalikan stok akibat penyesuaian dibatalkan',
-                        $record->stockAdjustment?->category === StockAdjustment::CAT_EXPIRED
+                        $record->stockAdjustment?->category === AdjustmentCategory::Expired
                             => 'Stok berkurang karena batch sudah kedaluwarsa',
                         $record->movement_type === 'waste'
                             => 'Stok berkurang karena bahan kedaluwarsa/rusak/tumpah',
@@ -201,15 +196,5 @@ class ViewStockHistory extends ListRecords
                     ]),
             ])
             ->defaultSort('created_at', 'desc');
-    }
-
-    private function isCancelled(StockMovement $record): bool
-    {
-        return match (true) {
-            $record->movement_type === 'correction' => false,
-            $record->movement_type === 'sale'
-                && $record->order?->status === 'cancelled' => true,
-            default => false,
-        };
     }
 }

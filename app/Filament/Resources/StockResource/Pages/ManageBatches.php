@@ -4,6 +4,9 @@ namespace App\Filament\Resources\StockResource\Pages;
 
 use App\Enums\BatchMode;
 use App\Enums\AdjustableType;
+use App\Enums\AdjustmentCategory;
+use App\Enums\AdjustmentType;
+use App\Enums\BatchStatus;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
@@ -203,7 +206,7 @@ class ManageBatches extends Page implements HasTable
                         $diff = $newQty - $oldQty;
                         $unit = $record->ingredient?->unit ?? '';
                         $batchCode = $record->batch_code ?? '#'.$record->id;
-                        $adjType = $diff > 0 ? StockAdjustment::TYPE_INCREASE : StockAdjustment::TYPE_DECREASE;
+                        $adjType = $diff > 0 ? AdjustmentType::Increase->value : AdjustmentType::Decrease->value;
                         $note = "Batch {$batchCode}: qty {$oldQty} → {$newQty} {$unit}";
 
                         StockAdjustment::create([
@@ -211,14 +214,13 @@ class ManageBatches extends Page implements HasTable
                             'adjustable_type' => AdjustableType::Ingredient->value,
                             'ingredient_id' => $record->ingredient_id,
                             'adjustment_type' => $adjType,
-                            'category' => StockAdjustment::CAT_CORRECTION,
+                            'category' => AdjustmentCategory::Correction->value,
                             'quantity' => abs($diff),
                             'quantity_before' => $oldQty,
                             'quantity_after' => $newQty,
                             'reason' => $note,
                             'reported_by' => Auth::id(),
                             'adjusted_at' => now(),
-                            'status' => StockAdjustment::STATUS_ACTIVE,
                         ]);
 
                         Notification::make()
@@ -247,7 +249,7 @@ class ManageBatches extends Page implements HasTable
                                 ->body('Batch ini memiliki riwayat pemakaian. Batch telah dinonaktifkan.')
                                 ->send();
                             
-                            $record->update(['quantity' => 0, 'status' => IngredientBatch::STATUS_INACTIVE]);
+                            $record->update(['quantity' => 0, 'status' => BatchStatus::Inactive]);
                             $action->cancel();
                             return;
                         }
@@ -261,15 +263,14 @@ class ManageBatches extends Page implements HasTable
                                 'code' => StockReconciliationService::generateAdjustmentCode(),
                                 'adjustable_type' => AdjustableType::Ingredient->value,
                                 'ingredient_id' => $record->ingredient_id,
-                                'adjustment_type' => StockAdjustment::TYPE_DECREASE,
-                                'category' => StockAdjustment::CAT_CORRECTION,
+                                'adjustment_type' => AdjustmentType::Decrease->value,
+                                'category' => AdjustmentCategory::Correction->value,
                                 'quantity' => (float) $record->quantity,
                                 'quantity_before' => (float) $record->quantity,
                                 'quantity_after' => 0,
                                 'reason' => $note,
                                 'reported_by' => Auth::id(),
                                 'adjusted_at' => now(),
-                                'status' => StockAdjustment::STATUS_ACTIVE,
                             ]);
                         }
                     }),

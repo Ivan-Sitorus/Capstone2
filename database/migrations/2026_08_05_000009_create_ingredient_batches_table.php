@@ -14,7 +14,7 @@ return new class extends Migration
             $table->decimal('quantity', 10, 3);
             $table->date('expiry_date')->nullable();
             $table->timestamp('received_at')->nullable();
-            $table->unsignedBigInteger('cost_per_unit')->default(0);
+            $table->integer('cost_per_unit')->default(0);
             $table->integer('custom_order')->nullable();
             $table->string('status')->default('active');
             $table->string('batch_code')->nullable()->unique();

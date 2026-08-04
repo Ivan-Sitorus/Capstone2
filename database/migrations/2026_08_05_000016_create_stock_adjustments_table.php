@@ -21,8 +21,6 @@ return new class extends Migration
             $table->timestamp('adjusted_at')->useCurrent();
             $table->string('adjustable_type');
             $table->foreignId('menu_id')->nullable()->constrained('menus')->nullOnDelete();
-            $table->string('status')->default('active');
-            $table->string('cancel_reason')->nullable();
             $table->string('code')->nullable()->unique();
             $table->timestamps();
 

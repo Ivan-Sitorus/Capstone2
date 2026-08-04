@@ -2,6 +2,9 @@
 
 namespace App\Filament\Resources\StockAdjustmentResource\Tables;
 
+use App\Enums\AdjustableType;
+use App\Enums\AdjustmentCategory;
+use App\Enums\AdjustmentType;
 use App\Models\StockAdjustment;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
@@ -27,11 +30,11 @@ class StockAdjustmentTable
                 TextColumn::make('adjustment_type')
                     ->label('Tipe Penyesuaian')
                     ->badge()
-                    ->color(fn (string $state): string => $state === StockAdjustment::TYPE_INCREASE ? 'primary' : 'danger')
-                    ->formatStateUsing(fn (string $state): string => $state === StockAdjustment::TYPE_INCREASE ? 'Penambahan' : 'Pengurangan'),
+                    ->color(fn (AdjustmentType $state): string => $state === AdjustmentType::Increase ? 'primary' : 'danger')
+                    ->formatStateUsing(fn (AdjustmentType $state): string => $state === AdjustmentType::Increase ? 'Penambahan' : 'Pengurangan'),
                 TextColumn::make('adjustable_type')
                     ->label('Jenis')
-                    ->formatStateUsing(fn ($state) => StockAdjustment::ADJUSTABLE_TYPES[$state] ?? $state)
+                    ->formatStateUsing(fn (?AdjustableType $state): string => $state === AdjustableType::Ingredient ? 'Bahan Baku' : 'Menu')
                     ->sortable(),
                 TextColumn::make('ingredient.name')
                     ->label('Nama')
@@ -44,25 +47,17 @@ class StockAdjustmentTable
                     ->sortable(),
                 TextColumn::make('category')
                     ->label('Kategori')
-                    ->formatStateUsing(fn ($state) => StockAdjustment::DECREASE_CATEGORIES[$state]
-                        ?? StockAdjustment::INCREASE_CATEGORIES[$state]
-                        ?? $state)
-                    ->sortable(),
-                TextColumn::make('status')
-                    ->label('Status')
-                    ->badge()
-                    ->color(fn (?string $state): string => $state === 'cancelled' ? 'danger' : 'success')
-                    ->formatStateUsing(fn (?string $state): string => $state === 'cancelled' ? 'Dibatalkan' : 'Aktif')
+                    ->formatStateUsing(fn (?AdjustmentCategory $state): string => $state?->label() ?? '-')
                     ->sortable(),
                 TextColumn::make('quantity')
                     ->label('Jumlah')
                     ->formatStateUsing(fn ($state, StockAdjustment $record) =>
-                        ($record->adjustment_type === StockAdjustment::TYPE_INCREASE ? '+' : '-')
+                        ($record->adjustment_type === AdjustmentType::Increase ? '+' : '-')
                         . \App\Filament\Resources\StockAdjustmentResource::formatNumber((float) $state)
                         . ' ' . ($record->isMenuAdjustment() ? 'porsi' : ($record->ingredient?->unit ?? ''))
                     )
                     ->color(fn (StockAdjustment $record): string =>
-                        $record->adjustment_type === StockAdjustment::TYPE_DECREASE ? 'danger' : 'success')
+                        $record->adjustment_type === AdjustmentType::Decrease ? 'danger' : 'success')
                     ->sortable(),
                 TextColumn::make('quantity_before')
                     ->label('Sebelum')
@@ -108,19 +103,23 @@ class StockAdjustmentTable
                     ),
                 SelectFilter::make('adjustable_type')
                     ->label('Jenis')
-                    ->options(StockAdjustment::ADJUSTABLE_TYPES),
+                    ->options([
+                        AdjustableType::Ingredient->value => 'Bahan Baku',
+                        AdjustableType::Menu->value => 'Menu',
+                    ]),
                 SelectFilter::make('adjustment_type')
                     ->label('Tipe')
                     ->options([
-                        StockAdjustment::TYPE_INCREASE => 'Penambahan',
-                        StockAdjustment::TYPE_DECREASE => 'Pengurangan',
+                        AdjustmentType::Increase->value => 'Penambahan',
+                        AdjustmentType::Decrease->value => 'Pengurangan',
                     ]),
                 SelectFilter::make('category')
                     ->label('Kategori')
-                    ->options(StockAdjustment::DECREASE_CATEGORIES + StockAdjustment::INCREASE_CATEGORIES),
+                    ->options(collect(AdjustmentCategory::cases())
+                        ->mapWithKeys(fn (AdjustmentCategory $c) => [$c->value => $c->label()])
+                        ->toArray()),
             ])
             ->recordActions([
-                \App\Filament\Resources\StockAdjustmentResource\Actions\CancelAdjustmentAction::make(),
                 \App\Filament\Resources\StockAdjustmentResource\Actions\DetailAdjustmentAction::make(),
             ])
             ->toolbarActions([])

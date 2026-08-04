@@ -3,9 +3,10 @@
 namespace App\Filament\Resources\StockAdjustmentResource\Forms;
 
 use App\Enums\AdjustableType;
+use App\Enums\AdjustmentCategory;
+use App\Enums\AdjustmentType;
 use App\Filament\Forms\Components\NumericInput;
 use App\Models\Ingredient;
-use App\Models\StockAdjustment;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -21,7 +22,10 @@ class StockAdjustmentForm
         return $schema->components([
             Select::make('adjustable_type')
                 ->label('Jenis')
-                ->options(StockAdjustment::ADJUSTABLE_TYPES)
+                ->options([
+                    AdjustableType::Ingredient->value => 'Bahan Baku',
+                    AdjustableType::Menu->value => 'Menu',
+                ])
                 ->default(AdjustableType::Ingredient->value)
                 ->required()
                 ->native(false)
@@ -44,8 +48,8 @@ class StockAdjustmentForm
             Select::make('adjustment_type')
                 ->label('Tipe Penyesuaian')
                 ->options([
-                    StockAdjustment::TYPE_INCREASE => 'Penambahan',
-                    StockAdjustment::TYPE_DECREASE => 'Pengurangan',
+                    AdjustmentType::Increase->value => 'Penambahan',
+                    AdjustmentType::Decrease->value => 'Pengurangan',
                 ])
                 ->required()
                 ->native(false)
@@ -53,15 +57,17 @@ class StockAdjustmentForm
             Select::make('category')
                 ->label('Kategori')
                 ->options(fn (Get $get) => filled($get('adjustment_type'))
-                    ? StockAdjustment::getCategoryOptions($get('adjustment_type'))
-                    : StockAdjustment::DECREASE_CATEGORIES + StockAdjustment::INCREASE_CATEGORIES)
+                    ? \App\Models\StockAdjustment::getCategoryOptions($get('adjustment_type'))
+                    : collect(AdjustmentCategory::cases())
+                        ->mapWithKeys(fn (AdjustmentCategory $c) => [$c->value => $c->label()])
+                        ->toArray())
                 ->required()
                 ->disabled(fn (Get $get) => ! filled($get('adjustment_type')))
                 ->native(false),
             NumericInput::apply(TextInput::make('quantity'), maxDigits: 6, precision: 3)
                 ->label('Jumlah')
                 ->required()
-                ->prefix(fn (Get $get) => $get('adjustment_type') === StockAdjustment::TYPE_DECREASE ? '-' : '+')
+                ->prefix(fn (Get $get) => $get('adjustment_type') === AdjustmentType::Decrease->value ? '-' : '+')
                 ->suffix(fn (Get $get) => $get('adjustable_type') === AdjustableType::Menu->value
                     ? ' porsi'
                     : ($get('ingredient_id')
