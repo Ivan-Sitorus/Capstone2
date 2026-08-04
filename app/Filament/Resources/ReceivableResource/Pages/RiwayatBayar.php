@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Filament\Resources\PiutangResource\Pages;
+namespace App\Filament\Resources\ReceivableResource\Pages;
 
 use App\Filament\Forms\Components\NumericInput;
-use App\Filament\Resources\PiutangResource;
+use App\Filament\Resources\ReceivableResource;
 use App\Models\Order;
 use App\Models\OrderPayment;
 use Filament\Actions\Action;
@@ -27,7 +27,7 @@ class RiwayatBayar extends Page implements HasTable
 {
     use InteractsWithTable;
 
-    protected static string $resource = PiutangResource::class;
+    protected static string $resource = ReceivableResource::class;
 
     protected static ?string $breadcrumb = 'Riwayat Bayar';
 

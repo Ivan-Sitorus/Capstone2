@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
 {
@@ -34,26 +33,6 @@ class Order extends Model
         $date = now();
         $orderNumber = static::whereDate('created_at', $date)->count() + 1;
         return 'ORD-'.$date->format('dmy').'-'.str_pad($orderNumber, 4, '0', STR_PAD_LEFT);
-    }
-
-    protected static function booted(): void
-    {
-        static::created(function (self $order) {
-            if ($order->payment_method === 'bayar_nanti') {
-                if (! $order->receivable()->exists()) {
-                    Receivable::create([
-                        'customer_name' => $order->customer_name ?? 'Event Customer',
-                        'amount' => $order->total_amount ?? 0,
-                        'invoice_date' => $order->created_at,
-                        'due_date' => $order->created_at->copy()->addDays(30),
-                        'status' => Receivable::STATUS_PENDING,
-                        'paid_amount' => 0,
-                        'order_id' => $order->id,
-                        'notes' => "Auto-generated from Order #{$order->order_code}",
-                    ]);
-                }
-            }
-        });
     }
 
     protected $fillable = [
@@ -104,11 +83,6 @@ class Order extends Model
     public function items(): HasMany
     {
         return $this->hasMany(OrderItem::class);
-    }
-
-    public function receivable(): HasOne
-    {
-        return $this->hasOne(Receivable::class);
     }
 
     public function processedBy(): BelongsTo

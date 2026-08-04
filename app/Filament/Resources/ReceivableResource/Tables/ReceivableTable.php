@@ -2,75 +2,102 @@
 
 namespace App\Filament\Resources\ReceivableResource\Tables;
 
-use App\Models\Receivable;
-use Filament\Actions\ViewAction;
+use App\Enums\OrderStatus;
+use App\Filament\Resources\ReceivableResource;
+use App\Models\Order;
 use Filament\Actions\Action;
-use Filament\Forms\Components\Textarea;
+use Filament\Actions\ActionGroup;
 use Filament\Support\Icons\Heroicon;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class ReceivableTable
 {
     public static function configure(Table $table): Table
     {
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query
+                ->where(function (Builder $q) {
+                    $q->where('payment_method', 'piutang')
+                      ->orWhere('status', OrderStatus::BelumLunas->value);
+                })
+                ->with('cashier', 'orderPayments')
+            )
+            ->searchPlaceholder('Cari Kode Pesanan')
             ->columns([
-                TextColumn::make('order.order_code')
-                    ->label('Pesanan')
+                TextColumn::make('order_code')
+                    ->label('Kode Pesanan')
                     ->searchable()
-                    ->url(fn (Receivable $record): ?string => $record->order
-                        ? route('filament.admin.resources.orders.view', $record->order)
-                        : null)
-                    ->openUrlInNewTab(),
+                    ->sortable()
+                    ->copyable(),
                 TextColumn::make('customer_name')
                     ->label('Pelanggan')
-                    ->searchable()
-                    ->sortable(),
-                TextColumn::make('amount')
-                    ->label('Jumlah')
+                    ->default('-')
+                    ->searchable(),
+                TextColumn::make('cashier.name')
+                    ->label('Kasir')
+                    ->default('-'),
+                TextColumn::make('total_amount')
+                    ->label('Total')
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
                 TextColumn::make('paid_amount')
                     ->label('Dibayar')
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
-                    ->sortable(),
+                    ->getStateUsing(function (Order $record) {
+                        return (float) $record->orderPayments->sum('amount');
+                    })
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
                 TextColumn::make('remaining_amount')
                     ->label('Sisa')
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
+                    ->getStateUsing(function (Order $record) {
+                        return (float) $record->total_amount - (float) $record->orderPayments->sum('amount');
+                    })
+                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                    ->color(fn ($state) => $state > 0 ? 'danger' : 'success'),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        Receivable::STATUS_PAID => 'success',
-                        Receivable::STATUS_CANCELLED => 'danger',
-                        default => 'warning',
-                    })
-                    ->formatStateUsing(fn (string $state): string => ucfirst($state))
-                    ->sortable(),
+                    ->color(fn (string $state): string => \App\Filament\Resources\OrderResource::getStatusColor($state))
+                    ->formatStateUsing(fn (string $state): string => \App\Filament\Resources\OrderResource::getStatusLabel($state)),
             ])
             ->filters([
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
-                        Receivable::STATUS_PENDING => 'Pending',
-                        Receivable::STATUS_PAID => 'Lunas',
-                        Receivable::STATUS_CANCELLED => 'Dibatalkan',
+                        'belum_lunas' => 'Belum Lunas',
+                        'selesai' => 'Lunas',
                     ]),
+                Filter::make('created_at')
+                    ->label('Rentang Waktu')
+                    ->form([
+                        DatePicker::make('created_from')->label('Dari'),
+                        DatePicker::make('created_until')->label('Sampai'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when($data['created_from'], fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date))
+                        ->when($data['created_until'], fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date))
+                    ),
             ])
             ->recordActions([
-                ViewAction::make(),
-                Action::make('cancel')
-                    ->label('Batalkan')
-                    ->color('danger')
-                    ->icon(Heroicon::OutlinedXCircle)
-                    ->action(fn ($record, array $data) => $record->cancel($data['reason'] ?? null))
-                    ->form([Textarea::make('reason')->label('Alasan Pembatalan')->required()])
-                    ->visible(fn ($record) => !in_array($record->status, ['paid', 'cancelled']))
-                    ->requiresConfirmation(),
+                ActionGroup::make([
+                Action::make('detail')
+                    ->label('Detail')
+                    ->icon(Heroicon::OutlinedEye)
+                    ->infolist(\App\Filament\Resources\OrderResource::getInfolistComponents())
+                    ->modalAutofocus(false)
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup'),
+                    Action::make('riwayat_bayar')
+                        ->label('Riwayat Bayar')
+                        ->icon(Heroicon::OutlinedBanknotes)
+                        ->url(fn (Order $record) => ReceivableResource::getUrl('riwayat-bayar', ['record' => $record])),
+                ])
+                ->icon(Heroicon::OutlinedEllipsisVertical),
             ])
-            ->toolbarActions([])
             ->defaultSort('created_at', 'desc');
     }
 }
