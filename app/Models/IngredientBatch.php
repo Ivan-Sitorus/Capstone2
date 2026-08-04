@@ -39,7 +39,7 @@ class IngredientBatch extends Model
     public static function generateBatchCode(): string
     {
         $date = now();
-        $number = static::whereDate('received_at', $date)->count() + 1;
+        $number = static::count() + 1;
 
         return 'BCH-'.$date->format('dmy').'-'.str_pad($number, 3, '0', STR_PAD_LEFT);
     }
@@ -66,12 +66,12 @@ class IngredientBatch extends Model
             'expiry_date' => 'date',
             'received_at' => 'datetime',
             'quantity' => 'decimal:3',
-            'cost_per_unit' => 'decimal:3',
+            'cost_per_unit' => 'integer',
             'custom_order' => 'integer',
             'status' => 'string',
             'allow_expired_usage' => 'boolean',
             'initial_quantity' => 'decimal:3',
-            'total_cost' => 'decimal:2',
+            'total_cost' => 'integer',
             'payment_status' => 'string',
         ];
     }

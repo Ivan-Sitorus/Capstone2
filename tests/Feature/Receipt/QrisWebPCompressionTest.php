@@ -21,7 +21,7 @@ class QrisWebPCompressionTest extends TestCase
 
         $order = Order::factory()->pending()->create([
             'qris_status' => null,
-            'resubmit_count' => 0,
+            'qris_resubmit_attempts' => 0,
             'payment_method' => 'qris',
         ]);
 
@@ -65,7 +65,7 @@ class QrisWebPCompressionTest extends TestCase
 
         $order = Order::factory()->pending()->create([
             'qris_status' => null,
-            'resubmit_count' => 0,
+            'qris_resubmit_attempts' => 0,
             'payment_method' => 'qris',
         ]);
 
@@ -95,7 +95,7 @@ class QrisWebPCompressionTest extends TestCase
 
         $order = Order::factory()->pending()->create([
             'qris_status' => 'resubmit_requested',
-            'resubmit_count' => 1,
+            'qris_resubmit_attempts' => 1,
             'payment_method' => 'qris',
             'payment_proof' => 'qris-proofs/old-proof.webp',
         ]);
@@ -125,7 +125,7 @@ class QrisWebPCompressionTest extends TestCase
 
         $order = Order::factory()->pending()->create([
             'qris_status' => null,
-            'resubmit_count' => 0,
+            'qris_resubmit_attempts' => 0,
         ]);
 
         // Create a large 2000x2000 JPEG just under 5MB
@@ -151,7 +151,7 @@ class QrisWebPCompressionTest extends TestCase
 
         $order = Order::factory()->pending()->create([
             'qris_status' => null,
-            'resubmit_count' => 0,
+            'qris_resubmit_attempts' => 0,
             'payment_proof' => null,
         ]);
 

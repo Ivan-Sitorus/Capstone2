@@ -19,7 +19,6 @@ class OrderItemFactory extends Factory
             'quantity' => $quantity,
             'unit_price' => $unitPrice,
             'subtotal' => $quantity * $unitPrice,
-            'notes' => fake()->optional(0.2)->word(),
         ];
     }
 }

@@ -59,7 +59,7 @@ class IngredientModelTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Stock movements are immutable');
 
-        $movement->update(['notes' => 'should fail']);
+        $movement->update(['quantity_after' => 200]);
     }
 
     public function test_stock_movement_is_immutable_on_delete(): void

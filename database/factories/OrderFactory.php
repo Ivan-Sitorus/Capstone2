@@ -25,7 +25,6 @@ class OrderFactory extends Factory
             'payment_proof' => null,
             'rejection_note' => null,
             'total_amount' => fake()->numberBetween(10000, 200000),
-            'notes' => fake()->optional(0.3)->sentence(),
         ];
     }
 
@@ -37,21 +36,21 @@ class OrderFactory extends Factory
         ]);
     }
 
-    public function diproses(): static
+    public function processing(): static
     {
         return $this->state(fn (array $attrs) => [
             'status' => 'processing',
         ]);
     }
 
-    public function selesai(): static
+    public function completed(): static
     {
         return $this->state(fn (array $attrs) => [
             'status' => 'completed',
         ]);
     }
 
-    public function bayarNanti(): static
+    public function payLater(): static
     {
         return $this->state(fn (array $attrs) => [
             'payment_method' => 'pay_later',

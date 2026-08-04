@@ -21,7 +21,7 @@ class QrisResubmitTest extends TestCase
 
         $order = Order::factory()->pending()->create([
             'qris_status' => 'resubmit_requested',
-            'resubmit_count' => 1,
+            'qris_resubmit_attempts' => 1,
             'payment_proof' => null,
             'rejection_note' => 'Gambar buram, ulangi',
         ]);
@@ -35,7 +35,7 @@ class QrisResubmitTest extends TestCase
         $response->assertOk();
         $order->refresh();
 
-        $this->assertSame(2, $order->resubmit_count);
+        $this->assertSame(2, $order->qris_resubmit_attempts);
         $this->assertSame('proof_submitted', $order->qris_status);
         $this->assertNull($order->rejection_note);
         $this->assertNotNull($order->payment_proof);
@@ -43,16 +43,16 @@ class QrisResubmitTest extends TestCase
     }
 
     /**
-     * Upload is blocked when resubmit_count >= 3.
+     * Upload is blocked when qris_resubmit_attempts >= 3.
      */
-    public function test_blocks_upload_when_resubmit_count_exceeded(): void
+    public function test_blocks_upload_when_qris_resubmit_attempts_exceeded(): void
     {
         Storage::fake('public');
 
         // count=2 triggers the block after increment (2→3, then check >= 3)
         $order = Order::factory()->pending()->create([
             'qris_status' => 'resubmit_requested',
-            'resubmit_count' => 2,
+            'qris_resubmit_attempts' => 2,
             'payment_proof' => null,
         ]);
 
@@ -67,7 +67,7 @@ class QrisResubmitTest extends TestCase
 
         $order->refresh();
         // Controller increments BEFORE checking limit: 2→3, then blocks
-        $this->assertSame(3, $order->resubmit_count);
+        $this->assertSame(3, $order->qris_resubmit_attempts);
         $this->assertNull($order->payment_proof);
     }
 
@@ -75,13 +75,13 @@ class QrisResubmitTest extends TestCase
      * Resubmit count increments from 1 to 2 on successful upload.
      * (With count=2, the increment puts it to 3 which triggers the block.)
      */
-    public function test_increments_resubmit_count_on_resubmit_upload(): void
+    public function test_increments_qris_resubmit_attempts_on_resubmit_upload(): void
     {
         Storage::fake('public');
 
         $order = Order::factory()->pending()->create([
             'qris_status' => 'resubmit_requested',
-            'resubmit_count' => 1,
+            'qris_resubmit_attempts' => 1,
             'payment_proof' => null,
         ]);
 
@@ -94,7 +94,7 @@ class QrisResubmitTest extends TestCase
         $response->assertOk();
         $order->refresh();
 
-        $this->assertSame(2, $order->resubmit_count);
+        $this->assertSame(2, $order->qris_resubmit_attempts);
         $this->assertSame('proof_submitted', $order->qris_status);
         Storage::disk('public')->assertExists($order->payment_proof);
     }
@@ -106,9 +106,9 @@ class QrisResubmitTest extends TestCase
     {
         Storage::fake('public');
 
-        $order = Order::factory()->diproses()->create([
+        $order = Order::factory()->processing()->create([
             'qris_status' => 'resubmit_requested',
-            'resubmit_count' => 0,
+            'qris_resubmit_attempts' => 0,
         ]);
 
         $file = UploadedFile::fake()->image('proof.jpg', 400, 600);
@@ -130,7 +130,7 @@ class QrisResubmitTest extends TestCase
 
         $order = Order::factory()->pending()->create([
             'qris_status' => null,
-            'resubmit_count' => 0,
+            'qris_resubmit_attempts' => 0,
         ]);
 
         $file = UploadedFile::fake()->create('document.pdf', 500);
@@ -152,7 +152,7 @@ class QrisResubmitTest extends TestCase
 
         $order = Order::factory()->pending()->create([
             'qris_status' => null,
-            'resubmit_count' => 0,
+            'qris_resubmit_attempts' => 0,
         ]);
 
         $file = UploadedFile::fake()->image('large.jpg', 1000, 1000)->size(6000); // 6MB
@@ -174,7 +174,7 @@ class QrisResubmitTest extends TestCase
 
         $order = Order::factory()->pending()->create([
             'qris_status' => null,
-            'resubmit_count' => 0,
+            'qris_resubmit_attempts' => 0,
             'payment_method' => 'qris',
         ]);
 
@@ -188,7 +188,7 @@ class QrisResubmitTest extends TestCase
         $order->refresh();
 
         $this->assertSame('proof_submitted', $order->qris_status);
-        $this->assertSame(0, $order->resubmit_count, 'First upload should not increment counter');
+        $this->assertSame(0, $order->qris_resubmit_attempts, 'First upload should not increment counter');
         $this->assertSame('qris', $order->payment_method);
     }
 }

@@ -20,7 +20,7 @@ class IngredientBatchFactory extends Factory
             'quantity' => $quantity,
             'expiry_date' => fake()->optional(0.7)->dateTimeBetween('+1 week', '+6 months'),
             'received_at' => fake()->dateTimeBetween('-1 month', 'now'),
-            'cost_per_unit' => fake()->randomFloat(2, 100, 50000),
+            'cost_per_unit' => fake()->numberBetween(100, 50000),
         ];
     }
 }

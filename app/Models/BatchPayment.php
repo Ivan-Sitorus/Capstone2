@@ -13,7 +13,7 @@ class BatchPayment extends Model
     {
         return [
             'payment_date' => 'datetime',
-            'amount' => 'decimal:2',
+            'amount' => 'integer',
         ];
     }
 

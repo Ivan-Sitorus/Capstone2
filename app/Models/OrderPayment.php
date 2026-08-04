@@ -13,7 +13,7 @@ class OrderPayment extends Model
     {
         return [
             'payment_date' => 'datetime',
-            'amount' => 'decimal:2',
+            'amount' => 'integer',
         ];
     }
 

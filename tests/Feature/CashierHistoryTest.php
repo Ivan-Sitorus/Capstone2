@@ -278,14 +278,14 @@ class CashierHistoryTest extends TestCase
 
         Order::factory()->count(4)->create([
             'processed_by' => $kitchen->id,
-            'status' => 'selesai',
+            'status' => 'completed',
             'payment_method' => 'cash',
             'created_at' => now()->subHours(2),
         ]);
 
         Order::factory()->create([
             'processed_by' => $kitchen->id,
-            'status' => 'diproses',
+            'status' => 'processing',
             'created_at' => now()->subHours(2),
         ]);
 
