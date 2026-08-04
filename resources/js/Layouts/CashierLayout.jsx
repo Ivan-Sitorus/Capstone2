@@ -48,8 +48,8 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
         setPendingCount(initialCount ?? 0);
     }, [initialCount]);
 
-    // Ambil pending count fresh setiap halaman dibuka — hindari angka stale
-    // dari cache prefetch Inertia saat berpindah menu
+    // Fetch fresh pending count every time a page opens — avoid stale numbers
+    // from Inertia cache prefetch when switching menu
     useEffect(() => {
         let cancelled = false;
         window.axios?.get('/kasir/pesanan-menunggu')

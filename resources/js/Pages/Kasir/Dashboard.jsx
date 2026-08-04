@@ -13,7 +13,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
         return () => clearInterval(timer);
     }, []);
 
-    // Ambil data fresh saat halaman dibuka — hindari snapshot stale dari cache prefetch
+    // Fetch fresh data when page opens — avoid stale snapshot from cache prefetch
     useEffect(() => {
         router.reload({ only: ['totalPenjualan', 'jumlahTransaksi', 'pesananAktif', 'cashPending', 'qrisPending', 'transaksiTerbaru'] });
     }, []);
