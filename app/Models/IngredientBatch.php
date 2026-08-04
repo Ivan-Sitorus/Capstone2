@@ -119,7 +119,7 @@ class IngredientBatch extends Model
 
         $this->payment_status = $totalPaid >= $totalCost && $totalCost > 0
             ? 'lunas'
-            : 'belum_lunas';
+            : 'unpaid';
 
         $this->saveQuietly();
     }
