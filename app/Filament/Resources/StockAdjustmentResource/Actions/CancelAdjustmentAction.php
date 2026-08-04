@@ -30,7 +30,8 @@ class CancelAdjustmentAction extends Action
             ->form([
                 Textarea::make('cancel_reason')
                     ->label('Alasan Pembatalan')
-                    ->required(),
+                    ->required()
+                    ->maxLength(255),
             ])
             ->action(function (StockAdjustment $record, Action $action) {
                 $data = $action->getData();

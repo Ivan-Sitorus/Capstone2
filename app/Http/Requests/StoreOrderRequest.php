@@ -33,6 +33,7 @@ class StoreOrderRequest extends FormRequest
             'items.*.quantity' => 'required|integer|min:1|max:999999',
             'payment_method' => 'required|in:cash,qris,bayar_nanti',
             'customer_name' => 'nullable|string|max:100',
+            'notes' => 'nullable|string|max:255',
         ];
     }
 

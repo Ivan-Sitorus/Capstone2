@@ -36,7 +36,8 @@ class MenuForm
                 ->createOptionForm([
                     TextInput::make("name")
                         ->label("Kategori Menu")
-                        ->required(),
+                        ->required()
+                        ->maxLength(255),
                 ])
                 ->createOptionAction(fn (Action $action) => $action->label("+ Kategori Baru")),
             FileUpload::make("image")

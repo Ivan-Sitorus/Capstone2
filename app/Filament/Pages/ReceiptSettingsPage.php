@@ -60,16 +60,17 @@ class ReceiptSettingsPage extends Page implements HasForms
                 Textarea::make('receipt_header')
                     ->label('Header')
                     ->rows(3)
-                    ->maxLength(500)
+                    ->maxLength(255)
                     ->helperText('Bisa diisi multi baris (Enter untuk baris baru).'),
                 Textarea::make('receipt_footer')
                     ->label('Footer')
                     ->rows(3)
-                    ->maxLength(500)
+                    ->maxLength(255)
                     ->helperText('Bisa diisi multi baris (Enter untuk baris baru).'),
                 Textarea::make('receipt_whatsapp_template')
                     ->label('Template WhatsApp')
                     ->rows(3)
+                    ->maxLength(255)
                     ->helperText(new \Illuminate\Support\HtmlString('Bisa diisi multi baris (Enter untuk baris baru).<br>Gunakan "(link)" untuk menempatkan tautan struk.')),
             ])
             ->statePath('data');

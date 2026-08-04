@@ -55,7 +55,8 @@ class ViewOrder extends ViewRecord
                         ->label('Tanggal Pembayaran')
                         ->default(now()),
                     Textarea::make('notes')
-                        ->label('Catatan'),
+                        ->label('Catatan')
+                        ->maxLength(255),
                 ])
                 ->action(function (Order $record, array $data): void {
                     $record->orderPayments()->create([

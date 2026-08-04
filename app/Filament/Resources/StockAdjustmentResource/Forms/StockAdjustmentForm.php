@@ -71,7 +71,7 @@ class StockAdjustmentForm
             Textarea::make('reason')
                 ->label('Catatan')
                 ->rows(3)
-                ->maxLength(65535),
+                ->maxLength(255),
             Select::make('reported_by')
                 ->label('Dilaporkan Oleh')
                 ->relationship('reportedBy', 'name')

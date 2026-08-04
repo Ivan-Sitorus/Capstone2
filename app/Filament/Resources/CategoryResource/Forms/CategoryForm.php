@@ -14,7 +14,7 @@ class CategoryForm
                 ->label('Kategori Menu')
                 ->required()
                 ->unique(ignoreRecord: true)
-                ->maxLength(100),
+                ->maxLength(255),
         ]);
     }
 }
