@@ -55,7 +55,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                 setShowCashModal(true);
             } else {
                 await axios.post(`/api/order/${order.id}/pay/qris`);
-                router.visit(`/customer/payment/${order.id}/qris`);
+                router.visit(`/pelanggan/payment/${order.id}/qris`);
             }
         } catch (err) {
             setError(err.response?.data?.message ?? 'Terjadi kesalahan. Coba lagi.');

@@ -66,7 +66,7 @@ export default function CustomerCart() {
                 is_mahasiswa:   isMahasiswa,
                 items: items.map(i => ({ menu_id: i.menuId, quantity: i.quantity })),
             });
-            router.visit(`/customer/payment/${res.data.order_id}/choose`);
+            router.visit(`/pelanggan/payment/${res.data.order_id}/choose`);
         } catch (err) {
             const msg = err.response?.data?.message ?? err.response?.data?.errors ?? 'Terjadi kesalahan. Coba lagi.';
             setErrorMsg(typeof msg === 'object' ? Object.values(msg).flat().join(' ') : msg);

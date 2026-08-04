@@ -43,44 +43,27 @@ Route::prefix('kasir')->middleware(['auth:web', 'role:cashier,admin'])->group(fu
     Route::get('/pesanan-menunggu', CashierPendingCountController::class)->name('kasir.pesanan-menunggu');
 });
 
-Route::get('/pesan', [CustomerMenuController::class, 'showIdentitas'])->name('pelanggan.identitas');
-
-// Customer pages
+// Customer pages (URL in Indonesian, route names in English)
 Route::prefix('pelanggan')->group(function () {
-    Route::get('/menu', [CustomerMenuController::class, 'index'])->name('pelanggan.menu');
-    Route::get('/keranjang', fn () => Inertia::render('Pelanggan/Cart/Index', []))->name('pelanggan.keranjang');
-    Route::get('/pesanan/{code}/status', [CustomerOrderController::class, 'status'])->name('pelanggan.pesanan.status');
-
-    // Payment flow
-    Route::get('/bayar/{orderCode}/pilih', [CustomerPaymentController::class, 'showChoose'])->name('pelanggan.bayar.pilih');
-    Route::get('/bayar/{orderCode}/tunai-status', [CustomerPaymentController::class, 'showCashStatus'])->name('pelanggan.bayar.tunai-status');
-    Route::get('/bayar/{orderCode}/qris', [CustomerPaymentController::class, 'showQrisUpload'])->name('pelanggan.bayar.qris-upload');
-    Route::get('/bayar/{orderCode}/qris-status', [CustomerPaymentController::class, 'showQrisStatus'])->name('pelanggan.bayar.qris-status');
-});
-
-// Customer routes
-Route::prefix('customer')->group(function () {
     Route::get('/login', [AuthController::class, 'showCustomerLogin'])->name('customer.login');
     Route::post('/login', [AuthController::class, 'customerLogin'])->name('customer.login.attempt');
-});
 
-Route::prefix('customer')->middleware('auth:web')->group(function () {
     Route::get('/menu', [CustomerMenuController::class, 'index'])->name('customer.menu');
     Route::get('/identitas', [CustomerMenuController::class, 'showIdentitas'])->name('customer.identitas');
     Route::post('/identitas', [CustomerMenuController::class, 'submitIdentitas'])->name('customer.identitas.submit');
+    Route::get('/keranjang', fn () => Inertia::render('Pelanggan/Cart/Index', []))->name('customer.cart');
+    Route::get('/riwayat', [CustomerOrderController::class, 'riwayat'])->name('customer.riwayat');
+
+    // Order flow
     Route::post('/order/store', [CustomerOrderController::class, 'store'])->name('customer.order.store');
     Route::get('/order/{order}/payment', [CustomerPaymentController::class, 'showChoose'])->name('customer.payment.choose');
     Route::post('/order/{order}/payment/choose', [CustomerPaymentController::class, 'choose'])->name('customer.payment.choose.post');
     Route::get('/order/{order}/payment/qris', [CustomerPaymentController::class, 'showQris'])->name('customer.payment.qris');
     Route::post('/order/{order}/payment/qris', [CustomerPaymentController::class, 'uploadQris'])->name('customer.payment.qris.upload');
     Route::get('/order/{order}/status', [CustomerOrderController::class, 'showStatus'])->name('customer.order.status');
-    Route::get('/riwayat', [CustomerOrderController::class, 'riwayat'])->name('customer.riwayat');
+    Route::get('/pesanan/{code}/status', [CustomerOrderController::class, 'status'])->name('customer.pesanan.status');
 });
 
 // Receipt (public — no auth required)
 Route::get('/receipt/{order:code}', fn (Order $order) => redirect()->route('receipt.show-by-uuid', ['order' => $order->uuid], 301));
 Route::get('/struk-pesanan/{order:uuid}', [ReceiptController::class, 'showByUuid'])->name('receipt.show-by-uuid');
-
-// Redirect old receivables to piutang
-Route::redirect('/admin/receivables', '/admin/piutang', 301);
-Route::redirect('/admin/receivables/{any}', '/admin/piutang/{any}', 301)->where('any', '.*');

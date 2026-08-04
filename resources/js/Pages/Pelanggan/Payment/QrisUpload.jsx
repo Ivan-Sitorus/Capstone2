@@ -57,7 +57,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
             <div className="bg-card border-b border-border px-6 pb-4 pt-[22px]">
                 <div className="flex items-center gap-[14px]">
                     <button
-                        onClick={() => router.visit(`/customer/payment/${order.order_code}/choose`)}
+                        onClick={() => router.visit(`/pelanggan/payment/${order.order_code}/choose`)}
                         className="w-9 h-9 rounded-[12px] bg-muted border-none cursor-pointer flex items-center justify-center shrink-0"
                     >
                         <ChevronLeft size={20} className="text-foreground" />
@@ -202,7 +202,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             Lihat Struk Digital
                         </button>
                         <button
-                            onClick={() => router.visit(route('pelanggan.pesanan.status', {code: order.order_code}))}
+                            onClick={() => router.visit(route('customer.pesanan.status', {code: order.order_code}))}
                             className="w-full h-[46px] bg-transparent border border-muted-foreground/30 rounded-[18px] text-[14px] font-semibold cursor-pointer text-muted-foreground"
                         >
                             Cek Status Pesanan

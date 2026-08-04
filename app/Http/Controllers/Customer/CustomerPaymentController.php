@@ -18,7 +18,7 @@ class CustomerPaymentController extends Controller
     public function showChoose(Order $order): Response
     {
         if ($order->status !== OrderStatus::Pending->value) {
-            return Inertia::location('/customer/riwayat');
+            return Inertia::location('/pelanggan/riwayat');
         }
 
         $payload = Cache::remember("order_choose_{$order->id}", 120, function () use ($order) {
@@ -49,7 +49,7 @@ class CustomerPaymentController extends Controller
 
     public function showCashStatus(Order $order): RedirectResponse
     {
-        return redirect('/customer/riwayat');
+        return redirect('/pelanggan/riwayat');
     }
 
     public function showQrisUpload(Order $order): Response

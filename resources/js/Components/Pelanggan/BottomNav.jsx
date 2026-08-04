@@ -9,10 +9,10 @@ function getRiwayatHref() {
         const saved = sessionStorage.getItem('w9_customer');
         if (saved) {
             const data = JSON.parse(saved);
-            if (data?.phone) return `/customer/riwayat?phone=${encodeURIComponent(data.phone)}`;
+            if (data?.phone) return `/pelanggan/riwayat?phone=${encodeURIComponent(data.phone)}`;
         }
     } catch (_) {}
-    return '/customer/riwayat';
+    return '/pelanggan/riwayat';
 }
 
 export default function BottomNav({ activeTab }) {

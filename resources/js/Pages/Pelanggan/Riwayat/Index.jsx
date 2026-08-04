@@ -61,7 +61,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                 if (saved) {
                     const data = JSON.parse(saved);
                     if (data?.phone) {
-                        router.visit(`/customer/riwayat?phone=${encodeURIComponent(data.phone)}`, {
+                        router.visit(`/pelanggan/riwayat?phone=${encodeURIComponent(data.phone)}`, {
                             preserveState: true, replace: true,
                         });
                     }

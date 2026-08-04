@@ -30,10 +30,10 @@ export default function PaymentProcess({ snapToken, order, clientKey, snapUrl })
 
         window.snap.pay(snapToken, {
             onSuccess: () => {
-                router.visit(`/customer/order/${order.order_code}/status`);
+                router.visit(`/pelanggan/order/${order.order_code}/status`);
             },
             onPending: () => {
-                router.visit(`/customer/order/${order.order_code}/status`);
+                router.visit(`/pelanggan/order/${order.order_code}/status`);
             },
             onError: () => {
                 setError('Pembayaran gagal. Silakan coba lagi.');
