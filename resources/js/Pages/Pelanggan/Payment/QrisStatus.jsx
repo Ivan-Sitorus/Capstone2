@@ -5,7 +5,7 @@ import { formatRupiah } from '@/helpers';
 
 export default function QrisStatus({ order }) {
     const isRejected = order.status === 'pending' && !!order.rejection_note;
-    const isDone     = order.status === 'selesai';
+    const isDone     = order.status === 'completed';
 
     useEffect(() => {
         if (isDone || isRejected) return;
@@ -14,7 +14,7 @@ export default function QrisStatus({ order }) {
     }, [order.status, order.rejection_note]);
 
     const isWaiting   = order.status === 'pending' && !order.rejection_note;
-    const isConfirmed = order.status === 'diproses';
+    const isConfirmed = order.status === 'processing';
 
     return (
         <PelangganLayout>

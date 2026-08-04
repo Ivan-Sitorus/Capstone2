@@ -20,8 +20,8 @@ const C  = {
 const TABS = [
     { key: 'all',      label: 'Semua'    },
     { key: 'pending',  label: 'Pending'  },
-    { key: 'diproses', label: 'Diproses' },
-    { key: 'selesai',  label: 'Selesai'  },
+    { key: 'processing', label: 'Diproses' },
+    { key: 'completed',  label: 'Selesai'  },
 ];
 
 const METHOD_LABEL = { cash: 'Tunai', qris: 'QRIS' };
@@ -71,7 +71,7 @@ export default function CustomerRiwayat({ orders = [] }) {
     }, []);
 
     useEffect(() => {
-        const hasActive = orders.some(o => o.status !== 'selesai');
+        const hasActive = orders.some(o => o.status !== 'completed');
         if (!hasActive) return;
         const id = setInterval(() => {
             router.reload({ only: ['orders'], preserveState: true });

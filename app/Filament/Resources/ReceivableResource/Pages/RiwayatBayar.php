@@ -66,8 +66,8 @@ class RiwayatBayar extends Page implements HasTable
                         ->label('Status')
                         ->state($this->order->status)
                         ->badge()
-                        ->color(fn () => $this->order->status === 'selesai' ? 'success' : 'warning')
-                        ->formatStateUsing(fn () => $this->order->status === 'selesai' ? 'Lunas' : 'Belum Lunas'),
+                        ->color(fn () => $this->order->status === 'completed' ? 'success' : 'warning')
+                        ->formatStateUsing(fn () => $this->order->status === 'completed' ? 'Lunas' : 'Belum Lunas'),
                 ])->columns(4),
             EmbeddedTable::make(),
         ]);

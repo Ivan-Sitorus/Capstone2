@@ -5,19 +5,19 @@ namespace App\Enums;
 enum OrderStatus: string
 {
     case Pending = 'pending';
-    case Diproses = 'diproses';
-    case Selesai = 'selesai';
-    case Dibatalkan = 'dibatalkan';
-    case BelumLunas = 'belum_lunas';
+    case Processing = 'processing';
+    case Completed = 'completed';
+    case Cancelled = 'cancelled';
+    case Unpaid = 'unpaid';
 
     public function label(): string
     {
         return match ($this) {
             self::Pending => 'Pending',
-            self::Diproses => 'Diproses',
-            self::Selesai => 'Selesai',
-            self::Dibatalkan => 'Dibatalkan',
-            self::BelumLunas => 'Belum Lunas',
+            self::Processing => 'Diproses',
+            self::Completed => 'Selesai',
+            self::Cancelled => 'Dibatalkan',
+            self::Unpaid => 'Belum Lunas',
         };
     }
 
@@ -25,10 +25,10 @@ enum OrderStatus: string
     {
         return match ($this) {
             self::Pending => 'warning',
-            self::Diproses => 'info',
-            self::Selesai => 'success',
-            self::Dibatalkan => 'danger',
-            self::BelumLunas => 'danger',
+            self::Processing => 'info',
+            self::Completed => 'success',
+            self::Cancelled => 'danger',
+            self::Unpaid => 'danger',
         };
     }
 }

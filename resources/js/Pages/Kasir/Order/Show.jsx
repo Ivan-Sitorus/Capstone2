@@ -29,7 +29,7 @@ export default function OrderShow({ order }) {
 
     const isCashPending = order.status === 'pending' && order.payment_method === 'cash';
     const isQrisPending = order.status === 'pending' && order.payment_method === 'qris' && !!order.payment_proof;
-    const canAdvance = order.status === 'diproses';
+    const canAdvance = order.status === 'processing';
 
     async function handleAction(url, body = {}) {
         if (processing) return;
@@ -42,7 +42,7 @@ export default function OrderShow({ order }) {
         }
     }
 
-    function handleAdvance() { handleAction(route('kasir.pesanan.status', {order: order.id}), { status: 'selesai' }); }
+    function handleAdvance() { handleAction(route('kasir.pesanan.status', {order: order.id}), { status: 'completed' }); }
     function handleConfirmCash() { handleAction(route('kasir.pesanan.konfirmasi-tunai', {order: order.id})); }
     function handleConfirmQris() { handleAction(route('kasir.pesanan.konfirmasi-qris', {order: order.id})); setShowRejectModal(false); }
     function handleRejectQris() { handleAction(route('kasir.pesanan.tolak-qris', {order: order.id}), { note: rejectNote }); setShowRejectModal(false); setRejectNote(''); }

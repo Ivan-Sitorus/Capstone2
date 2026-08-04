@@ -139,7 +139,7 @@ export default function PesananBaru({ categories }) {
             icon: <img src="/images/logo-qris.png" alt="QRIS" className="w-7 h-7 object-contain" />,
         },
         {
-            key: 'bayar_nanti',
+            key: 'pay_later',
             label: 'Bayar Nanti',
             desc: 'Simpan pesanan, pelanggan bayar nanti',
             icon: <Clock size={22} />,

@@ -20,8 +20,8 @@ class DashboardService
                 SUM(CASE WHEN status = ? AND payment_method = 'cash'   THEN 1 ELSE 0 END) AS cash_pending,
                 SUM(CASE WHEN status = ? AND payment_method = 'qris' AND payment_proof IS NOT NULL THEN 1 ELSE 0 END) AS qris_pending
             ", [
-            OrderStatus::Selesai->value,
-            OrderStatus::Selesai->value,
+            OrderStatus::Completed->value,
+            OrderStatus::Completed->value,
             OrderStatus::Pending->value,
             OrderStatus::Pending->value,
             ])
@@ -30,7 +30,7 @@ class DashboardService
 
     public function getActiveOrdersCount(): int
     {
-        return Order::whereNotIn('status', [OrderStatus::Selesai->value, OrderStatus::Dibatalkan->value])
+        return Order::whereNotIn('status', [OrderStatus::Completed->value, OrderStatus::Cancelled->value])
             ->where(fn($q) =>
                 $q->where('order_type', 'cashier')
                   ->orWhere(fn($q2) =>

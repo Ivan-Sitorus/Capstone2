@@ -208,7 +208,7 @@ class ViewStockHistory extends ListRecords
         return match (true) {
             $record->movement_type === 'correction' => false,
             $record->movement_type === 'sale'
-                && $record->order?->status === 'dibatalkan' => true,
+                && $record->order?->status === 'cancelled' => true,
             default => false,
         };
     }

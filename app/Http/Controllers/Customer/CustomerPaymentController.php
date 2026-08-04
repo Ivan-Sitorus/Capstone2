@@ -54,7 +54,7 @@ class CustomerPaymentController extends Controller
 
     public function showQrisUpload(Order $order): Response
     {
-        if (in_array($order->status, [OrderStatus::Diproses->value, OrderStatus::Selesai->value])) {
+        if (in_array($order->status, [OrderStatus::Processing->value, OrderStatus::Completed->value])) {
             return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderData($order)]);
         }
 

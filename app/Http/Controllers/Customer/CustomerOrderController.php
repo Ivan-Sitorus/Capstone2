@@ -33,7 +33,7 @@ class CustomerOrderController extends Controller
                     // Sembunyikan QRIS yang belum ada bukti & belum dikonfirmasi kasir
                     $q->where('payment_method', 'qris')
                       ->whereNull('payment_proof')
-                      ->whereNotIn('status', [OrderStatus::Diproses->value, OrderStatus::Selesai->value]);
+                      ->whereNotIn('status', [OrderStatus::Processing->value, OrderStatus::Completed->value]);
                 })
                 ->latest()
                 ->limit(50)

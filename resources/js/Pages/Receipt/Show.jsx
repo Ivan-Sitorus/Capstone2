@@ -23,7 +23,7 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
     }, []);
 
     const paymentLabel =
-        order.payment_method === 'bayar_nanti'
+        order.payment_method === 'pay_later'
             ? 'Bayar Nanti'
             : order.payment_method?.toUpperCase() ?? '-';
 
@@ -159,12 +159,12 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
                                     <Badge
                                         variant="outline"
                                         className={`text-xs font-semibold px-2 py-0.5 ${
-                                            order.payment_method !== 'bayar_nanti'
+                                            order.payment_method !== 'pay_later'
                                                 ? 'bg-green-50 text-green-600'
                                                 : 'bg-yellow-50 text-yellow-600'
                                         }`}
                                     >
-                                        {order.payment_method !== 'bayar_nanti' ? 'Lunas' : 'Belum Lunas'}
+                                        {order.payment_method !== 'pay_later' ? 'Lunas' : 'Belum Lunas'}
                                     </Badge>
                                 </div>
                             </div>

@@ -34,7 +34,7 @@ class OrderProcessingService
 
         DB::transaction(function () use ($order) {
             $order->update([
-                'status' => $order::STATUS_DIPROSES,
+                'status' => $order::STATUS_PROCESSING,
                 'cashier_id' => Auth::id(),
                 'processed_at' => now(),
             ]);
@@ -76,7 +76,7 @@ class OrderProcessingService
             }
             $order->update([
                 'qris_status' => 'accepted',
-                'status' => $order::STATUS_DIPROSES,
+                'status' => $order::STATUS_PROCESSING,
                 'cashier_id' => Auth::id(),
                 'payment_proof' => null,
                 'processed_at' => now(),

@@ -77,7 +77,7 @@ class CashierHistoryService
         }
 
         return Order::where('processed_by', $session->user_id)
-            ->where('status', OrderStatus::Selesai->value)
+            ->where('status', OrderStatus::Completed->value)
             ->whereBetween('created_at', [$session->started_at, $endTime])
             ->count();
     }

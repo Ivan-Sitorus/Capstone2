@@ -49,15 +49,15 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
     const tabs = [
         { key: 'all',         label: `Semua (${counts.all})` },
         { key: 'pending',     label: `Pending (${counts.pending})` },
-        { key: 'diproses',    label: `Diproses (${counts.diproses})` },
+        { key: 'processing',    label: `Diproses (${counts.processing})` },
         { key: 'belum_bayar', label: `Belum Bayar (${counts.belum_bayar ?? 0})` },
     ];
 
     const filteredOrders = (() => {
         switch (activeTab) {
             case 'pending':     return localOrders.filter(o => o.status === 'pending');
-            case 'diproses':    return localOrders.filter(o => o.status === 'diproses');
-            case 'belum_bayar': return localOrders.filter(o => o.payment_method === 'bayar_nanti');
+            case 'processing':    return localOrders.filter(o => o.status === 'processing');
+            case 'belum_bayar': return localOrders.filter(o => o.payment_method === 'pay_later');
             default:            return localOrders;
         }
     })();
@@ -67,9 +67,9 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         const orderId = qrisOrder.id;
         setProcessing(true);
 
-        pendingStatusRef.current.set(orderId, 'diproses');
+        pendingStatusRef.current.set(orderId, 'processing');
         setLocalOrders(prev => prev.map(o =>
-            o.id === orderId ? { ...o, status: 'diproses', payment_proof: null } : o
+            o.id === orderId ? { ...o, status: 'processing', payment_proof: null } : o
         ));
         setQrisOrder(null);
 
@@ -104,7 +104,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         if (processing) return;
         setProcessing(true);
 
-        if (targetStatus === 'selesai') {
+        if (targetStatus === 'completed') {
             pendingRemoveRef.current.add(orderId);
             setLocalOrders(prev => prev.filter(o => o.id !== orderId));
         } else {

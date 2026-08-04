@@ -11,7 +11,7 @@ class OrderFactory extends Factory
 
     public function definition(): array
     {
-        $paymentMethod = fake()->randomElement(['cash', 'qris', 'bayar_nanti']);
+        $paymentMethod = fake()->randomElement(['cash', 'qris', 'pay_later']);
 
         return [
             'order_code' => 'ORD-'.now()->format('Ymd').'-'.str_pad(self::$orderSequence++, 4, '0', STR_PAD_LEFT),
@@ -19,7 +19,7 @@ class OrderFactory extends Factory
             'phone' => fake()->optional(0.7)->phoneNumber(),
             'table_id' => null,
             'cashier_id' => User::factory()->state(['role' => 'cashier']),
-            'status' => fake()->randomElement(['pending', 'diproses', 'selesai']),
+            'status' => fake()->randomElement(['pending', 'processing', 'completed']),
             'order_type' => fake()->randomElement(['qr', 'cashier']),
             'payment_method' => $paymentMethod,
             'payment_proof' => null,
@@ -40,21 +40,21 @@ class OrderFactory extends Factory
     public function diproses(): static
     {
         return $this->state(fn (array $attrs) => [
-            'status' => 'diproses',
+            'status' => 'processing',
         ]);
     }
 
     public function selesai(): static
     {
         return $this->state(fn (array $attrs) => [
-            'status' => 'selesai',
+            'status' => 'completed',
         ]);
     }
 
     public function bayarNanti(): static
     {
         return $this->state(fn (array $attrs) => [
-            'payment_method' => 'bayar_nanti',
+            'payment_method' => 'pay_later',
         ]);
     }
 }

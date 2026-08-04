@@ -4,16 +4,16 @@ import PelangganLayout from '@/Layouts/PelangganLayout';
 import { formatRupiah } from '@/helpers';
 
 const STEPS = [
-    { label: 'Pesanan Diterima',          statuses: ['menunggu_bayar_cash','dikonfirmasi','diproses','siap','selesai'] },
+    { label: 'Pesanan Diterima',          statuses: ['menunggu_bayar_cash','dikonfirmasi','processing','siap','completed'] },
     { label: 'Menunggu Pembayaran Cash',  statuses: ['menunggu_bayar_cash'], active: true },
-    { label: 'Pembayaran Dikonfirmasi',   statuses: ['dikonfirmasi','diproses','siap','selesai'] },
-    { label: 'Pesanan Diproses',          statuses: ['diproses','siap','selesai'] },
-    { label: 'Pesanan Siap Diambil',      statuses: ['siap','selesai'] },
+    { label: 'Pembayaran Dikonfirmasi',   statuses: ['dikonfirmasi','processing','siap','completed'] },
+    { label: 'Pesanan Diproses',          statuses: ['processing','siap','completed'] },
+    { label: 'Pesanan Siap Diambil',      statuses: ['siap','completed'] },
 ];
 
 export default function CashStatus({ order }) {
     useEffect(() => {
-        if (['siap', 'selesai'].includes(order.status)) return;
+        if (['siap', 'completed'].includes(order.status)) return;
         const id = setInterval(() => router.reload({ only: ['order'] }), 5000);
         return () => clearInterval(id);
     }, [order.status]);
@@ -26,7 +26,7 @@ export default function CashStatus({ order }) {
                 </div>
 
                 <h1 className="text-[22px] font-bold text-foreground mb-1.5 text-center">
-                    {order.status === 'selesai' ? 'Pesanan Selesai!' : 'Pesanan Dikonfirmasi!'}
+                    {order.status === 'completed' ? 'Pesanan Selesai!' : 'Pesanan Dikonfirmasi!'}
                 </h1>
                 <p className="text-sm text-muted-foreground mb-1 text-center">
                     #{order.order_code}
@@ -68,13 +68,13 @@ export default function CashStatus({ order }) {
                     })}
                 </div>
 
-                {order.status !== 'selesai' && (
+                {order.status !== 'completed' && (
                     <p className="text-xs text-muted-foreground/50 text-center">
                         Halaman ini otomatis update setiap 5 detik
                     </p>
                 )}
 
-                {order.status === 'selesai' && (
+                {order.status === 'completed' && (
                     <button
                         onClick={() => router.visit('/pelanggan/menu')}
                         className="w-full h-[50px] bg-primary text-primary-foreground border-none rounded-[16px] text-[15px] font-bold cursor-pointer"

@@ -94,14 +94,14 @@ class ViewCashierHistory extends Page implements HasTable
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
                         'pending' => 'warning',
-                        'diproses' => 'info',
-                        'selesai' => 'success',
+                        'processing' => 'info',
+                        'completed' => 'success',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'pending' => 'Pending',
-                        'diproses' => 'Diproses',
-                        'selesai' => 'Selesai',
+                        'processing' => 'Diproses',
+                        'completed' => 'Selesai',
                         default => $state,
                     }),
                 TextColumn::make('total_amount')

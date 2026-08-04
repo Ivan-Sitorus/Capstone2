@@ -48,8 +48,8 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
 
     const isQrisPending  = order.status === 'pending' && order.payment_method === 'qris';
     const hasProof       = !!order.payment_proof;
-    const belumBayar     = order.payment_method === 'bayar_nanti';
-    const ALL_STATUSES   = ['pending', 'diproses', 'selesai'];
+    const belumBayar     = order.payment_method === 'pay_later';
+    const ALL_STATUSES   = ['pending', 'processing', 'completed'];
     const statusIndex    = ALL_STATUSES.indexOf(order.status);
 
     return (
@@ -68,7 +68,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                         <span className="text-base font-semibold text-foreground truncate">
                             #{order.order_code}
                         </span>
-                        {order.payment_method && order.payment_method !== 'bayar_nanti' && (() => {
+                        {order.payment_method && order.payment_method !== 'pay_later' && (() => {
                             const m = METHOD_META[order.payment_method] ?? METHOD_META['cash'];
                             const isQris = order.payment_method === 'qris';
                             return (
@@ -90,7 +90,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                     <div className="flex items-center gap-1.5 shrink-0">
                         <StatusBadge status={order.status} />
 
-                        {order.status !== 'selesai' && (
+                        {order.status !== 'completed' && (
                             <div ref={menuRef} className="relative">
                                 <button
                                     onClick={() => setMenuOpen(v => !v)}
@@ -121,7 +121,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                             const isCurrent  = s === order.status;
                                             const isNext     = i === statusIndex + 1;
                                             const isDisabled = !isCurrent && !isNext;
-                                            const isBlocked  = s === 'selesai' && belumBayar;
+                                            const isBlocked  = s === 'completed' && belumBayar;
 
                                             return (
                                                 <button
@@ -224,7 +224,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                         )}
 
                         {/* Tombol Konfirmasi Lunas + Popover */}
-                        {belumBayar && order.status === 'diproses' && (
+                        {belumBayar && order.status === 'processing' && (
                             <div ref={payRef} className="relative">
                                 <button
                                     onClick={() => setPayPopover(v => !v)}

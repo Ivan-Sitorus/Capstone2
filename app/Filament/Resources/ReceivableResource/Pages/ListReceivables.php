@@ -108,7 +108,7 @@ class ListReceivables extends ListRecords
                         'customer_name' => $data['customer_name'],
                         'total_amount' => $total,
                         'payment_method' => 'piutang',
-                        'status' => 'belum_lunas',
+                        'status' => 'unpaid',
                         'order_code' => Order::generateCode(),
                     ]);
 

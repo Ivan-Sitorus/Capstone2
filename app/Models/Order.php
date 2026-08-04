@@ -149,8 +149,8 @@ class Order extends Model
         }
 
         $this->status = $totalPaid >= (float) $this->total_amount
-            ? OrderStatus::Selesai->value
-            : OrderStatus::BelumLunas->value;
+            ? OrderStatus::Completed->value
+            : OrderStatus::Unpaid->value;
 
         $this->saveQuietly();
     }

@@ -55,7 +55,7 @@ export default function SharedOrderCard({
     const urgency = isKitchen && showTimer ? getUrgency(elapsed) : 'normal';
     const theme   = URGENCY_STYLES[urgency];
 
-    const canBump = isKitchen && (order.status === 'pending' || order.status === 'diproses');
+    const canBump = isKitchen && (order.status === 'pending' || order.status === 'processing');
     const items   = Array.isArray(order.items)
         ? order.items
         : [];

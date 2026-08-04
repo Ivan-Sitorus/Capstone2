@@ -8,10 +8,10 @@ trait HasOrderStatusBadge
     {
         return match ($state) {
             'pending' => 'warning',
-            'diproses' => 'info',
-            'selesai' => 'success',
-            'dibatalkan' => 'danger',
-            'belum_lunas' => 'warning',
+            'processing' => 'info',
+            'completed' => 'success',
+            'cancelled' => 'danger',
+            'unpaid' => 'warning',
             default => 'gray',
         };
     }
@@ -20,10 +20,10 @@ trait HasOrderStatusBadge
     {
         return match ($state) {
             'pending' => 'Pending',
-            'diproses' => 'Diproses',
-            'selesai' => 'Selesai',
-            'dibatalkan' => 'Dibatalkan',
-            'belum_lunas' => 'Belum Lunas',
+            'processing' => 'Diproses',
+            'completed' => 'Selesai',
+            'cancelled' => 'Dibatalkan',
+            'unpaid' => 'Belum Lunas',
             default => $state,
         };
     }
@@ -33,7 +33,7 @@ trait HasOrderStatusBadge
         return match ($state) {
             'cash' => 'Tunai',
             'qris' => 'QRIS',
-            'bayar_nanti' => 'Bayar Nanti',
+            'pay_later' => 'Bayar Nanti',
             'piutang' => 'Piutang',
             default => '-',
         };
@@ -43,7 +43,7 @@ trait HasOrderStatusBadge
     {
         return match ($state) {
             'lunas' => 'success',
-            'belum_lunas' => 'danger',
+            'unpaid' => 'danger',
             default => 'gray',
         };
     }
@@ -52,7 +52,7 @@ trait HasOrderStatusBadge
     {
         return match ($state) {
             'lunas' => 'Lunas',
-            'belum_lunas' => 'Belum Lunas',
+            'unpaid' => 'Belum Lunas',
             default => '-',
         };
     }

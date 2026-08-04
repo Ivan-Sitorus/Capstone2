@@ -23,7 +23,7 @@ class ReceivableTable
             ->modifyQueryUsing(fn (Builder $query) => $query
                 ->where(function (Builder $q) {
                     $q->where('payment_method', 'piutang')
-                      ->orWhere('status', OrderStatus::BelumLunas->value);
+                      ->orWhere('status', OrderStatus::Unpaid->value);
                 })
                 ->with('cashier', 'orderPayments')
             )
@@ -68,8 +68,8 @@ class ReceivableTable
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
-                        'belum_lunas' => 'Belum Lunas',
-                        'selesai' => 'Lunas',
+                        'unpaid' => 'Belum Lunas',
+                        'completed' => 'Lunas',
                     ]),
                 Filter::make('created_at')
                     ->label('Rentang Waktu')

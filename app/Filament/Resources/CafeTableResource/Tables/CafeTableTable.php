@@ -89,7 +89,7 @@ class CafeTableTable
                     ->requiresConfirmation()
                     ->modalHeading(fn (CafeTable $record) => 'Hapus Meja '.$record->table_number)
                     ->before(function (DeleteAction $action, CafeTable $record) {
-                        if ($record->orders()->whereIn('status', ['pending', 'diproses'])->exists()) {
+                        if ($record->orders()->whereIn('status', ['pending', 'processing'])->exists()) {
                             Notification::make()
                                 ->danger()
                                 ->title('Meja tidak dapat dihapus')

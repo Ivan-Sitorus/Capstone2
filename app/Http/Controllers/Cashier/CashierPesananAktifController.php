@@ -13,8 +13,8 @@ class CashierPesananAktifController extends Controller
     public function index(): Response
     {
         $orders = Order::with(['items.menu', 'cafeTable', 'cashier'])
-            ->whereNotIn('status', [OrderStatus::Selesai->value, OrderStatus::Dibatalkan->value])
-            ->where('status', '!=', OrderStatus::BelumLunas->value)
+            ->whereNotIn('status', [OrderStatus::Completed->value, OrderStatus::Cancelled->value])
+            ->where('status', '!=', OrderStatus::Unpaid->value)
             ->where(function ($q) {
                 // Order dari kasir: selalu tampil
                 $q->where('order_type', 'cashier')
@@ -26,7 +26,7 @@ class CashierPesananAktifController extends Controller
                                // QRIS: tampil saat bukti dikirim (pending) ATAU sudah dikonfirmasi (diproses, proof dihapus)
                                 ->orWhere(fn ($q4) => $q4->where('payment_method', 'qris')
                                     ->where(fn ($q5) => $q5->whereNotNull('payment_proof')
-                                        ->orWhere('status', OrderStatus::Diproses->value)
+                                        ->orWhere('status', OrderStatus::Processing->value)
                                     )
                                 )
                         )
@@ -38,8 +38,8 @@ class CashierPesananAktifController extends Controller
         $counts = [
             'all' => $orders->count(),
 'pending' => $orders->where('status', OrderStatus::Pending->value)->count(),
-                'diproses' => $orders->where('status', OrderStatus::Diproses->value)->count(),
-            'belum_bayar' => $orders->where('payment_method', 'bayar_nanti')->count(),
+                'processing' => $orders->where('status', OrderStatus::Processing->value)->count(),
+            'belum_bayar' => $orders->where('payment_method', 'pay_later')->count(),
         ];
 
         $ordersData = $orders->map(fn ($o) => [

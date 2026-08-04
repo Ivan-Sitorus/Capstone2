@@ -95,7 +95,7 @@ class PenjualanChartWidget extends LineChartWidget
             ->selectRaw("to_char(created_at, 'YYYY-MM-DD') as day, sum(total_amount) as total")
             ->whereDate('created_at', '>=', $from)
             ->whereDate('created_at', '<=', $to)
-            ->where('status', '!=', 'dibatalkan')
+            ->where('status', '!=', 'cancelled')
             ->groupBy('day')
             ->get()
             ->each(function ($row) use (&$result) {

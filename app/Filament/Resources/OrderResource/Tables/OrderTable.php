@@ -55,15 +55,15 @@ class OrderTable
                     ->label('Status')
                     ->options([
                         'pending' => 'Pending',
-                        'diproses' => 'Diproses',
-                        'selesai' => 'Selesai',
+                        'processing' => 'Diproses',
+                        'completed' => 'Selesai',
                     ]),
                 SelectFilter::make('payment_method')
                     ->label('Metode Bayar')
                     ->options([
                         'cash' => 'Tunai',
                         'qris' => 'QRIS',
-                        'bayar_nanti' => 'Bayar Nanti',
+                        'pay_later' => 'Bayar Nanti',
                     ]),
                 Filter::make('today')
                     ->label('Hari Ini')
