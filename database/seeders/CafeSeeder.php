@@ -272,10 +272,9 @@ class CafeSeeder extends Seeder
         // 6. CafeTables
         $this->seedCafeTables();
 
-        // 7–9. Orders + OrderItems + Payments/Receivables
+        // 7–9. Orders + OrderItems
         $orderData = $this->seedOrders();
         $this->seedOrderItems($orderData);
-        $this->seedReceivables($orderData);
 
         // 10. StockMovements from Orders (FEFO deduction)
         $this->seedStockMovementsFromOrders($orderData);
@@ -316,7 +315,6 @@ class CafeSeeder extends Seeder
 
         DB::table('stock_movements')->truncate();
         DB::table('stock_adjustments')->truncate();
-        DB::table('receivables')->truncate();
         DB::table('order_items')->truncate();
         DB::table('orders')->truncate();
         DB::table('menu_ingredients')->truncate();
@@ -660,33 +658,8 @@ class CafeSeeder extends Seeder
     }
 
     // ──────────────────────────────────────────────────────────────
-    //  9. Receivables (~30)
+    //  10. StockMovements from Orders (FEFO deduction)
     // ──────────────────────────────────────────────────────────────
-
-    private function seedReceivables(array $orderData): void
-    {
-        $rows = [];
-        foreach ($orderData as $orderId => $data) {
-            if ($data['payment_method'] !== 'bayar_nanti') {
-                continue;
-            }
-            $createdAt = Carbon::parse($data['created_at']);
-
-            $rows[] = [
-                'order_id' => $orderId,
-                'customer_name' => $data['customer_name'] ?? 'Event Customer',
-                'amount' => $data['total_amount'],
-                'status' => 'pending',
-                'paid_amount' => 0,
-                'notes' => "Auto-generated from Order #{$data['order_code']}",
-                'created_at' => $data['created_at'],
-                'updated_at' => $data['created_at'],
-            ];
-        }
-        if (!empty($rows)) {
-            DB::table('receivables')->insert($rows);
-        }
-    }
 
     // ──────────────────────────────────────────────────────────────
     //  11. StockMovements from Orders — FEFO deduction
