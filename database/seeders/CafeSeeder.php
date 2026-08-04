@@ -3,10 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\CafeTable;
-use App\Models\Category;
-use App\Models\Ingredient;
 use App\Models\Menu;
-use App\Models\MenuIngredient;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -282,27 +279,6 @@ class CafeSeeder extends Seeder
         // 11. StockAdjustments + StockMovements from Adjustments
         $this->seedStockAdjustments();
         $this->seedStockMovementsFromAdjustments();
-
-        // 12. Assign unit_id to ingredients
-        $unitMap = [];
-        foreach (['gram','kg','ml','liter','pcs','sachet'] as $u) {
-            $unitMap[$u] = DB::table('units')->where('name', $u)->value('id');
-        }
-        foreach (Ingredient::all() as $ingredient) {
-            if (isset($unitMap[$ingredient->unit])) {
-                Ingredient::withoutTimestamps(fn () =>
-                    $ingredient->update(['unit_id' => $unitMap[$ingredient->unit]])
-                );
-            }
-        }
-        // Assign unit_id to menu_ingredients (default to ingredient's unit)
-        foreach (MenuIngredient::with('ingredient')->get() as $mi) {
-            if ($mi->ingredient && $mi->ingredient->unit_id) {
-                MenuIngredient::withoutTimestamps(fn () =>
-                    $mi->update(['unit_id' => $mi->ingredient->unit_id])
-                );
-            }
-        }
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -395,7 +371,7 @@ class CafeSeeder extends Seeder
                     ? (clone $receivedAt)->addDays(max(7, (int) ($expiryMonths * 30)))
                     : (clone $receivedAt)->addMonths((int) $expiryMonths);
 
-                $unitCost = round($cost * $rng->float(0.85, 1.15), 2);
+                $unitCost = (int) round($cost * $rng->float(0.85, 1.15));
 
                 $rows[] = [
                     'ingredient_id' => $ingId,
@@ -405,7 +381,7 @@ class CafeSeeder extends Seeder
                     'cost_per_unit' => $unitCost,
                     'initial_quantity' => $qty,
                     'supplier_name' => $rng->pick(array_keys(self::SUPPLIERS)),
-                    'total_cost' => round($qty * $unitCost, 2),
+                    'total_cost' => (int) round($qty * $unitCost),
                     'payment_status' => 'lunas',
                     'custom_order' => null,
                     'status' => 'active',
@@ -561,24 +537,24 @@ class CafeSeeder extends Seeder
 
                     // Payment method distribution
                     $pmRoll = $rng->int(1, 100);
-                    $paymentMethod = $pmRoll <= 60 ? 'cash' : ($pmRoll <= 90 ? 'qris' : 'bayar_nanti');
+                    $paymentMethod = $pmRoll <= 60 ? 'cash' : ($pmRoll <= 90 ? 'qris' : 'pay_later');
 
-                    // Status: orders in last 1-2 months may vary, older are selesai
+                    // Status: orders in last 1-2 months may vary, older are completed
                     $monthsFromEnd = ($y === 2026 && $m >= 4) ? (($m - 4) * 30 + $day) / 30.0 : 999;
                     $roll = $rng->int(1, 100);
                     if ($monthsFromEnd <= 1.0 && $roll <= 40) {
-                        $status = $rng->pick(['diproses', 'diproses', 'pending', 'pending', 'dibatalkan']);
+                        $status = $rng->pick(['processing', 'processing', 'pending', 'pending', 'cancelled']);
                     } elseif ($monthsFromEnd <= 2.0 && $roll <= 15) {
-                        $status = $rng->pick(['diproses', 'pending', 'dibatalkan']);
+                        $status = $rng->pick(['processing', 'pending', 'cancelled']);
                     } else {
-                        $status = 'selesai';
+                        $status = 'completed';
                     }
 
-                    $completedAt = $status === 'selesai' ? (clone $timestamp)->addMinutes($rng->int(10, 45)) : null;
-                    $processedAt = in_array($status, ['diproses', 'selesai']) ? (clone $timestamp)->addMinutes($rng->int(2, 10)) : null;
-                    $cancelledAt = $status === 'dibatalkan' ? (clone $timestamp)->addMinutes($rng->int(5, 30)) : null;
+                    $completedAt = $status === 'completed' ? (clone $timestamp)->addMinutes($rng->int(10, 45)) : null;
+                    $processedAt = in_array($status, ['processing', 'completed']) ? (clone $timestamp)->addMinutes($rng->int(2, 10)) : null;
+                    $cancelledAt = $status === 'cancelled' ? (clone $timestamp)->addMinutes($rng->int(5, 30)) : null;
 
-                    $isAvailable = $status !== 'dibatalkan';
+                    $isAvailable = $status !== 'cancelled';
                     $tableId = $rng->int(1, 100) <= 70 ? $rng->int(1, 10) : null;
 
                     $orderRows[] = [
@@ -592,7 +568,6 @@ class CafeSeeder extends Seeder
                         'total_amount' => $totalAmount,
                         'payment_method' => $paymentMethod,
                         'uuid' => Str::uuid(),
-                        'notes' => null,
                         'processed_by' => $status !== 'pending' ? $this->cashierIds[$rng->int(0, 2)] : null,
                         'processed_at' => $processedAt,
                         'completed_at' => $completedAt,
@@ -648,7 +623,6 @@ class CafeSeeder extends Seeder
                     'quantity' => $qty,
                     'unit_price' => $price,
                     'subtotal' => $price * $qty,
-                    'notes' => null,
                     'created_at' => $data['created_at'],
                     'updated_at' => $data['created_at'],
                 ];
@@ -760,10 +734,8 @@ class CafeSeeder extends Seeder
                 'quantity_before' => round($oldQty, 2),
                 'quantity_change' => -round($deduct, 2),
                 'quantity_after' => round($batch['quantity'], 2),
-                'unit_cost' => round($batch['cost_per_unit'], 2),
+                'unit_cost' => (int) round($batch['cost_per_unit']),
                 'reference' => $orderCode,
-                'notes' => null,
-                'recorded_by' => $cashierId,
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
             ];
@@ -960,8 +932,6 @@ class CafeSeeder extends Seeder
                 'quantity_after' => (float) $adj->quantity_after,
                 'unit_cost' => null,
                 'reference' => $adj->code,
-                'notes' => $adj->reason,
-                'recorded_by' => $adj->reported_by,
                 'created_at' => $adj->adjusted_at,
                 'updated_at' => $adj->adjusted_at,
             ];

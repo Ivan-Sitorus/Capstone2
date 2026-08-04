@@ -23,8 +23,6 @@ class StockMovement extends Model
         'quantity_after',
         'unit_cost',
         'reference',
-        'notes',
-        'recorded_by',
     ];
 
     protected function casts(): array
@@ -33,7 +31,7 @@ class StockMovement extends Model
             'quantity_before' => 'decimal:3',
             'quantity_change' => 'decimal:3',
             'quantity_after' => 'decimal:3',
-            'unit_cost' => 'decimal:3',
+            'unit_cost' => 'integer',
         ];
     }
 
@@ -71,10 +69,5 @@ class StockMovement extends Model
     public function stockAdjustment(): BelongsTo
     {
         return $this->belongsTo(StockAdjustment::class);
-    }
-
-    public function recordedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'recorded_by');
     }
 }

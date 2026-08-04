@@ -127,8 +127,6 @@ class StockReconciliationService
                 'quantity_change' => $quantity,
                 'quantity_after' => (float) $batch->quantity,
                 'unit_cost' => $batch->cost_per_unit,
-                'notes' => $reason,
-                'recorded_by' => $reportedBy,
             ]);
 
             return $adjustment;
@@ -169,8 +167,6 @@ class StockReconciliationService
                 'source_type' => 'stock_adjustment',
                 'source_id' => (string) $adjustment->id,
                 'stock_adjustment_id' => $adjustment->id,
-                'recorded_by' => $reportedBy,
-                'notes' => $category ? "[{$category}] {$reason}" : $reason,
             ]
         );
 
@@ -191,8 +187,6 @@ class StockReconciliationService
         return DB::transaction(function () use (
             $menu, $quantity, $adjustmentType, $category, $reason, $reportedBy, $adjustedAt,
         ) {
-            $notes = $category ? "[{$category}] {$reason}" : $reason;
-
             $adjustment = StockAdjustment::create([
                 'code' => self::generateAdjustmentCode(),
                 'adjustable_type' => AdjustableType::Menu->value,
@@ -219,8 +213,6 @@ class StockReconciliationService
                             'source_type' => 'stock_adjustment',
                             'source_id' => (string) $adjustment->id,
                             'stock_adjustment_id' => $adjustment->id,
-                            'recorded_by' => $reportedBy,
-                            'notes' => $notes,
                         ],
                     );
                 }
@@ -249,8 +241,6 @@ class StockReconciliationService
                         'quantity_change' => $addQty,
                         'quantity_after' => (float) $batch->quantity,
                         'unit_cost' => $batch->cost_per_unit,
-                        'notes' => $notes,
-                        'recorded_by' => $reportedBy,
                     ]);
                 }
             }

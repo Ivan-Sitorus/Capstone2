@@ -19,13 +19,12 @@ return new class extends Migration
             $table->string('status')->default('pending');
             $table->string('order_type')->default('qr');
             $table->uuid('uuid')->nullable();
-            $table->integer('resubmit_count')->default(0);
+            $table->integer('qris_resubmit_attempts')->default(0);
             $table->string('qris_status')->nullable();
             $table->unsignedBigInteger('total_amount')->default(0);
             $table->string('payment_method')->nullable();
             $table->string('payment_proof')->nullable();
             $table->string('rejection_note')->nullable();
-            $table->string('notes')->nullable();
             $table->timestamp('processed_at')->nullable();
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('cancelled_at')->nullable();

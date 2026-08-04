@@ -6,9 +6,7 @@ use App\Filament\Resources\MenuResource\Forms\MenuForm;
 use App\Filament\Resources\MenuResource\Pages\ListMenus;
 use App\Filament\Resources\MenuResource\RelationManagers\IngredientsRelationManager;
 use App\Filament\Resources\MenuResource\Tables\MenuTable;
-use App\Models\Ingredient;
 use App\Models\Menu;
-use App\Services\UnitConversionService;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use BackedEnum;
@@ -58,24 +56,5 @@ class MenuResource extends Resource
         return [
             "index" => ListMenus::route("/"),
         ];
-    }
-
-    public static function getCompatibleUnitOptions(?int $ingredientId): array
-    {
-        if (! $ingredientId) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        $ingredient = Ingredient::find($ingredientId);
-        if (! $ingredient || ! $ingredient->unit_id) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        $unit = \App\Models\Unit::find($ingredient->unit_id);
-        if (! $unit) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        return app(UnitConversionService::class)
-            ->getCompatibleUnits($unit)
-            ->pluck('name', 'id')
-            ->toArray();
     }
 }

@@ -9,19 +9,13 @@ use App\Models\IngredientBatch;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\StockMovement;
-use App\Models\Unit;
-use App\Services\UnitConversionService;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class InventoryService
 {
-    public function __construct(
-        protected UnitConversionService $unitConversionService,
-    ) {}
-
-    public function processSaleForOrder(Order $order, ?int $recordedBy = null): array
+    public function processSaleForOrder(Order $order): array
     {
         $alreadyProcessed = StockMovement::query()
             ->where('order_id', $order->id)
@@ -40,13 +34,12 @@ class InventoryService
         $order->loadMissing('items');
 
         $items = $order->items
-            ->map(function ($orderItem) use ($order, $recordedBy) {
+            ->map(function ($orderItem) use ($order) {
                 return [
                     'menu_id' => (int) $orderItem->menu_id,
                     'quantity' => (int) $orderItem->quantity,
                     'order_id' => $order->id,
                     'order_item_id' => $orderItem->id,
-                    'recorded_by' => $recordedBy ?? $order->cashier_id,
                     'reference' => $order->order_code,
                     'usage_date' => $order->created_at?->toDateString(),
                 ];
@@ -93,7 +86,6 @@ class InventoryService
                     'source_id' => isset($item['order_item_id']) ? (string) $item['order_item_id'] : null,
                     'order_id' => $item['order_id'] ?? null,
                     'order_item_id' => $item['order_item_id'] ?? null,
-                    'recorded_by' => $item['recorded_by'] ?? null,
                     'reference' => $item['reference'] ?? null,
                     'usage_date' => $item['usage_date'] ?? null,
                 ];
@@ -106,10 +98,7 @@ class InventoryService
                         $deduction = $this->deductIngredientStock(
                             ingredient: $ingredient,
                             requiredQuantity: $requiredQuantity,
-                            context: array_merge($itemContext, [
-                                'notes' => "Order usage for menu {$menu->name}",
-                                'recipeUnitId' => $menuIngredient->unit_id,
-                            ])
+                            context: $itemContext
                         );
 
                         $stockChanges[] = [
@@ -158,15 +147,6 @@ class InventoryService
                     $ingredient = $menuIngredient->ingredient;
                     $requiredQuantity = (float) $menuIngredient->quantity_used * $quantity;
 
-                    // Unit conversion: if recipe unit differs from ingredient storage unit
-                    if ($menuIngredient->unit_id && $ingredient->unit_id && $menuIngredient->unit_id != $ingredient->unit_id) {
-                        $fromUnit = Unit::find($menuIngredient->unit_id);
-                        $toUnit = Unit::find($ingredient->unit_id);
-                        if ($fromUnit && $toUnit) {
-                            $requiredQuantity = $this->unitConversionService->convert($requiredQuantity, $fromUnit, $toUnit);
-                        }
-                    }
-
                     $availableQuantity = $ingredient->getTotalStock();
 
                     if ($availableQuantity < $requiredQuantity) {
@@ -189,20 +169,6 @@ class InventoryService
 
     private function deductIngredientStock(Ingredient $ingredient, float $requiredQuantity, array $context = []): array
     {
-
-        // Unit conversion: if recipe unit differs from ingredient storage unit
-        if (isset($context['recipeUnitId'])) {
-            if ($ingredient->unit_id && $context['recipeUnitId'] != $ingredient->unit_id) {
-                $fromUnit = Unit::find($context['recipeUnitId']);
-                $toUnit = Unit::find($ingredient->unit_id);
-                if ($fromUnit && $toUnit) {
-                    $converted = $this->unitConversionService->convert($requiredQuantity, $fromUnit, $toUnit);
-                    Log::info("Unit conversion: {$requiredQuantity} {$fromUnit->name} → {$converted} {$toUnit->name} for ingredient {$ingredient->name}");
-                    $requiredQuantity = $converted;
-                }
-            }
-        }
-
         $query = IngredientBatch::where('ingredient_id', $ingredient->id)
             ->where('quantity', '>', 0)
             ->where(function ($q) {
@@ -268,8 +234,6 @@ class InventoryService
                 'quantity_after' => $after,
                 'unit_cost' => $batch->cost_per_unit,
                 'reference' => $context['reference'] ?? null,
-                'notes' => $context['notes'] ?? null,
-                'recorded_by' => $context['recorded_by'] ?? null,
             ]);
 
             $batchChanges[] = [

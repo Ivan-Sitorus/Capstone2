@@ -9,7 +9,6 @@ use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Get;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -37,11 +36,6 @@ class IngredientsRelationManager extends RelationManager
                 ->required()
                 ->minValue(0.001)
                 ->step(0.001),
-            Select::make("unit_id")
-                ->label("Satuan")
-                ->options(fn (Get $get): array => self::getCompatibleUnitOptions($get("ingredient_id")))
-                ->searchable()
-                ->preload(),
         ]);
     }
 
@@ -57,7 +51,7 @@ class IngredientsRelationManager extends RelationManager
                 TextColumn::make("quantity_used")
                     ->label("Jumlah/Porsi")
                     ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => $state . " " . ($record->unit?->abbreviation ?? "")),
+                    ->formatStateUsing(fn ($state, $record) => $state . " " . ($record->ingredient?->unit ?? "")),
                 TextColumn::make("ingredient.total_stock")
                     ->label("Stok Tersedia")
                     ->getStateUsing(function ($record) {
@@ -92,24 +86,5 @@ class IngredientsRelationManager extends RelationManager
                     }),
             ])
             ->toolbarActions([]);
-    }
-
-    private static function getCompatibleUnitOptions(?int $ingredientId): array
-    {
-        if (! $ingredientId) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        $ingredient = \App\Models\Ingredient::find($ingredientId);
-        if (! $ingredient || ! $ingredient->unit_id) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        $unit = \App\Models\Unit::find($ingredient->unit_id);
-        if (! $unit) {
-            return \App\Models\Unit::pluck('name', 'id')->toArray();
-        }
-        return app(\App\Services\UnitConversionService::class)
-            ->getCompatibleUnits($unit)
-            ->pluck('name', 'id')
-            ->toArray();
     }
 }

@@ -15,7 +15,6 @@ return new class extends Migration
             $table->integer('quantity');
             $table->unsignedBigInteger('unit_price');
             $table->unsignedBigInteger('subtotal');
-            $table->string('notes')->nullable();
             $table->timestamps();
 
             $table->index('menu_id');

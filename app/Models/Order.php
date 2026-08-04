@@ -14,9 +14,9 @@ class Order extends Model
     use HasFactory;
 
     const STATUS_PENDING = 'pending';
-    const STATUS_DIPROSES = 'diproses';
-    const STATUS_SELESAI = 'selesai';
-    const STATUS_DIBATALKAN = 'dibatalkan';
+    const STATUS_PROCESSING = 'processing';
+    const STATUS_COMPLETED = 'completed';
+    const STATUS_CANCELLED = 'cancelled';
 
     protected static function boot(): void
     {
@@ -47,13 +47,12 @@ class Order extends Model
         'payment_proof',
         'rejection_note',
         'total_amount',
-        'notes',
         'processed_by',
         'processed_at',
         'completed_at',
         'cancelled_at',
         'uuid',
-        'resubmit_count',
+        'qris_resubmit_attempts',
         'qris_status',
     ];
 
@@ -61,7 +60,7 @@ class Order extends Model
     {
         return [
             'total_amount' => 'integer',
-            'resubmit_count' => 'integer',
+            'qris_resubmit_attempts' => 'integer',
             'qris_status' => 'string',
             'processed_at' => 'datetime',
             'completed_at' => 'datetime',
@@ -101,7 +100,7 @@ class Order extends Model
 
     public function isActive(): bool
     {
-        return $this->status !== self::STATUS_SELESAI && $this->status !== self::STATUS_DIBATALKAN;
+        return $this->status !== self::STATUS_COMPLETED && $this->status !== self::STATUS_CANCELLED;
     }
 
     /**
@@ -127,7 +126,7 @@ class Order extends Model
 
     public function isQrisResubmitable(): bool
     {
-        return $this->resubmit_count < 3 && $this->qris_status === 'resubmit_requested';
+        return $this->qris_resubmit_attempts < 3 && $this->qris_status === 'resubmit_requested';
     }
 
     public function orderPayments(): HasMany

@@ -151,8 +151,6 @@ class ManageBatches extends Page implements HasTable
                             'quantity_change' => $batch->quantity,
                             'quantity_after' => $batch->quantity,
                             'reference' => $batch->batch_code,
-                            'recorded_by' => auth()->id(),
-                            'notes' => 'Pembelian batch '.($batch->batch_code ?? $batch->id),
                         ]);
 
                         // Record initial supplier payment if any — observer auto-sets payment_status

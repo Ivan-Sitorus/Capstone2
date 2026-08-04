@@ -18,7 +18,6 @@ class Ingredient extends Model
         'unit',
         'low_stock_threshold',
         'batch_mode',
-        'unit_id',
     ];
 
     protected function casts(): array

@@ -69,7 +69,7 @@ class PlaceCashierOrderAction
                 $order->update(['total_amount' => $total]);
                 $orderModel = $order;
 
-                $this->inventoryService->processSaleForOrder($order, Auth::id());
+                $this->inventoryService->processSaleForOrder($order);
             });
         };
 

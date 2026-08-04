@@ -21,10 +21,8 @@ return new class extends Migration
             $table->decimal('quantity_before', 10, 3);
             $table->decimal('quantity_change', 10, 3);
             $table->decimal('quantity_after', 10, 3);
-            $table->decimal('unit_cost', 10, 3)->nullable();
+            $table->unsignedBigInteger('unit_cost')->nullable();
             $table->string('reference')->nullable();
-            $table->string('notes')->nullable();
-            $table->foreignId('recorded_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
 
             $table->index('ingredient_id');

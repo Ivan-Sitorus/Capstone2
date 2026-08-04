@@ -38,7 +38,7 @@ class OrderProcessingService
                 'cashier_id' => Auth::id(),
                 'processed_at' => now(),
             ]);
-            $this->inventoryService->processSaleForOrder($order, Auth::id());
+            $this->inventoryService->processSaleForOrder($order);
         });
 
         return ['message' => 'Pesanan diproses.'];
@@ -81,7 +81,7 @@ class OrderProcessingService
                 'payment_proof' => null,
                 'processed_at' => now(),
             ]);
-            $this->inventoryService->processSaleForOrder($order, Auth::id());
+            $this->inventoryService->processSaleForOrder($order);
         });
     }
 

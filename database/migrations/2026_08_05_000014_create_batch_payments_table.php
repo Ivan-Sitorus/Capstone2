@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('batch_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ingredient_batch_id')->constrained('ingredient_batches')->cascadeOnDelete();
-            $table->decimal('amount', 15, 2);
+            $table->unsignedBigInteger('amount');
             $table->timestamp('payment_date');
             $table->string('payment_method')->default('cash');
             $table->timestamps();

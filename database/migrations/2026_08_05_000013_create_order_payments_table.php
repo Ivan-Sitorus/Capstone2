@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('order_payments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
-            $table->decimal('amount', 15, 2);
+            $table->unsignedBigInteger('amount');
             $table->timestamp('payment_date');
             $table->string('payment_method');
             $table->timestamps();

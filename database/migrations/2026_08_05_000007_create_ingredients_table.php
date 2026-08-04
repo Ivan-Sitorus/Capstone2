@@ -14,7 +14,6 @@ return new class extends Migration
             $table->string('unit');
             $table->decimal('low_stock_threshold', 10, 3)->nullable();
             $table->string('batch_mode')->default('fefo');
-            $table->foreignId('unit_id')->nullable()->constrained('units')->nullOnDelete();
             $table->softDeletes();
             $table->timestamps();
         });

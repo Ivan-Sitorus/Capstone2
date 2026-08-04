@@ -112,7 +112,7 @@ class CashierOrderController extends Controller
                 $order->update($data);
 
                 if ($request->status === OrderStatus::Diproses->value) {
-                    $inventoryService->processSaleForOrder($order, Auth::id());
+                    $inventoryService->processSaleForOrder($order);
                 }
             });
         } catch (\RuntimeException $e) {

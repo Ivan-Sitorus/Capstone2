@@ -13,7 +13,6 @@ class MenuIngredient extends Model
         "menu_id",
         "ingredient_id",
         "quantity_used",
-        "unit_id",
     ];
 
     protected function casts(): array
@@ -31,10 +30,5 @@ class MenuIngredient extends Model
     public function ingredient(): BelongsTo
     {
         return $this->belongsTo(Ingredient::class);
-    }
-
-    public function unit(): BelongsTo
-    {
-        return $this->belongsTo(Unit::class);
     }
 }

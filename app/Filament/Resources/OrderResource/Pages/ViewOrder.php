@@ -8,7 +8,6 @@ use App\Models\Order;
 use Filament\Actions;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
@@ -54,9 +53,6 @@ class ViewOrder extends ViewRecord
                     DateTimePicker::make('payment_date')
                         ->label('Tanggal Pembayaran')
                         ->default(now()),
-                    Textarea::make('notes')
-                        ->label('Catatan')
-                        ->maxLength(255),
                 ])
                 ->action(function (Order $record, array $data): void {
                     $record->orderPayments()->create([
