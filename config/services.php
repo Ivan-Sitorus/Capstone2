@@ -35,8 +35,4 @@ return [
         ],
     ],
 
-    'datamining' => [
-        'url' => env('DATAMINING_URL'),
-    ],
-
 ];
