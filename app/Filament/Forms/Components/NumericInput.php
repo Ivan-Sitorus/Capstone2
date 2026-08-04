@@ -6,19 +6,19 @@ use Filament\Forms\Components\TextInput;
 use Filament\Support\RawJs;
 
 /**
- * Helper untuk semua input numerik di form Filament.
- * Memakai Alpine $money mask → auto-format ribuan (titik) & desimal (koma).
- * Titik ribuan di-strip sebelum validasi/simpan; koma desimal dinormalisasi ke titik.
+ * Helper for all numeric inputs in Filament forms.
+ * Uses the Alpine $money mask for automatic thousands (dot) and decimal (comma) formatting.
+ * Thousands dots are stripped before validation/saving; decimal commas are normalized to dots.
  */
 class NumericInput
 {
     /**
-     * Terapkan konfigurasi numeric lengkap ke TextInput:
-     * numeric() (keyboard angka + validasi) + type text (agar mask & maxLength jalan)
-     * + mask ribuan/desimal + strip titik + batas karakter + normalisasi koma→titik.
+     * Apply full numeric configuration to a TextInput:
+     * numeric() (number keyboard + validation) + type text (so mask & maxLength work)
+     * + thousands/decimal mask + strip dots + character limit + comma-to-dot normalization.
      *
-     * @param  int  $maxDigits  jumlah digit integer (mis. 6 = max 999.999, 9 = max 999.999.999)
-     * @param  int  $precision  digit desimal (0 = integer, 3 = max 3 desimal)
+     * @param  int  $maxDigits  number of integer digits (e.g. 6 = max 999.999, 9 = max 999.999.999)
+     * @param  int  $precision  decimal digits (0 = integer, 3 = max 3 decimals)
      */
     public static function apply(TextInput $input, int $maxDigits = 6, int $precision = 0): TextInput
     {
@@ -33,10 +33,10 @@ class NumericInput
     }
 
     /**
-     * Mask Alpine $money dengan format Indonesia:
-     * - ribuan separator: '.'  (muncul otomatis, mis. 15000 → 15.000)
-     * - desimal separator: ',' (koma)
-     * - precision: jumlah digit desimal (0 = integer, 3 = max 3 desimal)
+     * Alpine $money mask with Indonesian formatting:
+     * - thousands separator: '.' (automatic, e.g. 15000 → 15.000)
+     * - decimal separator: ',' (comma)
+     * - precision: number of decimal digits (0 = integer, 3 = max 3 decimals)
      */
     public static function mask(int $precision = 0): RawJs
     {
@@ -44,8 +44,8 @@ class NumericInput
     }
 
     /**
-     * Maksimal karakter input (termasuk titik ribuan & koma desimal).
-     * Contoh: 6 digit + 0 desimal → "999.999" = 7 char; 6 digit + 3 desimal → "999.999,999" = 11 char.
+     * Maximum input length (including thousands dots & decimal comma).
+     * Example: 6 digits + 0 decimals → "999.999" = 7 chars; 6 digits + 3 decimals → "999.999,999" = 11 chars.
      */
     public static function maxLength(int $maxDigits = 6, int $precision = 0): int
     {
@@ -56,7 +56,7 @@ class NumericInput
     }
 
     /**
-     * Koma desimal (format Indonesia) → titik untuk validasi numeric & DB.
+     * Convert decimal comma (Indonesian format) to dot for numeric validation & DB.
      */
     public static function normalizeState(mixed $state): mixed
     {
@@ -64,8 +64,8 @@ class NumericInput
     }
 
     /**
-     * Closure normalisasi koma→titik SEBELUM validasi (mutateStateForValidationUsing).
-     * Tanpa ini, input "8,8" gagal rule numeric karena koma belum dinormalisasi.
+     * Closure to normalize comma-to-dot BEFORE validation (mutateStateForValidationUsing).
+     * Without this, input "8,8" fails the numeric rule because the comma is not yet normalized.
      */
     public static function validationNormalizer(): \Closure
     {

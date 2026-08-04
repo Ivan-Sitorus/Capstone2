@@ -181,7 +181,7 @@ class ManageBatches extends Page implements HasTable
                     ->before(function (EditAction $action, IngredientBatch $record) {
                         $data = $action->getData();
 
-                        // Guard: total harga cannot go below already-paid amount
+                        // Guard: total price cannot go below already-paid amount
                         $newTotal = (float) str_replace(',', '.', $data['total_harga'] ?? $record->total_cost ?? 0);
                         $totalPaid = (float) $record->batchPayments()->sum('amount');
                         if ($totalPaid > $newTotal) {

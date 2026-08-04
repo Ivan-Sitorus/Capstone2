@@ -19,7 +19,7 @@ class CustomerOrderController extends Controller
 
     public function riwayat(Request $request): Response
     {
-        // Riwayat berdasarkan nomor telepon di sessionStorage (dikirim via query param)
+        // History by phone number from sessionStorage (sent via query param)
         $phone = $request->query('phone');
 
         $orders = $phone
@@ -30,7 +30,7 @@ class CustomerOrderController extends Controller
                 ->select(['id', 'order_code', 'status', 'total_amount', 'created_at', 'payment_method', 'customer_name', 'phone', 'payment_proof'])
                 ->where('phone', $phone)
                 ->whereNot(function ($q) {
-                    // Sembunyikan QRIS yang belum ada bukti & belum dikonfirmasi kasir
+                    // Hide QRIS orders without proof that have not been confirmed by cashier
                     $q->where('payment_method', 'qris')
                       ->whereNull('payment_proof')
                       ->whereNotIn('status', [OrderStatus::Processing->value, OrderStatus::Completed->value]);

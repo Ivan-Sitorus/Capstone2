@@ -16,14 +16,14 @@ class CashierPesananAktifController extends Controller
             ->whereNotIn('status', [OrderStatus::Completed->value, OrderStatus::Cancelled->value])
             ->where('status', '!=', OrderStatus::Unpaid->value)
             ->where(function ($q) {
-                // Order dari kasir: selalu tampil
+                // Orders from cashier: always shown
                 $q->where('order_type', 'cashier')
-                  // Order dari pelanggan via QR:
+                  // Orders from customer via QR:
                     ->orWhere(fn ($q2) => $q2->where('order_type', 'qr')
                         ->where(fn ($q3) =>
-                            // Cash: tampil begitu dipilih
+                            // Cash: shown as soon as selected
                             $q3->where('payment_method', 'cash')
-                               // QRIS: tampil saat bukti dikirim (pending) ATAU sudah dikonfirmasi (diproses, proof dihapus)
+                               // QRIS: shown when proof is submitted (pending) OR confirmed (processing, proof removed)
                                 ->orWhere(fn ($q4) => $q4->where('payment_method', 'qris')
                                     ->where(fn ($q5) => $q5->whereNotNull('payment_proof')
                                         ->orWhere('status', OrderStatus::Processing->value)

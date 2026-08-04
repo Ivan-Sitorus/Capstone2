@@ -27,7 +27,7 @@ class ReceiptController extends Controller
 
     private function renderReceipt(Order $order): Response
     {
-        // Hitung diskon (selisih total dari unit_price * qty vs subtotal)
+        // Calculate discount (difference between unit_price * qty and subtotal)
         $items = $order->items->map(fn ($i) => [
             'name' => $i->menu->name,
             'unit_price' => $i->unit_price,

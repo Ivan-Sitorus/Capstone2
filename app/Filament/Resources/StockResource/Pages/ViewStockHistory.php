@@ -117,7 +117,7 @@ class ViewStockHistory extends ListRecords
                         ?? '#' . ($record->ingredient_batch_id ?? '-')
                     ),
 
-                // 5. Perubahan
+                // 5. Change
                 TextColumn::make('quantity_change')
                     ->label('Perubahan')
                     ->formatStateUsing(fn ($state) =>
@@ -127,7 +127,7 @@ class ViewStockHistory extends ListRecords
                     ->color(fn (StockMovement $record): string => $record->quantity_change < 0 ? 'danger' : 'success')
                     ->sortable(),
 
-                // 6. Sebelum
+                // 6. Before
                 TextColumn::make('quantity_before')
                     ->label('Sebelum')
                     ->formatStateUsing(fn ($state) =>

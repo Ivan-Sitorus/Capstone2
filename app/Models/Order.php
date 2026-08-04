@@ -104,8 +104,8 @@ class Order extends Model
     }
 
     /**
-     * Jumlah pesanan pending yang perlu ditangani kasir.
-     * Satu sumber kebenaran — dipakai badge sidebar, broadcast, & endpoint count.
+     * Number of pending orders that need cashier attention.
+     * Single source of truth — used by sidebar badge, broadcast, and count endpoint.
      */
     public static function cashierPendingCount(): int
     {

@@ -26,7 +26,7 @@ class CustomerMenuController extends Controller
     {
         $table = $this->findTable($request->query('table'));
 
-        // Tolak jika meja tidak ada di DB atau ditandai tidak tersedia
+        // Reject if table does not exist in DB or is marked unavailable
         if ($tableId = $request->query('table')) {
             if (! $table || ! $table->is_available) {
                 abort(404);
