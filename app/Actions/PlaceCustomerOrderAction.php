@@ -18,7 +18,7 @@ class PlaceCustomerOrderAction
     {
         $request->validate([
             'customer_name'     => 'required|string|min:2|max:255',
-            'customer_phone'    => ['required', 'string', 'regex:/^[0-9]{10,15}$/'],
+            'phone'             => ['required', 'string', 'regex:/^[0-9]{10,15}$/'],
             'table_id'          => 'required|integer|exists:cafe_tables,id',
             'is_mahasiswa'      => 'boolean',
             'items'             => 'required|array|min:1',
@@ -26,7 +26,7 @@ class PlaceCustomerOrderAction
             'items.*.quantity'  => 'required|integer|min:1|max:20',
         ], [
             'customer_name.required' => 'Nama wajib diisi.',
-            'customer_phone.regex'   => 'Nomor telepon tidak valid.',
+            'phone.regex'            => 'Nomor telepon tidak valid.',
             'items.required'         => 'Pesanan tidak boleh kosong.',
             'items.min'              => 'Minimal 1 item dalam pesanan.',
         ]);
@@ -40,7 +40,7 @@ class PlaceCustomerOrderAction
 
             $order = Order::create([
                 'customer_name'  => $request->customer_name,
-                'customer_phone' => $request->customer_phone,
+                'phone'          => $request->phone,
                 'table_id'       => $request->table_id,
                 'cashier_id'     => null,
                 'order_type'     => 'qr',

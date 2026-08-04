@@ -38,7 +38,7 @@ class Order extends Model
     protected $fillable = [
         'order_code',
         'customer_name',
-        'customer_phone',
+        'phone',
         'table_id',
         'cashier_id',
         'status',
@@ -55,7 +55,6 @@ class Order extends Model
         'uuid',
         'resubmit_count',
         'qris_status',
-        'whatsapp_phone',
     ];
 
     protected function casts(): array

@@ -588,7 +588,7 @@ class CafeSeeder extends Seeder
                         'table_id' => $tableId,
                         'cashier_id' => $this->cashierIds[$rng->int(0, 2)],
                         'customer_name' => $rng->pick([null, null, null, 'Budi', 'Ani', 'Citra', 'Dewi', 'Eko', 'Fajar']),
-                        'customer_phone' => null,
+                        'phone' => null,
                         'status' => $status,
                         'order_type' => $rng->pick(['qr', 'qr', 'qr', 'cashier', 'cashier']),
                         'total_amount' => $totalAmount,

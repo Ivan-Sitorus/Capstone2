@@ -27,8 +27,8 @@ class CustomerOrderController extends Controller
                 'items'      => fn($q) => $q->select(['id', 'order_id', 'menu_id', 'quantity', 'subtotal']),
                 'items.menu' => fn($q) => $q->select(['id', 'name']),
             ])
-                ->select(['id', 'order_code', 'status', 'total_amount', 'created_at', 'payment_method', 'customer_name', 'customer_phone', 'payment_proof'])
-                ->where('customer_phone', $phone)
+                ->select(['id', 'order_code', 'status', 'total_amount', 'created_at', 'payment_method', 'customer_name', 'phone', 'payment_proof'])
+                ->where('phone', $phone)
                 ->whereNot(function ($q) {
                     // Sembunyikan QRIS yang belum ada bukti & belum dikonfirmasi kasir
                     $q->where('payment_method', 'qris')

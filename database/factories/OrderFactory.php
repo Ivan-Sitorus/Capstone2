@@ -16,7 +16,7 @@ class OrderFactory extends Factory
         return [
             'order_code' => 'ORD-'.now()->format('Ymd').'-'.str_pad(self::$orderSequence++, 4, '0', STR_PAD_LEFT),
             'customer_name' => fake()->name(),
-            'customer_phone' => fake()->optional(0.7)->phoneNumber(),
+            'phone' => fake()->optional(0.7)->phoneNumber(),
             'table_id' => null,
             'cashier_id' => User::factory()->state(['role' => 'cashier']),
             'status' => fake()->randomElement(['pending', 'diproses', 'selesai']),

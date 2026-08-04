@@ -182,7 +182,7 @@ class DailyIngredientUsageAggregationTest extends TestCase
         $order = Order::create([
             'uuid' => (string) \Illuminate\Support\Str::uuid7(),
             'customer_name' => 'Customer Mining',
-            'customer_phone' => '081234567890',
+            'phone' => '081234567890',
             'order_type' => 'qr',
             'status' => OrderStatus::Pending->value,
             'payment_method' => 'cash',

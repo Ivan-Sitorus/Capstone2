@@ -33,7 +33,7 @@ class CashierOrderController extends Controller
                 'status' => $order->status,
                 'total_amount' => $order->total_amount,
                 'customer_name' => $order->customer_name,
-                'customer_phone' => $order->customer_phone,
+                'phone' => $order->phone,
                 'payment_method' => $order->payment_method,
                 'payment_proof' => $order->payment_proof,
                 'rejection_note' => $order->rejection_note,

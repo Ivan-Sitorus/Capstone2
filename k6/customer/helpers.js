@@ -75,7 +75,7 @@ export function buildOrderPayload(tableId, menuIds, isMahasiswa) {
 
     return JSON.stringify({
         customer_name:  randomName(),
-        customer_phone: randomPhone(),
+        phone:          randomPhone(),
         table_id:       tableId,
         is_mahasiswa:   isMahasiswa,
         promotion_ids:  [],

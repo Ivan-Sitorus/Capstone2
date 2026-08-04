@@ -46,7 +46,7 @@ class ReceiptController extends Controller
                 'status' => $order->status,
                 'total_amount' => $order->total_amount,
                 'customer_name' => $order->customer_name,
-                'customer_phone' => $order->customer_phone,
+                'phone' => $order->phone,
                 'payment_method' => $order->payment_method,
                 'created_at' => $order->created_at->toISOString(),
                 'cashier_name' => $order->cashier?->name,

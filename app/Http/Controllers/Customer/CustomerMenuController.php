@@ -40,7 +40,7 @@ class CustomerMenuController extends Controller
     {
         $request->validate([
             'customer_name' => 'required|string|max:255',
-            'customer_phone' => 'required|string|max:20',
+            'phone' => 'required|string|max:20',
             'table_id' => 'nullable|integer|exists:cafe_tables,id',
         ]);
 

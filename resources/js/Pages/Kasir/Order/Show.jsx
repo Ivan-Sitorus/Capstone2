@@ -183,7 +183,7 @@ export default function OrderShow({ order }) {
                                         <div className="divide-y divide-border">
                                             <InfoRow label="ID Pesanan" value={order.order_code} bold />
                                             <InfoRow label="Nama Pelanggan" value={order.customer_name} bold />
-                                            <InfoRow label="No. Telepon" value={order.customer_phone} />
+                                            <InfoRow label="No. Telepon" value={order.phone} />
                                             <InfoRow label="Meja" value={order.table_number ? `No. ${order.table_number}` : '—'} />
                                             <InfoRow label="Tanggal" value={formatDate(order.created_at)} />
                                             <InfoRow label="Waktu" value={`${formatTime(order.created_at)} WIB`} />

@@ -61,7 +61,7 @@ export default function CustomerCart() {
         try {
             const res = await axios.post('/api/order', {
                 customer_name:  customer.name,
-                customer_phone: customer.phone,
+                phone:          customer.phone,
                 table_id:       customer.tableId,
                 is_mahasiswa:   isMahasiswa,
                 items: items.map(i => ({ menu_id: i.menuId, quantity: i.quantity })),

@@ -51,7 +51,7 @@ class OrderResource extends Resource
             Section::make('Pelanggan')
                 ->schema([
                     TextEntry::make($p.'customer_name')->label('Nama')->default('Guest'),
-                    TextEntry::make($p.'customer_phone')->label('No. HP')->default('-'),
+                    TextEntry::make($p.'phone')->label('No. HP')->default('-'),
                     TextEntry::make($p.'order_type')->label('Jenis')
                         ->badge()
                         ->color(fn (string $state): string => match ($state) {
