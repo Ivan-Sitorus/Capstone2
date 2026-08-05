@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CashierHistory extends Model
 {
+    protected $table = 'cashier_histories';
+
     protected $fillable = [
         'user_id',
         'type',

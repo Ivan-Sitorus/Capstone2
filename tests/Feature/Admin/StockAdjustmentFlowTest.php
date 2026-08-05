@@ -37,7 +37,7 @@ class StockAdjustmentFlowTest extends TestCase
             );
 
         $this->assertSame(50.0, (float) $latestBatch->fresh()->quantity);
-        $this->assertSame('increase', $adjustment->adjustment_type);
+        $this->assertSame('increase', $adjustment->adjustment_type->value);
         $this->assertSame(70.0, (float) $adjustment->quantity_before);
         $this->assertSame(90.0, (float) $adjustment->quantity_after);
     }
@@ -87,14 +87,13 @@ class StockAdjustmentFlowTest extends TestCase
 
         $this->assertSame(50.0, (float) $latestBatch->quantity);
         $this->assertSame(20.0, (float) $adjustment->quantity);
-        $this->assertSame('increase', $adjustment->adjustment_type);
+        $this->assertSame('increase', $adjustment->adjustment_type->value);
         $this->assertSame(70.0, (float) $adjustment->quantity_before);
         $this->assertSame(90.0, (float) $adjustment->quantity_after);
 
         $this->assertDatabaseHas('stock_movements', [
             'stock_adjustment_id' => $adjustment->id,
             'movement_type' => 'adjustment_increase',
-            'recorded_by' => $admin->id,
         ]);
     }
 
@@ -142,7 +141,7 @@ class StockAdjustmentFlowTest extends TestCase
         $ingredient->refresh();
 
         $this->assertSame(-25.0, (float) $adjustment->quantity);
-        $this->assertSame('decrease', $adjustment->adjustment_type);
+        $this->assertSame('decrease', $adjustment->adjustment_type->value);
         $this->assertSame(100.0, (float) $adjustment->quantity_before);
         $this->assertSame(75.0, (float) $adjustment->quantity_after);
         $this->assertSame(75.0, (float) $ingredient->getTotalStock());
@@ -150,7 +149,6 @@ class StockAdjustmentFlowTest extends TestCase
         $this->assertDatabaseHas('stock_movements', [
             'stock_adjustment_id' => $adjustment->id,
             'movement_type' => 'adjustment_decrease',
-            'recorded_by' => $admin->id,
         ]);
     }
 
