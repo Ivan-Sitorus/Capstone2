@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MenuResource\Tables;
 
+use App\Enums\MenuStatus;
 use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\Ingredient;
 use Filament\Actions\Action;
@@ -53,9 +54,9 @@ class MenuTable
                 TextColumn::make("status")
                     ->label(ColumnInfoTooltip::label('Status', "Aktif: Menu tampil di kasir dan pelanggan, bisa dipesan.\nNonaktif: Menu tidak tampil di kasir dan pelanggan, tidak bisa dipesan."))
                     ->badge()
-                    ->formatStateUsing(fn ($state) => $state === 'active' ? 'Aktif' : 'Nonaktif')
-                    ->color(fn ($state) => $state === 'active' ? 'success' : 'danger')
-                    ->tooltip(fn ($state) => $state === 'active'
+                    ->formatStateUsing(fn (MenuStatus $state) => $state === MenuStatus::Active ? 'Aktif' : 'Nonaktif')
+                    ->color(fn (MenuStatus $state) => $state === MenuStatus::Active ? 'success' : 'danger')
+                    ->tooltip(fn (MenuStatus $state) => $state === MenuStatus::Active
                         ? 'Aktif: menu tampil di POS & aplikasi pelanggan'
                         : 'Nonaktif: menu disembunyikan, tidak bisa dipesan'),
             ])
@@ -97,27 +98,27 @@ class MenuTable
                         }),
                     Action::make('toggle_status')
                         ->label(fn (\App\Models\Menu $record) => 
-                            $record->status === 'active' ? 'Nonaktifkan' : 'Aktifkan')
+                            $record->status === MenuStatus::Active ? 'Nonaktifkan' : 'Aktifkan')
                         ->icon(fn (\App\Models\Menu $record) => 
-                            $record->status === 'active' 
+                            $record->status === MenuStatus::Active 
                                 ? Heroicon::OutlinedArchiveBox 
                                 : Heroicon::OutlinedCheckCircle)
                         ->color(fn (\App\Models\Menu $record) => 
-                            $record->status === 'active' ? 'warning' : 'success')
+                            $record->status === MenuStatus::Active ? 'warning' : 'success')
                         ->requiresConfirmation()
                         ->modalHeading(fn (\App\Models\Menu $record) => 
-                            $record->status === 'active' ? 'Nonaktifkan Menu' : 'Aktifkan Menu')
+                            $record->status === MenuStatus::Active ? 'Nonaktifkan Menu' : 'Aktifkan Menu')
                         ->modalDescription(fn (\App\Models\Menu $record) => 
-                            $record->status === 'active' 
+                            $record->status === MenuStatus::Active 
                                 ? 'Menu akan dinonaktifkan dan tidak muncul di POS serta pelanggan. Data pesanan lama tetap aman.'
                                 : 'Menu akan diaktifkan kembali dan muncul di POS serta pelanggan.')
                         ->action(function (\App\Models\Menu $record) {
-                            $status = $record->status === 'active' ? 'inactive' : 'active';
+                            $status = $record->status === MenuStatus::Active ? MenuStatus::Inactive : MenuStatus::Active;
                             $record->update(['status' => $status]);
                             Notification::make()
                                 ->success()
-                                ->title($status === 'active' ? 'Menu diaktifkan' : 'Menu dinonaktifkan')
-                                ->body("\"{$record->name}\" berhasil " . ($status === 'active' ? 'diaktifkan' : 'dinonaktifkan'))
+                                ->title($status === MenuStatus::Active ? 'Menu diaktifkan' : 'Menu dinonaktifkan')
+                                ->body("\"{$record->name}\" berhasil " . ($status === MenuStatus::Active ? 'diaktifkan' : 'dinonaktifkan'))
                                 ->send();
                         }),
                 ])

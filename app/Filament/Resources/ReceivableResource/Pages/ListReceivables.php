@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ReceivableResource\Pages;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Menu;
@@ -107,8 +109,8 @@ class ListReceivables extends ListRecords
                         'cashier_id' => $data['cashier_id'],
                         'customer_name' => $data['customer_name'],
                         'total_amount' => $total,
-                        'payment_method' => 'piutang',
-                        'status' => 'unpaid',
+                        'payment_method' => PaymentMethod::PayLater,
+                        'status' => OrderStatus::Unpaid,
                         'order_code' => Order::generateCode(),
                     ]);
 

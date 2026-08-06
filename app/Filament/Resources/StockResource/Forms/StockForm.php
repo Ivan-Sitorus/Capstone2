@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\StockResource\Forms;
 
 use App\Enums\BatchMode;
+use App\Enums\Unit;
 use App\Filament\Forms\Components\NumericInput;
 use App\Models\Ingredient;
 use Filament\Forms\Components\DatePicker;
@@ -26,7 +27,7 @@ class StockForm
                     ->unique(ignoreRecord: true),
                 Select::make('unit')
                     ->label('Unit')
-                    ->options(Ingredient::UNITS)
+                    ->options(Unit::options())
                     ->required()
                     ->searchable()
                     ->native(false)

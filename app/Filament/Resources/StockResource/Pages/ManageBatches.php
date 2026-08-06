@@ -3,10 +3,7 @@
 namespace App\Filament\Resources\StockResource\Pages;
 
 use App\Enums\BatchMode;
-use App\Enums\AdjustableType;
-use App\Enums\AdjustmentCategory;
 use App\Enums\AdjustmentType;
-use App\Enums\BatchStatus;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
@@ -77,6 +74,7 @@ class ManageBatches extends Page implements HasTable
             ->columns([
                 TextColumn::make('batch_code')
                     ->label('Kode Batch')
+                    ->copyable()
                     ->default('-'),
                 TextColumn::make('received_at')
                     ->label('Waktu Diterima')
@@ -211,10 +209,8 @@ class ManageBatches extends Page implements HasTable
 
                         StockAdjustment::create([
                             'code' => StockReconciliationService::generateAdjustmentCode(),
-                            'adjustable_type' => AdjustableType::Ingredient->value,
                             'ingredient_id' => $record->ingredient_id,
                             'adjustment_type' => $adjType,
-                            'category' => AdjustmentCategory::Correction->value,
                             'quantity' => abs($diff),
                             'quantity_before' => $oldQty,
                             'quantity_after' => $newQty,
@@ -249,7 +245,7 @@ class ManageBatches extends Page implements HasTable
                                 ->body('Batch ini memiliki riwayat pemakaian. Batch telah dinonaktifkan.')
                                 ->send();
                             
-                            $record->update(['quantity' => 0, 'status' => BatchStatus::Inactive]);
+                            $record->update(['quantity' => 0]);
                             $action->cancel();
                             return;
                         }
@@ -261,10 +257,8 @@ class ManageBatches extends Page implements HasTable
 
                             StockAdjustment::create([
                                 'code' => StockReconciliationService::generateAdjustmentCode(),
-                                'adjustable_type' => AdjustableType::Ingredient->value,
                                 'ingredient_id' => $record->ingredient_id,
                                 'adjustment_type' => AdjustmentType::Decrease->value,
-                                'category' => AdjustmentCategory::Correction->value,
                                 'quantity' => (float) $record->quantity,
                                 'quantity_before' => (float) $record->quantity,
                                 'quantity_after' => 0,

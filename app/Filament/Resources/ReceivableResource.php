@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\UserRole;
 use App\Filament\Resources\ReceivableResource\Pages\ListReceivables;
 use App\Filament\Resources\ReceivableResource\Pages\RiwayatBayar;
 use App\Filament\Resources\ReceivableResource\Tables\ReceivableTable;
@@ -33,12 +34,12 @@ class ReceivableResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->role === 'admin';
+        return auth()->user()?->role === UserRole::Admin;
     }
 
     public static function canEdit($record): bool
     {
-        return auth()->user()?->role === 'admin';
+        return auth()->user()?->role === UserRole::Admin;
     }
 
     public static function canDelete($record): bool

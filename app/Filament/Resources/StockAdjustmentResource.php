@@ -2,8 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\AdjustableType;
-use App\Enums\AdjustmentCategory;
 use App\Enums\AdjustmentType;
 use App\Filament\Resources\StockAdjustmentResource\Actions\DetailAdjustmentAction;
 use App\Filament\Resources\StockAdjustmentResource\Forms\StockAdjustmentForm;
@@ -11,8 +9,6 @@ use App\Filament\Resources\StockAdjustmentResource\Pages\ListStockAdjustments;
 use App\Filament\Resources\StockAdjustmentResource\RelationManagers\MovementsRelationManager;
 use App\Filament\Resources\StockAdjustmentResource\Tables\StockAdjustmentTable;
 use App\Models\StockAdjustment;
-use Filament\Infolists\Components\RepeatableEntry;
-use Filament\Infolists\Components\RepeatableEntry\TableColumn;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
@@ -58,12 +54,7 @@ class StockAdjustmentResource extends Resource
                         ->badge()
                         ->color(fn (AdjustmentType $state): string => $state === AdjustmentType::Increase ? 'success' : 'danger')
                         ->formatStateUsing(fn (AdjustmentType $state): string => $state === AdjustmentType::Increase ? 'Penambahan' : 'Pengurangan'),
-                    TextEntry::make($p.'category')->label('Kategori')
-                        ->formatStateUsing(fn (?AdjustmentCategory $state): string => $state?->label() ?? '-'),
-                    TextEntry::make($p.'adjustable_type')->label('Jenis')
-                        ->formatStateUsing(fn (?AdjustableType $state): string => $state === AdjustableType::Ingredient ? 'Bahan Baku' : 'Menu'),
                     TextEntry::make($p.'ingredient.name')->label('Bahan Baku')->default('-'),
-                    TextEntry::make($p.'menu.name')->label('Menu')->default('-'),
                     TextEntry::make($p.'quantity')->label('Jumlah')
                         ->formatStateUsing(fn ($state, $record): string => static::formatQty(
                             $state, $record, $p
@@ -83,41 +74,6 @@ class StockAdjustmentResource extends Resource
                     TextEntry::make($p.'reason')->label('Catatan Penyesuaian')->default('-')->columnSpanFull(),
                     TextEntry::make($p.'reportedBy.name')->label('Dilaporkan Oleh')->default('-'),
                 ]),
-            Section::make('Bahan Baku Terpengaruh')
-                ->columnSpanFull()
-                ->visible(fn ($record): bool =>
-                    static::getAdjustableType($record, $p) === AdjustableType::Menu
-                )
-                ->schema([
-                    RepeatableEntry::make($p.'stockMovements')
-                        ->hiddenLabel()
-                        ->table([
-                            TableColumn::make('Bahan Baku'),
-                            TableColumn::make('Perubahan')->width(120),
-                            TableColumn::make('Sebelum')->width(100),
-                            TableColumn::make('Sesudah')->width(100),
-                        ])
-                        ->schema([
-                            TextEntry::make('ingredient.name'),
-                            TextEntry::make('quantity_change')
-                                ->formatStateUsing(fn ($state, $record) =>
-                                    ((float) $state >= 0 ? '+' : '-')
-                                    . number_format(abs((float) $state), abs((float) $state) != (int) abs((float) $state) ? 2 : 0, ',', '.')
-                                    . ' ' . ($record->ingredient?->unit ?? '')
-                                )
-                                ->color(fn ($state): string => (float) $state < 0 ? 'danger' : 'success'),
-                            TextEntry::make('quantity_before')
-                                ->formatStateUsing(fn ($state, $record) =>
-                                    number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.')
-                                    . ' ' . ($record->ingredient?->unit ?? '')
-                                ),
-                            TextEntry::make('quantity_after')
-                                ->formatStateUsing(fn ($state, $record) =>
-                                    number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.')
-                                    . ' ' . ($record->ingredient?->unit ?? '')
-                                ),
-                        ]),
-                ]),
         ];
     }
 
@@ -136,12 +92,6 @@ class StockAdjustmentResource extends Resource
         return $prefix ? $record?->{str_replace('.', '', $prefix)} : $record;
     }
 
-    public static function getAdjustableType($record, string $prefix): ?AdjustableType
-    {
-        $adj = static::resolveRecord($record, $prefix);
-        return $adj?->adjustable_type ?? AdjustableType::Ingredient;
-    }
-
     public static function getAdjustmentType($record, string $prefix): ?AdjustmentType
     {
         $adj = static::resolveRecord($record, $prefix);
@@ -151,12 +101,7 @@ class StockAdjustmentResource extends Resource
     public static function getUnit($record, string $prefix): string
     {
         $adj = static::resolveRecord($record, $prefix);
-        if (! $adj) {
-            return '';
-        }
-        return method_exists($adj, 'isMenuAdjustment') && $adj->isMenuAdjustment()
-            ? 'porsi'
-            : ($adj->ingredient?->unit ?? '');
+        return $adj?->ingredient?->unit ?? '';
     }
 
     public static function formatNumber(float $value): string

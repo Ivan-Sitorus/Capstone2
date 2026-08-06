@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\ReceivableResource\Pages;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Order;
@@ -66,8 +68,8 @@ class RiwayatBayar extends Page implements HasTable
                         ->label('Status')
                         ->state($this->order->status)
                         ->badge()
-                        ->color(fn () => $this->order->status === 'completed' ? 'success' : 'warning')
-                        ->formatStateUsing(fn () => $this->order->status === 'completed' ? 'Lunas' : 'Belum Lunas'),
+                        ->color(fn () => $this->order->status === OrderStatus::Completed ? 'success' : 'warning')
+                        ->formatStateUsing(fn () => $this->order->status === OrderStatus::Completed ? 'Lunas' : 'Belum Lunas'),
                 ])->columns(4),
             EmbeddedTable::make(),
         ]);
@@ -89,11 +91,10 @@ class RiwayatBayar extends Page implements HasTable
                 TextColumn::make('payment_method')
                     ->label('Metode')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'cash' => 'Tunai',
-                        'transfer' => 'Transfer',
-                        'qris' => 'QRIS',
-                        default => $state ?? '-',
+                    ->formatStateUsing(fn (?PaymentMethod $state): string => match ($state) {
+                        PaymentMethod::Cash => 'Tunai',
+                        PaymentMethod::Qris => 'QRIS',
+                        default => $state?->label() ?? '-',
                     }),
             ])
             ->defaultSort('payment_date', 'desc')

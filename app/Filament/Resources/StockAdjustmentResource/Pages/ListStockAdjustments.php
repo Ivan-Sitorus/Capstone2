@@ -2,9 +2,7 @@
 
 namespace App\Filament\Resources\StockAdjustmentResource\Pages;
 
-use App\Enums\AdjustableType;
 use App\Filament\Resources\StockAdjustmentResource;
-use App\Models\StockAdjustment;
 use App\Services\StockReconciliationService;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
@@ -27,12 +25,9 @@ class ListStockAdjustments extends ListRecords
                         $service = app(StockReconciliationService::class);
 
                         return $service->createManualAdjustment(
-                            adjustableType: (string) ($data['adjustable_type'] ?? AdjustableType::Ingredient->value),
                             ingredientId: isset($data['ingredient_id']) ? (int) $data['ingredient_id'] : null,
-                            menuId: isset($data['menu_id']) ? (int) $data['menu_id'] : null,
                             quantity: $parsedQuantity,
                             adjustmentType: (string) $data['adjustment_type'],
-                            category: $data['category'] ?? null,
                             reason: $data['reason'] ?? null,
                             reportedBy: $data['reported_by'] ?? null,
                             adjustedAt: $data['adjusted_at'] ?? null,

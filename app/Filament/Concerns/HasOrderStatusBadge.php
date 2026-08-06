@@ -34,7 +34,6 @@ trait HasOrderStatusBadge
             'cash' => 'Tunai',
             'qris' => 'QRIS',
             'pay_later' => 'Bayar Nanti',
-            'piutang' => 'Piutang',
             default => '-',
         };
     }

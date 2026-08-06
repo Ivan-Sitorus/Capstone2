@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ReceivableResource\Tables;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Order;
 use Filament\Actions\Action;
@@ -22,7 +23,7 @@ class ReceivableTable
         return $table
             ->modifyQueryUsing(fn (Builder $query) => $query
                 ->where(function (Builder $q) {
-                    $q->where('payment_method', 'piutang')
+                    $q->where('payment_method', PaymentMethod::PayLater->value)
                       ->orWhere('status', OrderStatus::Unpaid->value);
                 })
                 ->with('cashier', 'orderPayments')

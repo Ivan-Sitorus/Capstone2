@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\OrderStatus;
+use App\Enums\OrderType;
+use App\Enums\PaymentMethod;
 use App\Filament\Concerns\HasOrderStatusBadge;
 use App\Filament\Resources\OrderResource\Pages\ListOrders;
-use App\Filament\Resources\OrderResource\Pages\ViewOrder;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 use App\Filament\Resources\OrderResource\Tables\OrderTable;
 use App\Models\Order;
@@ -31,6 +33,8 @@ class OrderResource extends Resource
 
     protected static ?string $navigationLabel = 'Pesanan';
 
+    protected static ?string $slug = 'pesanan';
+
     protected static ?int $navigationSort = 1;
 
     public static function getInfolistComponents(string $prefix = ''): array
@@ -54,23 +58,18 @@ class OrderResource extends Resource
                     TextEntry::make($p.'phone')->label('No. HP')->default('-'),
                     TextEntry::make($p.'order_type')->label('Jenis')
                         ->badge()
-                        ->color(fn (string $state): string => match ($state) {
-                            'qr' => 'info',
-                            'cashier' => 'gray',
-                            default => 'gray',
+                        ->color(fn (OrderType $state): string => match ($state) {
+                            OrderType::Qr => 'info',
+                            OrderType::Cashier => 'gray',
                         })
-                        ->formatStateUsing(fn (string $state): string => match ($state) {
-                            'qr' => 'QR Pelanggan',
-                            'cashier' => 'Input Kasir',
-                            default => $state,
-                        }),
+                        ->formatStateUsing(fn (OrderType $state): string => $state->label()),
                 ])->columns(3),
 
             Section::make('Pembayaran')
                 ->schema([
                     TextEntry::make($p.'payment_method')->label('Metode')
                         ->badge()
-                        ->formatStateUsing(fn (?string $state): string => self::getPaymentLabel($state)),
+                        ->formatStateUsing(fn (?PaymentMethod $state): string => $state?->label() ?? '-'),
                     TextEntry::make($p.'payment_status')->label('Status Bayar')
                         ->badge()
                         ->color(fn (?string $state): string => self::getPaymentStatusColor($state))
@@ -78,8 +77,8 @@ class OrderResource extends Resource
                     TextEntry::make($p.'total_amount')->label('Total')->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
                     TextEntry::make($p.'status')->label('Status Pesanan')
                         ->badge()
-                        ->color(fn (string $state): string => self::getStatusColor($state))
-                        ->formatStateUsing(fn (string $state): string => self::getStatusLabel($state)),
+                        ->color(fn (OrderStatus $state): string => self::getStatusColor($state->value))
+                        ->formatStateUsing(fn (OrderStatus $state): string => self::getStatusLabel($state->value)),
                 ])->columns(3),
 
             Section::make('Item Pesanan')
@@ -129,7 +128,6 @@ class OrderResource extends Resource
     {
         return [
             'index' => ListOrders::route('/'),
-            'view' => ViewOrder::route('/{record}'),
         ];
     }
 

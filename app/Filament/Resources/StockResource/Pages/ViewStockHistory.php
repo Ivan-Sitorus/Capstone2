@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources\StockResource\Pages;
 
-use App\Enums\AdjustmentCategory;
+use App\Enums\MovementType;
 use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
 use App\Models\StockMovement;
@@ -58,34 +58,28 @@ class ViewStockHistory extends ListRecords
                     ->label('Jenis Pemakaian')
                     ->badge()
                     ->color(fn (StockMovement $record): string => match (true) {
-                        $record->movement_type === 'sale' => 'primary',
-                        $record->movement_type === 'purchase' => 'success',
-                        $record->stockAdjustment?->category === AdjustmentCategory::Expired => 'danger',
-                        $record->movement_type === 'waste' => 'danger',
-                        $record->movement_type === 'purchase' => 'success',
-                        in_array($record->movement_type, ['adjustment_increase', 'adjustment_decrease']) => 'warning',
+                        $record->movement_type === MovementType::Sale => 'primary',
+                        $record->movement_type === MovementType::Purchase => 'success',
+                        $record->movement_type === MovementType::Waste => 'danger',
+                        in_array($record->movement_type, [MovementType::AdjustmentIncrease, MovementType::AdjustmentDecrease]) => 'warning',
                         default => 'gray',
                     })
                     ->formatStateUsing(fn (StockMovement $record): string => match (true) {
-                        $record->stockAdjustment?->category === AdjustmentCategory::Expired
-                            => 'Kedaluwarsa',
-                        $record->movement_type === 'sale' => 'Penjualan',
-                        $record->movement_type === 'purchase' => 'Pembelian',
-                        $record->movement_type === 'waste' => 'Penyesuaian',
-                        in_array($record->movement_type, ['adjustment_increase', 'adjustment_decrease'])
+                        $record->movement_type === MovementType::Sale => 'Penjualan',
+                        $record->movement_type === MovementType::Purchase => 'Pembelian',
+                        $record->movement_type === MovementType::Waste => 'Penyesuaian',
+                        in_array($record->movement_type, [MovementType::AdjustmentIncrease, MovementType::AdjustmentDecrease])
                             => 'Penyesuaian',
-                        default => $record->movement_type,
+                        default => $record->movement_type->value,
                     })
                     ->tooltip(fn (StockMovement $record): string => match (true) {
-                        $record->movement_type === 'sale'
+                        $record->movement_type === MovementType::Sale
                             => 'Stok berkurang karena ada pesanan penjualan',
-                        $record->movement_type === 'purchase'
+                        $record->movement_type === MovementType::Purchase
                             => 'Stok bertambah karena ada pembelian',
-                        $record->stockAdjustment?->category === AdjustmentCategory::Expired
-                            => 'Stok berkurang karena batch sudah kedaluwarsa',
-                        $record->movement_type === 'waste'
+                        $record->movement_type === MovementType::Waste
                             => 'Stok berkurang karena bahan kedaluwarsa/rusak/tumpah',
-                        in_array($record->movement_type, ['adjustment_increase', 'adjustment_decrease'])
+                        in_array($record->movement_type, [MovementType::AdjustmentIncrease, MovementType::AdjustmentDecrease])
                             => 'Stok disesuaikan secara manual',
                         default => '',
                     }),
@@ -94,9 +88,9 @@ class ViewStockHistory extends ListRecords
                 TextColumn::make('reference')
                     ->label('Referensi')
                     ->state(fn (StockMovement $record): string => match (true) {
-                        $record->movement_type === 'sale' && $record->order
+                        $record->movement_type === MovementType::Sale && $record->order
                             => $record->order->order_code,
-                        $record->movement_type === 'purchase' && $record->ingredientBatch
+                        $record->movement_type === MovementType::Purchase && $record->ingredientBatch
                             => $record->ingredientBatch->batch_code,
                         (bool) $record->stock_adjustment_id
                             => \App\Models\StockAdjustment::find($record->stock_adjustment_id)?->code
@@ -117,7 +111,7 @@ class ViewStockHistory extends ListRecords
                     ->label('Perubahan')
                     ->formatStateUsing(fn ($state) =>
                         number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.')
-                        . ' ' . ($this->ingredient?->unit ?? '')
+                        . ' ' . ($this->ingredient?->unit?->value ?? '')
                     )
                     ->color(fn (StockMovement $record): string => $record->quantity_change < 0 ? 'danger' : 'success')
                     ->sortable(),
@@ -127,7 +121,7 @@ class ViewStockHistory extends ListRecords
                     ->label('Sebelum')
                     ->formatStateUsing(fn ($state) =>
                         number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.')
-                        . ' ' . ($this->ingredient?->unit ?? '')
+                        . ' ' . ($this->ingredient?->unit?->value ?? '')
                     )
                     ->sortable(),
 
@@ -136,7 +130,7 @@ class ViewStockHistory extends ListRecords
                     ->label('Sesudah')
                     ->formatStateUsing(fn ($state) =>
                         number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.')
-                        . ' ' . ($this->ingredient?->unit ?? '')
+                        . ' ' . ($this->ingredient?->unit?->value ?? '')
                     )
                     ->sortable(),
 
@@ -149,7 +143,7 @@ class ViewStockHistory extends ListRecords
                     ->visible(fn (StockMovement $record): bool =>
                         (bool) $record->stock_adjustment_id)
                     ->infolist(function (StockMovement $record): array {
-                        $record->loadMissing('stockAdjustment.ingredient', 'stockAdjustment.menu', 'stockAdjustment.reportedBy');
+                        $record->loadMissing('stockAdjustment.ingredient', 'stockAdjustment.reportedBy');
                         return StockAdjustmentResource::getInfolistComponents(prefix: 'stockAdjustment.');
                     })
                     ->modalAutofocus(false)
@@ -159,7 +153,7 @@ class ViewStockHistory extends ListRecords
                     ->label('Detail')
                     ->icon(Heroicon::OutlinedEye)
                     ->visible(fn (StockMovement $record): bool =>
-                        $record->movement_type === 'sale' && (bool) $record->order_id)
+                        $record->movement_type === MovementType::Sale && (bool) $record->order_id)
                     ->infolist(function (StockMovement $record): array {
                         $record->loadMissing('order.items.menu', 'order.cashier');
                         return OrderResource::getInfolistComponents(prefix: 'order.');
@@ -174,7 +168,7 @@ class ViewStockHistory extends ListRecords
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Tutup')
                     ->modalAutofocus(false)
-                    ->visible(fn ($record) => $record->movement_type === 'purchase')
+                    ->visible(fn ($record) => $record->movement_type === MovementType::Purchase)
                     ->infolist(fn ($record) => [
                         \Filament\Infolists\Components\Section::make('Informasi Batch')
                             ->schema([
@@ -183,8 +177,6 @@ class ViewStockHistory extends ListRecords
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.expiry_date')->label('Tanggal Kedaluwarsa')->date('d M Y')->default('-'),
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.quantity')->label('Quantity Awal')->formatStateUsing(fn ($state) => number_format((float)$state, 2)),
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.cost_per_unit')->label('Harga per Unit')->money('IDR')->default('-'),
-                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.status')->label('Status')->badge()
-                                    ->formatStateUsing(fn ($state) => $state === 'active' ? 'Aktif' : 'Nonaktif'),
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.allow_expired_usage')->label('Bisa Kedaluwarsa')->boolean(),
                             ])->columns(3),
                         \Filament\Infolists\Components\Section::make('Statistik Pemakaian')
