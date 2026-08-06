@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\AdjustmentCategory;
 use App\Enums\AdjustmentType;
-use App\Enums\AdjustableType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,11 +14,8 @@ class StockAdjustment extends Model
 
     protected $fillable = [
         'code',
-        'adjustable_type',
         'ingredient_id',
-        'menu_id',
         'adjustment_type',
-        'category',
         'quantity',
         'quantity_before',
         'quantity_after',
@@ -36,49 +31,13 @@ class StockAdjustment extends Model
             'quantity_before' => 'decimal:3',
             'quantity_after' => 'decimal:3',
             'adjusted_at' => 'datetime',
-            'adjustable_type' => AdjustableType::class,
             'adjustment_type' => AdjustmentType::class,
-            'category' => AdjustmentCategory::class,
         ];
-    }
-
-    public static function getCategoryOptions(?string $type): array
-    {
-        return match ($type) {
-            AdjustmentType::Increase->value => [
-                AdjustmentCategory::Correction->value => 'Koreksi Stok',
-                AdjustmentCategory::Other->value => 'Lainnya',
-            ],
-            AdjustmentType::Decrease->value => [
-                AdjustmentCategory::Expired->value => 'Kedaluwarsa',
-                AdjustmentCategory::Damaged->value => 'Rusak',
-                AdjustmentCategory::Spilled->value => 'Tumpah',
-                AdjustmentCategory::Complaint->value => 'Komplain Pelanggan',
-                AdjustmentCategory::Correction->value => 'Koreksi Stok',
-                AdjustmentCategory::Other->value => 'Lainnya',
-            ],
-            default => [],
-        };
-    }
-
-    public function isIngredientAdjustment(): bool
-    {
-        return $this->adjustable_type === AdjustableType::Ingredient;
-    }
-
-    public function isMenuAdjustment(): bool
-    {
-        return $this->adjustable_type === AdjustableType::Menu;
     }
 
     public function ingredient(): BelongsTo
     {
         return $this->belongsTo(Ingredient::class);
-    }
-
-    public function menu(): BelongsTo
-    {
-        return $this->belongsTo(Menu::class);
     }
 
     public function reportedBy(): BelongsTo

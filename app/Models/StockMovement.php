@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\MovementType;
+use App\Enums\SourceType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -33,6 +35,8 @@ class StockMovement extends Model
             'quantity_change' => 'decimal:3',
             'quantity_after' => 'decimal:3',
             'unit_cost' => 'integer',
+            'movement_type' => MovementType::class,
+            'source_type' => SourceType::class,
         ];
     }
 

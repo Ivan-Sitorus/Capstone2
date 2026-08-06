@@ -3,6 +3,9 @@
 namespace App\Models;
 
 use App\Enums\OrderStatus;
+use App\Enums\OrderType;
+use App\Enums\PaymentMethod;
+use App\Enums\QrisStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -12,11 +15,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Order extends Model
 {
     use HasFactory;
-
-    const STATUS_PENDING = 'pending';
-    const STATUS_PROCESSING = 'processing';
-    const STATUS_COMPLETED = 'completed';
-    const STATUS_CANCELLED = 'cancelled';
 
     protected static function boot(): void
     {
@@ -61,7 +59,10 @@ class Order extends Model
         return [
             'total_amount' => 'integer',
             'qris_resubmit_attempts' => 'integer',
-            'qris_status' => 'string',
+            'status' => OrderStatus::class,
+            'order_type' => OrderType::class,
+            'payment_method' => PaymentMethod::class,
+            'qris_status' => QrisStatus::class,
             'processed_at' => 'datetime',
             'completed_at' => 'datetime',
             'cancelled_at' => 'datetime',
@@ -90,17 +91,17 @@ class Order extends Model
 
     public function isCashPending(): bool
     {
-        return $this->status === self::STATUS_PENDING && $this->payment_method === 'cash';
+        return $this->status === OrderStatus::Pending && $this->payment_method === PaymentMethod::Cash;
     }
 
     public function isQrisPending(): bool
     {
-        return $this->status === self::STATUS_PENDING && $this->payment_method === 'qris';
+        return $this->status === OrderStatus::Pending && $this->payment_method === PaymentMethod::Qris;
     }
 
     public function isActive(): bool
     {
-        return $this->status !== self::STATUS_COMPLETED && $this->status !== self::STATUS_CANCELLED;
+        return $this->status !== OrderStatus::Completed && $this->status !== OrderStatus::Cancelled;
     }
 
     /**
@@ -109,11 +110,11 @@ class Order extends Model
      */
     public static function cashierPendingCount(): int
     {
-        return static::where('status', self::STATUS_PENDING)
-            ->where(fn ($q) => $q->where('order_type', 'cashier')
-                ->orWhere(fn ($q2) => $q2->where('order_type', 'qr')
-                    ->where(fn ($q3) => $q3->where('payment_method', 'cash')
-                        ->orWhere(fn ($q4) => $q4->where('payment_method', 'qris')->whereNotNull('payment_proof'))
+        return static::where('status', OrderStatus::Pending)
+            ->where(fn ($q) => $q->where('order_type', OrderType::Cashier)
+                ->orWhere(fn ($q2) => $q2->where('order_type', OrderType::Qr)
+                    ->where(fn ($q3) => $q3->where('payment_method', PaymentMethod::Cash)
+                        ->orWhere(fn ($q4) => $q4->where('payment_method', PaymentMethod::Qris)->whereNotNull('payment_proof'))
                     )
                 )
             )->count();
@@ -126,7 +127,7 @@ class Order extends Model
 
     public function isQrisResubmitable(): bool
     {
-        return $this->qris_resubmit_attempts < 3 && $this->qris_status === 'resubmit_requested';
+        return $this->qris_resubmit_attempts < 3 && $this->qris_status === QrisStatus::ResubmitRequested;
     }
 
     public function orderPayments(): HasMany
@@ -138,7 +139,7 @@ class Order extends Model
     {
         $this->load('orderPayments');
 
-        if ($this->payment_method !== 'piutang') {
+        if ($this->payment_method !== PaymentMethod::PayLater) {
             return;
         }
 
@@ -149,8 +150,8 @@ class Order extends Model
         }
 
         $this->status = $totalPaid >= (float) $this->total_amount
-            ? OrderStatus::Completed->value
-            : OrderStatus::Unpaid->value;
+            ? OrderStatus::Completed
+            : OrderStatus::Unpaid;
 
         $this->saveQuietly();
     }

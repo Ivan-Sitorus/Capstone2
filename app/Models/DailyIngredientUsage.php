@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Unit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -20,6 +21,7 @@ class DailyIngredientUsage extends Model
         return [
             'usage_date' => 'date',
             'jumlah_digunakan' => 'decimal:3',
+            'unit' => Unit::class,
         ];
     }
 

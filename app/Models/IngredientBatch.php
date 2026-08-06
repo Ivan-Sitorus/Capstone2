@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\BatchStatus;
 use App\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -52,7 +51,6 @@ class IngredientBatch extends Model
         'received_at',
         'cost_per_unit',
         'custom_order',
-        'status',
         'allow_expired_usage',
         'initial_quantity',
         'supplier_name',
@@ -68,23 +66,11 @@ class IngredientBatch extends Model
             'quantity' => 'decimal:3',
             'cost_per_unit' => 'integer',
             'custom_order' => 'integer',
-            'status' => BatchStatus::class,
             'payment_status' => PaymentStatus::class,
             'allow_expired_usage' => 'boolean',
             'initial_quantity' => 'decimal:3',
             'total_cost' => 'integer',
-            'payment_status' => 'string',
         ];
-    }
-
-    public function isActive(): bool
-    {
-        return $this->status === BatchStatus::Active;
-    }
-
-    public function isInactive(): bool
-    {
-        return $this->status === BatchStatus::Inactive;
     }
 
     public function ingredient(): BelongsTo

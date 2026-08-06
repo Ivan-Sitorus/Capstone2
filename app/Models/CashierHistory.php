@@ -11,7 +11,6 @@ class CashierHistory extends Model
 
     protected $fillable = [
         'user_id',
-        'type',
         'session_id',
         'started_at',
         'ended_at',
@@ -39,15 +38,5 @@ class CashierHistory extends Model
     public function scopeForUser($query, $userId)
     {
         return $query->where('user_id', $userId);
-    }
-
-    public function scopeType($query, string $type)
-    {
-        return $query->where('type', $type);
-    }
-
-    public function scopeCashier($query)
-    {
-        return $query->where('type', 'cashier');
     }
 }

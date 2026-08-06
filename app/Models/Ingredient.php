@@ -2,7 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
+use App\Enums\BatchMode;
+use App\Enums\Unit;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -24,25 +25,16 @@ class Ingredient extends Model
     {
         return [
             'low_stock_threshold' => 'decimal:3',
+            'unit' => Unit::class,
+            'batch_mode' => BatchMode::class,
         ];
     }
 
-    const UNITS = [
-        'gram' => 'Gram (g)',
-        'kg' => 'Kilogram (kg)',
-        'ml' => 'Mililiter (ml)',
-        'liter' => 'Liter (L)',
-        'pcs' => 'Buah / Pcs',
-        'sachet' => 'Sachet',
-    ];
-
-    const BATCH_MODE_FIFO = 'fifo';
-    const BATCH_MODE_FEFO = 'fefo';
     public static function batchModes(): array
     {
         return [
-            self::BATCH_MODE_FEFO => 'FEFO (First Expired First Out)',
-            self::BATCH_MODE_FIFO => 'FIFO (First In First Out)',
+            BatchMode::Fefo->value => 'FEFO (First Expired First Out)',
+            BatchMode::Fifo->value => 'FIFO (First In First Out)',
         ];
     }
 
