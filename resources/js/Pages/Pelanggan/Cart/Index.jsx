@@ -59,14 +59,14 @@ export default function CustomerCart() {
         }
         setLoading(true);
         try {
-            const res = await axios.post('/api/order', {
+            const res = await axios.post('/api/pesanan', {
                 customer_name:  customer.name,
                 phone:          customer.phone,
                 table_id:       customer.tableId,
                 is_mahasiswa:   isMahasiswa,
                 items: items.map(i => ({ menu_id: i.menuId, quantity: i.quantity })),
             });
-            router.visit(`/pelanggan/payment/${res.data.order_id}/choose`);
+            router.visit(`/pelanggan/pesanan/${res.data.order_id}/payment`);
         } catch (err) {
             const msg = err.response?.data?.message ?? err.response?.data?.errors ?? 'Terjadi kesalahan. Coba lagi.';
             setErrorMsg(typeof msg === 'object' ? Object.values(msg).flat().join(' ') : msg);

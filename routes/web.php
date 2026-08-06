@@ -21,7 +21,7 @@ Route::post('/kasir/login', [AuthController::class, 'login'])->name('kasir.login
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout')->middleware('auth');
 
 // Kasir pages
-Route::prefix('kasir')->middleware(['auth:web', 'role:cashier,admin'])->group(function () {
+Route::prefix('kasir')->middleware(['auth:web', 'role:cashier'])->group(function () {
     Route::get('/pesanan-baru', [CashierPesananBaruController::class, 'index'])->name('kasir.pesanan-baru');
     Route::post('/pesanan-baru', [CashierPesananBaruController::class, 'store'])->name('kasir.pesanan-baru.simpan');
     Route::get('/pesanan-aktif', [CashierPesananAktifController::class, 'index'])->name('kasir.pesanan-aktif');
@@ -55,12 +55,12 @@ Route::prefix('pelanggan')->group(function () {
     Route::get('/riwayat', [CustomerOrderController::class, 'riwayat'])->name('customer.riwayat');
 
     // Order flow
-    Route::post('/order/store', [CustomerOrderController::class, 'store'])->name('customer.order.store');
-    Route::get('/order/{order}/payment', [CustomerPaymentController::class, 'showChoose'])->name('customer.payment.choose');
-    Route::post('/order/{order}/payment/choose', [CustomerPaymentController::class, 'choose'])->name('customer.payment.choose.post');
-    Route::get('/order/{order}/payment/qris', [CustomerPaymentController::class, 'showQris'])->name('customer.payment.qris');
-    Route::post('/order/{order}/payment/qris', [CustomerPaymentController::class, 'uploadQris'])->name('customer.payment.qris.upload');
-    Route::get('/order/{order}/status', [CustomerOrderController::class, 'showStatus'])->name('customer.order.status');
+    Route::post('/pesanan/store', [CustomerOrderController::class, 'store'])->name('customer.order.store');
+    Route::get('/pesanan/{order}/payment', [CustomerPaymentController::class, 'showChoose'])->name('customer.payment.choose');
+    Route::post('/pesanan/{order}/payment/choose', [CustomerPaymentController::class, 'choose'])->name('customer.payment.choose.post');
+    Route::get('/pesanan/{order}/payment/qris', [CustomerPaymentController::class, 'showQris'])->name('customer.payment.qris');
+    Route::post('/pesanan/{order}/payment/qris', [CustomerPaymentController::class, 'uploadQris'])->name('customer.payment.qris.upload');
+    Route::get('/pesanan/{order}/status', [CustomerOrderController::class, 'showStatus'])->name('customer.order.status');
     Route::get('/pesanan/{code}/status', [CustomerOrderController::class, 'status'])->name('customer.pesanan.status');
 });
 

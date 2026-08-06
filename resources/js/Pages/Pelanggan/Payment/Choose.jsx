@@ -49,13 +49,13 @@ export default function PaymentChoose({ order, items, table_number }) {
         setError('');
         try {
             if (selected === 'cash') {
-                const res = await axios.post(`/api/order/${order.id}/pay/cash`);
+                const res = await axios.post(`/api/pesanan/${order.id}/pay/cash`);
                 setCashOrderCode(res.data.order_code ?? '');
                 clearCart();
                 setShowCashModal(true);
             } else {
-                await axios.post(`/api/order/${order.id}/pay/qris`);
-                router.visit(`/pelanggan/payment/${order.id}/qris`);
+                await axios.post(`/api/pesanan/${order.id}/pay/qris`);
+                router.visit(`/pelanggan/pesanan/${order.id}/payment/qris`);
             }
         } catch (err) {
             setError(err.response?.data?.message ?? 'Terjadi kesalahan. Coba lagi.');

@@ -40,7 +40,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
         const formData = new FormData();
         formData.append('proof', file);
         try {
-            await axios.post(`/api/order/${order.id}/qris-proof`, formData, {
+            await axios.post(`/api/pesanan/${order.id}/qris-proof`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             clearCart();
@@ -57,7 +57,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
             <div className="bg-card border-b border-border px-6 pb-4 pt-[22px]">
                 <div className="flex items-center gap-[14px]">
                     <button
-                        onClick={() => router.visit(`/pelanggan/payment/${order.order_code}/choose`)}
+                        onClick={() => router.visit(`/pelanggan/pesanan/${order.id}/payment`)}
                         className="w-9 h-9 rounded-[12px] bg-muted border-none cursor-pointer flex items-center justify-center shrink-0"
                     >
                         <ChevronLeft size={20} className="text-foreground" />

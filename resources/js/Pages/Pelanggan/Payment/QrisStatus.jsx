@@ -121,7 +121,7 @@ export default function QrisStatus({ order }) {
                             Silakan upload ulang bukti pembayaran yang valid.
                         </p>
                         <button
-                            onClick={() => router.visit(`/pelanggan/payment/${order.order_code}/qris`)}
+                            onClick={() => router.visit(`/pelanggan/pesanan/${order.id}/payment/qris`)}
                             style={{
                                 width: '100%', height: 50, background: '#E8763A', color: 'white',
                                 border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 700, cursor: 'pointer',
