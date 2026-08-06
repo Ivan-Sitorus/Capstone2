@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Enums\BatchMode;
+use App\Enums\MovementType;
+use App\Enums\SourceType;
 use App\Models\DailyIngredientUsage;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
@@ -19,7 +21,7 @@ class InventoryService
     {
         $alreadyProcessed = StockMovement::query()
             ->where('order_id', $order->id)
-            ->where('movement_type', 'sale')
+            ->where('movement_type', MovementType::Sale)
             ->exists();
 
         if ($alreadyProcessed) {
@@ -81,8 +83,8 @@ class InventoryService
                 }
 
                 $itemContext = [
-                    'movement_type' => 'sale',
-                    'source_type' => 'order_item',
+                    'movement_type' => MovementType::Sale,
+                    'source_type' => SourceType::OrderItem,
                     'source_id' => isset($item['order_item_id']) ? (string) $item['order_item_id'] : null,
                     'order_id' => $item['order_id'] ?? null,
                     'order_item_id' => $item['order_item_id'] ?? null,
@@ -179,7 +181,7 @@ class InventoryService
             ->lockForUpdate();
 
         match ($ingredient->batch_mode) {
-            BatchMode::Fifo->value => $query
+            BatchMode::Fifo => $query
                 ->orderByRaw('CASE WHEN received_at IS NULL THEN 1 ELSE 0 END')
                 ->orderBy('received_at', 'asc')
                 ->orderBy('expiry_date', 'asc')
@@ -198,8 +200,8 @@ class InventoryService
         if ($totalAvailable < $requiredQuantity) {
             throw new Exception(
                 "Stok tidak mencukupi untuk bahan '{$ingredient->name}'. ".
-                "Dibutuhkan: {$requiredQuantity} {$ingredient->unit}, ".
-                "Tersedia: {$totalAvailable} {$ingredient->unit}"
+                "Dibutuhkan: {$requiredQuantity} {$ingredient->unit->value}, ".
+                "Tersedia: {$totalAvailable} {$ingredient->unit->value}"
             );
         }
 
@@ -243,7 +245,7 @@ class InventoryService
             ];
         }
 
-        if (($context['movement_type'] ?? 'sale') === 'sale') {
+        if (($context['movement_type'] ?? MovementType::Sale) === MovementType::Sale) {
             $this->recordDailyIngredientUsage(
                 ingredient: $ingredient,
                 usedQuantity: $requiredQuantity,

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
 use App\Services\CashierHistoryService;
 use Illuminate\Http\RedirectResponse;
@@ -52,7 +53,7 @@ class AuthController extends Controller
         // Role validation BEFORE authentication attempt
         $existingUser = \App\Models\User::where('email', $request->email)->first();
         if ($existingUser) {
-            if ($request->is('kasir/*') && !in_array($existingUser->role, ['cashier', 'admin'])) {
+            if ($request->is('kasir/*') && $existingUser->role !== UserRole::Cashier) {
                 return back()->withErrors([
                     'email' => 'Akun ini tidak memiliki akses ke Kasir.',
                 ]);
@@ -74,7 +75,7 @@ class AuthController extends Controller
 
         $this->cashierHistoryService->startSession($user);
 
-        if ($user->role === 'admin') {
+        if ($user->role === UserRole::Admin) {
             return redirect()->to('/admin');
         }
 
@@ -86,7 +87,7 @@ class AuthController extends Controller
         $guard = 'web';
         $user = Auth::guard($guard)->user();
 
-        if ($user && $user->role === 'cashier') {
+        if ($user && $user->role === UserRole::Cashier) {
             $activeSession = $this->cashierHistoryService->getActiveSession($user);
             if ($activeSession) {
                 $this->cashierHistoryService->endSession($activeSession);

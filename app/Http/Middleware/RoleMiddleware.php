@@ -14,7 +14,7 @@ class RoleMiddleware
             return redirect()->route('kasir.login');
         }
 
-        if (! in_array(Auth::user()->role, $roles)) {
+        if (! in_array(Auth::user()->role->value, $roles)) {
             if ($request->is('admin') || $request->is('admin/*')) {
                 return redirect()->to('/admin/login');
             }

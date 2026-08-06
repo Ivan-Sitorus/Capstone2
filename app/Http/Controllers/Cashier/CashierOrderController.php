@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Cashier;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
+use App\Enums\QrisStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\InventoryService;
@@ -53,14 +55,14 @@ class CashierOrderController extends Controller
 
     public function cancel(Request $request, Order $order): JsonResponse
     {
-        if (in_array($order->status, [OrderStatus::Completed->value, OrderStatus::Cancelled->value])) {
+        if (in_array($order->status, [OrderStatus::Completed, OrderStatus::Cancelled])) {
             return response()->json(['message' => 'Pesanan ini tidak dapat dibatalkan.'], 409);
         }
 
         $request->validate(['reason' => 'nullable|string|max:255']);
 
         $order->update([
-            'status'         => OrderStatus::Cancelled->value,
+            'status'         => OrderStatus::Cancelled,
             'rejection_note' => $request->reason,
             'cashier_id'     => Auth::id(),
             'cancelled_at'   => now(),
@@ -78,12 +80,12 @@ class CashierOrderController extends Controller
             OrderStatus::Processing->value => OrderStatus::Completed->value,
         ];
 
-        $allowed = $validTransitions[$order->status] ?? null;
+        $allowed = $validTransitions[$order->status->value] ?? null;
         if (! $allowed || $allowed !== $request->status) {
             return response()->json(['message' => 'Transisi status tidak valid.'], 409);
         }
 
-        if ($request->status === OrderStatus::Completed->value && $order->payment_method === 'pay_later') {
+        if ($request->status === OrderStatus::Completed->value && $order->payment_method === PaymentMethod::PayLater) {
             return response()->json(['message' => 'Pesanan belum lunas. Konfirmasi pembayaran terlebih dahulu.'], 409);
         }
 
@@ -126,7 +128,7 @@ class CashierOrderController extends Controller
 
     public function confirmPayment(Request $request, Order $order): JsonResponse
     {
-        if ($order->payment_method !== 'pay_later') {
+        if ($order->payment_method !== PaymentMethod::PayLater) {
             return response()->json(['message' => 'Sudah lunas.'], 409);
         }
         $request->validate(['payment_method' => 'required|in:cash,qris']);
@@ -142,7 +144,7 @@ class CashierOrderController extends Controller
 
     public function confirmCash(Order $order): JsonResponse|RedirectResponse
     {
-        if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'cash') {
+        if ($order->status !== OrderStatus::Pending || $order->payment_method !== PaymentMethod::Cash) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
 
@@ -155,7 +157,7 @@ class CashierOrderController extends Controller
 
     public function confirmQris(Order $order): JsonResponse|RedirectResponse
     {
-        if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'qris') {
+        if ($order->status !== OrderStatus::Pending || $order->payment_method !== PaymentMethod::Qris) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
 
@@ -168,7 +170,7 @@ class CashierOrderController extends Controller
 
     public function rejectQris(Request $request, Order $order): JsonResponse
     {
-        if ($order->status !== OrderStatus::Pending->value || $order->payment_method !== 'qris') {
+        if ($order->status !== OrderStatus::Pending || $order->payment_method !== PaymentMethod::Qris) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
         $request->validate(['note' => 'nullable|string|max:255']);
@@ -187,7 +189,7 @@ class CashierOrderController extends Controller
 
     public function acceptQrisProof(Order $order): JsonResponse|RedirectResponse
     {
-        if ($order->qris_status !== 'proof_submitted') {
+        if ($order->qris_status !== QrisStatus::ProofSubmitted) {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
         }
 
@@ -201,7 +203,7 @@ class CashierOrderController extends Controller
 
     public function rejectQrisProof(Request $request, Order $order): JsonResponse
     {
-        if ($order->qris_status !== 'proof_submitted') {
+        if ($order->qris_status !== QrisStatus::ProofSubmitted) {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
         }
 
@@ -217,7 +219,7 @@ class CashierOrderController extends Controller
 
     public function requestQrisResubmit(Request $request, Order $order): JsonResponse
     {
-        if ($order->qris_status !== 'proof_submitted') {
+        if ($order->qris_status !== QrisStatus::ProofSubmitted) {
             return response()->json(['message' => 'Bukti QRIS tidak dalam status review.'], 409);
         }
 

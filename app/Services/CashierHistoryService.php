@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Enums\OrderStatus;
+use App\Enums\UserRole;
 use App\Models\CashierHistory;
 use App\Models\Order;
 use App\Models\User;
@@ -16,15 +16,11 @@ class CashierHistoryService
      *
      * Closes any existing active sessions on the SAME device (session_id)
      * before creating a new one. Sessions on OTHER devices remain active.
+     * Only cashier users get sessions (admin/customer are skipped).
      */
     public function startSession(User $user): ?CashierHistory
     {
-        $type = match ($user->role) {
-            'cashier' => 'cashier',
-            default => null,
-        };
-
-        if (! $type) {
+        if ($user->role !== UserRole::Cashier) {
             return null;
         }
 
@@ -32,7 +28,6 @@ class CashierHistoryService
 
         return CashierHistory::create([
             'user_id' => $user->id,
-            'type' => $type,
             'session_id' => session()->getId(),
             'started_at' => now(),
             'last_activity_at' => now(),
@@ -70,14 +65,7 @@ class CashierHistoryService
     {
         $endTime = $session->ended_at ?? now();
 
-        if ($session->type === 'cashier') {
-            return Order::where('cashier_id', $session->user_id)
-                ->whereBetween('created_at', [$session->started_at, $endTime])
-                ->count();
-        }
-
-        return Order::where('processed_by', $session->user_id)
-            ->where('status', OrderStatus::Completed->value)
+        return Order::where('cashier_id', $session->user_id)
             ->whereBetween('created_at', [$session->started_at, $endTime])
             ->count();
     }

@@ -16,7 +16,7 @@ class CashierPesananBaruController extends Controller
     public function index(): Response
     {
         // Cache 5 minutes — menu rarely changes, admin can clear cache when updating menu
-        $categories = Cache::remember('menu_categories_cashier_v3', 300, fn () => Category::with([
+        $categories = Cache::remember('menu_categories_cashier', 300, fn () => Category::with([
             'menus' => fn ($q) => $q->where('status', 'active')->orderBy('name')
                 ->with(['menuIngredients.ingredient.batches' => fn ($q) => $q
                     ->where('quantity', '>', 0)

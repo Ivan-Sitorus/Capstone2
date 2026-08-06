@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\UserRole;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -44,7 +45,7 @@ class HandleInertiaRequests extends Middleware
                     'id'         => $user->id,
                     'name'       => $user->name,
                     'email'      => $user->email,
-                    'role'       => $user->role,
+                    'role'       => $user->role->value,
                     'created_at' => $user->created_at,
                 ] : null,
             ],
@@ -56,7 +57,7 @@ class HandleInertiaRequests extends Middleware
             ],
             // Lazy closure — dihitung langsung tanpa cache agar badge selalu
             // akurat setiap navigasi (query COUNT ringan, satu sumber kebenaran)
-            'pendingOrderCount' => fn () => $user && in_array($user->role, ['cashier', 'admin'])
+            'pendingOrderCount' => fn () => $user && in_array($user->role, [UserRole::Cashier, UserRole::Admin])
                 ? Order::cashierPendingCount()
                 : 0,
         ]);

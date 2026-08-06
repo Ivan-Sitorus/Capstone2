@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Customer;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Setting;
@@ -53,7 +54,7 @@ class CustomerPaymentController extends Controller
             return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderData($order)]);
         }
 
-        $rejectedMessage = ($order->payment_method === 'qris' && $order->rejection_note && !$order->payment_proof)
+        $rejectedMessage = ($order->payment_method === PaymentMethod::Qris && $order->rejection_note && !$order->payment_proof)
             ? $order->rejection_note
             : null;
 

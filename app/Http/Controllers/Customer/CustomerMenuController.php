@@ -18,7 +18,7 @@ class CustomerMenuController extends Controller
         if (!$tableId) return null;
 
         return Cache::remember("cafe_table_{$tableId}", 600, fn () =>
-            CafeTable::select(['id', 'table_number', 'is_available'])->find($tableId)
+            CafeTable::select(['id', 'table_number'])->find($tableId)
         );
     }
 
@@ -26,9 +26,9 @@ class CustomerMenuController extends Controller
     {
         $table = $this->findTable($request->query('table'));
 
-        // Reject if table does not exist in DB or is marked unavailable
+        // Reject if table does not exist in DB
         if ($tableId = $request->query('table')) {
-            if (! $table || ! $table->is_available) {
+            if (! $table) {
                 abort(404);
             }
         }
@@ -49,7 +49,7 @@ class CustomerMenuController extends Controller
 
     public function index(Request $request): Response
     {
-        $categories = Cache::remember('customer_menu_v3', 300, function () {
+        $categories = Cache::remember('customer_menu', 300, function () {
             return Category::with([
                     'menus' => fn ($q) => $q
                         ->select(['id', 'category_id', 'name', 'price', 'image', 'status'])
@@ -64,7 +64,7 @@ class CustomerMenuController extends Controller
         $table = $this->findTable($request->query('table'));
 
         if ($tableId = $request->query('table')) {
-            if (! $table || ! $table->is_available) {
+            if (! $table) {
                 abort(404);
             }
         }

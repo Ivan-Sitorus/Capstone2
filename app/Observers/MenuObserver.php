@@ -9,7 +9,8 @@ class MenuObserver
 {
     public function saved(Menu $menu): void
     {
-        Cache::forget('customer_menu_v3');
-        Cache::forget('menu_categories_cashier_v3');
+        Cache::forget('customer_menu');
+        Cache::forget('menu_categories_cashier');
+        Cache::forget("menu_{$menu->id}");
     }
 }

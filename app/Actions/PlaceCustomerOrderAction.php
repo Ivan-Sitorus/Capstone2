@@ -2,7 +2,9 @@
 
 namespace App\Actions;
 
+use App\Enums\MenuStatus;
 use App\Enums\OrderStatus;
+use App\Enums\OrderType;
 use Exception;
 use App\Models\CafeTable;
 use App\Models\Menu;
@@ -68,7 +70,7 @@ class PlaceCustomerOrderAction
             foreach ($request->items as $item) {
                 $menu = $menus->get($item['menu_id']);
 
-                if (!$menu || $menu->status !== 'active') {
+                if (!$menu || $menu->status !== MenuStatus::Active) {
                     throw new Exception("Menu " . ($menu?->name ?? "#{$item['menu_id']}") . " tidak tersedia.");
                 }
 

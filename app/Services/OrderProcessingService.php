@@ -2,8 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Order;
+use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\QrisStatus;
+use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -16,10 +18,10 @@ class OrderProcessingService
 
     public function processOrder(Order $order, PaymentMethod $method): array
     {
-        if ($order->status !== $order::STATUS_PENDING) {
+        if ($order->status !== OrderStatus::Pending) {
             throw new \RuntimeException('Status pesanan tidak valid.');
         }
-        if ($order->payment_method !== $method->value) {
+        if ($order->payment_method !== $method) {
             throw new \RuntimeException('Metode pembayaran tidak sesuai.');
         }
 
@@ -34,7 +36,7 @@ class OrderProcessingService
 
         DB::transaction(function () use ($order) {
             $order->update([
-                'status' => $order::STATUS_PROCESSING,
+                'status' => OrderStatus::Processing,
                 'cashier_id' => Auth::id(),
                 'processed_at' => now(),
             ]);
@@ -61,7 +63,7 @@ class OrderProcessingService
                 Storage::disk('public')->delete($order->payment_proof);
             }
             $order->update([
-                'qris_status' => 'rejected',
+                'qris_status' => QrisStatus::Rejected,
                 'payment_proof' => null,
                 'rejection_note' => $reason,
             ]);
@@ -75,8 +77,8 @@ class OrderProcessingService
                 Storage::disk('public')->delete($order->payment_proof);
             }
             $order->update([
-                'qris_status' => 'accepted',
-                'status' => $order::STATUS_PROCESSING,
+                'qris_status' => QrisStatus::Accepted,
+                'status' => OrderStatus::Processing,
                 'cashier_id' => Auth::id(),
                 'payment_proof' => null,
                 'processed_at' => now(),
@@ -92,7 +94,7 @@ class OrderProcessingService
                 Storage::disk('public')->delete($order->payment_proof);
             }
             $order->update([
-                'qris_status' => 'resubmit_requested',
+                'qris_status' => QrisStatus::ResubmitRequested,
                 'payment_proof' => null,
                 'rejection_note' => $reason,
             ]);

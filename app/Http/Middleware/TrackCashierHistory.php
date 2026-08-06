@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Enums\UserRole;
 use App\Services\CashierHistoryService;
 use Closure;
 use Illuminate\Http\Request;
@@ -31,7 +32,7 @@ class TrackCashierHistory
 
         $user = Auth::user();
 
-        if (! in_array($user->role, ['cashier'], true)) {
+        if ($user->role !== UserRole::Cashier) {
             return $next($request);
         }
 

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Cashier;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Inertia\Inertia;
@@ -37,9 +38,9 @@ class CashierPesananAktifController extends Controller
 
         $counts = [
             'all' => $orders->count(),
-'pending' => $orders->where('status', OrderStatus::Pending->value)->count(),
-                'processing' => $orders->where('status', OrderStatus::Processing->value)->count(),
-            'belum_bayar' => $orders->where('payment_method', 'pay_later')->count(),
+'pending' => $orders->where('status', OrderStatus::Pending)->count(),
+                'processing' => $orders->where('status', OrderStatus::Processing)->count(),
+            'belum_bayar' => $orders->where('payment_method', PaymentMethod::PayLater)->count(),
         ];
 
         $ordersData = $orders->map(fn ($o) => [
