@@ -19,7 +19,6 @@ class IngredientModelTest extends TestCase
             'name' => 'Kopi Bubuk Test',
             'unit' => 'gram',
             'low_stock_threshold' => 100,
-            'is_active' => true,
         ]);
 
         IngredientBatch::create([

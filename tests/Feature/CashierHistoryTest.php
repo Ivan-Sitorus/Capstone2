@@ -32,7 +32,6 @@ class CashierHistoryTest extends TestCase
         $session = $this->service->startSession($user);
 
         $this->assertInstanceOf(CashierHistory::class, $session);
-        $this->assertEquals('cashier', $session->type);
         $this->assertNotNull($session->id);
         $this->assertEquals($user->id, $session->user_id);
         $this->assertTrue($session->is_active);
@@ -42,7 +41,6 @@ class CashierHistoryTest extends TestCase
 
         $this->assertDatabaseHas('cashier_histories', [
             'user_id' => $user->id,
-            'type' => 'cashier',
             'is_active' => true,
         ]);
     }
@@ -72,7 +70,6 @@ class CashierHistoryTest extends TestCase
 
         $oldCashierSession = CashierHistory::create([
             'user_id' => $user->id,
-            'type' => 'cashier',
             'session_id' => $sessionId,
             'started_at' => now()->subHours(2),
             'last_activity_at' => now()->subHours(1),
@@ -81,7 +78,6 @@ class CashierHistoryTest extends TestCase
 
         $oldCashierSession = CashierHistory::create([
             'user_id' => $user->id,
-            'type' => 'cashier',
             'session_id' => $sessionId,
             'started_at' => now()->subHours(3),
             'last_activity_at' => now()->subHours(2),
@@ -113,7 +109,6 @@ class CashierHistoryTest extends TestCase
 
         $session = CashierHistory::create([
             'user_id' => $user->id,
-            'type' => 'cashier',
             'started_at' => now(),
             'last_activity_at' => now(),
             'is_active' => true,
@@ -133,7 +128,6 @@ class CashierHistoryTest extends TestCase
         $cashierUser = User::factory()->create(['role' => 'cashier']);
         CashierHistory::create([
             'user_id' => $cashierUser->id,
-            'type' => 'cashier',
             'started_at' => now()->subHours(2),
             'last_activity_at' => now()->subMinutes(45),
             'is_active' => true,
@@ -142,7 +136,6 @@ class CashierHistoryTest extends TestCase
         $cashierUser = User::factory()->create(['role' => 'cashier']);
         CashierHistory::create([
             'user_id' => $cashierUser->id,
-            'type' => 'cashier',
             'started_at' => now()->subHours(2),
             'last_activity_at' => now()->subMinutes(45),
             'is_active' => true,
@@ -168,7 +161,6 @@ class CashierHistoryTest extends TestCase
         $cashierUser = User::factory()->create(['role' => 'cashier']);
         CashierHistory::create([
             'user_id' => $cashierUser->id,
-            'type' => 'cashier',
             'started_at' => now()->subHours(2),
             'last_activity_at' => now()->subMinutes(10),
             'is_active' => true,
@@ -177,7 +169,6 @@ class CashierHistoryTest extends TestCase
         $cashierUser = User::factory()->create(['role' => 'cashier']);
         CashierHistory::create([
             'user_id' => $cashierUser->id,
-            'type' => 'cashier',
             'started_at' => now()->subHours(2),
             'last_activity_at' => now()->subMinutes(10),
             'is_active' => true,
@@ -204,7 +195,6 @@ class CashierHistoryTest extends TestCase
 
         $session = CashierHistory::create([
             'user_id' => $user->id,
-            'type' => 'cashier',
             'started_at' => now(),
             'last_activity_at' => now(),
             'is_active' => true,
@@ -224,7 +214,6 @@ class CashierHistoryTest extends TestCase
 
         $session = CashierHistory::create([
             'user_id' => $cashier->id,
-            'type' => 'cashier',
             'started_at' => now()->subHours(2),
             'last_activity_at' => now()->subMinutes(30),
             'is_active' => true,
@@ -248,7 +237,6 @@ class CashierHistoryTest extends TestCase
 
         $session = CashierHistory::create([
             'user_id' => $cashier->id,
-            'type' => 'cashier',
             'started_at' => now()->subHours(2),
             'last_activity_at' => now(),
             'is_active' => true,
@@ -273,7 +261,6 @@ class CashierHistoryTest extends TestCase
 
         $endedSession = CashierHistory::create([
             'user_id' => $cashier2->id,
-            'type' => 'cashier',
             'started_at' => now()->subHours(4),
             'ended_at' => now()->subHours(3),
             'last_activity_at' => now()->subHours(3),
@@ -309,7 +296,6 @@ class CashierHistoryTest extends TestCase
 
         $session = CashierHistory::create([
             'user_id' => $cashier->id,
-            'type' => 'cashier',
             'started_at' => now()->subHours(2),
             'last_activity_at' => now(),
             'is_active' => true,
@@ -339,7 +325,6 @@ class CashierHistoryTest extends TestCase
 
         $session = CashierHistory::create([
             'user_id' => $user->id,
-            'type' => 'cashier',
             'started_at' => now()->subMinutes(10),
             'last_activity_at' => now()->subMinutes(5),
             'is_active' => true,
@@ -372,7 +357,6 @@ class CashierHistoryTest extends TestCase
 
         $oldCashierSession = CashierHistory::create([
             'user_id' => $cashierUser->id,
-            'type' => 'cashier',
             'started_at' => now()->subHours(2),
             'last_activity_at' => now()->subMinutes(45),
             'is_active' => true,
@@ -382,7 +366,6 @@ class CashierHistoryTest extends TestCase
 
         $oldCashierSession = CashierHistory::create([
             'user_id' => $cashierUser->id,
-            'type' => 'cashier',
             'started_at' => now()->subHours(2),
             'last_activity_at' => now()->subMinutes(45),
             'is_active' => true,
@@ -430,7 +413,6 @@ class CashierHistoryTest extends TestCase
 
         $session = CashierHistory::create([
             'user_id' => $user->id,
-            'type' => 'cashier',
             'started_at' => now()->subMinutes(10),
             'last_activity_at' => now()->subMinutes(2),
             'is_active' => true,
@@ -477,7 +459,6 @@ class CashierHistoryTest extends TestCase
 
         $this->assertDatabaseHas('cashier_histories', [
             'user_id' => $user->id,
-            'type' => 'cashier',
             'is_active' => true,
         ]);
     }

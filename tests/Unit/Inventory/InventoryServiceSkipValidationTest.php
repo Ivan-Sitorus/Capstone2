@@ -21,7 +21,6 @@ class InventoryServiceSkipValidationTest extends TestCase
         $category = Category::create([
             'name' => 'Kategori Test ' . uniqid(),
             'slug' => 'kategori-test-' . uniqid(),
-            'is_active' => true,
         ]);
 
         $menu = Menu::create([
@@ -41,7 +40,6 @@ class InventoryServiceSkipValidationTest extends TestCase
             'name' => 'Bahan Test',
             'unit' => 'gram',
             'low_stock_threshold' => 10,
-            'is_active' => true,
         ]);
 
         IngredientBatch::create([

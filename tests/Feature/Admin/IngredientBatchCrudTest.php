@@ -17,7 +17,6 @@ class IngredientBatchCrudTest extends TestCase
             'name' => 'Kopi Batch Test',
             'unit' => 'gram',
             'low_stock_threshold' => 50,
-            'is_active' => true,
         ]);
 
         $batch = IngredientBatch::create([
@@ -49,7 +48,6 @@ class IngredientBatchCrudTest extends TestCase
             'name' => 'Gula Batch Test',
             'unit' => 'gram',
             'low_stock_threshold' => 20,
-            'is_active' => true,
         ]);
 
         IngredientBatch::create([
