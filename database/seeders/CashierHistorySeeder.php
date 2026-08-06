@@ -42,7 +42,6 @@ class CashierHistorySeeder extends Seeder
 
                 $sessions[] = [
                     'user_id' => $cashier->id,
-                    'type' => 'cashier',
                     'session_id' => 'seed-' . ($sessionId++),
                     'started_at' => $startedAt,
                     'ended_at' => $endedAt,
@@ -59,7 +58,6 @@ class CashierHistorySeeder extends Seeder
         $activeNow = $now->copy()->subHours(rand(1, 3));
         $sessions[] = [
             'user_id' => $firstCashier->id,
-            'type' => 'cashier',
             'session_id' => 'seed-' . ($sessionId),
             'started_at' => $activeNow,
             'ended_at' => null,

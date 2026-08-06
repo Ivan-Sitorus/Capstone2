@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::create('menus', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('category_id')->constrained('categories')->restrictOnDelete();
+            $table->foreignId('category_id')->constrained('menu_categories')->restrictOnDelete();
             $table->string('name');
-            $table->integer('price')->default(0);
+            $table->integer('price');
             $table->string('image')->nullable();
             $table->string('status')->default('active');
             $table->integer('discounted_price')->nullable();

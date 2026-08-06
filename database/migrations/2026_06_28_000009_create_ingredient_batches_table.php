@@ -14,9 +14,8 @@ return new class extends Migration
             $table->decimal('quantity', 10, 3);
             $table->date('expiry_date')->nullable();
             $table->timestamp('received_at')->nullable();
-            $table->integer('cost_per_unit')->default(0);
+            $table->integer('cost_per_unit');
             $table->integer('custom_order')->nullable();
-            $table->string('status')->default('active');
             $table->string('batch_code')->nullable()->unique();
             $table->boolean('allow_expired_usage')->default(false);
             $table->decimal('initial_quantity', 10, 3)->nullable();

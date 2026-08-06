@@ -10,6 +10,8 @@ class Category extends Model
 {
     use HasFactory;
 
+    protected $table = 'menu_categories';
+
     protected $fillable = ['name'];
 
     protected function casts(): array

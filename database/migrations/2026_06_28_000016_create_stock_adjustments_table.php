@@ -12,21 +12,17 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ingredient_id')->nullable()->constrained('ingredients')->cascadeOnDelete();
             $table->string('adjustment_type');
-            $table->string('category')->nullable();
             $table->decimal('quantity', 10, 3);
             $table->decimal('quantity_before', 10, 3);
             $table->decimal('quantity_after', 10, 3);
             $table->string('reason')->nullable();
             $table->foreignId('reported_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('adjusted_at')->useCurrent();
-            $table->string('adjustable_type');
-            $table->foreignId('menu_id')->nullable()->constrained('menus')->nullOnDelete();
             $table->string('code')->nullable()->unique();
             $table->timestamps();
 
             $table->index(['adjustment_type', 'adjusted_at']);
             $table->index(['ingredient_id', 'adjusted_at']);
-            $table->index(['category', 'adjusted_at']);
         });
     }
 

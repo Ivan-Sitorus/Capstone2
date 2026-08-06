@@ -297,7 +297,7 @@ class CafeSeeder extends Seeder
         DB::table('menus')->truncate();
         DB::table('ingredient_batches')->truncate();
         DB::table('ingredients')->truncate();
-        DB::table('categories')->truncate();
+        DB::table('menu_categories')->truncate();
         DB::table('cafe_tables')->truncate();
 
         DB::statement('SET session_replication_role = DEFAULT');
@@ -313,9 +313,9 @@ class CafeSeeder extends Seeder
         foreach (self::CATEGORIES as $key => $name) {
             $rows[] = ['name' => $name, 'created_at' => now(), 'updated_at' => now()];
         }
-        DB::table('categories')->insert($rows);
+        DB::table('menu_categories')->insert($rows);
 
-        $this->categoryIds = DB::table('categories')->pluck('id', 'name')
+        $this->categoryIds = DB::table('menu_categories')->pluck('id', 'name')
             ->mapWithKeys(fn ($id, $name) => [array_search($name, self::CATEGORIES) => $id])
             ->all();
     }
@@ -393,7 +393,7 @@ class CafeSeeder extends Seeder
 
         // Load all batches into in-memory cache keyed by ingredient_id
         $allBatches = DB::table('ingredient_batches')
-            ->select('id', 'ingredient_id', 'quantity', 'expiry_date', 'received_at', 'cost_per_unit', 'status')
+            ->select('id', 'ingredient_id', 'quantity', 'expiry_date', 'received_at', 'cost_per_unit')
             ->orderBy('expiry_date')
             ->get();
 
@@ -405,7 +405,6 @@ class CafeSeeder extends Seeder
                 'expiry_date' => $batch->expiry_date,
                 'received_at' => $batch->received_at,
                 'cost_per_unit' => (float) $batch->cost_per_unit,
-                'status' => $batch->status,
             ];
         }
     }
@@ -755,14 +754,12 @@ class CafeSeeder extends Seeder
         $rng = $this->rng(789);
         $rows = [];
         $ingKeys = array_keys(self::INGREDIENTS);
-        $now = Carbon::now();
         $adminId = 1;
         $dailyAdjCounter = []; // date key (dmy) → sequence number
         $seqDate = Carbon::create(2025, 6, 15);
 
         // --- 8 increase adjustments ---
-        $increaseCategories = ['correction', 'correction', 'correction', 'correction', 'correction', 'other', 'other', 'other'];
-        foreach ($increaseCategories as $i => $cat) {
+        foreach (range(1, 8) as $i) {
             $ingKey = $rng->pick($ingKeys);
             $ingId = $this->ingredientIds[$ingKey];
             $adjQty = $rng->float(1, 10);
@@ -775,15 +772,12 @@ class CafeSeeder extends Seeder
             $code = sprintf('ADJ-%s-%d', $adjDateKey, $dailyAdjCounter[$adjDateKey]);
 
             $rows[] = [
-                'adjustable_type' => 'ingredient',
                 'ingredient_id' => $ingId,
-                'menu_id' => null,
                 'adjustment_type' => 'increase',
-                'category' => $cat,
                 'quantity' => round($adjQty, 2),
                 'quantity_before' => $currentStock,
                 'quantity_after' => round($newStock, 2),
-                'reason' => $this->adjustmentReason($cat),
+                'reason' => 'Koreksi stok setelah stock opname',
                 'reported_by' => $adminId,
                 'adjusted_at' => $adjustedAt,
                 'code' => $code,
@@ -796,8 +790,7 @@ class CafeSeeder extends Seeder
         }
 
         // --- 5 decrease adjustments ---
-        $decreaseCategories = ['expired', 'expired', 'damaged', 'spilled', 'complaint'];
-        foreach ($decreaseCategories as $cat) {
+        foreach (range(1, 5) as $i) {
             $ingKey = $rng->pick($ingKeys);
             $ingId = $this->ingredientIds[$ingKey];
             $currentStock = $this->getTotalStock($ingId);
@@ -811,15 +804,12 @@ class CafeSeeder extends Seeder
             $code = sprintf('ADJ-%s-%d', $adjDateKey, $dailyAdjCounter[$adjDateKey]);
 
             $rows[] = [
-                'adjustable_type' => 'ingredient',
                 'ingredient_id' => $ingId,
-                'menu_id' => null,
                 'adjustment_type' => 'decrease',
-                'category' => $cat,
                 'quantity' => round($adjQty, 2),
                 'quantity_before' => $currentStock,
                 'quantity_after' => round($newStock, 2),
-                'reason' => $this->adjustmentReason($cat),
+                'reason' => 'Bahan rusak / kedaluwarsa — penyesuaian stok',
                 'reported_by' => $adminId,
                 'adjusted_at' => $adjustedAt,
                 'code' => $code,
@@ -842,7 +832,6 @@ class CafeSeeder extends Seeder
     private function seedStockMovementsFromAdjustments(): void
     {
         $adjustments = DB::table('stock_adjustments')
-            ->where('adjustable_type', 'ingredient')
             ->orderBy('id')
             ->get();
 
@@ -944,19 +933,6 @@ class CafeSeeder extends Seeder
             $remaining = round($remaining - $deduct, 4);
         }
         unset($batch);
-    }
-
-    private function adjustmentReason(string $cat): string
-    {
-        return match ($cat) {
-            'expired' => 'Bahan kedaluwarsa — dibuang',
-            'damaged' => 'Bahan rusak — tidak layak pakai',
-            'spilled' => 'Bahan tumpah saat persiapan',
-            'complaint' => 'Komplain pelanggan — penggantian',
-            'correction' => 'Koreksi stok setelah stock opname',
-            'other' => 'Penyesuaian stok rutin',
-            default => 'Penyesuaian stok',
-        };
     }
 
     /**

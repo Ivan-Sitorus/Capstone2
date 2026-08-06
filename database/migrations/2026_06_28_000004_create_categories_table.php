@@ -8,17 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('cafe_tables', function (Blueprint $table) {
+        Schema::create('menu_categories', function (Blueprint $table) {
             $table->id();
-            $table->integer('table_number')->unique();
-            $table->string('qr_code')->unique();
-            $table->boolean('is_available')->default(true);
+            $table->string('name');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('cafe_tables');
+        Schema::dropIfExists('menu_categories');
     }
 };

@@ -21,7 +21,7 @@ return new class extends Migration
             $table->uuid('uuid')->nullable();
             $table->integer('qris_resubmit_attempts')->default(0);
             $table->string('qris_status')->nullable();
-            $table->unsignedBigInteger('total_amount')->default(0);
+            $table->unsignedBigInteger('total_amount');
             $table->string('payment_method')->nullable();
             $table->string('payment_proof')->nullable();
             $table->string('rejection_note')->nullable();
