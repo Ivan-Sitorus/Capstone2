@@ -289,8 +289,8 @@ class ManageBatches extends Page implements HasTable
             DatePicker::make('expiry_date')
                 ->label('Tanggal Kedaluwarsa')
                 ->native(false)
-                ->required(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
-                ->helperText(fn () => $this->record->batch_mode === BatchMode::Fefo->value
+                ->required(fn () => $this->record->batch_mode === BatchMode::Fefo)
+                ->helperText(fn () => $this->record->batch_mode === BatchMode::Fefo
                     ? 'Wajib untuk mode FEFO'
                     : null),
             DateTimePicker::make('received_at')
@@ -349,7 +349,7 @@ class ManageBatches extends Page implements HasTable
         $fields[] = Toggle::make('allow_expired_usage')
             ->label('Bisa dipakai meskipun kedaluwarsa')
             ->helperText('Jika tidak diaktifkan, batch ini otomatis tidak bisa dipakai jika sudah kedaluwarsa')
-            ->visible(fn () => $this->record->batch_mode === BatchMode::Fefo->value)
+            ->visible(fn () => $this->record->batch_mode === BatchMode::Fefo)
             ->default(false);
 
         return $fields;

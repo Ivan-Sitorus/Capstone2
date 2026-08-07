@@ -17,7 +17,7 @@ class UploadQrisProofAction
             'proof' => 'required|file|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        if ($order->status !== OrderStatus::Pending->value) {
+        if ($order->status !== OrderStatus::Pending) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
 

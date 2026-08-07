@@ -12,7 +12,7 @@ class ChooseQrisAction
 {
     public function handle(Order $order): JsonResponse
     {
-        if ($order->status !== OrderStatus::Pending->value) {
+        if ($order->status !== OrderStatus::Pending) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
         $order->update(['payment_method' => 'qris']);
