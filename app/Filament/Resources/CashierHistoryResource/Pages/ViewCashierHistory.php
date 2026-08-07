@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\CashierHistoryResource\Pages;
 
+use App\Enums\OrderStatus;
 use App\Filament\Resources\CashierHistoryResource;
 use App\Models\CashierHistory;
 use App\Models\Order;
@@ -92,18 +93,8 @@ class ViewCashierHistory extends Page implements HasTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'pending' => 'warning',
-                        'processing' => 'info',
-                        'completed' => 'success',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending' => 'Pending',
-                        'processing' => 'Diproses',
-                        'completed' => 'Selesai',
-                        default => $state,
-                    }),
+                    ->color(fn (OrderStatus $state): string => \App\Filament\Resources\OrderResource::getStatusColor($state->value))
+                    ->formatStateUsing(fn (OrderStatus $state): string => \App\Filament\Resources\OrderResource::getStatusLabel($state->value)),
                 TextColumn::make('total_amount')
                     ->label('Total')
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))

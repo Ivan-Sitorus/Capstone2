@@ -101,7 +101,7 @@ class StockAdjustmentResource extends Resource
     public static function getUnit($record, string $prefix): string
     {
         $adj = static::resolveRecord($record, $prefix);
-        return $adj?->ingredient?->unit ?? '';
+        return $adj?->ingredient?->unit?->value ?? '';
     }
 
     public static function formatNumber(float $value): string

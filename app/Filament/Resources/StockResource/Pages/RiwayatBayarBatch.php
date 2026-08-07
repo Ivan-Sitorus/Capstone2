@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StockResource\Pages;
 
+use App\Enums\PaymentMethod;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\StockResource;
 use App\Models\BatchPayment;
@@ -90,12 +91,7 @@ class RiwayatBayarBatch extends Page implements HasTable
                 TextColumn::make('payment_method')
                     ->label('Metode')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'cash' => 'Tunai',
-                        'transfer' => 'Transfer',
-                        'qris' => 'QRIS',
-                        default => $state ?? '-',
-                    }),
+                    ->formatStateUsing(fn (?PaymentMethod $state): string => $state?->label() ?? '-'),
             ])
             ->defaultSort('payment_date', 'desc')
             ->recordActions([

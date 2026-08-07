@@ -57,7 +57,7 @@ class TopBahanBakuWidget extends BarChartWidget
                     'backgroundColor' => '#17A2B8',
                 ],
             ],
-            'labels' => $rows->map(fn ($r) => $r->ingredient_name . ($r->unit ? ' (' . $r->unit . ')' : ''))->values()->all(),
+            'labels' => $rows->map(fn ($r) => $r->ingredient_name . ($r->unit?->value ? ' (' . $r->unit->value . ')' : ''))->values()->all(),
         ];
     }
 

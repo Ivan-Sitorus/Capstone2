@@ -107,7 +107,7 @@ class InventoryService
                             'ingredient_id' => $ingredient->id,
                             'ingredient_name' => $ingredient->name,
                             'total_deducted' => $requiredQuantity,
-                            'unit' => $ingredient->unit,
+                            'unit' => $ingredient->unit?->value,
                             'batches' => $deduction['batch_changes'],
                         ];
                     }
@@ -156,7 +156,7 @@ class InventoryService
                             'ingredient_name' => $ingredient->name,
                             'required' => $requiredQuantity,
                             'available' => $availableQuantity,
-                            'unit' => $ingredient->unit,
+                            'unit' => $ingredient->unit?->value,
                         ];
                     }
                 }
@@ -257,7 +257,7 @@ class InventoryService
             'ingredient_id' => $ingredient->id,
             'ingredient_name' => $ingredient->name,
             'total_deducted' => $requiredQuantity,
-            'unit' => $ingredient->unit,
+            'unit' => $ingredient->unit?->value,
             'batch_changes' => $batchChanges,
         ];
     }
@@ -275,7 +275,7 @@ class InventoryService
         if ($dailyUsage) {
             $dailyUsage->fill([
                 'ingredient_name' => $ingredient->name,
-                'unit' => $ingredient->unit,
+                'unit' => $ingredient->unit?->value,
                 'jumlah_digunakan' => round(((float) $dailyUsage->jumlah_digunakan) + $usedQuantity, 2),
             ]);
             $dailyUsage->save();
@@ -287,7 +287,7 @@ class InventoryService
             'usage_date' => $resolvedUsageDate,
             'ingredient_id' => $ingredient->id,
             'ingredient_name' => $ingredient->name,
-            'unit' => $ingredient->unit,
+            'unit' => $ingredient->unit?->value,
             'jumlah_digunakan' => round($usedQuantity, 2),
         ]);
     }

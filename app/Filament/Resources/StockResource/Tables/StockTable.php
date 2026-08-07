@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\StockResource\Tables;
 
+use App\Enums\BatchMode;
 use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\Ingredient;
 use Filament\Actions\Action;
@@ -27,6 +28,7 @@ class StockTable
                     ->sortable(),
                 TextColumn::make('unit')
                     ->label('Unit')
+                    ->formatStateUsing(fn (Ingredient $record) => $record->unit?->value ?? '')
                     ->sortable(),
                 TextColumn::make('nearest_expiry')
                     ->label('Kedaluwarsa Terdekat')
@@ -48,12 +50,12 @@ class StockTable
                             ? '' 
                             : number_format((float) $state, (float) $state != (int) $state ? 2 : 0, ',', '.')
                     )
-                    ->suffix(fn (Ingredient $record) => ' '.$record->unit)
+                    ->suffix(fn (Ingredient $record) => ' '.($record->unit?->value ?? ''))
                     ->sortable(),
                 TextColumn::make('total_stock')
                     ->label('Total Stok')
                     ->getStateUsing(fn (Ingredient $record) => $record->getTotalStock() + 0)
-                    ->suffix(fn (Ingredient $record) => ' '.$record->unit)
+                    ->suffix(fn (Ingredient $record) => ' '.($record->unit?->value ?? ''))
                     ->badge()
                     ->color(fn (Ingredient $record) => $record->getTotalStock() < (float) $record->low_stock_threshold ? 'danger' : 'success')
                     ->sortable(query: function ($query, string $direction): void {
@@ -62,8 +64,8 @@ class StockTable
                 TextColumn::make('batch_mode')
                     ->label(ColumnInfoTooltip::label('Prioritas Batch', "FEFO: Batch stok dengan kedaluwarsa terdekat dipakai lebih dulu\nFIFO: Batch stok dengan waktu diterima paling awal dipakai lebih dulu"))
                     ->badge()
-                    ->color(fn ($state) => $state === 'fifo' ? 'info' : 'warning')
-                    ->formatStateUsing(fn ($state) => strtoupper($state)),
+                    ->formatStateUsing(fn (BatchMode $state) => strtoupper($state->value))
+                    ->color(fn (BatchMode $state) => $state === BatchMode::Fifo ? 'info' : 'warning'),
             ])
             ->filters([
                 Filter::make('low_stock')

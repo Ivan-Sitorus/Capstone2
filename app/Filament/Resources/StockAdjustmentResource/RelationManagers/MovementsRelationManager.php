@@ -30,27 +30,28 @@ class MovementsRelationManager extends RelationManager
                     ->sortable(),
                 TextColumn::make('ingredient.unit')
                     ->label('Unit')
+                    ->formatStateUsing(fn (StockMovement $record) => $record->ingredient?->unit?->value ?? '')
                     ->sortable(),
                 TextColumn::make('quantity_change')
                     ->label('Perubahan')
                     ->formatStateUsing(fn ($state, StockMovement $record) =>
                         ($state >= 0 ? '+ ' : '- ')
                         . number_format(abs((float) $state), 0, ',', '.')
-                        . ' ' . ($record->ingredient?->unit ?? '')
+                        . ' ' . ($record->ingredient?->unit?->value ?? '')
                     )
                     ->sortable(),
                 TextColumn::make('quantity_before')
                     ->label('Sebelum')
                     ->formatStateUsing(fn ($state, StockMovement $record) =>
                         number_format((float) $state, 0, ',', '.')
-                        . ' ' . ($record->ingredient?->unit ?? '')
+                        . ' ' . ($record->ingredient?->unit?->value ?? '')
                     )
                     ->sortable(),
                 TextColumn::make('quantity_after')
                     ->label('Sesudah')
                     ->formatStateUsing(fn ($state, StockMovement $record) =>
                         number_format((float) $state, 0, ',', '.')
-                        . ' ' . ($record->ingredient?->unit ?? '')
+                        . ' ' . ($record->ingredient?->unit?->value ?? '')
                     )
                     ->sortable(),
                 TextColumn::make('ingredient_batch_id')

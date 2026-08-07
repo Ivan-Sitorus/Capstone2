@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\OrderResource\Tables;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use Filament\Actions\Action;
@@ -38,12 +40,12 @@ class OrderTable
                 TextColumn::make('payment_method')
                     ->label('Metode')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => OrderResource::getPaymentLabel($state)),
+                    ->formatStateUsing(fn (?PaymentMethod $state): string => $state?->label() ?? '-'),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => OrderResource::getStatusColor($state))
-                    ->formatStateUsing(fn (string $state): string => OrderResource::getStatusLabel($state)),
+                    ->color(fn (OrderStatus $state): string => OrderResource::getStatusColor($state->value))
+                    ->formatStateUsing(fn (OrderStatus $state): string => OrderResource::getStatusLabel($state->value)),
                 TextColumn::make('created_at')
                     ->label('Waktu')
                     ->dateTime('d M Y, H:i:s')

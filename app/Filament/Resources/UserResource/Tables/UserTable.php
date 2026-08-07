@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\UserResource\Tables;
 
+use App\Enums\UserRole;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -25,16 +26,12 @@ class UserTable
                 TextColumn::make('role')
                     ->label('Role')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
-                        'admin' => 'success',
-                        'cashier' => 'info',
+                    ->color(fn (UserRole $state): string => match ($state) {
+                        UserRole::Admin => 'success',
+                        UserRole::Cashier => 'info',
                         default => 'gray',
                     })
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'admin' => 'Admin',
-                        'cashier' => 'Kasir',
-                        default => $state,
-                    })
+                    ->formatStateUsing(fn (UserRole $state): string => $state->label())
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Terdaftar')

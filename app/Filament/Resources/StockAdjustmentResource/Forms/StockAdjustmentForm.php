@@ -24,7 +24,7 @@ class StockAdjustmentForm
                 ->required()
                 ->searchable()
                 ->preload()
-                ->getOptionLabelFromRecordUsing(fn ($record) => $record->name.' ('.$record->unit.')'),
+                ->getOptionLabelFromRecordUsing(fn ($record) => $record->name.' ('.$record->unit?->value.')'),
             Select::make('adjustment_type')
                 ->label('Tipe Penyesuaian')
                 ->options([
@@ -39,7 +39,7 @@ class StockAdjustmentForm
                 ->required()
                 ->prefix(fn (Get $get) => $get('adjustment_type') === AdjustmentType::Decrease->value ? '-' : '+')
                 ->suffix(fn (Get $get) => $get('ingredient_id')
-                    ? ' ' . (Ingredient::find($get('ingredient_id'))?->unit ?? '')
+                    ? ' ' . (Ingredient::find($get('ingredient_id'))?->unit?->value ?? '')
                     : ''
                 ),
             Textarea::make('reason')

@@ -30,7 +30,7 @@ class IngredientsRelationManager extends RelationManager
                 ->searchable()
                 ->preload()
                 ->live()
-                ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".$record->unit.")"),
+                ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".($record->unit?->value ?? '').")"),
             NumericInput::apply(TextInput::make("quantity_used"), maxDigits: 6, precision: 3)
                 ->label("Jumlah per Porsi")
                 ->required()
@@ -51,14 +51,14 @@ class IngredientsRelationManager extends RelationManager
                 TextColumn::make("quantity_used")
                     ->label("Jumlah/Porsi")
                     ->sortable()
-                    ->formatStateUsing(fn ($state, $record) => $state . " " . ($record->ingredient?->unit ?? "")),
+                    ->formatStateUsing(fn ($state, $record) => $state . " " . ($record->ingredient?->unit?->value ?? "")),
                 TextColumn::make("ingredient.total_stock")
                     ->label("Stok Tersedia")
                     ->getStateUsing(function ($record) {
                         $stock = $record->ingredient->batches->sum('quantity');
                         return number_format($stock, 2);
                     })
-                    ->suffix(fn ($record) => " ".($record->ingredient->unit ?? ""))
+                    ->suffix(fn ($record) => " ".($record->ingredient->unit?->value ?? ""))
                     ->badge()
                     ->color(function ($record) {
                         $stock = $record->ingredient->batches->sum('quantity');

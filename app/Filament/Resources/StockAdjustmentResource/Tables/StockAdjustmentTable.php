@@ -40,7 +40,7 @@ class StockAdjustmentTable
                     ->formatStateUsing(fn ($state, $record) =>
                         ($record->adjustment_type === AdjustmentType::Increase ? '+' : '-')
                         . StockAdjustmentResource::formatNumber((float) $state)
-                        . ' ' . ($record->ingredient?->unit ?? '')
+                        . ' ' . ($record->ingredient?->unit?->value ?? '')
                     )
                     ->color(fn ($record): string =>
                         $record->adjustment_type === AdjustmentType::Decrease ? 'danger' : 'success')
@@ -49,14 +49,14 @@ class StockAdjustmentTable
                     ->label('Sebelum')
                     ->formatStateUsing(fn ($state, $record) =>
                         StockAdjustmentResource::formatNumber((float) $state)
-                        . ' ' . ($record->ingredient?->unit ?? '')
+                        . ' ' . ($record->ingredient?->unit?->value ?? '')
                     )
                     ->sortable(),
                 TextColumn::make('quantity_after')
                     ->label('Sesudah')
                     ->formatStateUsing(fn ($state, $record) =>
                         StockAdjustmentResource::formatNumber((float) $state)
-                        . ' ' . ($record->ingredient?->unit ?? '')
+                        . ' ' . ($record->ingredient?->unit?->value ?? '')
                     )
                     ->sortable(),
                 TextColumn::make('reportedBy.name')

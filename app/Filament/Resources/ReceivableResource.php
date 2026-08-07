@@ -34,12 +34,12 @@ class ReceivableResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->role === UserRole::Admin;
+        return \Filament\Facades\Filament::auth()->user()?->role === UserRole::Admin;
     }
 
     public static function canEdit($record): bool
     {
-        return auth()->user()?->role === UserRole::Admin;
+        return \Filament\Facades\Filament::auth()->user()?->role === UserRole::Admin;
     }
 
     public static function canDelete($record): bool

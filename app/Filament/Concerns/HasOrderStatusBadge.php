@@ -37,22 +37,4 @@ trait HasOrderStatusBadge
             default => '-',
         };
     }
-
-    public static function getPaymentStatusColor(?string $state): string
-    {
-        return match ($state) {
-            'lunas' => 'success',
-            'unpaid' => 'danger',
-            default => 'gray',
-        };
-    }
-
-    public static function getPaymentStatusLabel(?string $state): string
-    {
-        return match ($state) {
-            'lunas' => 'Lunas',
-            'unpaid' => 'Belum Lunas',
-            default => '-',
-        };
-    }
 }

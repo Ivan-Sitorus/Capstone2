@@ -62,8 +62,8 @@ class ReceivableTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (string $state): string => \App\Filament\Resources\OrderResource::getStatusColor($state))
-                    ->formatStateUsing(fn (string $state): string => \App\Filament\Resources\OrderResource::getStatusLabel($state)),
+                    ->color(fn (OrderStatus $state): string => \App\Filament\Resources\OrderResource::getStatusColor($state->value))
+                    ->formatStateUsing(fn (OrderStatus $state): string => \App\Filament\Resources\OrderResource::getStatusLabel($state->value)),
             ])
             ->filters([
                 SelectFilter::make('status')

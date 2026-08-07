@@ -4,6 +4,7 @@ namespace App\Filament\Resources\StockResource\Pages;
 
 use App\Enums\BatchMode;
 use App\Enums\AdjustmentType;
+use App\Enums\PaymentStatus;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
@@ -65,7 +66,7 @@ class ManageBatches extends Page implements HasTable
 
     public function table(Table $table): Table
     {
-        $unit = $this->record->unit;
+        $unit = $this->record->unit?->value ?? '';
 
         return $table
             ->query(fn () => IngredientBatch::where('ingredient_id', $this->record->id)
@@ -114,8 +115,8 @@ class ManageBatches extends Page implements HasTable
                 TextColumn::make('payment_status')
                     ->label('Status Utang')
                     ->badge()
-                    ->formatStateUsing(fn (?string $state): string => $state === 'lunas' ? 'Lunas' : 'Belum Lunas')
-                    ->color(fn (?string $state): string => $state === 'lunas' ? 'success' : 'warning'),
+                    ->formatStateUsing(fn (?PaymentStatus $state): string => $state === PaymentStatus::Paid ? 'Lunas' : 'Belum Lunas')
+                    ->color(fn (?PaymentStatus $state): string => $state === PaymentStatus::Paid ? 'success' : 'warning'),
                 TextColumn::make('allow_expired_usage')
                     ->label('')
                     ->default('')
@@ -202,7 +203,7 @@ class ManageBatches extends Page implements HasTable
                         if (abs($oldQty - $newQty) < 0.001) return;
 
                         $diff = $newQty - $oldQty;
-                        $unit = $record->ingredient?->unit ?? '';
+                        $unit = $record->ingredient?->unit?->value ?? '';
                         $batchCode = $record->batch_code ?? '#'.$record->id;
                         $adjType = $diff > 0 ? AdjustmentType::Increase->value : AdjustmentType::Decrease->value;
                         $note = "Batch {$batchCode}: qty {$oldQty} → {$newQty} {$unit}";
@@ -251,9 +252,9 @@ class ManageBatches extends Page implements HasTable
                         }
 
                         if ((float) $record->quantity > 0) {
-                            $unit = $record->ingredient?->unit ?? '';
-                            $batchCode = $record->batch_code ?? '#'.$record->id;
-                            $note = "Hapus batch {$batchCode}: sisa {$record->quantity} {$unit}";
+                        $unit = $record->ingredient?->unit?->value ?? '';
+                        $batchCode = $record->batch_code ?? '#'.$record->id;
+                        $note = "Hapus batch {$batchCode}: sisa {$record->quantity} {$unit}";
 
                             StockAdjustment::create([
                                 'code' => StockReconciliationService::generateAdjustmentCode(),
@@ -283,8 +284,8 @@ class ManageBatches extends Page implements HasTable
                 ->required()
                 ->minValue(0)
                 ->maxValue(999999)
-                ->step(fn () => in_array($this->record->unit, ['gram', 'ml']) ? 1 : 0.001)
-                ->suffix(fn () => ' '.$this->record->unit),
+                ->step(fn () => in_array($this->record->unit?->value, ['gram', 'ml']) ? 1 : 0.001)
+                ->suffix(fn () => ' '.($this->record->unit?->value ?? '')),
             DatePicker::make('expiry_date')
                 ->label('Tanggal Kedaluwarsa')
                 ->native(false)

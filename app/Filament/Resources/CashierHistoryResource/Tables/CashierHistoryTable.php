@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\CashierHistoryResource\Tables;
 
+use App\Enums\UserRole;
 use App\Filament\Resources\CashierHistoryResource;
 use App\Models\CashierHistory;
 use App\Services\CashierHistoryService;
@@ -11,7 +12,6 @@ use Filament\Forms\Components\TextInput;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
-use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -31,17 +31,13 @@ class CashierHistoryTable
                 TextColumn::make('user.email')
                     ->label('Email')
                     ->searchable(),
-                TextColumn::make('type')
+                TextColumn::make('user.role')
                     ->label('Role')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'cashier' => 'Kasir',
-                        'kitchen' => 'Dapur',
-                        default => $state,
-                    })
-                    ->color(fn (string $state): string => match ($state) {
-                        'cashier' => 'blue',
-                        'kitchen' => 'orange',
+                    ->formatStateUsing(fn (UserRole $state): string => $state->label())
+                    ->color(fn (UserRole $state): string => match ($state) {
+                        UserRole::Admin => 'success',
+                        UserRole::Cashier => 'info',
                         default => 'gray',
                     }),
                 TextColumn::make('started_at')
@@ -105,12 +101,6 @@ class CashierHistoryTable
                             $data['ended_until'] ?? null,
                             fn (Builder $query, $date): Builder => $query->whereDate('ended_at', '<=', $date)
                         )),
-                SelectFilter::make('type')
-                    ->label('Role')
-                    ->options([
-                        'cashier' => 'Kasir',
-                        'kitchen' => 'Dapur',
-                    ]),
             ])
             ->recordActions([
                 Action::make('view')
