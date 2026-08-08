@@ -27,7 +27,7 @@ class CategoryResource extends Resource
 
     protected static bool $shouldRegisterNavigation = true;
 
-    protected static ?string $slug = 'kategori';
+    protected static ?string $slug = 'kategori-menu';
 
     protected static ?string $breadcrumb = 'Kategori Menu';
 

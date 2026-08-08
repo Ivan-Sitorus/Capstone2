@@ -27,6 +27,8 @@ class CafeTableResource extends Resource
 
     protected static ?string $label = 'QR Code Meja';
 
+    protected static ?string $slug = 'qr-code-meja';
+
     protected static ?int $navigationSort = 4;
 
     public static function form(Schema $schema): Schema
