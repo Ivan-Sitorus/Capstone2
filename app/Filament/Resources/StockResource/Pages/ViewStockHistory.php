@@ -174,7 +174,7 @@ class ViewStockHistory extends ListRecords
                             ->schema([
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.batch_code')->label('Kode Batch')->copyable(),
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.received_at')->label('Waktu Diterima')->dateTime('d M Y, H:i:s'),
-                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.expiry_date')->label('Tanggal Kedaluwarsa')->date('d M Y')->default('-'),
+                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.expiry_date')->label('Tanggal Kedaluwarsa')->formatStateUsing(fn ($state) => blank($state) ? '-' : \Illuminate\Support\Carbon::parse($state)->translatedFormat('d M Y')),
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.quantity')->label('Quantity Awal')->formatStateUsing(fn ($state) => number_format((float)$state, 2)),
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.total_cost')->label('Harga Total')
                                     ->formatStateUsing(fn ($state, $record) => 'Rp'.number_format((float) $state, 0, ',', '.')

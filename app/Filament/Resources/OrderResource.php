@@ -19,6 +19,7 @@ use Filament\Schemas\Schema;
 use BackedEnum;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Support\Carbon;
 use UnitEnum;
 
 class OrderResource extends Resource
@@ -52,9 +53,15 @@ class OrderResource extends Resource
                 ->schema([
                     TextEntry::make($p.'order_code')->label('Kode Pesanan')->copyable(),
                     TextEntry::make($p.'created_at')->label('Waktu')->dateTime('d M Y, H:i:s'),
-                    TextEntry::make($p.'processed_at')->label('Diproses')->dateTime('d M Y, H:i:s')->default('-'),
-                    TextEntry::make($p.'completed_at')->label('Selesai')->dateTime('d M Y, H:i:s')->default('-'),
-                    TextEntry::make($p.'cancelled_at')->label('Dibatalkan')->dateTime('d M Y, H:i:s')->default('-'),
+                    TextEntry::make($p.'processed_at')
+                        ->label('Diproses')
+                        ->formatStateUsing(fn ($state) => blank($state) ? '-' : Carbon::parse($state)->translatedFormat('d M Y, H:i:s')),
+                    TextEntry::make($p.'completed_at')
+                        ->label('Selesai')
+                        ->formatStateUsing(fn ($state) => blank($state) ? '-' : Carbon::parse($state)->translatedFormat('d M Y, H:i:s')),
+                    TextEntry::make($p.'cancelled_at')
+                        ->label('Dibatalkan')
+                        ->formatStateUsing(fn ($state) => blank($state) ? '-' : Carbon::parse($state)->translatedFormat('d M Y, H:i:s')),
                     TextEntry::make($p.'cashier.name')->label('Kasir')->default('-'),
                 ])->columns(3),
 
