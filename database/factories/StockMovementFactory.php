@@ -27,7 +27,6 @@ class StockMovementFactory extends Factory
             'quantity_after' => in_array($movementType, ['purchase', 'adjustment_increase', 'correction'])
                 ? $quantityBefore + $quantityChange
                 : max(0, $quantityBefore - $quantityChange),
-            'unit_cost' => fake()->optional(0.7)->numberBetween(100, 25000),
             'reference' => fake()->optional(0.5)->bothify('PO-####-??'),
         ];
     }

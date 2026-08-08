@@ -24,7 +24,6 @@ class StockMovement extends Model
         'quantity_before',
         'quantity_change',
         'quantity_after',
-        'unit_cost',
         'reference',
     ];
 
@@ -34,7 +33,6 @@ class StockMovement extends Model
             'quantity_before' => 'decimal:3',
             'quantity_change' => 'decimal:3',
             'quantity_after' => 'decimal:3',
-            'unit_cost' => 'integer',
             'movement_type' => MovementType::class,
             'source_type' => SourceType::class,
         ];

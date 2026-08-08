@@ -109,7 +109,6 @@ class StockReconciliationService
                 'quantity_before' => $batchBefore,
                 'quantity_change' => $quantity,
                 'quantity_after' => (float) $batch->quantity,
-                'unit_cost' => $batch->cost_per_unit,
             ]);
 
             return $adjustment;

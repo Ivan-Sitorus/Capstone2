@@ -16,8 +16,8 @@ return new class extends Migration
             $table->foreignId('table_id')->nullable()->constrained('cafe_tables')->restrictOnDelete();
             $table->foreignId('cashier_id')->nullable()->constrained('users')->nullOnDelete();
             $table->foreignId('processed_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->string('status')->default('pending');
-            $table->string('order_type')->default('qr');
+            $table->string('status');
+            $table->string('order_type');
             $table->uuid('uuid')->nullable();
             $table->integer('qris_resubmit_attempts')->default(0);
             $table->string('qris_status')->nullable();

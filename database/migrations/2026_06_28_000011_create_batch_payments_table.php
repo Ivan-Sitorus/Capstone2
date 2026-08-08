@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('ingredient_batch_id')->constrained('ingredient_batches')->cascadeOnDelete();
             $table->unsignedBigInteger('amount');
             $table->timestamp('payment_date');
-            $table->string('payment_method')->default('cash');
+            $table->string('payment_method');
             $table->timestamps();
 
             $table->index('ingredient_batch_id');

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('price');
             $table->string('image')->nullable();
-            $table->string('status')->default('active');
+            $table->string('status');
             $table->integer('discounted_price')->nullable();
             $table->timestamps();
         });

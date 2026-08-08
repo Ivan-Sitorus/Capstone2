@@ -13,7 +13,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('unit');
             $table->decimal('low_stock_threshold', 10, 3)->nullable();
-            $table->string('batch_mode')->default('fefo');
+            $table->string('batch_mode');
             $table->softDeletes();
             $table->timestamps();
         });

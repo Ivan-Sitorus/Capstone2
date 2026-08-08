@@ -14,14 +14,12 @@ return new class extends Migration
             $table->decimal('quantity', 10, 3);
             $table->date('expiry_date')->nullable();
             $table->timestamp('received_at')->nullable();
-            $table->integer('cost_per_unit');
-            $table->integer('custom_order')->nullable();
             $table->string('batch_code')->nullable()->unique();
             $table->boolean('allow_expired_usage')->default(false);
             $table->decimal('initial_quantity', 10, 3)->nullable();
             $table->string('supplier_name')->nullable();
-            $table->unsignedBigInteger('total_cost')->nullable();
-            $table->string('payment_status')->default('unpaid');
+            $table->unsignedBigInteger('total_cost');
+            $table->string('payment_status');
             $table->timestamps();
 
             $table->index(['ingredient_id', 'expiry_date']);

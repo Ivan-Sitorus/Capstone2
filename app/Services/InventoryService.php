@@ -234,7 +234,6 @@ class InventoryService
                 'quantity_before' => $before,
                 'quantity_change' => -$deductFromThisBatch,
                 'quantity_after' => $after,
-                'unit_cost' => $batch->cost_per_unit,
                 'reference' => $context['reference'] ?? null,
             ]);
 
