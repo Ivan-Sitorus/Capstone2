@@ -175,7 +175,7 @@ class MenuForm
                             maxDigits: 6,
                             precision: NumericInput::precisionForUnit($get('unit')),
                         ))
-                        ->mutateStateForValidationUsing(NumericInput::validationNormalizer())
+                        ->mutateStateForValidationUsing(fn ($state) => NumericInput::normalizeState($state))
                         ->dehydrateStateUsing(fn ($state) => NumericInput::normalizeState($state))
                         ->disabled(fn (Get $get): bool => blank($get('ingredient_id')))
                         ->minValue(fn (Get $get): float => in_array($get('unit'), ['gram', 'ml'], true) ? 1 : 0.001)

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Forms\Components;
 
+use App\Enums\Unit;
 use Filament\Forms\Components\TextInput;
 use Filament\Support\RawJs;
 
@@ -29,7 +30,7 @@ class NumericInput
             ->mask(static::mask($precision))
             ->stripCharacters('.')
             ->rules(static::rulesFor($maxDigits, $precision))
-            ->mutateStateForValidationUsing(static::validationNormalizer())
+            ->mutateStateForValidationUsing(fn ($state) => static::normalizeState($state))
             ->dehydrateStateUsing(fn ($state) => static::normalizeState($state));
     }
 
@@ -62,15 +63,7 @@ class NumericInput
      */
     public static function precisionForUnit(?string $unit): int
     {
-        return in_array($unit, ['gram', 'ml'], true) ? 0 : 3;
-    }
-
-    /**
-     * Max numeric value for a given maxDigits & precision, as string rule value.
-     */
-    public static function maxValueFor(int $maxDigits = 6, int $precision = 0): string
-    {
-        return (string) ((10 ** $maxDigits) - ($precision > 0 ? 10 ** -$precision : 1));
+        return in_array($unit, [Unit::Gram->value, Unit::Milliliter->value], true) ? 0 : 3;
     }
 
     /**
@@ -90,14 +83,5 @@ class NumericInput
     public static function normalizeState(mixed $state): mixed
     {
         return is_string($state) ? str_replace(',', '.', $state) : $state;
-    }
-
-    /**
-     * Closure to normalize comma-to-dot BEFORE validation (mutateStateForValidationUsing).
-     * Without this, input "8,8" fails the numeric rule because the comma is not yet normalized.
-     */
-    public static function validationNormalizer(): \Closure
-    {
-        return fn (mixed $state): mixed => static::normalizeState($state);
     }
 }
