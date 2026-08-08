@@ -14,8 +14,9 @@ class NumericInput
 {
     /**
      * Apply full numeric configuration to a TextInput:
-     * numeric() (number keyboard + validation) + type text (so mask & maxLength work)
-     * + thousands/decimal mask + strip dots + character limit + comma-to-dot normalization.
+     * numeric() (number keyboard + validation) + type text (so mask works)
+     * + thousands/decimal mask + strip dots + dynamic rules (max + decimal/integer)
+     * + comma-to-dot normalization.
      *
      * @param  int  $maxDigits  number of integer digits (e.g. 6 = max 999.999, 9 = max 999.999.999)
      * @param  int  $precision  decimal digits (0 = integer, 3 = max 3 decimals)
@@ -27,9 +28,49 @@ class NumericInput
             ->type('text')
             ->mask(static::mask($precision))
             ->stripCharacters('.')
-            ->maxLength(static::maxLength($maxDigits, $precision))
+            ->rules(static::rulesFor($maxDigits, $precision))
             ->mutateStateForValidationUsing(static::validationNormalizer())
             ->dehydrateStateUsing(fn ($state) => static::normalizeState($state));
+    }
+
+    /**
+     * Build validation rules from maxDigits & precision.
+     * Uses native Laravel rules (max + decimal/integer) instead of max_digits,
+     * which is broken for decimal values (Laravel counts string length and
+     * rejects any non-digit character, e.g. the decimal dot).
+     *
+     * @return array<int, string>
+     */
+    public static function rulesFor(int $maxDigits = 6, int $precision = 0): array
+    {
+        $maxValue = (10 ** $maxDigits) - ($precision > 0 ? 10 ** -$precision : 1);
+
+        $rules = ['numeric', "max:{$maxValue}"];
+
+        if ($precision > 0) {
+            $rules[] = "decimal:0,{$precision}";
+        } else {
+            $rules[] = 'integer';
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Map a unit value to decimal precision:
+     * gram/ml → 0 (integer only), others (kg/liter/pcs/sachet) → 3.
+     */
+    public static function precisionForUnit(?string $unit): int
+    {
+        return in_array($unit, ['gram', 'ml'], true) ? 0 : 3;
+    }
+
+    /**
+     * Max numeric value for a given maxDigits & precision, as string rule value.
+     */
+    public static function maxValueFor(int $maxDigits = 6, int $precision = 0): string
+    {
+        return (string) ((10 ** $maxDigits) - ($precision > 0 ? 10 ** -$precision : 1));
     }
 
     /**

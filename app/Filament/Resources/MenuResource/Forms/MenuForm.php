@@ -110,7 +110,11 @@ class MenuForm
                                 return;
                             }
                             $ingredient = Ingredient::find($ingredientId);
-                            $set('unit', $ingredient?->unit?->value ?? null);
+                            $unit = $ingredient?->unit;
+
+                            // Auto-fill hanya untuk tipe count (pcs/sachet — satu-satunya opsi).
+                            // Weight/volume (gram/kg/ml/liter) dibiarkan kosong agar user memilih sendiri.
+                            $set('unit', $unit && $unit->unitType() === 'count' ? $unit->value : null);
                         }),
                     Select::make("unit")
                         ->label("Satuan")
@@ -153,24 +157,30 @@ class MenuForm
                                 return null;
                             }
 
-                            return Ingredient::find($ingredientId)?->unit?->value ?? null;
+                            $unit = Ingredient::find($ingredientId)?->unit;
+
+                            // Auto-pilih hanya untuk count; weight/volume biarkan kosong.
+                            return $unit && $unit->unitType() === 'count' ? $unit->value : null;
                         }),
-                    NumericInput::apply(TextInput::make("quantity_used"), maxDigits: 6, precision: 3)
+                    TextInput::make("quantity_used")
                         ->label("Jumlah per Porsi")
                         ->required()
+                        ->numeric()
+                        ->type('text')
+                        ->mask(fn (Get $get) => NumericInput::mask(
+                            NumericInput::precisionForUnit($get('unit')),
+                        ))
+                        ->stripCharacters('.')
+                        ->rules(fn (Get $get) => NumericInput::rulesFor(
+                            maxDigits: 6,
+                            precision: NumericInput::precisionForUnit($get('unit')),
+                        ))
+                        ->mutateStateForValidationUsing(NumericInput::validationNormalizer())
+                        ->dehydrateStateUsing(fn ($state) => NumericInput::normalizeState($state))
                         ->disabled(fn (Get $get): bool => blank($get('ingredient_id')))
-                        ->minValue(fn (Get $get): float => in_array(
-                            Ingredient::find($get('ingredient_id'))?->unit?->value,
-                            ['gram', 'ml'],
-                            true,
-                        ) ? 1 : 0.001)
-                        ->maxValue(999999)
-                        ->step(fn (Get $get): float => in_array(
-                            Ingredient::find($get('ingredient_id'))?->unit?->value,
-                            ['gram', 'ml'],
-                            true,
-                        ) ? 1 : 0.001)
-                        ->suffix(fn (Get $get) => Ingredient::find($get('ingredient_id'))?->unit?->value ?? ''),
+                        ->minValue(fn (Get $get): float => in_array($get('unit'), ['gram', 'ml'], true) ? 1 : 0.001)
+                        ->step(fn (Get $get): float => in_array($get('unit'), ['gram', 'ml'], true) ? 1 : 0.001)
+                        ->suffix(fn (Get $get) => $get('unit') ?? ''),
                 ]),
         ]);
     }
