@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MenuResource\Forms;
 
+use App\Enums\Unit;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\MenuResource;
 use App\Models\Ingredient;
@@ -31,6 +32,7 @@ class MenuForm
                 ->required()
                 ->searchable()
                 ->preload()
+                ->native(false)
                 ->placeholder("Pilih Kategori Menu")
                 ->createOptionForm([
                     TextInput::make("name")
@@ -64,6 +66,7 @@ class MenuForm
                     'inactive' => 'Nonaktif',
                 ])
                 ->default('active')
+                ->native(false)
                 ->required(),
             NumericInput::apply(TextInput::make("discounted_price"), maxDigits: 9)
                 ->label("Harga Diskon")
@@ -94,15 +97,80 @@ class MenuForm
                         ->required()
                         ->searchable()
                         ->preload()
+                        ->native(false)
                         ->live()
+                        ->distinct()
                         ->placeholder("Pilih bahan baku...")
-                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".($record->unit?->value ?? '').")"),
+                        ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".($record->unit?->value ?? '').")")
+                        ->suffix(fn (Get $get) => Ingredient::find($get('ingredient_id'))?->unit?->value ?? '')
+                        ->afterStateUpdated(function (Set $set, Get $get): void {
+                            $ingredientId = $get('ingredient_id');
+                            if (! $ingredientId) {
+                                $set('unit', null);
+                                return;
+                            }
+                            $ingredient = Ingredient::find($ingredientId);
+                            $set('unit', $ingredient?->unit?->value ?? null);
+                        }),
+                    Select::make("unit")
+                        ->label("Satuan")
+                        ->required()
+                        ->native(false)
+                        ->live()
+                        ->options(function (Get $get): array {
+                            $ingredientId = $get('ingredient_id');
+                            if (! $ingredientId) {
+                                return [];
+                            }
+                            $ingredient = Ingredient::find($ingredientId);
+                            if (! $ingredient?->unit) {
+                                return [];
+                            }
+
+                            $unitType = $ingredient->unit->unitType();
+
+                            return collect(Unit::cases())
+                                ->filter(fn (Unit $unit): bool => $unit->unitType() === $unitType)
+                                ->mapWithKeys(fn (Unit $unit): array => [$unit->value => $unit->label()])
+                                ->all();
+                        })
+                        ->disabled(function (Get $get): bool {
+                            $ingredientId = $get('ingredient_id');
+                            if (! $ingredientId) {
+                                return false;
+                            }
+                            $ingredient = Ingredient::find($ingredientId);
+
+                            return $ingredient?->unit?->unitType() === 'count';
+                        })
+                        ->default(function (Get $get, ?\App\Models\MenuIngredient $record): ?string {
+                            if ($record?->unit) {
+                                return $record->unit->value;
+                            }
+
+                            $ingredientId = $get('ingredient_id');
+                            if (! $ingredientId) {
+                                return null;
+                            }
+
+                            return Ingredient::find($ingredientId)?->unit?->value ?? null;
+                        }),
                     NumericInput::apply(TextInput::make("quantity_used"), maxDigits: 6, precision: 3)
                         ->label("Jumlah per Porsi")
                         ->required()
-                        ->minValue(0.001)
+                        ->disabled(fn (Get $get): bool => blank($get('ingredient_id')))
+                        ->minValue(fn (Get $get): float => in_array(
+                            Ingredient::find($get('ingredient_id'))?->unit?->value,
+                            ['gram', 'ml'],
+                            true,
+                        ) ? 1 : 0.001)
                         ->maxValue(999999)
-                        ->step(0.001),
+                        ->step(fn (Get $get): float => in_array(
+                            Ingredient::find($get('ingredient_id'))?->unit?->value,
+                            ['gram', 'ml'],
+                            true,
+                        ) ? 1 : 0.001)
+                        ->suffix(fn (Get $get) => Ingredient::find($get('ingredient_id'))?->unit?->value ?? ''),
                 ]),
         ]);
     }

@@ -18,7 +18,8 @@ class UserTable
                 TextColumn::make('name')
                     ->label('Nama')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(30),
                 TextColumn::make('email')
                     ->label('Email')
                     ->searchable()

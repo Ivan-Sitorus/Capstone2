@@ -19,7 +19,8 @@ class CategoryTable
                 TextColumn::make('name')
                     ->label('Kategori Menu')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(30),
                 TextColumn::make('menus_count')
                     ->label('Jumlah Menu')
                     ->counts('menus')

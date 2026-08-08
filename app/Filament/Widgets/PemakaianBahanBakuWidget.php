@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\DailyIngredientUsage;
 use App\Models\Ingredient;
+use Filament\Support\RawJs;
 use Filament\Widgets\LineChartWidget;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\On;
@@ -71,10 +72,32 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         return $options ?: null;
     }
 
+    protected function getOptions(): array | RawJs | null
+    {
+        $ingredientName = $this->selectedIngredient();
+        $unit = $ingredientName
+            ? Ingredient::where('name', $ingredientName)->value('unit')
+            : null;
+
+        // Eloquent menerapkan cast enum pada value() — ambil ->value bila BackedEnum
+        $unitValue = $unit instanceof \BackedEnum ? $unit->value : $unit;
+        $unitLabel = $unitValue ? " {$unitValue}" : '';
+
+        return [
+            'scales' => [
+                'y' => [
+                    'ticks' => [
+                        'callback' => RawJs::make("function(value) { return value + '{$unitLabel}'; }"),
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function getHeading(): string
     {
-        $from = Carbon::parse($this->rangeFrom())->format('d M Y');
-        $until = Carbon::parse($this->rangeUntil())->format('d M Y');
+        $from = Carbon::parse($this->rangeFrom())->translatedFormat('d M Y');
+        $until = Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
         $ingredient = $this->selectedIngredient();
         $prefix = $ingredient ? "Pemakaian {$ingredient}" : 'Pemakaian Bahan Baku';
         return "{$prefix} ({$from} – {$until})";
@@ -90,7 +113,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         $days = [];
         for ($i = 0; $i < $rangeDays; $i++) {
             $date = $fromDate->copy()->addDays($i)->toDateString();
-            $labels[] = Carbon::parse($date)->format('d M');
+            $labels[] = Carbon::parse($date)->translatedFormat('d M');
             $days[$date] = 0;
         }
 
@@ -109,7 +132,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => $fromDate->format('d M Y') . ' – ' . $untilDate->format('d M Y'),
+                    'label' => $fromDate->translatedFormat('d M Y') . ' – ' . $untilDate->translatedFormat('d M Y'),
                     'data' => array_values($current),
                     'borderColor' => '#28A745',
                     'backgroundColor' => 'rgba(40, 167, 69, 0.1)',
@@ -156,6 +179,6 @@ class PemakaianBahanBakuWidget extends LineChartWidget
 
     private function formatDatePeriod(string $from, string $to): string
     {
-        return Carbon::parse($from)->format('d M Y') . ' – ' . Carbon::parse($to)->format('d M Y');
+        return Carbon::parse($from)->translatedFormat('d M Y') . ' – ' . Carbon::parse($to)->translatedFormat('d M Y');
     }
 }

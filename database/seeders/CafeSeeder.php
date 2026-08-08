@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 
 class CafeSeeder extends Seeder
 {
-    /** @var array<int, array<int, array{id:int,ingredient_id:int,quantity:float,expiry_date:string,received_at:string,cost_per_unit:float,status:string}>> */
+    /** @var array<int, array<int, array{id:int,ingredient_id:int,quantity:float,expiry_date:string,received_at:string}>> */
     private array $batchCache = [];
 
     /** @var array<int, array> */
@@ -233,6 +233,8 @@ class CafeSeeder extends Seeder
     /** @var array<string, int> ingredient key → DB id */
     private array $ingredientIds = [];
 
+    private array $ingredientUnits = [];
+
     /** @var array<int, int> menu name → DB id */
     private array $menuIds = [];
 
@@ -344,6 +346,10 @@ class CafeSeeder extends Seeder
                 array_search($name, array_map(fn ($v) => $v[0], self::INGREDIENTS)) => $id,
             ])
             ->all();
+
+        $this->ingredientUnits = collect(self::INGREDIENTS)
+            ->mapWithKeys(fn ($def, $key) => [$key => $def[1]])
+            ->all();
     }
 
     // ──────────────────────────────────────────────────────────────
@@ -378,12 +384,10 @@ class CafeSeeder extends Seeder
                     'quantity' => $qty,
                     'expiry_date' => $expiry->toDateString(),
                     'received_at' => $receivedAt->toDateTimeString(),
-                    'cost_per_unit' => $unitCost,
                     'initial_quantity' => $qty,
                     'supplier_name' => $rng->pick(array_keys(self::SUPPLIERS)),
                     'total_cost' => (int) round($qty * $unitCost),
-                    'payment_status' => 'lunas',
-                    'custom_order' => null,
+                    'payment_status' => 'paid',
                     'batch_code' => sprintf('BCH-%s-%d', $receivedAt->format('dmy'), ++$batchSeq),
                 ];
             }
@@ -393,7 +397,7 @@ class CafeSeeder extends Seeder
 
         // Load all batches into in-memory cache keyed by ingredient_id
         $allBatches = DB::table('ingredient_batches')
-            ->select('id', 'ingredient_id', 'quantity', 'expiry_date', 'received_at', 'cost_per_unit')
+            ->select('id', 'ingredient_id', 'quantity', 'expiry_date', 'received_at')
             ->orderBy('expiry_date')
             ->get();
 
@@ -404,7 +408,6 @@ class CafeSeeder extends Seeder
                 'quantity' => (float) $batch->quantity,
                 'expiry_date' => $batch->expiry_date,
                 'received_at' => $batch->received_at,
-                'cost_per_unit' => (float) $batch->cost_per_unit,
             ];
         }
     }
@@ -421,6 +424,7 @@ class CafeSeeder extends Seeder
                 'category_id' => $catId,
                 'name' => $name,
                 'price' => $def['price'],
+                'status' => 'active',
                 'discounted_price' => $def['price'] - $def['cashback'],
             ]);
             $this->menuIds[$name] = $menu->id;
@@ -441,6 +445,7 @@ class CafeSeeder extends Seeder
                     'menu_id' => $menuId,
                     'ingredient_id' => $this->ingredientIds[$ingKey],
                     'quantity_used' => $qty,
+                    'unit' => $this->ingredientUnits[$ingKey] ?? null,
                 ];
             }
         }
@@ -731,7 +736,6 @@ class CafeSeeder extends Seeder
                 'quantity_before' => round($oldQty, 2),
                 'quantity_change' => -round($deduct, 2),
                 'quantity_after' => round($batch['quantity'], 2),
-                'unit_cost' => (int) round($batch['cost_per_unit']),
                 'reference' => $orderCode,
                 'created_at' => $timestamp,
                 'updated_at' => $timestamp,
@@ -877,7 +881,6 @@ class CafeSeeder extends Seeder
                 'quantity_before' => (float) $adj->quantity_before,
                 'quantity_change' => round($change, 2),
                 'quantity_after' => (float) $adj->quantity_after,
-                'unit_cost' => null,
                 'reference' => $adj->code,
                 'created_at' => $adj->adjusted_at,
                 'updated_at' => $adj->adjusted_at,
@@ -909,9 +912,6 @@ class CafeSeeder extends Seeder
             'quantity' => $qty,
             'expiry_date' => $date->copy()->addMonths(12)->toDateString(),
             'received_at' => $date->toDateTimeString(),
-            'cost_per_unit' => self::BATCH_CONFIG[
-                array_search($ingredientId, $this->ingredientIds)
-            ][0] ?? 0,
         ];
     }
 

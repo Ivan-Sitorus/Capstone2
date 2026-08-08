@@ -33,6 +33,12 @@ class OrderResource extends Resource
 
     protected static ?string $navigationLabel = 'Pesanan';
 
+    protected static ?string $label = 'Pesanan';
+
+    protected static ?string $pluralLabel = 'Pesanan';
+
+    protected static ?string $breadcrumb = 'Pesanan';
+
     protected static ?string $slug = 'pesanan';
 
     protected static ?int $navigationSort = 1;
@@ -46,15 +52,15 @@ class OrderResource extends Resource
                 ->schema([
                     TextEntry::make($p.'order_code')->label('Kode Pesanan')->copyable(),
                     TextEntry::make($p.'created_at')->label('Waktu')->dateTime('d M Y, H:i:s'),
-                    TextEntry::make($p.'processed_at')->label('Diproses')->dateTime('d M Y, H:i:s'),
-                    TextEntry::make($p.'completed_at')->label('Selesai')->dateTime('d M Y, H:i:s'),
-                    TextEntry::make($p.'cancelled_at')->label('Dibatalkan')->dateTime('d M Y, H:i:s'),
+                    TextEntry::make($p.'processed_at')->label('Diproses')->dateTime('d M Y, H:i:s')->default('-'),
+                    TextEntry::make($p.'completed_at')->label('Selesai')->dateTime('d M Y, H:i:s')->default('-'),
+                    TextEntry::make($p.'cancelled_at')->label('Dibatalkan')->dateTime('d M Y, H:i:s')->default('-'),
                     TextEntry::make($p.'cashier.name')->label('Kasir')->default('-'),
                 ])->columns(3),
 
             Section::make('Pelanggan')
                 ->schema([
-                    TextEntry::make($p.'customer_name')->label('Nama')->default('Guest'),
+                    TextEntry::make($p.'customer_name')->label('Nama')->default('-'),
                     TextEntry::make($p.'phone')->label('No. HP')->default('-'),
                     TextEntry::make($p.'order_type')->label('Jenis')
                         ->badge()

@@ -25,7 +25,8 @@ class StockTable
                 TextColumn::make('name')
                     ->label('Nama Bahan')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(30),
                 TextColumn::make('unit')
                     ->label('Unit')
                     ->formatStateUsing(fn (Ingredient $record) => $record->unit?->value ?? '')

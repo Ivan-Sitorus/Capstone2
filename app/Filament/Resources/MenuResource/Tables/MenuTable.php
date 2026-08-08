@@ -29,7 +29,8 @@ class MenuTable
                 TextColumn::make("name")
                     ->label("Nama Menu")
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(30),
                 TextColumn::make("category.name")
                     ->label("Kategori Menu")
                     ->sortable()
