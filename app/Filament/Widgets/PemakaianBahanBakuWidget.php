@@ -83,15 +83,19 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         $unitValue = $unit instanceof \BackedEnum ? $unit->value : $unit;
         $unitLabel = $unitValue ? " {$unitValue}" : '';
 
-        return [
-            'scales' => [
-                'y' => [
-                    'ticks' => [
-                        'callback' => RawJs::make("function(value) { return value + '{$unitLabel}'; }"),
-                    ],
-                ],
-            ],
-        ];
+        // RawJs wajib sebagai return penuh (bukan bersarang di array) agar
+        // @js() merender callback sebagai function, bukan JSON string/object.
+        return RawJs::make(<<<JS
+            {
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => value + '{$unitLabel}',
+                        },
+                    },
+                },
+            }
+        JS);
     }
 
     public function getHeading(): string
