@@ -85,18 +85,6 @@ class NumericInput
     }
 
     /**
-     * Maximum input length (including thousands dots & decimal comma).
-     * Example: 6 digits + 0 decimals → "999.999" = 7 chars; 6 digits + 3 decimals → "999.999,999" = 11 chars.
-     */
-    public static function maxLength(int $maxDigits = 6, int $precision = 0): int
-    {
-        $thousandDots = (int) floor(($maxDigits - 1) / 3);
-        $decimalPart = $precision > 0 ? 1 + $precision : 0;
-
-        return $maxDigits + $thousandDots + $decimalPart;
-    }
-
-    /**
      * Convert decimal comma (Indonesian format) to dot for numeric validation & DB.
      */
     public static function normalizeState(mixed $state): mixed
