@@ -20,25 +20,19 @@ class InventoryServiceSkipValidationTest extends TestCase
     {
         $category = Category::create([
             'name' => 'Kategori Test ' . uniqid(),
-            'slug' => 'kategori-test-' . uniqid(),
         ]);
 
         $menu = Menu::create([
             'category_id' => $category->id,
             'name' => 'Menu Test',
-            'slug' => 'menu-test-' . uniqid(),
-            'description' => null,
             'price' => 10000,
-            'cashback' => 0,
+            'status' => 'active',
             'image' => null,
-            'is_available' => true,
-            'is_student_discount' => false,
-            'student_price' => null,
         ]);
 
         $ingredient = Ingredient::create([
             'name' => 'Bahan Test',
-            'unit' => 'gram',
+            'unit' => 'gram', 'batch_mode' => 'fefo',
             'low_stock_threshold' => 10,
         ]);
 
@@ -47,7 +41,8 @@ class InventoryServiceSkipValidationTest extends TestCase
             'quantity' => 5,
             'expiry_date' => now()->addDays(10)->toDateString(),
             'received_at' => now(),
-            'cost_per_unit' => 1,
+            'total_cost' => 1000,
+            'payment_status' => 'paid',
         ]);
 
         MenuIngredient::create([

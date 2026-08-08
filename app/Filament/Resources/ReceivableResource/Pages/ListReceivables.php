@@ -43,6 +43,7 @@ class ListReceivables extends ListRecords
                         ->options(fn () => User::whereIn('role', ['cashier', 'admin'])->orderBy('name')->pluck('name', 'id'))
                         ->default(fn () => auth()->id())
                         ->searchable()
+                        ->native(false)
                         ->required(),
                     TextInput::make('customer_name')
                         ->label('Nama Pelanggan')
@@ -56,6 +57,7 @@ class ListReceivables extends ListRecords
                                 ->options(fn () => Menu::where('status', 'active')->orderBy('name')->pluck('name', 'id'))
                                 ->required()
                                 ->searchable()
+                                ->native(false)
                                 ->live(),
                             NumericInput::apply(TextInput::make('quantity'), maxDigits: 5)
                                 ->label('Jumlah')
@@ -74,6 +76,7 @@ class ListReceivables extends ListRecords
                                     }
                                     return ['normal' => 'Normal'];
                                 })
+                                ->native(false)
                                 ->default('normal')
                                 ->live(),
                         ])

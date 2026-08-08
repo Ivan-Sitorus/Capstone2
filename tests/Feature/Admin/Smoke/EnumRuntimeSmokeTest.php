@@ -21,7 +21,7 @@ class EnumRuntimeSmokeTest extends TestCase
             'name' => 'Kopi', 'unit' => 'gram', 'batch_mode' => 'fefo', 'low_stock_threshold' => 10,
         ]);
         IngredientBatch::create([
-            'ingredient_id' => $ingredient->id, 'quantity' => 100, 'cost_per_unit' => 5000,
+            'ingredient_id' => $ingredient->id, 'quantity' => 100, 'total_cost' => 500000,
             'received_at' => now(), 'payment_status' => 'paid',
         ]);
         Order::factory()->create(['cashier_id' => $cashier->id, 'payment_method' => 'pay_later', 'status' => 'unpaid']);

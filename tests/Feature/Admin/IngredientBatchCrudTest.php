@@ -15,7 +15,7 @@ class IngredientBatchCrudTest extends TestCase
     {
         $ingredient = Ingredient::create([
             'name' => 'Kopi Batch Test',
-            'unit' => 'gram',
+            'unit' => 'gram', 'batch_mode' => 'fefo',
             'low_stock_threshold' => 50,
         ]);
 
@@ -23,8 +23,8 @@ class IngredientBatchCrudTest extends TestCase
             'ingredient_id' => $ingredient->id,
             'quantity' => 100,
             'expiry_date' => now()->addDays(10)->toDateString(),
-            'received_at' => now()->subDay(),
-            'cost_per_unit' => 2,
+            'received_at' => now()->subDay(), 'payment_status' => 'paid',
+            'total_cost' => 2000,
         ]);
 
         $this->assertDatabaseHas('ingredient_batches', [
@@ -46,7 +46,7 @@ class IngredientBatchCrudTest extends TestCase
     {
         $ingredient = Ingredient::create([
             'name' => 'Gula Batch Test',
-            'unit' => 'gram',
+            'unit' => 'gram', 'batch_mode' => 'fefo',
             'low_stock_threshold' => 20,
         ]);
 
@@ -54,16 +54,16 @@ class IngredientBatchCrudTest extends TestCase
             'ingredient_id' => $ingredient->id,
             'quantity' => 40,
             'expiry_date' => now()->addDays(30)->toDateString(),
-            'received_at' => now()->subDays(2),
-            'cost_per_unit' => 1,
+            'received_at' => now()->subDays(2), 'payment_status' => 'paid',
+            'total_cost' => 1000,
         ]);
 
         IngredientBatch::create([
             'ingredient_id' => $ingredient->id,
             'quantity' => 60,
             'expiry_date' => now()->addDays(7)->toDateString(),
-            'received_at' => now()->subDays(1),
-            'cost_per_unit' => 1,
+            'received_at' => now()->subDays(1), 'payment_status' => 'paid',
+            'total_cost' => 1000,
         ]);
 
         $first = $ingredient->batches()

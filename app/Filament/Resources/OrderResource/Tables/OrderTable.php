@@ -28,7 +28,7 @@ class OrderTable
                 TextColumn::make('customer_name')
                     ->label('Pelanggan')
                     ->searchable()
-                    ->default('Guest'),
+                    ->default('-'),
                 TextColumn::make('cashier.name')
                     ->label('Kasir')
                     ->searchable()
@@ -38,8 +38,7 @@ class OrderTable
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
                     ->sortable(),
                 TextColumn::make('payment_method')
-                    ->label('Metode')
-                    ->badge()
+                    ->label('Metode Bayar')
                     ->formatStateUsing(fn (?PaymentMethod $state): string => $state?->label() ?? '-'),
                 TextColumn::make('status')
                     ->label('Status')

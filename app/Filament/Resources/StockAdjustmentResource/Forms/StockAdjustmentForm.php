@@ -24,6 +24,7 @@ class StockAdjustmentForm
                 ->required()
                 ->searchable()
                 ->preload()
+                ->native(false)
                 ->getOptionLabelFromRecordUsing(fn ($record) => $record->name.' ('.$record->unit?->value.')'),
             Select::make('adjustment_type')
                 ->label('Tipe Penyesuaian')
@@ -51,6 +52,7 @@ class StockAdjustmentForm
                 ->relationship('reportedBy', 'name')
                 ->searchable()
                 ->preload()
+                ->native(false)
                 ->default(fn () => Auth::id()),
             DateTimePicker::make('adjusted_at')
                 ->label('Tanggal Kejadian')

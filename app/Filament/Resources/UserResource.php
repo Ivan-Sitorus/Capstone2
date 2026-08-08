@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Forms\UserForm;
-use App\Filament\Resources\UserResource\Pages\EditUser;
 use App\Filament\Resources\UserResource\Pages\ListUsers;
 use App\Filament\Resources\UserResource\Tables\UserTable;
 use App\Models\User;
@@ -46,7 +45,6 @@ class UserResource extends Resource
     {
         return [
             'index' => ListUsers::route('/'),
-            'edit' => EditUser::route('/{record}/edit'),
         ];
     }
 }

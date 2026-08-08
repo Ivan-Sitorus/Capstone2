@@ -110,6 +110,7 @@ class RiwayatBayarBatch extends Page implements HasTable
                                 'transfer' => 'Transfer',
                                 'qris' => 'QRIS',
                             ])
+                            ->native(false)
                             ->required(),
                         DateTimePicker::make('payment_date')
                             ->label('Tanggal')
@@ -149,6 +150,7 @@ class RiwayatBayarBatch extends Page implements HasTable
                             'transfer' => 'Transfer',
                             'qris' => 'QRIS',
                         ])
+                        ->native(false)
                         ->default('cash')
                         ->required(),
                     DateTimePicker::make('payment_date')

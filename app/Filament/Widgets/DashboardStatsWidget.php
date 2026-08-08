@@ -56,8 +56,8 @@ class DashboardStatsWidget extends StatsOverviewWidget
             ->distinct('ingredient_id')
             ->count('ingredient_id');
 
-        $desc = 'Periode ' . Carbon::parse($this->rangeFrom())->format('d M Y')
-              . ' – ' . Carbon::parse($this->rangeUntil())->format('d M Y');
+        $desc = 'Periode ' . Carbon::parse($this->rangeFrom())->translatedFormat('d M Y')
+              . ' – ' . Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
 
         return [
             Stat::make('Penjualan', 'Rp ' . number_format($totalRange, 0, ',', '.'))

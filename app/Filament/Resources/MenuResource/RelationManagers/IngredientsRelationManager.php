@@ -29,7 +29,9 @@ class IngredientsRelationManager extends RelationManager
                 ->required()
                 ->searchable()
                 ->preload()
+                ->native(false)
                 ->live()
+                ->distinct()
                 ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".($record->unit?->value ?? '').")"),
             NumericInput::apply(TextInput::make("quantity_used"), maxDigits: 6, precision: 3)
                 ->label("Jumlah per Porsi")

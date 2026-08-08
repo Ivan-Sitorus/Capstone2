@@ -34,8 +34,8 @@ class TopBahanBakuWidget extends BarChartWidget
 
     public function getHeading(): string
     {
-        $from = Carbon::parse($this->rangeFrom())->format('d M Y');
-        $until = Carbon::parse($this->rangeUntil())->format('d M Y');
+        $from = Carbon::parse($this->rangeFrom())->translatedFormat('d M Y');
+        $until = Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
         return "Top 10 Bahan Baku ({$from} – {$until})";
     }
 

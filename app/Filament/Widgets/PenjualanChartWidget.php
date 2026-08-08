@@ -34,8 +34,8 @@ class PenjualanChartWidget extends LineChartWidget
 
     public function getHeading(): string
     {
-        $from = Carbon::parse($this->rangeFrom())->format('d M Y');
-        $until = Carbon::parse($this->rangeUntil())->format('d M Y');
+        $from = Carbon::parse($this->rangeFrom())->translatedFormat('d M Y');
+        $until = Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
         return "Penjualan ({$from} – {$until})";
     }
 
@@ -49,7 +49,7 @@ class PenjualanChartWidget extends LineChartWidget
         $days = [];
         for ($i = 0; $i < $rangeDays; $i++) {
             $date = $fromDate->copy()->addDays($i)->toDateString();
-            $labels[] = Carbon::parse($date)->format('d M');
+            $labels[] = Carbon::parse($date)->translatedFormat('d M');
             $days[$date] = 0;
         }
 
@@ -68,7 +68,7 @@ class PenjualanChartWidget extends LineChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => $fromDate->format('d M Y') . ' – ' . $untilDate->format('d M Y'),
+                    'label' => $fromDate->translatedFormat('d M Y') . ' – ' . $untilDate->translatedFormat('d M Y'),
                     'data' => array_values($current),
                     'borderColor' => '#3B6FD4',
                     'backgroundColor' => 'rgba(59, 111, 212, 0.1)',
@@ -109,6 +109,6 @@ class PenjualanChartWidget extends LineChartWidget
 
     private function formatDatePeriod(string $from, string $to): string
     {
-        return Carbon::parse($from)->format('d M Y') . ' – ' . Carbon::parse($to)->format('d M Y');
+        return Carbon::parse($from)->translatedFormat('d M Y') . ' – ' . Carbon::parse($to)->translatedFormat('d M Y');
     }
 }

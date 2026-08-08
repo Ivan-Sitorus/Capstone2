@@ -35,6 +35,7 @@ class UserForm
                     'cashier' => 'Kasir',
                 ])
                 ->required()
+                ->native(false)
                 ->default('cashier'),
         ]);
     }

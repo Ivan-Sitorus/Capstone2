@@ -83,6 +83,7 @@ class ReceivableTable
                         ->when($data['created_until'], fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date))
                     ),
             ])
+            ->recordUrl(fn (Order $record): string => ReceivableResource::getUrl('riwayat-bayar', ['record' => $record]))
             ->recordActions([
                 ActionGroup::make([
                 Action::make('detail')

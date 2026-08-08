@@ -27,7 +27,6 @@ class ReceiptSettingsPage extends Page implements HasForms
 
     protected static ?int $navigationSort = 5;
     protected static ?string $title = 'Pengaturan Struk & WhatsApp';
-    protected string $view = 'filament.pages.receipt-settings';
 
     public ?array $data = [];
     public ?array $previewData = [];

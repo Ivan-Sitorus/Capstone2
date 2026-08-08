@@ -176,7 +176,10 @@ class ViewStockHistory extends ListRecords
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.received_at')->label('Waktu Diterima')->dateTime('d M Y, H:i:s'),
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.expiry_date')->label('Tanggal Kedaluwarsa')->date('d M Y')->default('-'),
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.quantity')->label('Quantity Awal')->formatStateUsing(fn ($state) => number_format((float)$state, 2)),
-                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.cost_per_unit')->label('Harga per Unit')->money('IDR')->default('-'),
+                                \Filament\Infolists\Components\TextEntry::make('ingredientBatch.total_cost')->label('Harga Total')
+                                    ->formatStateUsing(fn ($state, $record) => 'Rp'.number_format((float) $state, 0, ',', '.')
+                                        .' / '.number_format((float) ($record->ingredientBatch?->initial_quantity ?? $record->ingredientBatch?->quantity ?? 0), 2)
+                                        .' '.($record->ingredientBatch?->ingredient?->unit?->value ?? '')),
                                 \Filament\Infolists\Components\TextEntry::make('ingredientBatch.allow_expired_usage')->label('Bisa Kedaluwarsa')->boolean(),
                             ])->columns(3),
                         \Filament\Infolists\Components\Section::make('Statistik Pemakaian')

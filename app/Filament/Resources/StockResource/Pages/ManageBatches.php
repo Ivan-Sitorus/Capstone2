@@ -95,9 +95,13 @@ class ManageBatches extends Page implements HasTable
                     ->date('d M Y')
                     ->sortable()
                     ->color(fn ($record) => $record->expiry_date && $record->expiry_date->isPast() ? 'danger' : null),
-                TextColumn::make('cost_per_unit')
-                    ->label('Harga/Unit')
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                TextColumn::make('total_cost')
+                    ->label('Harga Total')
+                    ->formatStateUsing(function ($state, IngredientBatch $record) use ($unit) {
+                        $qty = (float) ($record->initial_quantity ?? $record->quantity ?? 0);
+                        $fmtQty = number_format($qty, (float) $qty != (int) $qty ? 2 : 0, ',', '.');
+                        return 'Rp'.number_format((float) $state, 0, ',', '.').' / '.$fmtQty.' '.$unit;
+                    })
                     ->sortable(),
                 TextColumn::make('supplier_name')
                     ->label('Supplier')
@@ -133,12 +137,10 @@ class ManageBatches extends Page implements HasTable
                     ->form($this->batchFormFields(isCreate: true))
                     ->using(function (array $data): IngredientBatch {
                         $totalCost = (float) ($data['total_harga'] ?? 0);
-                        $initialQty = (float) ($data['quantity'] ?? 0);
                         $totalDibayar = (float) ($data['total_dibayar'] ?? 0);
 
-                        $data['total_cost'] = $totalCost > 0 ? $totalCost : null;
+                        $data['total_cost'] = $totalCost;
                         $data['initial_quantity'] = $data['quantity'];
-                        $data['cost_per_unit'] = $initialQty > 0 ? $totalCost / $initialQty : 0;
                         unset($data['total_harga'], $data['sudah_lunas'], $data['total_dibayar']);
 
                         $batch = $this->record->batches()->create($data);
@@ -228,10 +230,8 @@ class ManageBatches extends Page implements HasTable
                     })
                     ->using(function (array $data, $livewire, IngredientBatch $record, $table): void {
                         $totalCost = (float) ($data['total_harga'] ?? 0);
-                        $initialQty = (float) ($record->initial_quantity ?: $record->quantity);
 
-                        $data['total_cost'] = $totalCost > 0 ? $totalCost : null;
-                        $data['cost_per_unit'] = $initialQty > 0 ? $totalCost / $initialQty : 0;
+                        $data['total_cost'] = $totalCost;
                         unset($data['total_harga'], $data['sudah_lunas'], $data['total_dibayar']);
 
                         $record->update($data);

@@ -70,11 +70,11 @@ class StockForm
                             ->nullable()
                             ->default(now())
                             ->native(false),
-                        NumericInput::apply(TextInput::make('cost_per_unit'), maxDigits: 9)
-                            ->label('Harga per Unit')
+                        NumericInput::apply(TextInput::make('total_cost'), maxDigits: 9)
+                            ->label('Harga Total')
                             ->required()
-                            ->minValue(0)
-                            ->prefix(fn ($get) => $get('../../unit') ? 'Rp/'.$get('../../unit') : 'Rp'),
+                            ->minValue(1)
+                            ->prefix('Rp'),
                     ])
                     ->defaultItems(0)
                     ->collapsible(),

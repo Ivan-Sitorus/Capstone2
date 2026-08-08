@@ -4,6 +4,8 @@ namespace App\Filament\Resources\StockAdjustmentResource\Tables;
 
 use App\Enums\AdjustmentType;
 use App\Filament\Resources\StockAdjustmentResource;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -90,8 +92,18 @@ class StockAdjustmentTable
                         AdjustmentType::Decrease->value => 'Pengurangan',
                     ]),
             ])
+            ->recordAction('detail')
             ->recordActions([
-                \App\Filament\Resources\StockAdjustmentResource\Actions\DetailAdjustmentAction::make(),
+                ActionGroup::make([
+                    \App\Filament\Resources\StockAdjustmentResource\Actions\DetailAdjustmentAction::make(),
+                    DeleteAction::make()
+                        ->requiresConfirmation()
+                        ->modalHeading('Hapus Penyesuaian Stok')
+                        ->modalDescription('Stok bahan baku akan dikembalikan ke jumlah semula seperti sebelum penyesuaian ini dibuat. Apakah Anda yakin?')
+                        ->modalSubmitActionLabel('Ya, Hapus')
+                        ->modalCancelActionLabel('Batal'),
+                ])
+                ->icon(\Filament\Support\Icons\Heroicon::OutlinedEllipsisVertical),
             ])
             ->toolbarActions([])
             ->defaultSort('adjusted_at', 'desc');
