@@ -59,7 +59,7 @@ class ListReceivables extends ListRecords
                                 ->searchable()
                                 ->native(false)
                                 ->live(),
-                            NumericInput::apply(TextInput::make('quantity'), maxDigits: 5)
+                            NumericInput::apply('quantity', maxDigits: 5, precision: 0)
                                 ->label('Jumlah')
                                 ->required()
                                 ->minValue(1)

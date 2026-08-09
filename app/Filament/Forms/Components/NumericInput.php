@@ -19,11 +19,17 @@ class NumericInput
      * + thousands/decimal mask + strip dots + dynamic rules (max + decimal/integer)
      * + comma-to-dot normalization.
      *
+     * Accepts either a field name (created via TextInput::make()) or an existing TextInput,
+     * following the Laravel Builder idiom: normalize union types with an instanceof check.
+     *
+     * @param  string | TextInput  $input  field name or pre-built TextInput instance
      * @param  int  $maxDigits  number of integer digits (e.g. 6 = max 999.999, 9 = max 999.999.999)
      * @param  int  $precision  decimal digits (0 = integer, 3 = max 3 decimals)
      */
-    public static function apply(TextInput $input, int $maxDigits = 6, int $precision = 0): TextInput
+    public static function apply(string | TextInput $input, int $maxDigits, int $precision): TextInput
     {
+        $input = $input instanceof TextInput ? $input : TextInput::make($input);
+
         return $input
             ->numeric()
             ->type('text')
@@ -35,19 +41,19 @@ class NumericInput
     }
 
     /**
-     * Preset: uang (maxDigits 9, integer) — price, amount, total_cost, dst.
+     * Preset: money (maxDigits 9, integer) — price, amount, total_cost, etc.
      */
     public static function money(string $name): TextInput
     {
-        return static::apply(TextInput::make($name), maxDigits: 9);
+        return static::apply($name, maxDigits: 9, precision: 0);
     }
 
     /**
-     * Preset: kuantitas (maxDigits 6, 3 desimal) — quantity, quantity_used, dst.
+     * Preset: quantity (maxDigits 6, 3 decimals) — quantity, quantity_used, etc.
      */
     public static function quantity(string $name): TextInput
     {
-        return static::apply(TextInput::make($name), maxDigits: 6, precision: 3);
+        return static::apply($name, maxDigits: 6, precision: 3);
     }
 
     /**
@@ -58,7 +64,7 @@ class NumericInput
      *
      * @return array<int, string>
      */
-    public static function rulesFor(int $maxDigits = 6, int $precision = 0): array
+    public static function rulesFor(int $maxDigits, int $precision): array
     {
         $maxValue = (10 ** $maxDigits) - ($precision > 0 ? 10 ** -$precision : 1);
 
@@ -88,7 +94,7 @@ class NumericInput
      * - decimal separator: ',' (comma)
      * - precision: number of decimal digits (0 = integer, 3 = max 3 decimals)
      */
-    public static function mask(int $precision = 0): RawJs
+    public static function mask(int $precision): RawJs
     {
         return RawJs::make("\$money(\$input, ',', '.', {$precision})");
     }
