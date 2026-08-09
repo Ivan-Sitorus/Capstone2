@@ -8,7 +8,6 @@ use App\Models\Ingredient;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Auth;
@@ -35,7 +34,7 @@ class StockAdjustmentForm
                 ->required()
                 ->native(false)
                 ->live(),
-            NumericInput::apply(TextInput::make('quantity'), maxDigits: 6, precision: 3)
+            NumericInput::quantity('quantity')
                 ->label('Jumlah')
                 ->required()
                 ->prefix(fn (Get $get) => $get('adjustment_type') === AdjustmentType::Decrease->value ? '-' : '+')

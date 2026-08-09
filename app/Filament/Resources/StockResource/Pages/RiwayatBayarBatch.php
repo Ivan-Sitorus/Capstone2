@@ -12,7 +12,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\Page;
@@ -98,7 +97,7 @@ class RiwayatBayarBatch extends Page implements HasTable
                 EditAction::make()
                     ->modalHeading('Edit Pembayaran')
                     ->form([
-                        NumericInput::apply(TextInput::make('amount'), maxDigits: 9)
+                        NumericInput::money('amount')
                             ->label('Jumlah')
                             ->required()
                             ->minValue(1)
@@ -138,7 +137,7 @@ class RiwayatBayarBatch extends Page implements HasTable
                 ->icon('heroicon-o-plus')
                 ->modalHeading('Catat Pembayaran Supplier')
                 ->form([
-                    NumericInput::apply(TextInput::make('amount'), maxDigits: 9)
+                    NumericInput::money('amount')
                         ->label('Jumlah')
                         ->required()
                         ->minValue(1)

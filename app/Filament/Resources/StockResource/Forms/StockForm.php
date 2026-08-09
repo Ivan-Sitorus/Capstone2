@@ -32,7 +32,7 @@ class StockForm
                     ->searchable()
                     ->native(false)
                     ->live(),
-                NumericInput::apply(TextInput::make('low_stock_threshold'), maxDigits: 6, precision: 3)
+                NumericInput::quantity('low_stock_threshold')
                     ->label('Peringatan Stok Rendah')
                     ->formatStateUsing(fn ($state) => $state !== null && $state !== '' ? number_format((float) $state, 2, ',', '.') : '')
                     ->suffix(fn ($get) => $get('unit') ? ' '.$get('unit') : ''),
@@ -51,7 +51,7 @@ class StockForm
                     ->columnSpanFull()
                     ->columns(1)
                     ->schema([
-                        NumericInput::apply(TextInput::make('quantity'), maxDigits: 6, precision: 3)
+                        NumericInput::quantity('quantity')
                             ->label('Jumlah')
                             ->required()
                             ->minValue(0)
@@ -70,7 +70,7 @@ class StockForm
                             ->nullable()
                             ->default(now())
                             ->native(false),
-                        NumericInput::apply(TextInput::make('total_cost'), maxDigits: 9)
+                        NumericInput::money('total_cost')
                             ->label('Harga Total')
                             ->required()
                             ->minValue(1)

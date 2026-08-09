@@ -35,6 +35,22 @@ class NumericInput
     }
 
     /**
+     * Preset: uang (maxDigits 9, integer) — price, amount, total_cost, dst.
+     */
+    public static function money(string $name): TextInput
+    {
+        return static::apply(TextInput::make($name), maxDigits: 9);
+    }
+
+    /**
+     * Preset: kuantitas (maxDigits 6, 3 desimal) — quantity, quantity_used, dst.
+     */
+    public static function quantity(string $name): TextInput
+    {
+        return static::apply(TextInput::make($name), maxDigits: 6, precision: 3);
+    }
+
+    /**
      * Build validation rules from maxDigits & precision.
      * Uses native Laravel rules (max + decimal/integer) instead of max_digits,
      * which is broken for decimal values (Laravel counts string length and

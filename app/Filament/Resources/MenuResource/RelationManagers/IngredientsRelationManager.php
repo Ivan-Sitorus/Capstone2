@@ -8,7 +8,6 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -33,7 +32,7 @@ class IngredientsRelationManager extends RelationManager
                 ->live()
                 ->distinct()
                 ->getOptionLabelFromRecordUsing(fn ($record) => $record->name." (".($record->unit?->value ?? '').")"),
-            NumericInput::apply(TextInput::make("quantity_used"), maxDigits: 6, precision: 3)
+            NumericInput::quantity("quantity_used")
                 ->label("Jumlah per Porsi")
                 ->required()
                 ->minValue(0.001)

@@ -83,7 +83,7 @@ class ListReceivables extends ListRecords
                         ->columns(3)
                         ->minItems(1)
                         ->required(),
-                    NumericInput::apply(TextInput::make('paid_amount'), maxDigits: 9)
+                    NumericInput::money('paid_amount')
                         ->label('Sudah Dibayar')
                         ->minValue(0)
                         ->default(0)

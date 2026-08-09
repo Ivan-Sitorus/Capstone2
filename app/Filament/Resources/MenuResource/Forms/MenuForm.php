@@ -53,7 +53,7 @@ class MenuForm
                 ->saveUploadedFileUsing(function ($file) {
                     return app(MenuImageService::class)->convertAndStore($file);
                 }),
-            NumericInput::apply(TextInput::make("price"), maxDigits: 9)
+            NumericInput::money("price")
                 ->label("Harga")
                 ->required()
                 ->integer()
@@ -68,7 +68,7 @@ class MenuForm
                 ->default('active')
                 ->native(false)
                 ->required(),
-            NumericInput::apply(TextInput::make("discounted_price"), maxDigits: 9)
+            NumericInput::money("discounted_price")
                 ->label("Harga Diskon")
                 ->integer()
                 ->minValue(0)

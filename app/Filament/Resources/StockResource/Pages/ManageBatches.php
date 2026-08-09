@@ -279,7 +279,7 @@ class ManageBatches extends Page implements HasTable
     private function batchFormFields(bool $isCreate = false): array
     {
         $fields = [
-            NumericInput::apply(TextInput::make('quantity'), maxDigits: 6, precision: 3)
+            NumericInput::quantity('quantity')
                 ->label('Jumlah')
                 ->required()
                 ->minValue(0)
@@ -302,7 +302,7 @@ class ManageBatches extends Page implements HasTable
                 ->label('Supplier')
                 ->maxLength(255)
                 ->placeholder('Nama supplier...'),
-            NumericInput::apply(TextInput::make('total_harga'), maxDigits: 9)
+            NumericInput::money('total_harga')
                 ->label('Total Harga')
                 ->required()
                 ->minValue(0)
@@ -317,7 +317,7 @@ class ManageBatches extends Page implements HasTable
         ];
 
         if ($isCreate) {
-            $fields[] = NumericInput::apply(TextInput::make('total_dibayar'), maxDigits: 9)
+            $fields[] = NumericInput::money('total_dibayar')
                 ->label('Total Dibayar')
                 ->minValue(0)
                 ->default(0)
