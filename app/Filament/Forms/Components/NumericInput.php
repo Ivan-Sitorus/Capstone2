@@ -35,6 +35,9 @@ class NumericInput
             ->type('text')
             ->mask(static::mask($precision))
             ->stripCharacters('.')
+            ->extraInputAttributes([
+                'maxlength' => static::maxLengthFor($maxDigits, $precision),
+            ])
             ->rules(static::rulesFor($maxDigits, $precision))
             ->mutateStateForValidationUsing(fn ($state) => static::normalizeState($state))
             ->dehydrateStateUsing(fn ($state) => static::normalizeState($state));
@@ -54,6 +57,21 @@ class NumericInput
     public static function quantity(string $name): TextInput
     {
         return static::apply($name, maxDigits: 6, precision: 3);
+    }
+
+    /**
+     * Maximum input length (characters), including thousand dots & decimal comma.
+     * Used only for the HTML maxlength attribute — NOT for validation
+     * (validation uses rulesFor(), since max_digits is broken for decimals).
+     *
+     * Examples: (6,3) → "999.999,999" = 11; (9,0) → "999.999.999" = 11; (6,0) → "999.999" = 7.
+     */
+    public static function maxLengthFor(int $maxDigits, int $precision): int
+    {
+        $thousandDots = (int) floor(($maxDigits - 1) / 3);
+        $decimalPart = $precision > 0 ? 1 + $precision : 0;
+
+        return $maxDigits + $thousandDots + $decimalPart;
     }
 
     /**
