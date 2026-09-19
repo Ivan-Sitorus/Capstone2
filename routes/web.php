@@ -51,7 +51,7 @@ Route::prefix('pelanggan')->group(function () {
     Route::get('/menu', [CustomerMenuController::class, 'index'])->name('customer.menu');
     Route::get('/identitas', [CustomerMenuController::class, 'showIdentitas'])->name('customer.identitas');
     Route::post('/identitas', [CustomerMenuController::class, 'submitIdentitas'])->name('customer.identitas.submit');
-    Route::get('/keranjang', fn () => Inertia::render('Pelanggan/Cart/Index', []))->name('customer.cart');
+    Route::get('/keranjang', fn () => Inertia::render('Customer/Cart/Index', []))->name('customer.cart');
     Route::get('/riwayat', [CustomerOrderController::class, 'riwayat'])->name('customer.riwayat');
 
     // Order flow

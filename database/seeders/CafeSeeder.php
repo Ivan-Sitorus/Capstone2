@@ -617,12 +617,14 @@ class CafeSeeder extends Seeder
     {
         $rows = [];
         foreach ($orderData as $orderId => $data) {
+            $position = 0;
             foreach ($data['items'] as $menuName => $qty) {
                 $menuId = $this->menuIds[$menuName];
                 $price = self::MENUS[$menuName]['price'];
                 $rows[] = [
                     'order_id' => $orderId,
                     'menu_id' => $menuId,
+                    'item_position' => $position++,
                     'quantity' => $qty,
                     'unit_price' => $price,
                     'subtotal' => $price * $qty,
