@@ -57,7 +57,7 @@ class CustomerOrderController extends Controller
                 ])
             : collect();
 
-        return Inertia::render('Pelanggan/Riwayat/Index', ['orders' => $orders]);
+        return Inertia::render('Customer/Riwayat/Index', ['orders' => $orders]);
     }
 
     public function status(string $code): Response
@@ -66,7 +66,7 @@ class CustomerOrderController extends Controller
             ->where('order_code', $code)
             ->firstOrFail();
 
-        return Inertia::render('Pelanggan/Order/Status', [
+        return Inertia::render('Customer/Order/Status', [
             'order' => [
                 'id'             => $order->id,
                 'order_code'     => $order->order_code,

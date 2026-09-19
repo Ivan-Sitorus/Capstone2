@@ -3,18 +3,19 @@ import { router, Head } from '@inertiajs/react';
 import axios from 'axios';
 import useCart from '@/Hooks/useCart';
 import { ChevronLeft, Banknote, QrCode, MapPin, Wallet } from 'lucide-react';
-import PelangganLayout from '@/Layouts/PelangganLayout';
+import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
 
 const F = '"Inter", system-ui, sans-serif';
 
+/* stone-minimalist tokens — sesuai Stitch */
 const C = {
     surface:    '#FFFFFF',
-    bg:         '#F7F5F2',
-    border:     '#F3F4F6',
-    borderMd:   '#E5E7EB',
-    accent:     '#44403C',
-    accentDark: '#1C1917',
+    bg:         '#F7F5F2',   /* stone-bg */
+    border:     '#F3F4F6',   /* gray-100 */
+    borderMd:   '#E5E7EB',   /* gray-200 */
+    accent:     '#44403C',   /* stone-primary */
+    accentDark: '#1C1917',   /* stone-heading / hover */
     textHead:   '#1C1917',
     textSecond: '#78716C',
     shadow:     '0 2px 8px -2px rgba(0,0,0,0.05)',
@@ -49,13 +50,13 @@ export default function PaymentChoose({ order, items, table_number }) {
         setError('');
         try {
             if (selected === 'cash') {
-                const res = await axios.post(`/api/pesanan/${order.id}/pay/cash`);
+                const res = await axios.post(`/api/order/${order.id}/pay/cash`);
                 setCashOrderCode(res.data.order_code ?? '');
                 clearCart();
                 setShowCashModal(true);
             } else {
-                await axios.post(`/api/pesanan/${order.id}/pay/qris`);
-                router.visit(`/pelanggan/pesanan/${order.id}/payment/qris`);
+                await axios.post(`/api/order/${order.id}/pay/qris`);
+                router.visit(`/customer/payment/${order.id}/qris`);
             }
         } catch (err) {
             setError(err.response?.data?.message ?? 'Terjadi kesalahan. Coba lagi.');
@@ -70,11 +71,11 @@ export default function PaymentChoose({ order, items, table_number }) {
             const saved = sessionStorage.getItem('w9_customer');
             if (saved) tableId = JSON.parse(saved)?.tableId;
         } catch (_) {}
-        router.visit(tableId ? `/pelanggan/menu?table=${tableId}` : '/pelanggan/menu');
+        router.visit(tableId ? `/customer/menu?table=${tableId}` : '/customer/menu');
     }
 
     return (
-        <PelangganLayout activeTab="cart">
+        <CustomerLayout activeTab="cart">
             <Head>
                 <title>Pilih Pembayaran — W9 Cafe</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -94,6 +95,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                 `}</style>
             </Head>
 
+            {/* ── Wallpaper ── */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: '100%', maxWidth: 430, height: '100vh',
@@ -104,6 +106,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                 />
             </div>
 
+            {/* ── Fixed flex-column container ── */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: '100%', maxWidth: 430, height: '100vh',
@@ -112,13 +115,14 @@ export default function PaymentChoose({ order, items, table_number }) {
                 backdropFilter: 'blur(2px)',
             }}>
 
+                {/* ── Header ── */}
                 <header style={{
                     padding: '32px 24px 16px',
                     display: 'flex', alignItems: 'flex-start', gap: 16,
                     flexShrink: 0,
                 }}>
                     <button
-                        onClick={() => router.visit('/pelanggan/keranjang')}
+                        onClick={() => router.visit('/customer/cart')}
                         className="w9p-btn-back"
                         style={{
                             marginTop: 2,
@@ -158,6 +162,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                     </div>
                 </header>
 
+                {/* ── Scroll area ── */}
                 <div className="w9p-scroll" style={{
                     flex: 1, overflowY: 'auto',
                     scrollbarWidth: 'none',
@@ -166,6 +171,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                     display: 'flex', flexDirection: 'column',
                 }}>
 
+                    {/* ── Order Summary ── */}
                     <section style={{ padding: '0 24px', marginTop: 8 }}>
                         <h2 style={{
                             fontSize: 10, fontWeight: 700, color: C.textSecond,
@@ -182,6 +188,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                             boxShadow: C.shadow,
                             overflow: 'hidden',
                         }}>
+                            {/* Item rows */}
                             {items.map((item, idx) => (
                                 <div key={idx} style={{
                                     padding: '14px 16px',
@@ -189,6 +196,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                                     borderBottom: idx < items.length - 1 ? `1px solid ${C.border}` : 'none',
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        {/* Qty badge — rectangular, sesuai Stitch */}
                                         <span style={{
                                             background: C.bg,
                                             color: C.accent,
@@ -208,6 +216,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                                 </div>
                             ))}
 
+                            {/* Total row */}
                             <div style={{
                                 padding: '14px 16px',
                                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -224,6 +233,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                         </div>
                     </section>
 
+                    {/* ── Payment Methods ── */}
                     <section style={{ padding: '0 24px', marginTop: 24 }}>
                         <h2 style={{
                             fontSize: 10, fontWeight: 700, color: C.textSecond,
@@ -253,6 +263,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                                             cursor: 'pointer',
                                         }}
                                     >
+                                        {/* Icon box — bg tetap stone-bg, tidak berubah saat aktif */}
                                         <div style={{
                                             width: 40, height: 40, borderRadius: 10,
                                             background: C.bg,
@@ -266,6 +277,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                                             }
                                         </div>
 
+                                        {/* Labels */}
                                         <div style={{ flex: 1 }}>
                                             <p style={{
                                                 fontSize: 14, fontWeight: 700, color: C.textHead,
@@ -281,6 +293,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                                             </p>
                                         </div>
 
+                                        {/* Radio indicator */}
                                         <div style={{
                                             width: 20, height: 20, borderRadius: '50%',
                                             border: `2px solid ${active ? C.accent : C.borderMd}`,
@@ -301,8 +314,9 @@ export default function PaymentChoose({ order, items, table_number }) {
                         </div>
                     </section>
 
-                </div>
+                </div>{/* end scroll */}
 
+                {/* ── Confirm Button — fixed footer, selalu terlihat ── */}
                 <div style={{
                     padding: '12px 24px 84px',
                     flexShrink: 0,
@@ -340,8 +354,9 @@ export default function PaymentChoose({ order, items, table_number }) {
                     </button>
                 </div>
 
-            </div>
+            </div>{/* end fixed container */}
 
+            {/* ── Cash Modal (C5b) ── */}
             {showCashModal && (
                 <div style={{
                     position: 'fixed', inset: 0,
@@ -359,6 +374,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                         alignItems: 'center', gap: 14,
                         boxShadow: '0 12px 40px rgba(28,25,23,0.20)',
                     }}>
+                        {/* Icon */}
                         <div style={{
                             width: 64, height: 64, borderRadius: 16,
                             background: C.bg, border: `1px solid ${C.border}`,
@@ -381,6 +397,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                             Silakan tunjukkan pesanan ini ke kasir dan lakukan pembayaran tunai.
                         </div>
 
+                        {/* Order info box */}
                         <div style={{
                             width: '100%',
                             background: C.bg, borderRadius: 12,
@@ -409,6 +426,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                             </span>
                         </div>
 
+                        {/* Info riwayat */}
                         <div style={{
                             width: '100%', background: C.bg,
                             borderRadius: 10, border: `1px solid ${C.border}`,
@@ -421,6 +439,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                             </span>
                         </div>
 
+                        {/* Button */}
                         <button
                             onClick={handleMengerti}
                             className="w9p-confirm"
@@ -438,6 +457,6 @@ export default function PaymentChoose({ order, items, table_number }) {
                     </div>
                 </div>
             )}
-        </PelangganLayout>
+        </CustomerLayout>
     );
 }

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
 import axios from 'axios';
 import { Coffee } from 'lucide-react';
-import PelangganLayout from '@/Layouts/PelangganLayout';
+import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
 import { formatRupiah } from '@/helpers';
 
@@ -34,10 +34,10 @@ export default function CustomerCart() {
         } catch (_) {}
     }, []);
 
-    const totalDiscount = isMahasiswa
-        ? items.reduce((s, i) => s + ((i.price - (i.discounted_price ?? i.price)) * i.quantity), 0)
+    const totalCashback = isMahasiswa
+        ? items.reduce((s, i) => s + (i.cashback ?? 0) * i.quantity, 0)
         : 0;
-    const grandTotal = total - totalDiscount;
+    const grandTotal = total - totalCashback;
 
     const handleIncrement = (menuId) => {
         const item = items.find(i => i.menuId === menuId);
@@ -59,14 +59,14 @@ export default function CustomerCart() {
         }
         setLoading(true);
         try {
-            const res = await axios.post('/api/pesanan', {
+            const res = await axios.post('/api/order', {
                 customer_name:  customer.name,
-                phone:          customer.phone,
+                customer_phone: customer.phone,
                 table_id:       customer.tableId,
                 is_mahasiswa:   isMahasiswa,
                 items: items.map(i => ({ menu_id: i.menuId, quantity: i.quantity })),
             });
-            router.visit(`/pelanggan/pesanan/${res.data.order_id}/payment`);
+            router.visit(`/customer/payment/${res.data.order_id}/choose`);
         } catch (err) {
             const msg = err.response?.data?.message ?? err.response?.data?.errors ?? 'Terjadi kesalahan. Coba lagi.';
             setErrorMsg(typeof msg === 'object' ? Object.values(msg).flat().join(' ') : msg);
@@ -76,7 +76,7 @@ export default function CustomerCart() {
     }
 
     return (
-        <PelangganLayout activeTab="cart">
+        <CustomerLayout activeTab="cart">
             <Head>
                 <title>Keranjang — W9 Cafe</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -90,6 +90,7 @@ export default function CustomerCart() {
                 `}</style>
             </Head>
 
+            {/* ── Wallpaper ── */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: '100%', maxWidth: 430, height: '100vh',
@@ -100,12 +101,14 @@ export default function CustomerCart() {
                 />
             </div>
 
+            {/* ── Fixed content container ── */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: '100%', maxWidth: 430, height: '100vh',
                 display: 'flex', flexDirection: 'column', zIndex: 1,
             }}>
 
+                {/* ── Header ── */}
                 <header style={{
                     paddingTop: 32, paddingBottom: 16,
                     paddingLeft: 24, paddingRight: 24,
@@ -123,12 +126,14 @@ export default function CustomerCart() {
                     </p>
                 </header>
 
+                {/* ── Scrollable area ── */}
                 <div style={{
                     flex: 1, overflowY: 'auto', scrollbarWidth: 'none',
                     WebkitOverflowScrolling: 'touch',
                     padding: '0 24px', paddingBottom: 100,
                 }}>
 
+                    {/* ── Empty state ── */}
                     {isEmpty ? (
                         <div style={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -153,7 +158,7 @@ export default function CustomerCart() {
                                 </p>
                             </div>
                             <button
-                                onClick={() => router.visit(`/pelanggan/menu?table=${tableId ?? ''}`)}
+                                onClick={() => router.visit(`/customer/menu?table=${tableId ?? ''}`)}
                                 className="w9cart-btn"
                                 style={{
                                     marginTop: 4, height: 46, padding: '0 28px',
@@ -169,9 +174,11 @@ export default function CustomerCart() {
                     ) : (
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, paddingTop: 4 }}>
 
+                            {/* ── Item cards ── */}
                             {items.map((item) => {
-                                const discountedPrice = isMahasiswa ? (item.discounted_price ?? item.price) : item.price;
-                                const subtotal = discountedPrice * item.quantity;
+                                const cb       = isMahasiswa ? (item.cashback ?? 0) : 0;
+                                const effPrice = item.price - cb;
+                                const subtotal = effPrice * item.quantity;
                                 return (
                                     <article key={item.menuId} style={{
                                         background: 'rgba(255,255,255,0.90)',
@@ -182,6 +189,7 @@ export default function CustomerCart() {
                                         display: 'flex', alignItems: 'center', gap: 16,
                                         boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                                     }}>
+                                        {/* Thumbnail */}
                                         <div style={{
                                             width: 64, height: 64, borderRadius: 10,
                                             background: C.alt, flexShrink: 0,
@@ -194,6 +202,7 @@ export default function CustomerCart() {
                                             }
                                         </div>
 
+                                        {/* Info */}
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                             <h3 style={{
                                                 fontSize: 14, fontWeight: 600,
@@ -203,13 +212,14 @@ export default function CustomerCart() {
                                                 {item.name}
                                             </h3>
                                             <p style={{ fontSize: 11, color: C.textSecond, fontFamily: F, margin: '0 0 4px' }}>
-                                                {formatRupiah(discountedPrice)} × {item.quantity}
+                                                {formatRupiah(effPrice)} × {item.quantity}
                                             </p>
                                             <p style={{ fontSize: 14, fontWeight: 700, color: C.textPrimary, fontFamily: F, margin: 0 }}>
                                                 {formatRupiah(subtotal)}
                                             </p>
                                         </div>
 
+                                        {/* Qty controls */}
                                         <div style={{
                                             display: 'flex', alignItems: 'center', gap: 10,
                                             background: C.alt, padding: '6px 8px', borderRadius: 8,
@@ -244,6 +254,7 @@ export default function CustomerCart() {
                                 );
                             })}
 
+                            {/* ── Order Summary ── */}
                             <section style={{
                                 background: 'rgba(255,255,255,0.90)',
                                 backdropFilter: 'blur(8px)',
@@ -261,15 +272,16 @@ export default function CustomerCart() {
                                     Ringkasan Pesanan
                                 </p>
 
+                                {/* Rows above divider */}
                                 <div style={{ borderBottom: `1px solid ${C.border}`, paddingBottom: 14, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                         <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>Subtotal</span>
                                         <span style={{ fontSize: 13, color: C.textPrimary, fontFamily: F }}>{formatRupiah(total)}</span>
                                     </div>
-                                    {isMahasiswa && totalDiscount > 0 && (
+                                    {isMahasiswa && totalCashback > 0 && (
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>Diskon Mahasiswa</span>
-                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>− {formatRupiah(totalDiscount)}</span>
+                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>Cashback Mahasiswa</span>
+                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>− {formatRupiah(totalCashback)}</span>
                                         </div>
                                     )}
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -278,6 +290,7 @@ export default function CustomerCart() {
                                     </div>
                                 </div>
 
+                                {/* Total */}
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, fontFamily: F }}>Total</span>
                                     <span style={{ fontSize: 17, fontWeight: 700, color: C.textPrimary, fontFamily: F }}>
@@ -286,6 +299,7 @@ export default function CustomerCart() {
                                 </div>
                             </section>
 
+                            {/* ── Error ── */}
                             {errorMsg && (
                                 <div style={{
                                     background: '#FEF2F2', border: '1px solid #FECACA',
@@ -296,6 +310,7 @@ export default function CustomerCart() {
                                 </div>
                             )}
 
+                            {/* ── CTA ── */}
                             <div style={{ paddingTop: 4 }}>
                                 <button
                                     onClick={handleCheckout}
@@ -318,8 +333,8 @@ export default function CustomerCart() {
 
                         </div>
                     )}
-                </div>
-            </div>
-        </PelangganLayout>
+                </div>{/* end scrollable */}
+            </div>{/* end fixed container */}
+        </CustomerLayout>
     );
 }

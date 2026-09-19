@@ -35,7 +35,7 @@ class CustomerPaymentController extends Controller
             ];
         });
 
-        return Inertia::render('Pelanggan/Payment/Choose', $payload);
+        return Inertia::render('Customer/Payment/Choose', $payload);
     }
 
     public function chooseCash(Request $request, Order $order): JsonResponse
@@ -51,14 +51,14 @@ class CustomerPaymentController extends Controller
     public function showQrisUpload(Order $order): Response
     {
         if (in_array($order->status, [OrderStatus::Processing, OrderStatus::Completed])) {
-            return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderData($order)]);
+            return Inertia::render('Customer/Payment/QrisStatus', ['order' => $this->orderData($order)]);
         }
 
         $rejectedMessage = ($order->payment_method === PaymentMethod::Qris && $order->rejection_note && !$order->payment_proof)
             ? $order->rejection_note
             : null;
 
-        return Inertia::render('Pelanggan/Payment/QrisUpload', [
+        return Inertia::render('Customer/Payment/QrisUpload', [
             'order'           => $order->only(['id', 'order_code', 'total_amount']),
             'qrisImage'       => asset('storage/' . Setting::get('qris_image', 'qris/qris-w9cafe.png')),
             'qrisName'        => Setting::get('qris_name', 'W9 Cafe'),
@@ -74,7 +74,7 @@ class CustomerPaymentController extends Controller
 
     public function showQrisStatus(Order $order): Response
     {
-        return Inertia::render('Pelanggan/Payment/QrisStatus', ['order' => $this->orderData($order)]);
+        return Inertia::render('Customer/Payment/QrisStatus', ['order' => $this->orderData($order)]);
     }
 
     private function orderData(Order $order): array

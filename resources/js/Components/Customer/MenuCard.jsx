@@ -5,7 +5,9 @@ import { formatRupiah } from '@/helpers';
 export default function MenuCard({ menu, onAdd }) {
     const [pressing, setPressing] = useState(false);
 
-    const displayPrice = menu.discounted_price ?? menu.price;
+    const displayPrice = menu.is_student_discount && menu.student_price
+        ? Number(menu.student_price)
+        : Number(menu.price);
 
     return (
         <div style={{
@@ -46,7 +48,7 @@ export default function MenuCard({ menu, onAdd }) {
                     {menu.name}
                 </div>
 
-                {menu.discounted_price && menu.discounted_price > 0 && (
+                {menu.is_student_discount && menu.student_price && (
                     <div style={{ fontSize: 11, color: '#8C7B6B', textDecoration: 'line-through' }}>
                         {formatRupiah(menu.price)}
                     </div>

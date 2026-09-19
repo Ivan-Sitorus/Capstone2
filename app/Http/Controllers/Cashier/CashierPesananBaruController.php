@@ -36,7 +36,7 @@ class CashierPesananBaruController extends Controller
             })
         );
 
-        return Inertia::render('Kasir/PesananBaru', ['categories' => $categories]);
+        return Inertia::render('Cashier/PesananBaru', ['categories' => $categories]);
     }
 
     public function store(StoreOrderRequest $request, PlaceCashierOrderAction $action): RedirectResponse

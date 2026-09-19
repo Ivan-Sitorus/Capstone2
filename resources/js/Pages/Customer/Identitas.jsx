@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { User, Phone, Check, MapPin } from 'lucide-react';
-import PelangganLayout from '@/Layouts/PelangganLayout';
+import CustomerLayout from '@/Layouts/CustomerLayout';
 
 const F = '"Inter", system-ui, sans-serif';
 const C = {
@@ -32,7 +32,7 @@ export default function Identitas({ table }) {
             if (saved) {
                 const data = JSON.parse(saved);
                 if (data.name && data.phone && data.tableId === table.id) {
-                    router.visit(`/pelanggan/menu?table=${table.id}`);
+                    router.visit(`/customer/menu?table=${table.id}`);
                 }
             }
         } catch (_) {}
@@ -66,13 +66,13 @@ export default function Identitas({ table }) {
             tableNumber: table?.table_number ?? null,
         }));
 
-        router.visit(table ? `/pelanggan/menu?table=${table.id}` : '/pelanggan/menu');
+        router.visit(table ? `/customer/menu?table=${table.id}` : '/customer/menu');
     }
 
     /* ── No table state ── */
     if (!table) {
         return (
-            <PelangganLayout activeTab="menu" showBottomNav={false}>
+            <CustomerLayout activeTab="menu" showBottomNav={false}>
                 <Head>
                     <title>W9 Cafe</title>
                     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -115,13 +115,13 @@ export default function Identitas({ table }) {
                         Hubungi kasir jika membutuhkan bantuan.
                     </p>
                 </div>
-            </PelangganLayout>
+            </CustomerLayout>
         );
     }
 
     /* ── Main form ── */
     return (
-        <PelangganLayout activeTab="menu" showBottomNav={false}>
+        <CustomerLayout activeTab="menu" showBottomNav={false}>
             <Head>
                 <title>Selamat Datang — W9 Cafe</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -362,6 +362,6 @@ export default function Identitas({ table }) {
                 </main>
 
             </div>
-        </PelangganLayout>
+        </CustomerLayout>
     );
 }

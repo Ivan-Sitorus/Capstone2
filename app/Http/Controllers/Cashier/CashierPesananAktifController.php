@@ -63,7 +63,7 @@ class CashierPesananAktifController extends Controller
             ]),
         ]);
 
-        return Inertia::render('Kasir/PesananAktif', [
+        return Inertia::render('Cashier/PesananAktif', [
             'orders' => $ordersData,
             'counts' => $counts,
         ]);

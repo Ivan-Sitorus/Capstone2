@@ -9,18 +9,18 @@ function getRiwayatHref() {
         const saved = sessionStorage.getItem('w9_customer');
         if (saved) {
             const data = JSON.parse(saved);
-            if (data?.phone) return `/pelanggan/riwayat?phone=${encodeURIComponent(data.phone)}`;
+            if (data?.phone) return `/customer/riwayat?phone=${encodeURIComponent(data.phone)}`;
         }
     } catch (_) {}
-    return '/pelanggan/riwayat';
+    return '/customer/riwayat';
 }
 
 export default function BottomNav({ activeTab }) {
     const { count } = useCart();
 
     const TABS = [
-        { key: 'menu',    label: 'Menu',      Icon: Home,         href: '/pelanggan/menu' },
-        { key: 'cart',    label: 'Keranjang', Icon: ShoppingCart, href: '/pelanggan/keranjang' },
+        { key: 'menu',    label: 'Menu',      Icon: Home,         href: '/customer/menu' },
+        { key: 'cart',    label: 'Keranjang', Icon: ShoppingCart, href: '/customer/cart' },
         { key: 'riwayat', label: 'Riwayat',   Icon: Clock,        href: getRiwayatHref() },
     ];
 
@@ -64,6 +64,7 @@ export default function BottomNav({ activeTab }) {
                                 position:       'relative',
                             }}
                         >
+                            {/* Icon box */}
                             <div style={{
                                 width:           active ? 44 : 32,
                                 height:          active ? 32 : 32,
@@ -103,6 +104,7 @@ export default function BottomNav({ activeTab }) {
                                 )}
                             </div>
 
+                            {/* Label */}
                             <span style={{
                                 fontSize:      10,
                                 fontWeight:    active ? 600 : 400,

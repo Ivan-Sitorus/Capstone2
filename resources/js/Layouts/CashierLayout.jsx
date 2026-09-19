@@ -14,11 +14,11 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-    { label: 'Dashboard',       href: '/kasir/dashboard',     icon: LayoutDashboard },
-    { label: 'Pesanan Baru',    href: '/kasir/pesanan-baru',  icon: ShoppingCart },
-    { label: 'Pesanan Aktif',   href: '/kasir/pesanan-aktif', icon: ClipboardList },
-    { label: 'Riwayat Pesanan', href: '/kasir/riwayat-pesanan', icon: History },
-    { label: 'Profil',          href: '/kasir/profil',        icon: User },
+    { label: 'Dashboard',       href: '/cashier/dashboard',     icon: LayoutDashboard },
+    { label: 'Pesanan Baru',    href: '/cashier/pesanan-baru',  icon: ShoppingCart },
+    { label: 'Pesanan Aktif',   href: '/cashier/pesanan-aktif', icon: ClipboardList },
+    { label: 'Riwayat Pesanan', href: '/cashier/riwayat',       icon: History },
+    { label: 'Profil',          href: '/cashier/profil',        icon: User },
 ];
 
 export default function CashierLayout({ children, title = 'Dashboard', fullscreen = false }) {
@@ -48,11 +48,26 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
         setPendingCount(initialCount ?? 0);
     }, [initialCount]);
 
-    // Fetch fresh pending count every time a page opens — avoid stale numbers
-    // from Inertia cache prefetch when switching menu
+    useEffect(() => {
+        // WebSocket via Laravel Reverb — zero polling, push-based update
+        if (!window.Echo) return;
+
+        const channel = window.Echo.channel('orders');
+
+        channel.listen('.OrderStatusUpdated', (e) => {
+            setPendingCount(e.pendingCount);
+        });
+
+        return () => {
+            window.Echo.leaveChannel('orders');
+        };
+    }, []);
+
+    // Ambil pending count fresh setiap halaman dibuka — hindari angka stale
+    // dari cache prefetch Inertia saat berpindah menu
     useEffect(() => {
         let cancelled = false;
-        window.axios?.get('/kasir/pesanan-menunggu')
+        window.axios?.get('/cashier/pending-count')
             .then(res => { if (!cancelled) setPendingCount(res.data.count); })
             .catch(() => {});
         return () => { cancelled = true; };

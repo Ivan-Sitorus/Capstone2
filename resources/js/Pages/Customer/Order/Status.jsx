@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { router } from '@inertiajs/react';
-import PelangganLayout from '@/Layouts/PelangganLayout';
+import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
 const STATUS_CONFIG = {
@@ -15,6 +15,7 @@ const STATUS_CONFIG = {
 export default function OrderStatus({ order }) {
     const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
 
+    // Poll status tiap 10 detik selama masih aktif
     useEffect(() => {
         if (['completed', 'cancelled'].includes(order.status)) return;
         const id = setInterval(() => {
@@ -24,12 +25,13 @@ export default function OrderStatus({ order }) {
     }, [order.status]);
 
     return (
-        <PelangganLayout activeTab="riwayat">
+        <CustomerLayout activeTab="riwayat">
             <div style={{
                 display: 'flex', flexDirection: 'column',
                 gap: 16, padding: '24px 24px 24px',
             }}>
 
+                {/* Status card */}
                 <div style={{
                     background: cfg.bg, borderRadius: 20,
                     padding: '28px 24px', textAlign: 'center',
@@ -48,6 +50,7 @@ export default function OrderStatus({ order }) {
                     </div>
                 </div>
 
+                {/* Detail card */}
                 <div style={{
                     background: '#FFFFFF', borderRadius: 20,
                     border: '1px solid #EDE8E2', padding: 20,
@@ -82,8 +85,9 @@ export default function OrderStatus({ order }) {
                     ))}
                 </div>
 
+                {/* Back button */}
                 <button
-                    onClick={() => router.visit('/pelanggan/menu')}
+                    onClick={() => router.visit('/customer/menu')}
                     style={{
                         background: '#E8763A', color: '#FFFFFF',
                         border: 'none', borderRadius: 50,
@@ -98,6 +102,6 @@ export default function OrderStatus({ order }) {
                 </button>
 
             </div>
-        </PelangganLayout>
+        </CustomerLayout>
     );
 }

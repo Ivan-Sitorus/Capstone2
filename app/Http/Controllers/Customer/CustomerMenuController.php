@@ -33,7 +33,7 @@ class CustomerMenuController extends Controller
             }
         }
 
-        return Inertia::render('Pelanggan/Identitas', ['table' => $table]);
+        return Inertia::render('Customer/Identitas', ['table' => $table]);
     }
 
     public function submitIdentitas(Request $request): RedirectResponse
@@ -69,7 +69,7 @@ class CustomerMenuController extends Controller
             }
         }
 
-        return Inertia::render('Pelanggan/Menu/Index', [
+        return Inertia::render('Customer/Menu/Index', [
             'categories' => $categories,
             'table' => $table,
         ]);

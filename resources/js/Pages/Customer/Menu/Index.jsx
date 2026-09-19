@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { Search, ShoppingBag, Coffee } from 'lucide-react';
-import PelangganLayout from '@/Layouts/PelangganLayout';
+import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
 import { formatRupiah } from '@/helpers';
 
@@ -23,8 +23,10 @@ const C = {
     shadowLift:  '0 8px 24px -2px rgba(0,0,0,0.10)',
 };
 
-function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false }) {
-    const soldOut  = menu.status !== 'active';
+/* ── Menu card ─────────────────────────────────────────────────── */
+function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false, isMahasiswa = false }) {
+    const cashback = Number(menu.cashback ?? 0);
+    const soldOut  = menu.is_available === false;
 
     return (
         <article className="w9-card" style={{
@@ -38,6 +40,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
             flexDirection: 'column',
             opacity:       soldOut ? 0.75 : 1,
         }}>
+            {/* Image — square aspect */}
             <div style={{
                 position:       'relative',
                 width:          '100%',
@@ -83,6 +86,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                 )}
             </div>
 
+            {/* Info */}
             <div style={{
                 padding:       '14px 14px 14px',
                 flex:          1,
@@ -102,6 +106,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                     {menu.name}
                 </h3>
 
+                {/* Price — brand-primary color sesuai Stitch */}
                 <p style={{
                     fontSize:   13,
                     fontWeight: 600,
@@ -112,6 +117,24 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                     {formatRupiah(Number(menu.price))}
                 </p>
 
+                {/* Cashback badge */}
+                {isMahasiswa && cashback > 0 && (
+                    <p style={{
+                        fontSize:   10,
+                        fontWeight: 500,
+                        color:      C.success,
+                        fontFamily: F,
+                        display:    'flex',
+                        alignItems: 'center',
+                        gap:        4,
+                        margin:     0,
+                    }}>
+                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.success, flexShrink: 0 }} />
+                        Cashback {formatRupiah(cashback)}
+                    </p>
+                )}
+
+                {/* Action */}
                 <div style={{ marginTop: 'auto', paddingTop: 10 }}>
                     {soldOut ? (
                         <button disabled style={{
@@ -199,6 +222,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
     );
 }
 
+/* ── Main page ─────────────────────────────────────────────────── */
 export default function CustomerMenu({ categories, table }) {
     const [activeCategory, setActiveCategory] = useState('all');
     const [search,         setSearch]         = useState('');
@@ -270,7 +294,7 @@ export default function CustomerMenu({ categories, table }) {
     if (!ready) return null;
 
     return (
-        <PelangganLayout activeTab="menu">
+        <CustomerLayout activeTab="menu">
             <Head>
                 <title>Menu — W9 Cafe</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -294,6 +318,7 @@ export default function CustomerMenu({ categories, table }) {
                 `}</style>
             </Head>
 
+            {/* Wallpaper */}
             <div className="w9-wallpaper" aria-hidden="true">
                 <img src="/images/wallpaper-menu.jpg" alt=""
                     fetchPriority="high" loading="eager"
@@ -301,16 +326,20 @@ export default function CustomerMenu({ categories, table }) {
                 />
             </div>
 
+            {/* Fixed flex-column container */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: '100%', maxWidth: 430, height: '100vh',
                 display: 'flex', flexDirection: 'column', zIndex: 1,
             }}>
 
+                {/* ── Header ── */}
                 <header style={{ padding: '24px 20px 14px', flexShrink: 0, background: 'transparent' }}>
 
+                    {/* Logo + greeting row */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
 
+                        {/* Logo — rounded-xl dark bg sesuai Stitch */}
                         <div style={{
                             width: 48, height: 48, borderRadius: 14,
                             background: C.accent,
@@ -329,6 +358,7 @@ export default function CustomerMenu({ categories, table }) {
                             />
                         </div>
 
+                        {/* Greeting + name inline */}
                         <div style={{ flex: 1 }}>
                             <p style={{
                                 fontSize: 10, fontWeight: 500, color: C.textSecond,
@@ -354,6 +384,7 @@ export default function CustomerMenu({ categories, table }) {
 
                     </div>
 
+                    {/* Search — no border, rounded-12, backdrop-blur sesuai Stitch */}
                     <div style={{ position: 'relative' }}>
                         <Search size={18} color={C.textMuted} strokeWidth={2}
                             style={{
@@ -384,6 +415,7 @@ export default function CustomerMenu({ categories, table }) {
                     </div>
                 </header>
 
+                {/* ── Category chips — rounded-12 sesuai Stitch ── */}
                 <div style={{ flexShrink: 0 }}>
                     <div className="w9-chips" style={{
                         display: 'flex', gap: 8, overflowX: 'auto',
@@ -419,6 +451,7 @@ export default function CustomerMenu({ categories, table }) {
                     </div>
                 </div>
 
+                {/* ── Menu scroll area ── */}
                 <div className="w9-scroll" style={{
                     flex: 1, overflowY: 'auto',
                     padding: '4px 16px',
@@ -441,6 +474,7 @@ export default function CustomerMenu({ categories, table }) {
                                 <MenuItemCard
                                     key={menu.id} menu={menu} priority={idx < 4}
                                     cartItem={cartMap[menu.id]}
+                                    isMahasiswa={!!customer?.isMahasiswa}
                                     onAdd={() => addItem(menu)}
                                     onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
                                     onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
@@ -468,9 +502,10 @@ export default function CustomerMenu({ categories, table }) {
                                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                                     {group.menus.map(menu => (
                                         <MenuItemCard
-                                        key={menu.id} menu={menu}
-                                        cartItem={cartMap[menu.id]}
-                                        onAdd={() => addItem(menu)}
+                                            key={menu.id} menu={menu}
+                                            cartItem={cartMap[menu.id]}
+                                            isMahasiswa={!!customer?.isMahasiswa}
+                                            onAdd={() => addItem(menu)}
                                             onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
                                             onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
                                         />
@@ -481,8 +516,9 @@ export default function CustomerMenu({ categories, table }) {
                     )}
                 </div>
 
-            </div>
+            </div>{/* end fixed container */}
 
+            {/* ── Cart bar ── */}
             {count > 0 && (
                 <div style={{
                     position: 'fixed', bottom: 64, left: '50%', transform: 'translateX(-50%)',
@@ -515,7 +551,7 @@ export default function CustomerMenu({ categories, table }) {
                         </div>
                     </div>
                     <button
-                        onClick={() => router.visit('/pelanggan/keranjang')}
+                        onClick={() => router.visit('/customer/cart')}
                         style={{
                             background: C.surface, color: C.textPrimary,
                             border: 'none', borderRadius: 8,
@@ -529,6 +565,6 @@ export default function CustomerMenu({ categories, table }) {
                 </div>
             )}
 
-        </PelangganLayout>
+        </CustomerLayout>
     );
 }

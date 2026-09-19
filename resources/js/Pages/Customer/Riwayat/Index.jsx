@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { ClipboardList, X } from 'lucide-react';
-import PelangganLayout from '@/Layouts/PelangganLayout';
-import RiwayatCard from '@/Components/Pelanggan/RiwayatCard';
+import CustomerLayout from '@/Layouts/CustomerLayout';
+import RiwayatCard from '@/Components/Customer/RiwayatCard';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
 const F  = '"Inter", system-ui, sans-serif';
@@ -20,8 +20,8 @@ const C  = {
 const TABS = [
     { key: 'all',      label: 'Semua'    },
     { key: 'pending',  label: 'Pending'  },
-    { key: 'processing', label: 'Diproses' },
-    { key: 'completed',  label: 'Selesai'  },
+    { key: 'diproses', label: 'Diproses' },
+    { key: 'selesai',  label: 'Selesai'  },
 ];
 
 const METHOD_LABEL = { cash: 'Tunai', qris: 'QRIS' };
@@ -61,7 +61,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                 if (saved) {
                     const data = JSON.parse(saved);
                     if (data?.phone) {
-                        router.visit(`/pelanggan/riwayat?phone=${encodeURIComponent(data.phone)}`, {
+                        router.visit(`/customer/riwayat?phone=${encodeURIComponent(data.phone)}`, {
                             preserveState: true, replace: true,
                         });
                     }
@@ -70,8 +70,9 @@ export default function CustomerRiwayat({ orders = [] }) {
         }
     }, []);
 
+    /* Auto-refresh tiap 8 detik selama ada order aktif */
     useEffect(() => {
-        const hasActive = orders.some(o => o.status !== 'completed');
+        const hasActive = orders.some(o => o.status !== 'selesai');
         if (!hasActive) return;
         const id = setInterval(() => {
             router.reload({ only: ['orders'], preserveState: true });
@@ -86,7 +87,7 @@ export default function CustomerRiwayat({ orders = [] }) {
     const grouped = groupByDate(filteredOrders, formatDate);
 
     return (
-        <PelangganLayout activeTab="riwayat">
+        <CustomerLayout activeTab="riwayat">
             <Head>
                 <title>Riwayat Pesanan — W9 Cafe</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -100,6 +101,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                 `}</style>
             </Head>
 
+            {/* ── Wallpaper ── */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: '100%', maxWidth: 430, height: '100vh',
@@ -110,12 +112,14 @@ export default function CustomerRiwayat({ orders = [] }) {
                 />
             </div>
 
+            {/* ── Fixed flex-column ── */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: '100%', maxWidth: 430, height: '100vh',
                 display: 'flex', flexDirection: 'column', zIndex: 1,
             }}>
 
+                {/* ── Scrollable content ── */}
                 <div className="w9r-scroll" style={{
                     flex: 1, overflowY: 'auto', scrollbarWidth: 'none',
                     WebkitOverflowScrolling: 'touch',
@@ -123,6 +127,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                     display: 'flex', flexDirection: 'column',
                 }}>
 
+                    {/* ── Total Order ── */}
                     <section style={{ marginBottom: 24, paddingLeft: 4 }}>
                         <h2 style={{
                             fontSize: 10, fontWeight: 700, color: C.accent,
@@ -139,6 +144,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                         </p>
                     </section>
 
+                    {/* ── Filter Tabs ── */}
                     <section style={{ marginBottom: 24 }}>
                         <div style={{ display: 'flex', gap: 6, alignItems: 'center', width: '100%' }}>
                             {TABS.map(tab => {
@@ -172,6 +178,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                         </div>
                     </section>
 
+                    {/* ── Order list ── */}
                     {filteredOrders.length === 0 ? (
                         <div style={{
                             display: 'flex', flexDirection: 'column',
@@ -198,6 +205,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                     ) : (
                         Array.from(grouped.entries()).map(([dateLabel, groupOrders]) => (
                             <div key={dateLabel}>
+                                {/* Date header */}
                                 <div style={{ marginBottom: 12 }}>
                                     <span style={{
                                         fontSize: 11, fontWeight: 700, color: C.accent,
@@ -222,9 +230,10 @@ export default function CustomerRiwayat({ orders = [] }) {
                         ))
                     )}
 
-                </div>
-            </div>
+                </div>{/* end scroll */}
+            </div>{/* end fixed container */}
 
+            {/* ── Receipt Modal (Struk) ── */}
             {receiptOrder && (
                 <div
                     onClick={() => setReceiptOrder(null)}
@@ -250,8 +259,10 @@ export default function CustomerRiwayat({ orders = [] }) {
                             fontFamily: F,
                         }}
                     >
+                        {/* Top bar */}
                         <div style={{ height: 3, background: C.accent, flexShrink: 0 }} />
 
+                        {/* Close button */}
                         <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 16px 0', flexShrink: 0 }}>
                             <button
                                 onClick={() => setReceiptOrder(null)}
@@ -266,8 +277,10 @@ export default function CustomerRiwayat({ orders = [] }) {
                             </button>
                         </div>
 
+                        {/* Scrollable content */}
                         <div style={{ overflowY: 'auto', flex: 1, padding: '4px 24px 8px' }}>
 
+                            {/* Logo */}
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, paddingBottom: 18 }}>
                                 <div style={{
                                     width: 54, height: 54, borderRadius: 14,
@@ -291,6 +304,7 @@ export default function CustomerRiwayat({ orders = [] }) {
 
                             <div style={{ height: 1, background: C.border, marginBottom: 16 }} />
 
+                            {/* Info rows */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 16 }}>
                                 {[
                                     { label: 'No. Pesanan', value: receiptOrder.order_code },
@@ -307,6 +321,7 @@ export default function CustomerRiwayat({ orders = [] }) {
 
                             <div style={{ height: 1, background: C.border, marginBottom: 14 }} />
 
+                            {/* Items header */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                                 {['ITEM', 'QTY', 'HARGA'].map((h, i) => (
                                     <span key={h} style={{
@@ -319,6 +334,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                                 ))}
                             </div>
 
+                            {/* Items */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
                                 {(receiptOrder.items ?? []).map((item, i) => (
                                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -331,11 +347,13 @@ export default function CustomerRiwayat({ orders = [] }) {
 
                             <div style={{ height: 1, background: C.border, marginBottom: 12 }} />
 
+                            {/* Subtotal */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
                                 <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>Subtotal</span>
                                 <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>{formatRupiah(receiptOrder.total_amount)}</span>
                             </div>
 
+                            {/* Total */}
                             <div style={{
                                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                                 marginBottom: 20, padding: '10px 12px',
@@ -347,6 +365,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                                 </span>
                             </div>
 
+                            {/* Thank you */}
                             <div style={{ textAlign: 'center', marginBottom: 18 }}>
                                 <span style={{ fontSize: 13, fontWeight: 600, color: C.textSecond, fontFamily: F }}>
                                     Terima kasih sudah memesan!
@@ -354,6 +373,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                             </div>
                         </div>
 
+                        {/* Footer: Tutup */}
                         <div style={{ padding: '10px 20px 22px', flexShrink: 0, borderTop: `1px solid ${C.border}` }}>
                             <button
                                 onClick={() => setReceiptOrder(null)}
@@ -372,6 +392,6 @@ export default function CustomerRiwayat({ orders = [] }) {
                     </div>
                 </div>
             )}
-        </PelangganLayout>
+        </CustomerLayout>
     );
 }

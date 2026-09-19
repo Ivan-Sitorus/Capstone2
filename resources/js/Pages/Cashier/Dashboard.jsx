@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { router, Link, Head } from '@inertiajs/react';
 import { Calendar, Plus, ClipboardList, Clock } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
-import StatBar from '@/Components/Kasir/StatBar';
+import StatBar from '@/Components/Cashier/StatBar';
 import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
@@ -13,7 +13,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
         return () => clearInterval(timer);
     }, []);
 
-    // Fetch fresh data when page opens — avoid stale snapshot from cache prefetch
+    // Ambil data fresh saat halaman dibuka — hindari snapshot stale dari cache prefetch
     useEffect(() => {
         router.reload({ only: ['totalPenjualan', 'jumlahTransaksi', 'pesananAktif', 'cashPending', 'qrisPending', 'transaksiTerbaru'] });
     }, []);
@@ -64,7 +64,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
             {/* ── C. Quick Actions ── */}
             <div style={{ display: 'flex', gap: 12, marginBottom: 28 }}>
                 <button
-                    onClick={() => router.visit('/kasir/pesanan-baru')}
+                    onClick={() => router.visit('/cashier/pesanan-baru')}
                     style={{
                         display: 'flex', alignItems: 'center', gap: 8,
                         height: 44, padding: '0 20px',
@@ -79,7 +79,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                 </button>
 
                 <button
-                    onClick={() => router.visit('/kasir/pesanan-aktif')}
+                    onClick={() => router.visit('/cashier/pesanan-aktif')}
                     style={{
                         display: 'flex', alignItems: 'center', gap: 8,
                         height: 44, padding: '0 20px',
@@ -94,7 +94,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                 </button>
 
                 <button
-                    onClick={() => router.visit('/kasir/riwayat-pesanan')}
+                    onClick={() => router.visit('/cashier/riwayat')}
                     style={{
                         display: 'flex', alignItems: 'center', gap: 8,
                         height: 44, padding: '0 20px',
@@ -117,7 +117,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                         Transaksi Terbaru
                     </h2>
                     <Link
-                        href="/kasir/riwayat-pesanan"
+                        href="/cashier/riwayat"
                         style={{ fontSize: 13, fontWeight: 500, color: '#3B6FD4', textDecoration: 'none' }}
                     >
                         Lihat Semua →

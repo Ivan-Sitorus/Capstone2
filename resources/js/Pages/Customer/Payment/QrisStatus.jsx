@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { router } from '@inertiajs/react';
-import PelangganLayout from '@/Layouts/PelangganLayout';
+import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
 
 export default function QrisStatus({ order }) {
     const isRejected = order.status === 'pending' && !!order.rejection_note;
-    const isDone     = order.status === 'completed';
+    const isDone     = order.status === 'selesai';
 
     useEffect(() => {
         if (isDone || isRejected) return;
@@ -14,10 +14,10 @@ export default function QrisStatus({ order }) {
     }, [order.status, order.rejection_note]);
 
     const isWaiting   = order.status === 'pending' && !order.rejection_note;
-    const isConfirmed = order.status === 'processing';
+    const isConfirmed = order.status === 'diproses';
 
     return (
-        <PelangganLayout>
+        <CustomerLayout>
             <div style={{
                 padding: 24, maxWidth: 430, margin: '0 auto',
                 fontFamily: "'Outfit', system-ui, sans-serif",
@@ -26,6 +26,7 @@ export default function QrisStatus({ order }) {
                 justifyContent: 'center',
             }}>
 
+                {/* Menunggu konfirmasi */}
                 {isWaiting && (
                     <>
                         <div style={{
@@ -44,6 +45,7 @@ export default function QrisStatus({ order }) {
                     </>
                 )}
 
+                {/* Dikonfirmasi / Diproses / Siap */}
                 {isConfirmed && (
                     <>
                         <div style={{ fontSize: 72, marginBottom: 16 }}>✅</div>
@@ -79,6 +81,7 @@ export default function QrisStatus({ order }) {
                     </>
                 )}
 
+                {/* Selesai */}
                 {isDone && (
                     <>
                         <div style={{ fontSize: 72, marginBottom: 16 }}>🎉</div>
@@ -89,7 +92,7 @@ export default function QrisStatus({ order }) {
                             Silakan ambil pesanan Anda di kasir.
                         </p>
                         <button
-                            onClick={() => router.visit('/pelanggan/menu')}
+                            onClick={() => router.visit('/customer/menu')}
                             style={{
                                 width: '100%', height: 50, background: '#E8763A', color: 'white',
                                 border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 700, cursor: 'pointer',
@@ -100,6 +103,7 @@ export default function QrisStatus({ order }) {
                     </>
                 )}
 
+                {/* Ditolak */}
                 {isRejected && (
                     <>
                         <div style={{ fontSize: 72, marginBottom: 16 }}>✗</div>
@@ -121,7 +125,7 @@ export default function QrisStatus({ order }) {
                             Silakan upload ulang bukti pembayaran yang valid.
                         </p>
                         <button
-                            onClick={() => router.visit(`/pelanggan/pesanan/${order.id}/payment/qris`)}
+                            onClick={() => router.visit(`/customer/payment/${order.order_code}/qris`)}
                             style={{
                                 width: '100%', height: 50, background: '#E8763A', color: 'white',
                                 border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 700, cursor: 'pointer',
@@ -132,6 +136,6 @@ export default function QrisStatus({ order }) {
                     </>
                 )}
             </div>
-        </PelangganLayout>
+        </CustomerLayout>
     );
 }
