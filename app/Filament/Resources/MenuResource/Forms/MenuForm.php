@@ -174,8 +174,8 @@ class MenuForm
                             NumericInput::precisionForUnit($get('unit')),
                         ))
                         ->stripCharacters('.')
-                        ->extraInputAttributes([
-                            'maxlength' => fn (Get $get) => NumericInput::maxLengthFor(
+                        ->extraInputAttributes(fn (Get $get) => [
+                            'maxlength' => NumericInput::maxLengthFor(
                                 maxDigits: 6,
                                 precision: NumericInput::precisionForUnit($get('unit')),
                             ),
