@@ -85,6 +85,26 @@ services:
                 condition: service_healthy
         healthcheck:
             test: ["CMD", "curl", "-f", "http://localhost:80/up"]
+    datamining:
+        build:
+            context: .
+            dockerfile: datamining/Dockerfile
+        image: 'w9cafe-datamining:latest'
+        environment:
+            DB_HOST: 'pgsql'
+            DB_PORT: '5432'
+            DB_DATABASE: '${DB_DATABASE:-pos_cafe}'
+            DB_USERNAME: '${DB_USERNAME:-postgres}'
+            DB_PASSWORD: '${DB_PASSWORD:-secret}'
+        networks:
+            - sail
+        ports:
+            - '${DATAMINING_PORT:-8001}:8001'
+        mem_limit: 1g
+        restart: unless-stopped
+        depends_on:
+            pgsql:
+                condition: service_healthy
 networks:
     sail:
         driver: bridge

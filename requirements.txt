@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+scipy
+plotly
+joblib
+python-multipart
+psycopg2-binary
+sqlalchemy
+prophet
+mlxtend
+python-dotenv
