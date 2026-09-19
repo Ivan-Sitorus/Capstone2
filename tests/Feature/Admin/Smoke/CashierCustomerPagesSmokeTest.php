@@ -15,7 +15,7 @@ class CashierCustomerPagesSmokeTest extends TestCase
         $this->seed();
 
         $cashier = User::where('email', 'kasir@w9cafe.com')->firstOrFail();
-        $customer = User::where('email', 'budi@student.com')->first();
+        $customer = User::factory()->create(['role' => 'customer']);
 
         $cashierPages = [
             '/kasir/dashboard',
