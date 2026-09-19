@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
             $table->foreignId('menu_id')->constrained('menus')->restrictOnDelete();
+            $table->integer('item_position')->default(0);
             $table->integer('quantity');
             $table->integer('unit_price');
             $table->unsignedBigInteger('subtotal');

@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('menu_id')->constrained('menus')->cascadeOnDelete();
             $table->foreignId('ingredient_id')->nullable()->constrained('ingredients')->nullOnDelete();
             $table->decimal('quantity_used', 10, 3);
+            $table->string('unit')->nullable();
 
             $table->unique(['menu_id', 'ingredient_id']);
         });

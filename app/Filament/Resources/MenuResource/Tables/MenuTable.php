@@ -39,6 +39,10 @@ class MenuTable
                     ->label("Harga")
                     ->formatStateUsing(fn ($state) => "Rp".number_format($state, 0, ",", "."))
                     ->sortable(),
+                TextColumn::make("cost_price")
+                    ->label("Harga Modal")
+                    ->formatStateUsing(fn ($state) => "Rp".number_format($state, 0, ",", "."))
+                    ->sortable(),
                 TextColumn::make("discounted_price")
                     ->label("Harga Diskon")
                     ->formatStateUsing(fn ($state) => $state ? "Rp".number_format($state, 0, ",", ".") : "-")

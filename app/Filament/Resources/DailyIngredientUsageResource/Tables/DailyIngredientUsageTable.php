@@ -26,7 +26,7 @@ class DailyIngredientUsageTable
                     ->label('Satuan')
                     ->badge()
                     ->sortable(),
-                TextColumn::make('jumlah_digunakan')
+                TextColumn::make('quantity_used')
                     ->label('Jumlah Digunakan')
                     ->numeric(decimalPlaces: 2)
                     ->sortable(),

@@ -14,7 +14,7 @@ return new class extends Migration
             $table->foreignId('ingredient_id')->constrained('ingredients')->cascadeOnDelete();
             $table->string('ingredient_name');
             $table->string('unit');
-            $table->decimal('jumlah_digunakan', 23, 3)->default(0);
+            $table->decimal('quantity_used', 23, 3)->default(0);
             $table->timestamps();
 
             $table->unique(['usage_date', 'ingredient_id']);

@@ -67,7 +67,7 @@ class PlaceCustomerOrderAction
                 $menus = $menus->union($fresh);
             }
 
-            foreach ($request->items as $item) {
+            foreach ($request->items as $position => $item) {
                 $menu = $menus->get($item['menu_id']);
 
                 if (!$menu || $menu->status !== MenuStatus::Active) {
@@ -82,6 +82,7 @@ class PlaceCustomerOrderAction
                 $orderItemsToInsert[] = [
                     'order_id'   => $order->id,
                     'menu_id'    => $menu->id,
+                    'item_position' => $position,
                     'quantity'   => $item['quantity'],
                     'unit_price' => $unitPrice,
                     'subtotal'   => $subtotal,

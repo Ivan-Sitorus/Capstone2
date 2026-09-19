@@ -275,7 +275,7 @@ class InventoryService
             $dailyUsage->fill([
                 'ingredient_name' => $ingredient->name,
                 'unit' => $ingredient->unit,
-                'jumlah_digunakan' => round(((float) $dailyUsage->jumlah_digunakan) + $usedQuantity, 2),
+                'quantity_used' => round(((float) $dailyUsage->quantity_used) + $usedQuantity, 2),
             ]);
             $dailyUsage->save();
 
@@ -287,7 +287,7 @@ class InventoryService
             'ingredient_id' => $ingredient->id,
             'ingredient_name' => $ingredient->name,
             'unit' => $ingredient->unit,
-            'jumlah_digunakan' => round($usedQuantity, 2),
+            'quantity_used' => round($usedQuantity, 2),
         ]);
     }
 }

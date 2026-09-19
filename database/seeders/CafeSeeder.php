@@ -424,6 +424,7 @@ class CafeSeeder extends Seeder
                 'category_id' => $catId,
                 'name' => $name,
                 'price' => $def['price'],
+                'cost_price' => (int) round($def['price'] * 0.6),
                 'status' => 'active',
                 'discounted_price' => $def['price'] - $def['cashback'],
             ]);

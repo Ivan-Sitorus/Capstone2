@@ -18,6 +18,7 @@ class Menu extends Model
         'category_id',
         'name',
         'price',
+        'cost_price',
         'discounted_price',
         'image',
         'status',
@@ -29,6 +30,7 @@ class Menu extends Model
     {
         return [
             'price' => 'integer',
+            'cost_price' => 'integer',
             'discounted_price' => 'integer',
             'status' => MenuStatus::class,
         ];

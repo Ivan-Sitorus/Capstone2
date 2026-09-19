@@ -42,7 +42,7 @@ class TopBahanBakuWidget extends BarChartWidget
     protected function getData(): array
     {
         $rows = DailyIngredientUsage::query()
-            ->selectRaw('ingredient_name, unit, SUM(jumlah_digunakan) as total')
+            ->selectRaw('ingredient_name, unit, SUM(quantity_used) as total')
             ->whereBetween('usage_date', [$this->rangeFrom(), $this->rangeUntil()])
             ->groupBy('ingredient_name', 'unit')
             ->orderByDesc('total')

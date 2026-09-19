@@ -56,8 +56,12 @@ class MenuForm
             NumericInput::money("price")
                 ->label("Harga")
                 ->required()
-                ->integer()
                 ->minValue(1)
+                ->prefix("Rp"),
+            NumericInput::money("cost_price")
+                ->label("Harga Modal")
+                ->required()
+                ->minValue(0)
                 ->prefix("Rp"),
             Select::make('status')
                 ->label('Status')
@@ -70,7 +74,6 @@ class MenuForm
                 ->required(),
             NumericInput::money("discounted_price")
                 ->label("Harga Diskon")
-                ->integer()
                 ->minValue(0)
                 ->rules([
                     fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {

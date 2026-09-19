@@ -13,14 +13,14 @@ class DailyIngredientUsage extends Model
         'ingredient_id',
         'ingredient_name',
         'unit',
-        'jumlah_digunakan',
+        'quantity_used',
     ];
 
     protected function casts(): array
     {
         return [
             'usage_date' => 'date',
-            'jumlah_digunakan' => 'decimal:3',
+            'quantity_used' => 'decimal:3',
             'unit' => Unit::class,
         ];
     }

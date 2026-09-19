@@ -29,7 +29,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
     private function topIngredient(): ?string
     {
         return DailyIngredientUsage::query()
-            ->selectRaw('ingredient_name, SUM(jumlah_digunakan) as total')
+            ->selectRaw('ingredient_name, SUM(quantity_used) as total')
             ->whereBetween('usage_date', [$this->rangeFrom(), $this->rangeUntil()])
             ->groupBy('ingredient_name')
             ->orderByDesc('total')
@@ -161,7 +161,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         $ingredient = $this->selectedIngredient();
 
         $query = DailyIngredientUsage::query()
-            ->selectRaw("usage_date::date as day, sum(jumlah_digunakan) as total")
+            ->selectRaw("usage_date::date as day, sum(quantity_used) as total")
             ->whereDate('usage_date', '>=', $from)
             ->whereDate('usage_date', '<=', $to);
 

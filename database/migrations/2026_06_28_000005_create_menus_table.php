@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('category_id')->constrained('menu_categories')->restrictOnDelete();
             $table->string('name');
             $table->integer('price');
+            $table->integer('cost_price')->default(0);
             $table->string('image')->nullable();
             $table->string('status');
             $table->integer('discounted_price')->nullable();

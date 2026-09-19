@@ -43,7 +43,7 @@ class PlaceCashierOrderAction
                 $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
                 $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
-                foreach ($request->items as $item) {
+                foreach ($request->items as $position => $item) {
                     $menu = $menus->get($item['menu_id']);
 
                     $unitPrice = ($isMahasiswa && $menu->is_student_discount && $menu->student_price !== null)
@@ -54,6 +54,7 @@ class PlaceCashierOrderAction
                     $itemsToInsert[] = [
                         'order_id' => $order->id,
                         'menu_id' => $menu->id,
+                        'item_position' => $position,
                         'quantity' => $item['quantity'],
                         'unit_price' => $unitPrice,
                         'subtotal' => $subtotal,
