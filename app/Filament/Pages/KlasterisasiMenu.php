@@ -1,0 +1,236 @@
+<?php
+
+namespace App\Filament\Pages;
+
+use Carbon\Carbon;
+use Filament\Pages\Page;
+use Filament\Actions\Action;
+use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
+
+class KlasterisasiMenu extends Page
+{
+    protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-squares-2x2';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Analitik';
+
+    protected static ?string $navigationLabel = 'Klasterisasi Menu Penjualan';
+
+    protected static ?string $title = 'Klasterisasi Menu Penjualan';
+
+    protected static ?int $navigationSort = 11;
+
+    // ── Input pengguna ─────────────────────────────────────────────────────
+    public string $inputDateFrom = '';
+    public string $inputDateTo   = '';
+
+    // ── Batas kategorisasi penjualan (user-defined) ────────────────────────
+    // Sangat Laris : total > sangat_laris_batas
+    // Laris        : laris_batas_bawah ≤ total ≤ sangat_laris_batas
+    // Cukup        : cukup_batas_bawah ≤ total ≤ (laris_batas_bawah - 1)
+    // Kurang Laris : total < cukup_batas_bawah
+    public int $sangat_laris_batas = 399;
+    public int $laris_batas_bawah  = 350;
+    public int $cukup_batas_bawah  = 200;
+
+    // ── State ──────────────────────────────────────────────────────────────
+    public bool    $isRunning = false;
+    public bool    $hasResult = false;
+    public ?string $lastRunAt = null;
+    public ?string $errorMsg  = null;
+
+    // ── Tanggal input yang digunakan saat run terakhir ─────────────────────
+    public string $usedDateFrom = '';
+    public string $usedDateTo   = '';
+
+    // ── Hasil clustering ───────────────────────────────────────────────────
+    public int    $bestK           = 0;
+    public float  $silhouetteScore = 0.0;
+    public int    $totalMenu       = 0;
+    public string $dateFrom        = '';   // actual min date in returned data
+    public string $dateTo          = '';   // actual max date in returned data
+
+    public array  $preprocessLogs  = [];
+    public array  $tableRows       = [];   // LAPORAN HASIL CLUSTERING
+    public array  $kategoriRows    = [];   // LAPORAN KATEGORISASI
+    public array  $clusterSummary  = [];   // RATA-RATA per klaster
+
+    // ── Grafik (base64 PNG) ────────────────────────────────────────────────
+    public ?string $chartBarJumlah     = null;
+    public ?string $chartBarKeuntungan = null;
+    public ?string $chartKategorisasi  = null;
+    public ?string $chartElbow         = null;
+    public ?string $chartSilhouette    = null;
+
+    public function getView(): string
+    {
+        return 'filament.pages.klasterisasi-menu';
+    }
+
+    public function getTitle(): string
+    {
+        return 'Klasterisasi Menu Penjualan';
+    }
+
+    // ── Validasi rentang tanggal (minimal 3 bulan) ─────────────────────────
+    public function isDatesValid(): bool
+    {
+        if (empty($this->inputDateFrom) || empty($this->inputDateTo)) {
+            return false;
+        }
+        try {
+            $from = Carbon::parse($this->inputDateFrom);
+            $to   = Carbon::parse($this->inputDateTo);
+            return $to->gt($from) && $from->copy()->addMonths(3)->lte($to);
+        } catch (\Throwable) {
+            return false;
+        }
+    }
+
+    // ── Validasi batas kategorisasi ────────────────────────────────────────
+    public function isCategoryValid(): bool
+    {
+        return $this->sangat_laris_batas > $this->laris_batas_bawah
+            && $this->laris_batas_bawah > $this->cukup_batas_bawah
+            && $this->cukup_batas_bawah > 0;
+    }
+
+    // ── Tentukan kategori berdasarkan total jumlah penjualan ───────────────
+    private function assignKategori(float $totalJumlah): string
+    {
+        $total = (int) floor($totalJumlah);
+        if ($total > $this->sangat_laris_batas) return 'Sangat Laris';
+        if ($total >= $this->laris_batas_bawah)  return 'Laris';
+        if ($total >= $this->cukup_batas_bawah)  return 'Cukup';
+        return 'Kurang Laris';
+    }
+
+    // ── Panggil FastAPI dan simpan hasil ───────────────────────────────────
+    public function runClustering(): void
+    {
+        // Validasi tanggal
+        if (! $this->isDatesValid()) {
+            Notification::make()
+                ->title('Rentang tanggal belum valid')
+                ->body('Isi "Dari Tanggal" dan "Sampai Tanggal" dengan rentang minimal 3 bulan.')
+                ->warning()
+                ->send();
+            return;
+        }
+
+        // Validasi batas kategorisasi
+        if (! $this->isCategoryValid()) {
+            Notification::make()
+                ->title('Batas kategorisasi tidak valid')
+                ->body('Pastikan: Batas Sangat Laris > Batas Bawah Laris > Batas Bawah Cukup > 0.')
+                ->warning()
+                ->send();
+            return;
+        }
+
+        $this->isRunning = true;
+        $this->errorMsg  = null;
+
+        try {
+            $response = Http::timeout(180)->post(config('datamining.url') . '/clustering', [
+                'date_from' => $this->inputDateFrom,
+                'date_to'   => $this->inputDateTo,
+            ]);
+
+            if (! $response->successful()) {
+                throw new \Exception('FastAPI merespons dengan status ' . $response->status());
+            }
+
+            $data = $response->json();
+
+            if (($data['status'] ?? '') === 'error') {
+                throw new \Exception($data['message'] ?? 'Unknown error dari FastAPI');
+            }
+
+            // Simpan ke state Livewire
+            $this->bestK           = $data['best_k']           ?? 0;
+            $this->silhouetteScore = $data['silhouette_score'] ?? 0.0;
+            $this->totalMenu       = $data['total_menu']       ?? 0;
+            $this->dateFrom        = $data['date_range']['from'] ?? $this->inputDateFrom;
+            $this->dateTo          = $data['date_range']['to']   ?? $this->inputDateTo;
+            $this->preprocessLogs = $data['preprocessing_logs'] ?? [];
+            $this->tableRows      = $data['table_rows']          ?? [];
+            $this->clusterSummary = $data['cluster_summary']     ?? [];
+
+            // Kategorisasi dihitung di PHP berdasarkan batas yang ditetapkan user
+            $this->kategoriRows = array_map(
+                fn ($row) => array_merge($row, [
+                    'Kategori' => $this->assignKategori((float) ($row['Total_Jumlah'] ?? 0)),
+                ]),
+                $this->tableRows
+            );
+            $this->chartBarJumlah     = $data['charts']['bar_jumlah']     ?? null;
+            $this->chartBarKeuntungan = $data['charts']['bar_keuntungan'] ?? null;
+            $this->chartKategorisasi  = $data['charts']['kategorisasi']   ?? null;
+            $this->chartElbow         = $data['charts']['elbow']           ?? null;
+            $this->chartSilhouette    = $data['charts']['silhouette']      ?? null;
+
+            $this->hasResult    = true;
+            $this->lastRunAt    = now()->locale('id')->translatedFormat('d M Y, H:i');
+            $this->usedDateFrom = $this->inputDateFrom;
+            $this->usedDateTo   = $this->inputDateTo;
+
+            // ── Simpan ke cache (unik per rentang tanggal, tanpa batas jumlah) ─
+            $newResult = array_merge($data, [
+                'last_run_at'      => $this->lastRunAt,
+                'input_date_from'  => $this->inputDateFrom,
+                'input_date_to'    => $this->inputDateTo,
+            ]);
+
+            $results = Cache::get('klasterisasi_menu_results', []);
+
+            // Jika date range sama → ganti (replace) hasil yang sudah ada
+            $replaced = false;
+            foreach ($results as $idx => $r) {
+                if (($r['input_date_from'] ?? '') === $this->inputDateFrom
+                    && ($r['input_date_to']   ?? '') === $this->inputDateTo) {
+                    array_splice($results, $idx, 1);
+                    array_unshift($results, $newResult);
+                    $replaced = true;
+                    break;
+                }
+            }
+
+            if (! $replaced) {
+                array_unshift($results, $newResult);
+            }
+
+            Cache::put('klasterisasi_menu_results', $results, now()->addDays(30));
+
+            Notification::make()
+                ->title('Clustering selesai!')
+                ->body("K optimal = {$this->bestK} | Silhouette = {$this->silhouetteScore}")
+                ->success()
+                ->send();
+
+        } catch (\Throwable $e) {
+            $this->errorMsg  = $e->getMessage();
+            $this->hasResult = false;
+
+            Notification::make()
+                ->title('Clustering gagal')
+                ->body($e->getMessage())
+                ->danger()
+                ->send();
+        } finally {
+            $this->isRunning = false;
+        }
+    }
+
+    protected function getHeaderActions(): array
+    {
+        return [
+            Action::make('run_clustering')
+                ->label('Jalankan Clustering')
+                ->icon('heroicon-o-cpu-chip')
+                ->color('primary')
+                ->action(fn () => $this->runClustering()),
+        ];
+    }
+}
