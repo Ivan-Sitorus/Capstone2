@@ -15,9 +15,7 @@ class MenuFormModalSmokeTest extends TestCase
 
     public function test_menu_create_modal_renders(): void
     {
-        $this->seed();
-
-        $admin = User::where('email', 'admin@w9cafe.com')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin']);
 
         $this->actingAs($admin, 'admin');
 
