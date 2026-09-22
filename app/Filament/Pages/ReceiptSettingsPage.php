@@ -31,6 +31,11 @@ class ReceiptSettingsPage extends Page implements HasForms
     public ?array $data = [];
     public ?array $previewData = [];
 
+    public function getView(): string
+    {
+        return 'filament.pages.receipt-settings';
+    }
+
     public function mount(): void
     {
         $this->form->fill([

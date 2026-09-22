@@ -11,7 +11,6 @@ use App\Http\Controllers\Customer\CustomerMenuController;
 use App\Http\Controllers\Customer\CustomerOrderController;
 use App\Http\Controllers\Customer\CustomerPaymentController;
 use App\Http\Controllers\ReceiptController;
-use App\Models\Order;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -66,6 +65,5 @@ Route::prefix('pelanggan')->group(function () {
 // QR table entry — accepts {APP_URL}/order?table={id} and forwards to the identity form
 Route::get('/order', fn () => redirect()->route('customer.identitas', request()->only('table')))->name('customer.order.entry');
 
-// Receipt (public — no auth required)
-Route::get('/receipt/{order:code}', fn (Order $order) => redirect()->route('receipt.show-by-uuid', ['order' => $order->uuid], 301));
+// Receipt (public — no auth required, UUIDv7 only for privacy)
 Route::get('/struk-pesanan/{order:uuid}', [ReceiptController::class, 'showByUuid'])->name('receipt.show-by-uuid');

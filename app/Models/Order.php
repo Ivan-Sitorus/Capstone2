@@ -7,6 +7,7 @@ use App\Enums\OrderType;
 use App\Enums\PaymentMethod;
 use App\Enums\QrisStatus;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids;
 
     protected static function boot(): void
     {
@@ -24,6 +25,11 @@ class Order extends Model
             $order->order_code ??= 'ORD-'.date('dmy').'-'.
                 (Order::whereDate('created_at', today())->count() + 1);
         });
+    }
+
+    public function uniqueIds(): array
+    {
+        return ['uuid'];
     }
 
     public static function generateCode(): string
