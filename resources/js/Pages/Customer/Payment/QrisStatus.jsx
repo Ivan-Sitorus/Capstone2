@@ -5,16 +5,17 @@ import { formatRupiah } from '@/helpers';
 
 export default function QrisStatus({ order }) {
     const isRejected = order.status === 'pending' && !!order.rejection_note;
-    const isDone     = order.status === 'selesai';
+    const isDone     = order.status === 'completed';
 
     useEffect(() => {
         if (isDone || isRejected) return;
-        const id = setInterval(() => router.reload({ only: ['order'] }), 5000);
+        const reload = () => { if (document.visibilityState !== 'hidden') router.reload({ only: ['order'] }); };
+        const id = setInterval(reload, 15000);
         return () => clearInterval(id);
     }, [order.status, order.rejection_note]);
 
     const isWaiting   = order.status === 'pending' && !order.rejection_note;
-    const isConfirmed = order.status === 'diproses';
+    const isConfirmed = order.status === 'processing';
 
     return (
         <CustomerLayout>

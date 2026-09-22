@@ -1,10 +1,11 @@
 // Pencil design tokens — brown/coffee theme
 const statusMap = {
     // Order statuses
-    pending:  { dot: '#D4A64A', text: '#D4A64A', bg: '#FFF8E1', label: 'Pending'  },
-    diproses: { dot: '#5B8BD4', text: '#5B8BD4', bg: '#E3F2FD', label: 'Diproses' },
-    selesai:  { dot: '#4D9B6A', text: '#4D9B6A', bg: '#E8F5E9', label: 'Selesai'  },
-    dibatalkan: { dot: '#C95D4A', text: '#C95D4A', bg: '#FBE9E7', label: 'Dibatalkan' },
+    pending:    { dot: '#D4A64A', text: '#D4A64A', bg: '#FFF8E1', label: 'Pending'  },
+    processing: { dot: '#5B8BD4', text: '#5B8BD4', bg: '#E3F2FD', label: 'Diproses' },
+    completed:  { dot: '#4D9B6A', text: '#4D9B6A', bg: '#E8F5E9', label: 'Selesai'  },
+    cancelled:  { dot: '#C95D4A', text: '#C95D4A', bg: '#FBE9E7', label: 'Dibatalkan' },
+    unpaid:     { dot: '#EF4444', text: '#EF4444', bg: '#FEF2F2', label: 'Belum Lunas' },
     // Verifikasi statuses
     menunggu:  { dot: '#D4A64A', text: '#D4A64A', bg: '#FFF8E1', label: 'Menunggu'  },
     disetujui: { dot: '#4D9B6A', text: '#4D9B6A', bg: '#E8F5E9', label: 'Disetujui' },

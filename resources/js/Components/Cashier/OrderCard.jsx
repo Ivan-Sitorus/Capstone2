@@ -12,9 +12,9 @@ import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
 
 const STATUS_META = {
-    pending:  { dot: '#D08068', label: 'Pending'  },
-    diproses: { dot: '#D4A64A', label: 'Diproses' },
-    selesai:  { dot: '#4D9B6A', label: 'Selesai'  },
+    pending:    { dot: '#D08068', label: 'Pending'  },
+    processing: { dot: '#D4A64A', label: 'Diproses' },
+    completed:  { dot: '#4D9B6A', label: 'Selesai'  },
 };
 
 export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone, onConfirmPayment, onCancel }) {
@@ -44,7 +44,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
     const isQrisPending  = order.status === 'pending' && order.payment_method === 'qris';
     const hasProof       = !!order.payment_proof;
     const belumBayar     = order.is_paid === false;
-    const ALL_STATUSES   = ['pending', 'diproses', 'selesai'];
+    const ALL_STATUSES   = ['pending', 'processing', 'completed'];
     const statusIndex    = ALL_STATUSES.indexOf(order.status);
 
     return (
@@ -97,7 +97,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexShrink: 0 }}>
                     <StatusBadge status={order.status} />
 
-                    {order.status !== 'selesai' && (
+                    {order.status !== 'completed' && (
                         <div ref={menuRef} style={{ position: 'relative' }}>
                             <button
                                 onClick={() => setMenuOpen(v => !v)}
@@ -141,7 +141,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                         const isNext     = i === statusIndex + 1;
                                         const isDisabled = !isCurrent && !isNext;
                                         // Blok "Selesai" jika belum bayar
-                                        const isBlocked  = s === 'selesai' && belumBayar;
+                                        const isBlocked  = s === 'completed' && belumBayar;
 
                                         return (
                                             <button
@@ -272,7 +272,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                     )}
 
                     {/* Tombol Konfirmasi Lunas + Popover */}
-                    {belumBayar && order.status === 'diproses' && (
+                    {belumBayar && order.status === 'processing' && (
                         <div ref={payRef} style={{ position: 'relative' }}>
                             <button
                                 onClick={() => setPayPopover(v => !v)}

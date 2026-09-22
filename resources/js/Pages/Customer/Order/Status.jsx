@@ -15,12 +15,12 @@ const STATUS_CONFIG = {
 export default function OrderStatus({ order }) {
     const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
 
-    // Poll status tiap 10 detik selama masih aktif
+    // Poll status tiap 30 detik selama masih aktif (jeda saat tab tersembunyi)
     useEffect(() => {
         if (['completed', 'cancelled'].includes(order.status)) return;
         const id = setInterval(() => {
-            router.reload({ only: ['order'] });
-        }, 10_000);
+            if (document.visibilityState !== 'hidden') router.reload({ only: ['order'] });
+        }, 30_000);
         return () => clearInterval(id);
     }, [order.status]);
 

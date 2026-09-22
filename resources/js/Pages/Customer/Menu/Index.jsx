@@ -229,6 +229,13 @@ export default function CustomerMenu({ categories, table }) {
     const [customer,       setCustomer]       = useState(null);
     const [ready,          setReady]          = useState(false);
 
+    useEffect(() => {
+        const id = setInterval(() => {
+            if (document.visibilityState !== 'hidden') router.reload({ only: ['categories'] });
+        }, 60000);
+        return () => clearInterval(id);
+    }, []);
+
     const { items, addItem, updateQty, setTable, total, count } = useCart();
 
     useEffect(() => {

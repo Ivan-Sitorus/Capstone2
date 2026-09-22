@@ -1,10 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
-import { Search, X, Banknote, QrCode, ShieldCheck, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { Search, X, Banknote, QrCode, ShieldCheck, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen, RefreshCw } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
 import MenuGridItem from '@/Components/Cashier/MenuGridItem';
 import KeranjangItem from '@/Components/Cashier/KeranjangItem';
-import { formatRupiah } from '@/helpers';
+import { formatRupiah, formatTime } from '@/helpers';
 
 export default function PesananBaru({ categories }) {
     const [cartItems,      setCartItems]     = useState([]);
@@ -18,6 +18,18 @@ export default function PesananBaru({ categories }) {
     const [showSuccess,    setShowSuccess]    = useState(false);
     const [successTotal,   setSuccessTotal]   = useState(0);
     const [isCartCollapsed, setIsCartCollapsed] = useState(false);
+    const [lastUpdated,    setLastUpdated]    = useState(() => new Date());
+
+    const refreshMenu = () => {
+        router.reload({ only: ['categories'], onSuccess: () => setLastUpdated(new Date()) });
+    };
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            if (document.visibilityState !== 'hidden') refreshMenu();
+        }, 60000);
+        return () => clearInterval(id);
+    }, []);
     const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(() => {
         if (typeof window === 'undefined') return false;
         return window.localStorage.getItem('cashier-sidebar-collapsed') === 'true';
@@ -179,18 +191,24 @@ export default function PesananBaru({ categories }) {
                     }}
                 >
                     {/* Search */}
-                    <div style={{ position: 'relative' }}>
-                        <Search size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none' }} />
-                        <input
-                            type="text" value={search} onChange={e => setSearch(e.target.value)}
-                            placeholder="Cari menu..."
-                            style={{ width: '100%', height: 44, border: `1px solid ${T.border}`, borderRadius: 8, padding: '0 40px 0 44px', fontSize: 14, color: T.text, background: T.surface, outline: 'none', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(15,23,42,0.04)' }}
-                        />
-                        {search && (
-                            <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: 0, display: 'flex' }}>
-                                <X size={16} />
-                            </button>
-                        )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        <div style={{ position: 'relative', flex: 1 }}>
+                            <Search size={18} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: '#94A3B8', pointerEvents: 'none' }} />
+                            <input
+                                type="text" value={search} onChange={e => setSearch(e.target.value)}
+                                placeholder="Cari menu..."
+                                style={{ width: '100%', height: 44, border: `1px solid ${T.border}`, borderRadius: 8, padding: '0 40px 0 44px', fontSize: 14, color: T.text, background: T.surface, outline: 'none', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(15,23,42,0.04)' }}
+                            />
+                            {search && (
+                                <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#94A3B8', padding: 0, display: 'flex' }}>
+                                    <X size={16} />
+                                </button>
+                            )}
+                        </div>
+                        <span style={{ fontSize: 11, color: '#6C757D', whiteSpace: 'nowrap', flexShrink: 0 }}>Diperbarui {formatTime(lastUpdated)}</span>
+                        <button onClick={refreshMenu} aria-label="Muat ulang menu" style={{ width: 40, height: 40, border: `1px solid ${T.border}`, borderRadius: 8, background: T.surface, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#3B6FD4', flexShrink: 0 }}>
+                            <RefreshCw size={16} />
+                        </button>
                     </div>
 
                     {/* Category chips */}

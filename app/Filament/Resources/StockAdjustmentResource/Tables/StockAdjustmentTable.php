@@ -27,6 +27,7 @@ class StockAdjustmentTable
                 TextColumn::make('code')
                     ->label('Kode')
                     ->copyable()
+                    ->searchable()
                     ->sortable(),
                 TextColumn::make('adjustment_type')
                     ->label('Tipe Penyesuaian')
