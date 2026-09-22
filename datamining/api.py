@@ -10,7 +10,7 @@ Endpoints:
   POST /association       — Association Rules (Apriori/FP-Growth)
 """
 
-import io, os, base64, warnings, math
+import io, os, base64, warnings, math, json
 from typing import Optional
 import numpy as np
 import pandas as pd
@@ -738,3 +738,89 @@ async def prediction_bahan_baku(request: Request):
     except Exception as e:
         import traceback
         return {"status": "error", "message": str(e), "trace": traceback.format_exc()}
+
+
+# ── Jalankan pipeline berdasarkan tipe (untuk fire-and-forget) ─────────────
+def _run_pipeline_for(run_type: str, date_from, date_to) -> dict:
+    if run_type == "clustering":
+        df = fetch_order_data(date_from, date_to)
+        if df.empty:
+            raise ValueError("Tidak ada data pesanan selesai pada rentang tanggal yang dipilih.")
+        if df["Nama Item"].nunique() < 2:
+            raise ValueError("Clustering butuh minimal 2 menu berbeda.")
+        return run_pipeline(df)
+
+    if run_type == "prediction":
+        df = fetch_order_data(date_from, date_to)
+        if df.empty:
+            raise ValueError("Tidak ada data pesanan selesai pada rentang tanggal yang dipilih.")
+        if df["Tanggal"].nunique() < 3:
+            raise ValueError("Data terlalu sedikit: butuh minimal 3 hari transaksi.")
+        return run_prediction_pipeline(df)
+
+    if run_type == "association":
+        df = fetch_association_data(date_from, date_to)
+        if df.empty:
+            raise ValueError("Tidak ada data pesanan pada rentang tanggal tersebut.")
+        return run_association_pipeline(df)
+
+    if run_type == "clustering-bahan-baku":
+        df = fetch_ingredient_data(date_from, date_to)
+        if df.empty:
+            raise ValueError("Tidak ada data pemakaian bahan baku pada rentang tanggal yang dipilih.")
+        return run_bahan_baku_pipeline(df)
+
+    if run_type == "prediction-bahan-baku":
+        df = fetch_ingredient_data(date_from, date_to)
+        if df.empty:
+            raise ValueError("Tidak ada data pemakaian bahan baku pada rentang tanggal yang dipilih.")
+        if df["Tanggal"].nunique() < 3:
+            raise ValueError("Data terlalu sedikit: butuh minimal 3 hari data.")
+        return run_prediction_pipeline_bahan_baku(df)
+
+    raise ValueError(f"Tipe data mining tidak dikenal: {run_type}")
+
+
+def _update_run(run_id: int, status: str, payload: Optional[dict] = None, error: Optional[str] = None) -> None:
+    conn = get_connection()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """UPDATE datamining_runs
+               SET status = %s,
+                   payload = %s::json,
+                   error = %s,
+                   updated_at = NOW()
+               WHERE id = %s""",
+            (status, json.dumps(payload, default=str) if payload is not None else None, error, run_id),
+        )
+        conn.commit()
+    finally:
+        conn.close()
+
+
+@app.post("/run")
+async def run(request: Request):
+    try:
+        body = await request.json()
+    except Exception:
+        body = {}
+
+    run_id    = body.get("run_id")
+    run_type  = (body.get("type") or "").strip()
+    date_from = (body.get("date_from") or "").strip() or None
+    date_to   = (body.get("date_to")   or "").strip() or None
+
+    if not run_id or not run_type:
+        return {"status": "error", "message": "run_id dan type wajib diisi."}
+
+    try:
+        result = _run_pipeline_for(run_type, date_from, date_to)
+        # Simpan data terstruktur saja — buang representasi gambar (base64),
+        # karena diagram akan dirender ulang oleh native Filament ChartWidget.
+        result.pop("charts", None)
+        _update_run(run_id, "completed", payload=result)
+        return {"status": "ok", "run_id": run_id}
+    except Exception as e:
+        _update_run(run_id, "failed", error=str(e)[:2000])
+        return {"status": "error", "run_id": run_id, "message": str(e)}
