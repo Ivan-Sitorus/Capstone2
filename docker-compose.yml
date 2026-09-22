@@ -19,10 +19,9 @@ services:
             timeout: 5s
     redis:
         image: 'redis:alpine'
+        command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
         ports:
             - '${FORWARD_REDIS_PORT:-6379}:6379'
-        volumes:
-            - 'pos-redis:/data'
         networks:
             - pos
         healthcheck:
@@ -82,8 +81,6 @@ networks:
         driver: bridge
 volumes:
     pos-pgsql:
-        driver: local
-    pos-redis:
         driver: local
     storage-data:
         driver: local
