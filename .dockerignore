@@ -7,9 +7,14 @@
 .env
 .env.*
 
-# Dependencies (will exist after install)
+# Dependencies (installed/rebuilt outside the image build)
 node_modules
 vendor
+venv
+
+# Python bytecode
+__pycache__
+*.pyc
 
 # Cache, logs, and temp
 storage/logs
@@ -18,21 +23,34 @@ storage/framework/sessions
 storage/framework/views
 storage/framework/testing
 storage/app/private/*
+supervisord.*
 
 # Testing
 tests
 k6
-test-results
 .phpunit.result.cache
 phpunit*
-playwright*
 
 # Tooling
 .sisyphus
 .opencode
+.claude
+.vscode
+.github
+.vercel
+.playwright-mcp
 
-# Documentation
+# Reference copies, docs, archives
+.demofilamentphp
+.kasir_dan_pelanggan_final
+.skripsi
+supabase
+gambar_diagram_DFD
 *.md
+*.docx
+*.pdf
+create-form-snapshot.yml
+vercel.json
 
 # Packages
 *.deb

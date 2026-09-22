@@ -17,7 +17,6 @@ RUN apk add --no-cache \
     curl \
     ca-certificates \
     tzdata \
-    fcgi \
     nginx \
     supervisor
 
@@ -48,7 +47,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
         bcmath \
         zip \
         intl \
-        soap \
         exif \
         pcntl && \
     pecl install redis && docker-php-ext-enable redis && \
@@ -105,6 +103,8 @@ RUN printf '%s\n' \
     '[supervisord]' \
     'nodaemon=true' \
     'user=root' \
+    'logfile=/dev/stdout' \
+    'logfile_maxbytes=0' \
     '' \
     '[program:php-fpm]' \
     'command=/usr/local/sbin/php-fpm -F' \
@@ -112,14 +112,6 @@ RUN printf '%s\n' \
     'stdout_logfile_maxbytes=0' \
     'stderr_logfile=/dev/stderr' \
     'stderr_logfile_maxbytes=0' \
-    '' \
-    '[program:reverb]' \
-    'command=/usr/local/bin/php /var/www/html/artisan reverb:start --host=0.0.0.0 --port=8083' \
-    'stdout_logfile=/dev/stdout' \
-    'stdout_logfile_maxbytes=0' \
-    'stderr_logfile=/dev/stderr' \
-    'stderr_logfile_maxbytes=0' \
-    'autorestart=true' \
     '' \
     '[program:nginx]' \
     'command=/usr/sbin/nginx -g "daemon off;"' \
@@ -143,6 +135,5 @@ RUN printf '%s\n' \
     chmod +x /usr/local/bin/startup.sh
 
 # ── Final ────────────────────────────────────────────────────────────
-WORKDIR /var/www/html
 EXPOSE 80
 CMD ["/usr/local/bin/startup.sh"]
