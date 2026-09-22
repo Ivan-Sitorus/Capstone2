@@ -2,14 +2,23 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\AssociationChartWidget;
+use App\Filament\Widgets\AssociationSummaryWidget;
+use App\Services\DataMiningRunner;
 use Carbon\Carbon;
-use Filament\Pages\Page;
 use Filament\Actions\Action;
+use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
-use App\Models\DataminingRun;
+use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
+use Filament\Pages\Page;
+use Filament\Schemas\Components\EmbeddedSchema;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
 
 class AsosiatifMenu extends Page
 {
+    use HasFiltersForm;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-link';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Analitik';
@@ -20,78 +29,83 @@ class AsosiatifMenu extends Page
 
     protected static ?int $navigationSort = 12;
 
-    // ── Input pengguna ─────────────────────────────────────────────────────
-    public string $inputDateFrom = '';
-    public string $inputDateTo   = '';
-
-    // ── State ──────────────────────────────────────────────────────────────
-    public bool    $hasResult = false;
-    public ?string $lastRunAt = null;
-    public ?string $errorMsg  = null;
-
-    // ── Tanggal yang digunakan saat run (berbeda dari input aktif) ──────────
-    public string $usedDateFrom = '';
-    public string $usedDateTo   = '';
-
-    // ── Hasil association rule ─────────────────────────────────────────────
-    public int    $totalRules        = 0;
-    public int    $totalTransactions = 0;
-    public float  $minSupport        = 0.0;
-    public float  $minConfidence     = 0.0;
-    public string $dateFrom          = '';
-    public string $dateTo            = '';
-    public array  $rules             = [];
-    public array  $freq1Itemsets     = [];
-    public array  $freq2Itemsets     = [];
-    public array  $preprocessLogs    = [];
-
-    // ── Grafik ─────────────────────────────────────────────────────────────
-    public ?string $chartSupConf  = null;
-    public ?string $chartTopRules = null;
-    public ?string $chartFreqItem = null;
-
-    public function getView(): string
+    public function mount(): void
     {
-        return 'filament.pages.asosiatif-menu';
+        $this->mountHasFilters();
+
+        if (empty($this->filters['from'])) {
+            $this->filters['from'] = now()->subMonths(3)->toDateString();
+        }
+        if (empty($this->filters['until'])) {
+            $this->filters['until'] = now()->toDateString();
+        }
     }
 
-    public function getTitle(): string
+    public function filtersForm(Schema $schema): Schema
     {
-        return 'Asosiatif Menu';
+        return $schema->components([
+            DatePicker::make('from')
+                ->label('Dari Tanggal')
+                ->native(false)
+                ->displayFormat('d M Y')
+                ->maxDate(now()),
+            DatePicker::make('until')
+                ->label('Sampai Tanggal')
+                ->native(false)
+                ->displayFormat('d M Y')
+                ->maxDate(now()),
+        ]);
     }
 
-    // ── Validasi rentang tanggal (minimal 3 bulan) ─────────────────────────
-    public function isDatesValid(): bool
+    public function content(Schema $schema): Schema
     {
-        if (empty($this->inputDateFrom) || empty($this->inputDateTo)) {
+        return $schema
+            ->components([
+                EmbeddedSchema::make('filtersForm'),
+                Grid::make()
+                    ->schema(fn (): array => $this->getWidgetsSchemaComponents($this->getWidgets())),
+            ]);
+    }
+
+    public function getWidgets(): array
+    {
+        return [
+            AssociationChartWidget::class,
+            AssociationSummaryWidget::class,
+        ];
+    }
+
+    public function isDateRangeValid(): bool
+    {
+        $from = $this->filters['from'] ?? null;
+        $to   = $this->filters['until'] ?? null;
+
+        if (! $from || ! $to) {
             return false;
         }
+
         try {
-            $from = Carbon::parse($this->inputDateFrom);
-            $to   = Carbon::parse($this->inputDateTo);
-            return $to->gt($from) && $from->copy()->addMonths(3)->lte($to);
+            return Carbon::parse($to)->greaterThan(Carbon::parse($from))
+                && Carbon::parse($from)->diffInMonths(Carbon::parse($to)) >= 3;
         } catch (\Throwable) {
             return false;
         }
     }
 
-    // ── Panggil FastAPI endpoint association rule ──────────────────────────
     public function runAssociation(): void
     {
-        if (! $this->isDatesValid()) {
+        if (! $this->isDateRangeValid()) {
             Notification::make()
                 ->title('Rentang tanggal belum valid')
-                ->body('Isi "Dari Tanggal" dan "Sampai Tanggal" dengan rentang minimal 3 bulan.')
+                ->body('Pilih rentang tanggal minimal 3 bulan.')
                 ->warning()
                 ->send();
+
             return;
         }
 
-        $this->errorMsg  = null;
-        $this->hasResult = false;
-
         try {
-            app(\App\Services\DataMiningRunner::class)->dispatch('association', $this->inputDateFrom, $this->inputDateTo);
+            app(DataMiningRunner::class)->dispatch('association', $this->filters['from'], $this->filters['until']);
 
             Notification::make()
                 ->title('Association Rule sedang diproses')
@@ -100,59 +114,13 @@ class AsosiatifMenu extends Page
                 ->send();
         } catch (\Throwable $e) {
             report($e);
-            $this->errorMsg = $e->getMessage();
 
             Notification::make()
-                ->title('Gagal memulai Association Rule')
+                ->title('Association Rule gagal dimulai')
                 ->body($e->getMessage())
                 ->danger()
                 ->send();
         }
-    }
-
-    public function mount(): void
-    {
-        $this->loadLatestResult();
-    }
-
-    public function loadLatestResult(): void
-    {
-        $run = DataminingRun::latest('association');
-
-        if (! $run) {
-            return;
-        }
-
-        if ($run->status === 'completed') {
-            $this->hydrateResult($run->payload ?? []);
-            $this->lastRunAt    = $run->created_at?->locale('id')->translatedFormat('d M Y, H:i');
-            $this->usedDateFrom = $run->parameters['date_from'] ?? '';
-            $this->usedDateTo   = $run->parameters['date_to'] ?? '';
-        } elseif ($run->status === 'failed') {
-            $this->errorMsg  = $run->error;
-            $this->hasResult = false;
-        }
-    }
-
-    protected function hydrateResult(array $data): void
-    {
-        $this->totalRules        = $data['total_rules']        ?? 0;
-        $this->totalTransactions = $data['total_transactions'] ?? 0;
-        $this->minSupport        = $data['min_support']        ?? 0.0;
-        $this->minConfidence     = $data['min_confidence']     ?? 0.0;
-        $this->dateFrom          = $data['date_range']['from'] ?? '';
-        $this->dateTo            = $data['date_range']['to']   ?? '';
-        $this->rules             = $data['rules']              ?? [];
-        $this->freq1Itemsets     = $data['freq_1_itemsets']    ?? [];
-        $this->freq2Itemsets     = $data['freq_2_itemsets']    ?? [];
-        $this->preprocessLogs    = $data['preprocessing_logs'] ?? [];
-
-        $charts = $data['charts'] ?? [];
-        $this->chartSupConf  = $charts['sup_conf']  ?? null;
-        $this->chartTopRules = $charts['top_rules'] ?? null;
-        $this->chartFreqItem = $charts['freq_item'] ?? null;
-
-        $this->hasResult = true;
     }
 
     protected function getHeaderActions(): array
@@ -162,6 +130,7 @@ class AsosiatifMenu extends Page
                 ->label('Jalankan Association Rule')
                 ->icon('heroicon-o-play')
                 ->color('primary')
+                ->disabled(fn () => ! $this->isDateRangeValid())
                 ->action(fn () => $this->runAssociation()),
         ];
     }
