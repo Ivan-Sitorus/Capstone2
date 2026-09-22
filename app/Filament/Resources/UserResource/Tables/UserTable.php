@@ -5,9 +5,12 @@ namespace App\Filament\Resources\UserResource\Tables;
 use App\Enums\UserRole;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\DatePicker;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class UserTable
 {
@@ -46,6 +49,16 @@ class UserTable
                         'admin' => 'Admin',
                         'cashier' => 'Kasir',
                     ]),
+                Filter::make('created_range')
+                    ->label('Rentang Tanggal Daftar')
+                    ->form([
+                        DatePicker::make('created_from')->label('Dari'),
+                        DatePicker::make('created_until')->label('Sampai'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when($data['created_from'], fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
+                        ->when($data['created_until'], fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date))
+                    ),
             ])
             ->recordActions([
                 EditAction::make()->modal(),

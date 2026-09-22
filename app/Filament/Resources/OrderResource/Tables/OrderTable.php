@@ -7,6 +7,7 @@ use App\Enums\PaymentMethod;
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
 use Filament\Actions\Action;
+use Filament\Forms\Components\DatePicker;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -66,6 +67,16 @@ class OrderTable
                         'qris' => 'QRIS',
                         'pay_later' => 'Bayar Nanti',
                     ]),
+                Filter::make('created_range')
+                    ->label('Rentang Tanggal')
+                    ->form([
+                        DatePicker::make('created_from')->label('Dari'),
+                        DatePicker::make('created_until')->label('Sampai'),
+                    ])
+                    ->query(fn (Builder $query, array $data): Builder => $query
+                        ->when($data['created_from'], fn (Builder $q, $date): Builder => $q->whereDate('created_at', '>=', $date))
+                        ->when($data['created_until'], fn (Builder $q, $date): Builder => $q->whereDate('created_at', '<=', $date))
+                    ),
                 Filter::make('today')
                     ->label('Hari Ini')
                     ->query(fn (Builder $query): Builder => $query->whereDate('created_at', today()))
