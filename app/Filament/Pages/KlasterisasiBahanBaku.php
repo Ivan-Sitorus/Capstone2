@@ -193,6 +193,7 @@ class KlasterisasiBahanBaku extends Page
                 ->send();
 
         } catch (\Exception $e) {
+            report($e);
             $this->errorMsg  = $e->getMessage();
             $this->hasResult = false;
 

@@ -210,6 +210,7 @@ class KlasterisasiMenu extends Page
                 ->send();
 
         } catch (\Throwable $e) {
+            report($e);
             $this->errorMsg  = $e->getMessage();
             $this->hasResult = false;
 
