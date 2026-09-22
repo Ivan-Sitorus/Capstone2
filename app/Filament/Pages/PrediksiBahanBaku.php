@@ -6,8 +6,7 @@ use Carbon\Carbon;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
+use App\Models\DataminingRun;
 
 class PrediksiBahanBaku extends Page
 {
@@ -98,89 +97,70 @@ class PrediksiBahanBaku extends Page
             return;
         }
 
+        $this->hasResult = false;
+
         try {
-            $response = Http::timeout(600)->asJson()->post(config('datamining.url') . '/prediction-bahan-baku', [
-                'date_from' => $this->inputDateFrom,
-                'date_to'   => $this->inputDateTo,
-            ]);
-
-            if (! $response->successful()) {
-                throw new \Exception('FastAPI merespons dengan status ' . $response->status());
-            }
-
-            $data = $response->json();
-
-            if (($data['status'] ?? '') === 'error') {
-                throw new \Exception($data['message'] ?? 'Unknown error dari FastAPI');
-            }
-
-            $this->totalIngredients = $data['total_ingredients']       ?? 0;
-            $this->forecastDays     = $data['forecast_days']           ?? 0;
-            $this->dateFrom         = $data['date_range']['from']      ?? '';
-            $this->dateTo           = $data['date_range']['to']        ?? '';
-            $this->dateForecastFrom = $data['forecast_range']['from']  ?? '';
-            $this->dateForecastTo   = $data['forecast_range']['to']    ?? '';
-            $this->predictions      = $data['predictions']             ?? [];
-            $this->summaryTable     = $data['summary_table']           ?? [];
-            $this->preprocessLogs   = $data['preprocessing_logs']      ?? [];
-
-            $charts = $data['charts'] ?? [];
-            $this->chartForecastAll       = $charts['forecast_all']       ?? null;
-            $this->chartFeatureImportance = $charts['feature_importance'] ?? null;
-            $this->chartEvaluation        = $charts['evaluation']         ?? null;
-            $this->chartAllItems          = $charts['all_items']          ?? null;
-            $this->chartPerIngredient     = $charts['per_ingredient']     ?? [];
-
-            $this->hasResult = true;
-            $this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
-
-            // ── Simpan ke history (max 3, unik per date range) ──────────────
-            $history   = Cache::get('prediksi_bahan_baku_results_history', []);
-            $inputFrom = $this->inputDateFrom;
-            $inputTo   = $this->inputDateTo;
-
-            // Hapus entry dengan date range yang sama (replace)
-            $history = array_values(array_filter(
-                $history,
-                fn($h) => !(($h['input_date_from'] ?? '') === $inputFrom
-                          && ($h['input_date_to']   ?? '') === $inputTo)
-            ));
-
-            // Tambahkan entry baru di awal (terbaru pertama)
-            array_unshift($history, [
-                'run_at'               => $this->lastRunAt,
-                'input_date_from'      => $this->inputDateFrom,
-                'input_date_to'        => $this->inputDateTo,
-                'date_from'            => $this->dateFrom,
-                'date_to'              => $this->dateTo,
-                'date_forecast_from'   => $this->dateForecastFrom,
-                'date_forecast_to'     => $this->dateForecastTo,
-                'total_ingredients'    => $this->totalIngredients,
-                'forecast_days'        => $this->forecastDays,
-                'predictions'          => $this->predictions,
-                'summary_table'        => $this->summaryTable,
-                'chart_feature_importance' => $this->chartFeatureImportance,
-            ]);
-
-            Cache::put('prediksi_bahan_baku_results_history', $history, now()->addDays(30));
+            app(\App\Services\DataMiningRunner::class)->dispatch('prediction-bahan-baku', $this->inputDateFrom, $this->inputDateTo);
 
             Notification::make()
-                ->title('Prediksi Bahan Baku selesai!')
-                ->body("Berhasil memprediksi {$this->totalIngredients} bahan baku untuk {$this->forecastDays} hari ke depan.")
-                ->success()
+                ->title('Prediksi Bahan Baku sedang diproses')
+                ->body('Hasil akan muncul otomatis setelah selesai diproses.')
+                ->info()
                 ->send();
-
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             report($e);
-            $this->errorMsg  = $e->getMessage();
-            $this->hasResult = false;
+            $this->errorMsg = $e->getMessage();
 
             Notification::make()
-                ->title('Prediksi Bahan Baku gagal')
+                ->title('Prediksi Bahan Baku gagal dimulai')
                 ->body($e->getMessage())
                 ->danger()
                 ->send();
         }
+    }
+
+    public function mount(): void
+    {
+        $this->loadLatestResult();
+    }
+
+    public function loadLatestResult(): void
+    {
+        $run = DataminingRun::latest('prediction-bahan-baku');
+
+        if (! $run) {
+            return;
+        }
+
+        if ($run->status === 'completed') {
+            $this->hydrateResult($run->payload ?? []);
+            $this->lastRunAt = $run->created_at?->locale('id')->translatedFormat('d M Y, H:i');
+        } elseif ($run->status === 'failed') {
+            $this->errorMsg  = $run->error;
+            $this->hasResult = false;
+        }
+    }
+
+    protected function hydrateResult(array $data): void
+    {
+        $this->totalIngredients = $data['total_ingredients']      ?? 0;
+        $this->forecastDays     = $data['forecast_days']          ?? 0;
+        $this->dateFrom         = $data['date_range']['from']     ?? '';
+        $this->dateTo           = $data['date_range']['to']       ?? '';
+        $this->dateForecastFrom = $data['forecast_range']['from'] ?? '';
+        $this->dateForecastTo   = $data['forecast_range']['to']   ?? '';
+        $this->predictions      = $data['predictions']            ?? [];
+        $this->summaryTable     = $data['summary_table']          ?? [];
+        $this->preprocessLogs   = $data['preprocessing_logs']     ?? [];
+
+        $charts = $data['charts'] ?? [];
+        $this->chartForecastAll       = $charts['forecast_all']       ?? null;
+        $this->chartFeatureImportance = $charts['feature_importance'] ?? null;
+        $this->chartEvaluation        = $charts['evaluation']         ?? null;
+        $this->chartAllItems          = $charts['all_items']          ?? null;
+        $this->chartPerIngredient     = $charts['per_ingredient']     ?? [];
+
+        $this->hasResult = true;
     }
 
     protected function getHeaderActions(): array

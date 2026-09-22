@@ -5,8 +5,7 @@ namespace App\Filament\Pages;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Cache;
+use App\Models\DataminingRun;
 use Carbon\Carbon;
 
 class KlasterisasiBahanBaku extends Page
@@ -112,97 +111,70 @@ class KlasterisasiBahanBaku extends Page
             return;
         }
 
+        $this->errorMsg  = null;
+        $this->hasResult = false;
+
         try {
-            $response = Http::timeout(180)->asJson()->post(
-                config('datamining.url') . '/clustering-bahan-baku',
-                [
-                    'date_from' => $this->inputDateFrom,
-                    'date_to'   => $this->inputDateTo,
-                ]
-            );
-
-            if (! $response->successful()) {
-                throw new \Exception('FastAPI merespons dengan status ' . $response->status());
-            }
-
-            $data = $response->json();
-
-            if (($data['status'] ?? '') === 'error') {
-                throw new \Exception($data['message'] ?? 'Unknown error dari FastAPI');
-            }
-
-            $this->bestK            = $data['best_k']              ?? 0;
-            $this->silhouetteScore  = $data['silhouette_score']    ?? 0.0;
-            $this->totalIngredients = $data['total_ingredients']   ?? 0;
-            $this->dateFrom         = $data['date_range']['from']  ?? '';
-            $this->dateTo           = $data['date_range']['to']    ?? '';
-            $this->clusters         = $data['clusters']            ?? [];
-            $this->tableRows        = $data['table_rows']          ?? [];
-            $this->rataRataTable    = $data['rata_rata_table']      ?? [];
-            $this->preprocessLogs   = $data['preprocessing_logs']  ?? [];
-            $this->chartRataKlaster = $data['charts']['rata_klaster'] ?? null;
-            $this->chartBar         = $data['charts']['bar']          ?? null;
-            $this->chartElbow       = $data['charts']['elbow']        ?? null;
-            $this->chartSilhouette  = $data['charts']['silhouette']   ?? null;
-
-            $this->hasResult = true;
-            $this->lastRunAt = now()->locale('id')->translatedFormat('d M Y, H:i');
-
-            // ── Simpan ke history cache (maks 3, unik per rentang tanggal) ──
-            $inputFrom = $this->inputDateFrom;
-            $inputTo   = $this->inputDateTo;
-
-            $history = Cache::get('klasterisasi_bahan_baku_results_history', []);
-
-            // Hapus entry lama dengan rentang tanggal yang sama
-            $history = array_values(array_filter(
-                $history,
-                fn ($h) => !(
-                    ($h['input_date_from'] ?? '') === $inputFrom &&
-                    ($h['input_date_to']   ?? '') === $inputTo
-                )
-            ));
-
-            array_unshift($history, [
-                'run_at'            => $this->lastRunAt,
-                'input_date_from'   => $inputFrom,
-                'input_date_to'     => $inputTo,
-                'best_k'            => $this->bestK,
-                'silhouette_score'  => $this->silhouetteScore,
-                'total_ingredients' => $this->totalIngredients,
-                'date_from'         => $this->dateFrom,
-                'date_to'           => $this->dateTo,
-                'clusters'          => $this->clusters,
-                'table_rows'        => $this->tableRows,
-                'rata_rata_table'   => $this->rataRataTable,
-                'preprocessing_logs'=> $this->preprocessLogs,
-                'charts'            => [
-                    'rata_klaster' => $this->chartRataKlaster,
-                    'bar'          => $this->chartBar,
-                    'elbow'        => $this->chartElbow,
-                    'silhouette'   => $this->chartSilhouette,
-                ],
-            ]);
-
-            Cache::put('klasterisasi_bahan_baku_results_history', $history, now()->addDays(30));
+            app(\App\Services\DataMiningRunner::class)->dispatch('clustering-bahan-baku', $this->inputDateFrom, $this->inputDateTo);
 
             Notification::make()
-                ->title('Clustering Bahan Baku selesai!')
-                ->body("K-Means berhasil. K optimal = {$this->bestK}, Silhouette = {$this->silhouetteScore}")
-                ->success()
+                ->title('Clustering Bahan Baku sedang diproses')
+                ->body('Hasil akan muncul otomatis setelah selesai diproses.')
+                ->info()
                 ->send();
-
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             report($e);
-            $this->errorMsg  = $e->getMessage();
-            $this->hasResult = false;
+            $this->errorMsg = $e->getMessage();
 
             Notification::make()
-                ->title('Clustering Bahan Baku gagal')
+                ->title('Clustering Bahan Baku gagal dimulai')
                 ->body($e->getMessage())
                 ->danger()
                 ->send();
         }
+    }
+
+    public function mount(): void
+    {
+        $this->loadLatestResult();
+    }
+
+    public function loadLatestResult(): void
+    {
+        $run = DataminingRun::latest('clustering-bahan-baku');
+
+        if (! $run) {
+            return;
+        }
+
+        if ($run->status === 'completed') {
+            $this->hydrateResult($run->payload ?? []);
+            $this->lastRunAt = $run->created_at?->locale('id')->translatedFormat('d M Y, H:i');
+        } elseif ($run->status === 'failed') {
+            $this->errorMsg  = $run->error;
+            $this->hasResult = false;
+        }
+    }
+
+    protected function hydrateResult(array $data): void
+    {
+        $this->bestK            = $data['best_k']             ?? 0;
+        $this->silhouetteScore  = $data['silhouette_score']   ?? 0.0;
+        $this->totalIngredients = $data['total_ingredients']  ?? 0;
+        $this->dateFrom         = $data['date_range']['from'] ?? '';
+        $this->dateTo           = $data['date_range']['to']   ?? '';
+        $this->clusters         = $data['clusters']           ?? [];
+        $this->tableRows        = $data['table_rows']         ?? [];
+        $this->rataRataTable    = $data['rata_rata_table']    ?? [];
+        $this->preprocessLogs   = $data['preprocessing_logs'] ?? [];
+
+        $charts = $data['charts'] ?? [];
+        $this->chartRataKlaster = $charts['rata_klaster'] ?? null;
+        $this->chartBar         = $charts['bar']          ?? null;
+        $this->chartElbow       = $charts['elbow']        ?? null;
+        $this->chartSilhouette  = $charts['silhouette']   ?? null;
+
+        $this->hasResult = true;
     }
 
     protected function getHeaderActions(): array

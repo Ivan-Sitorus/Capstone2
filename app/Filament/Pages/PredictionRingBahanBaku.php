@@ -5,7 +5,7 @@ namespace App\Filament\Pages;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Cache;
+use App\Models\DataminingRun;
 
 class PredictionRingBahanBaku extends Page
 {
@@ -38,13 +38,34 @@ class PredictionRingBahanBaku extends Page
     // ── Load saat halaman pertama kali dibuka ──────────────────────────
     public function mount(): void
     {
-        $this->loadFromCache();
+        $this->loadHistory();
     }
 
-    // ── Ambil history dari cache ───────────────────────────────────────
-    public function loadFromCache(): void
+    // ── Ambil history dari datamining_runs ─────────────────────────────
+    public function loadHistory(): void
     {
-        $history = Cache::get('prediksi_bahan_baku_results_history', []);
+        $history = DataminingRun::completedHistory('prediction-bahan-baku', 3)
+            ->map(function (DataminingRun $run) {
+                $payload = $run->payload ?? [];
+                $params  = $run->parameters ?? [];
+
+                return [
+                    'run_at'                   => $run->created_at?->locale('id')->translatedFormat('d M Y, H:i'),
+                    'input_date_from'          => $params['date_from'] ?? '',
+                    'input_date_to'            => $params['date_to'] ?? '',
+                    'date_from'                => $payload['date_range']['from'] ?? '',
+                    'date_to'                  => $payload['date_range']['to'] ?? '',
+                    'date_forecast_from'       => $payload['forecast_range']['from'] ?? '',
+                    'date_forecast_to'         => $payload['forecast_range']['to'] ?? '',
+                    'total_ingredients'        => $payload['total_ingredients'] ?? 0,
+                    'forecast_days'            => $payload['forecast_days'] ?? 0,
+                    'predictions'              => $payload['predictions'] ?? [],
+                    'summary_table'            => $payload['summary_table'] ?? [],
+                    'chart_feature_importance' => null,
+                ];
+            })
+            ->values()
+            ->all();
 
         if (empty($history)) {
             $this->hasResult = false;
@@ -63,7 +84,7 @@ class PredictionRingBahanBaku extends Page
                 ->label('Perbarui Data Prediksi Penggunaan Bahan Baku')
                 ->icon('heroicon-o-arrow-path')
                 ->action(function () {
-                    $this->loadFromCache();
+                    $this->loadHistory();
 
                     if ($this->hasResult) {
                         $count = count($this->results);
