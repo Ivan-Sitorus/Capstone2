@@ -2,7 +2,7 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-COPY requirements.txt .
+COPY datamining/requirements.txt .
 
 # Build tools needed to compile prophet/scipy wheels when no prebuilt wheel matches.
 RUN apt-get update \

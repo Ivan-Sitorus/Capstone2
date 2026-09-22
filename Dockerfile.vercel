@@ -1,0 +1,71 @@
+# Vercel container build — Laravel + Inertia/React di FrankenPHP
+
+# ── Base: FrankenPHP (PHP 8.5) + ekstensi yang dibutuhkan ──────────────
+FROM dunglas/frankenphp:1-php8.5-bookworm AS base
+
+RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" \
+    && install-php-extensions pdo_pgsql pgsql gd bcmath zip intl exif pcntl redis imagick
+
+WORKDIR /app
+
+# ── Frontend build (Vite + React) ──────────────────────────────────────
+FROM node:24-alpine AS frontend
+
+WORKDIR /app
+
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY vite.config.js ./
+COPY resources ./resources
+
+RUN npm run build
+
+# ── Composer dependencies + app (PHP 8.5, sesuai composer.json ^8.5) ────
+FROM base AS dependencies
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+COPY composer.json composer.lock ./
+RUN composer install \
+    --no-dev \
+    --no-interaction \
+    --no-progress \
+    --no-scripts \
+    --optimize-autoloader \
+    --prefer-dist
+
+COPY . .
+COPY --from=frontend /app/public/build ./public/build
+
+RUN composer dump-autoload --no-dev --classmap-authoritative
+
+# ── Runtime ─────────────────────────────────────────────────────────────
+FROM base AS runtime
+
+COPY --from=dependencies --chown=www-data:www-data /app /app
+COPY --chown=www-data:www-data Caddyfile /etc/frankenphp/Caddyfile
+
+RUN mkdir -p \
+        storage/framework/cache \
+        storage/framework/sessions \
+        storage/framework/views \
+        bootstrap/cache \
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && setcap CAP_NET_BIND_SERVICE=+eip /usr/local/bin/frankenphp \
+    && chown -R www-data:www-data /config/caddy /data/caddy
+
+ENV PORT=80 \
+    APP_ENV=production \
+    APP_DEBUG=false \
+    LOG_CHANNEL=stderr \
+    CACHE_STORE=array \
+    SESSION_DRIVER=database \
+    QUEUE_CONNECTION=sync \
+    FILESYSTEM_DISK=local
+
+USER www-data
+
+EXPOSE 80
+
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
