@@ -21,4 +21,23 @@ class DataminingRun extends Model
             'payload'    => 'array',
         ];
     }
+
+    public static function latestCompleted(string $type): ?self
+    {
+        return static::query()
+            ->where('type', $type)
+            ->where('status', 'completed')
+            ->latest()
+            ->first();
+    }
+
+    public static function completedHistory(string $type, int $limit = 3): \Illuminate\Database\Eloquent\Collection
+    {
+        return static::query()
+            ->where('type', $type)
+            ->where('status', 'completed')
+            ->latest()
+            ->limit($limit)
+            ->get();
+    }
 }
