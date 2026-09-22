@@ -659,27 +659,33 @@ async def association(request: Request):
 
 def fetch_ingredient_data(date_from: Optional[str] = None,
                           date_to:   Optional[str] = None) -> pd.DataFrame:
-    where_clauses = []
+    """Ambil pemakaian bahan baku dari tabel normalized:
+    order_items -> orders (status completed) -> menu_ingredients -> ingredients."""
+    where_clauses = ["o.status = 'completed'"]
     params: list = []
 
     if date_from and date_from.strip():
-        where_clauses.append("diu.usage_date::date >= %s")
+        where_clauses.append("o.created_at::date >= %s")
         params.append(date_from.strip())
     if date_to and date_to.strip():
-        where_clauses.append("diu.usage_date::date <= %s")
+        where_clauses.append("o.created_at::date <= %s")
         params.append(date_to.strip())
 
-    where_sql = ("WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
+    where_sql = " AND ".join(where_clauses)
 
     sql = f"""
         SELECT
-            diu.usage_date::date             AS "Tanggal",
-            diu.ingredient_name              AS "Bahan_Baku",
-            diu.unit                         AS "Unit",
-            diu.quantity_used::float      AS "Jumlah_Digunakan"
-        FROM daily_ingredient_usages diu
-        {where_sql}
-        ORDER BY diu.usage_date ASC
+            o.created_at::date                          AS "Tanggal",
+            i.name                                      AS "Bahan_Baku",
+            i.unit                                      AS "Unit",
+            SUM(oi.quantity * mi.quantity_used)::float  AS "Jumlah_Digunakan"
+        FROM order_items oi
+        JOIN orders o ON o.id = oi.order_id
+        JOIN menu_ingredients mi ON mi.menu_id = oi.menu_id
+        JOIN ingredients i ON i.id = mi.ingredient_id
+        WHERE {where_sql}
+        GROUP BY o.created_at::date, i.id, i.name, i.unit
+        ORDER BY o.created_at::date ASC
     """
     conn = get_connection()
     try:
