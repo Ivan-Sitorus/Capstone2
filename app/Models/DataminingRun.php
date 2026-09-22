@@ -31,6 +31,14 @@ class DataminingRun extends Model
             ->first();
     }
 
+    public static function latest(string $type): ?self
+    {
+        return static::query()
+            ->where('type', $type)
+            ->latest()
+            ->first();
+    }
+
     public static function completedHistory(string $type, int $limit = 3): \Illuminate\Database\Eloquent\Collection
     {
         return static::query()
