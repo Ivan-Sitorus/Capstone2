@@ -1,8 +1,0 @@
-includes:
-    - ./vendor/larastan/larastan/extension.neon
-    - ./vendor/phpstan/phpstan-deprecation-rules/rules.neon
-
-parameters:
-    paths:
-        - app
-    level: 8
