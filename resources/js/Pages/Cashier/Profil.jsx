@@ -8,7 +8,7 @@ export default function Profil({ user }) {
     const [logoutHover, setLogoutHover] = useState(false);
 
     function handleLogout() {
-        router.post('/logout');
+        router.post(route('logout'));
     }
 
     const roleLabel = {

@@ -64,7 +64,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
             {/* ── C. Quick Actions ── */}
             <div style={{ display: 'flex', gap: 12, marginBottom: 28 }}>
                 <button
-                    onClick={() => router.visit('/cashier/pesanan-baru')}
+                    onClick={() => router.visit(route('kasir.pesanan-baru'))}
                     style={{
                         display: 'flex', alignItems: 'center', gap: 8,
                         height: 44, padding: '0 20px',
@@ -79,7 +79,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                 </button>
 
                 <button
-                    onClick={() => router.visit('/cashier/pesanan-aktif')}
+                    onClick={() => router.visit(route('kasir.pesanan-aktif'))}
                     style={{
                         display: 'flex', alignItems: 'center', gap: 8,
                         height: 44, padding: '0 20px',
@@ -94,7 +94,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                 </button>
 
                 <button
-                    onClick={() => router.visit('/cashier/riwayat')}
+                    onClick={() => router.visit(route('kasir.riwayat-pesanan'))}
                     style={{
                         display: 'flex', alignItems: 'center', gap: 8,
                         height: 44, padding: '0 20px',
@@ -117,7 +117,7 @@ export default function Dashboard({ totalPenjualan, jumlahTransaksi, pesananAkti
                         Transaksi Terbaru
                     </h2>
                     <Link
-                        href="/cashier/riwayat"
+                        href={route('kasir.riwayat-pesanan')}
                         style={{ fontSize: 13, fontWeight: 500, color: '#3B6FD4', textDecoration: 'none' }}
                     >
                         Lihat Semua →

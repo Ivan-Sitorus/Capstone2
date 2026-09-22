@@ -79,7 +79,7 @@ class AuthController extends Controller
             return redirect()->to('/admin');
         }
 
-        return Inertia::location(route('kasir.pesanan-baru'));
+        return redirect()->route('kasir.pesanan-baru');
     }
 
     public function logout(Request $request): RedirectResponse

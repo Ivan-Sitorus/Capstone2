@@ -236,26 +236,26 @@ export default function CustomerMenu({ categories, table }) {
             const saved = sessionStorage.getItem('w9_customer');
             if (!saved) {
                 const fb = table?.id ?? '';
-                router.visit(fb ? `/order?table=${fb}` : '/order');
+                router.visit(fb ? route('customer.identitas', { table: fb }) : route('customer.identitas'));
                 return;
             }
             const data = JSON.parse(saved);
             if (!data.name || !data.phone) {
                 sessionStorage.removeItem('w9_customer');
                 const fb = table?.id ?? '';
-                router.visit(fb ? `/order?table=${fb}` : '/order');
+                router.visit(fb ? route('customer.identitas', { table: fb }) : route('customer.identitas'));
                 return;
             }
             if (table?.id && data.tableId !== table.id) {
                 sessionStorage.removeItem('w9_customer');
-                router.visit(`/order?table=${table.id}`);
+                router.visit(route('customer.identitas', { table: table.id }));
                 return;
             }
             setCustomer(data);
             setTable(table?.id ?? data.tableId ?? null);
             setReady(true);
         } catch (_) {
-            router.visit('/order');
+            router.visit(route('customer.identitas'));
         }
     }, [table?.id]);
 
@@ -551,7 +551,7 @@ export default function CustomerMenu({ categories, table }) {
                         </div>
                     </div>
                     <button
-                        onClick={() => router.visit('/customer/cart')}
+                        onClick={() => router.visit(route('customer.cart'))}
                         style={{
                             background: C.surface, color: C.textPrimary,
                             border: 'none', borderRadius: 8,

@@ -15,18 +15,6 @@ export default function CustomerLayout({ children, activeTab = 'menu', showBotto
         }
     }, [flash]);
 
-    /* ── Load Midtrans Snap (once) ── */
-    useEffect(() => {
-        if (typeof window === 'undefined' || window.snap) return;
-        const snapUrl = import.meta.env.VITE_MIDTRANS_SNAP_URL;
-        const clientKey = import.meta.env.VITE_MIDTRANS_CLIENT_KEY;
-        if (!snapUrl || !clientKey) return;
-        const s = document.createElement('script');
-        s.src = snapUrl;
-        s.setAttribute('data-client-key', clientKey);
-        document.head.appendChild(s);
-    }, []);
-
     return (
         <div style={{
             maxWidth: 430,

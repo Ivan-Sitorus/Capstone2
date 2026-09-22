@@ -106,7 +106,7 @@ class Order extends Model
 
     /**
      * Number of pending orders that need cashier attention.
-     * Single source of truth — used by sidebar badge, broadcast, and count endpoint.
+     * Single source of truth — used by sidebar badge and count endpoint.
      */
     public static function cashierPendingCount(): int
     {

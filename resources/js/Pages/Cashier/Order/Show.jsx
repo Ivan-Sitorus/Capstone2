@@ -47,14 +47,14 @@ export default function OrderShow({ order }) {
         if (typeof window !== 'undefined' && window.history.length > 1) {
             window.history.back();
         } else {
-            router.visit('/cashier/pesanan-aktif');
+            router.visit(route('kasir.pesanan-aktif'));
         }
     }
 
-    function handleAdvance()      { handleAction(`/cashier/order/${order.id}/status`, { status: 'selesai' }); }
-    function handleConfirmCash()  { handleAction(`/cashier/order/${order.id}/confirm-cash`); }
-    function handleConfirmQris()  { handleAction(`/cashier/order/${order.id}/confirm-qris`); setShowRejectModal(false); }
-    function handleRejectQris()   { handleAction(`/cashier/order/${order.id}/reject-qris`, { note: rejectNote }); setShowRejectModal(false); setRejectNote(''); }
+    function handleAdvance()      { handleAction(route('kasir.pesanan.status', { order: order.id }), { status: 'selesai' }); }
+    function handleConfirmCash()  { handleAction(route('kasir.pesanan.konfirmasi-tunai', { order: order.id })); }
+    function handleConfirmQris()  { handleAction(route('kasir.pesanan.konfirmasi-qris', { order: order.id })); setShowRejectModal(false); }
+    function handleRejectQris()   { handleAction(route('kasir.pesanan.tolak-qris', { order: order.id }), { note: rejectNote }); setShowRejectModal(false); setRejectNote(''); }
 
     return (
         <CashierLayout title={`Detail Pesanan ${order.order_code}`} fullscreen>

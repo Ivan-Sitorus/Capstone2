@@ -9,18 +9,18 @@ function getRiwayatHref() {
         const saved = sessionStorage.getItem('w9_customer');
         if (saved) {
             const data = JSON.parse(saved);
-            if (data?.phone) return `/customer/riwayat?phone=${encodeURIComponent(data.phone)}`;
+            if (data?.phone) return route('customer.riwayat', { phone: data.phone });
         }
     } catch (_) {}
-    return '/customer/riwayat';
+    return route('customer.riwayat');
 }
 
 export default function BottomNav({ activeTab }) {
     const { count } = useCart();
 
     const TABS = [
-        { key: 'menu',    label: 'Menu',      Icon: Home,         href: '/customer/menu' },
-        { key: 'cart',    label: 'Keranjang', Icon: ShoppingCart, href: '/customer/cart' },
+        { key: 'menu',    label: 'Menu',      Icon: Home,         href: route('customer.menu') },
+        { key: 'cart',    label: 'Keranjang', Icon: ShoppingCart, href: route('customer.cart') },
         { key: 'riwayat', label: 'Riwayat',   Icon: Clock,        href: getRiwayatHref() },
     ];
 

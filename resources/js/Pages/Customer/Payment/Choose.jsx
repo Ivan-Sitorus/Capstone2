@@ -50,13 +50,13 @@ export default function PaymentChoose({ order, items, table_number }) {
         setError('');
         try {
             if (selected === 'cash') {
-                const res = await axios.post(`/api/order/${order.id}/pay/cash`);
+                const res = await axios.post(route('customer.payment.cash', { order: order.id }));
                 setCashOrderCode(res.data.order_code ?? '');
                 clearCart();
                 setShowCashModal(true);
             } else {
-                await axios.post(`/api/order/${order.id}/pay/qris`);
-                router.visit(`/customer/payment/${order.id}/qris`);
+                await axios.post(route('customer.payment.qris-init', { order: order.id }));
+                router.visit(route('customer.payment.qris', { order: order.id }));
             }
         } catch (err) {
             setError(err.response?.data?.message ?? 'Terjadi kesalahan. Coba lagi.');
@@ -71,7 +71,7 @@ export default function PaymentChoose({ order, items, table_number }) {
             const saved = sessionStorage.getItem('w9_customer');
             if (saved) tableId = JSON.parse(saved)?.tableId;
         } catch (_) {}
-        router.visit(tableId ? `/customer/menu?table=${tableId}` : '/customer/menu');
+        router.visit(tableId ? route('customer.menu', { table: tableId }) : route('customer.menu'));
     }
 
     return (
@@ -122,7 +122,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                     flexShrink: 0,
                 }}>
                     <button
-                        onClick={() => router.visit('/customer/cart')}
+                        onClick={() => router.visit(route('customer.cart'))}
                         className="w9p-btn-back"
                         style={{
                             marginTop: 2,

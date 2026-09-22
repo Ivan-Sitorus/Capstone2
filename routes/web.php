@@ -35,6 +35,7 @@ Route::prefix('kasir')->middleware(['auth:web', 'role:cashier'])->group(function
     Route::post('/pesanan/{order}/qris/accept', [CashierOrderController::class, 'acceptQrisProof'])->name('kasir.pesanan.qris.accept');
     Route::post('/pesanan/{order}/qris/reject', [CashierOrderController::class, 'rejectQrisProof'])->name('kasir.pesanan.qris.reject');
     Route::post('/pesanan/{order}/qris/resubmit', [CashierOrderController::class, 'requestQrisResubmit'])->name('kasir.pesanan.qris.resubmit');
+    Route::post('/pesanan/{order}/whatsapp-link', [CashierOrderController::class, 'whatsappLink'])->name('kasir.pesanan.whatsapp-link');
 
     Route::get('/dashboard', [CashierDashboardController::class, 'index'])->name('kasir.dashboard');
     Route::patch('/pesanan/{order}/cancel', [CashierOrderController::class, 'cancel'])->name('kasir.pesanan.cancel');
@@ -55,14 +56,15 @@ Route::prefix('pelanggan')->group(function () {
     Route::get('/riwayat', [CustomerOrderController::class, 'riwayat'])->name('customer.riwayat');
 
     // Order flow
-    Route::post('/pesanan/store', [CustomerOrderController::class, 'store'])->name('customer.order.store');
     Route::get('/pesanan/{order}/payment', [CustomerPaymentController::class, 'showChoose'])->name('customer.payment.choose');
     Route::post('/pesanan/{order}/payment/choose', [CustomerPaymentController::class, 'choose'])->name('customer.payment.choose.post');
     Route::get('/pesanan/{order}/payment/qris', [CustomerPaymentController::class, 'showQris'])->name('customer.payment.qris');
     Route::post('/pesanan/{order}/payment/qris', [CustomerPaymentController::class, 'uploadQris'])->name('customer.payment.qris.upload');
     Route::get('/pesanan/{order}/status', [CustomerOrderController::class, 'showStatus'])->name('customer.order.status');
-    Route::get('/pesanan/{code}/status', [CustomerOrderController::class, 'status'])->name('customer.pesanan.status');
 });
+
+// QR table entry — accepts {APP_URL}/order?table={id} and forwards to the identity form
+Route::get('/order', fn () => redirect()->route('customer.identitas', request()->only('table')))->name('customer.order.entry');
 
 // Receipt (public — no auth required)
 Route::get('/receipt/{order:code}', fn (Order $order) => redirect()->route('receipt.show-by-uuid', ['order' => $order->uuid], 301));

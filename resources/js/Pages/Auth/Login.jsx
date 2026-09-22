@@ -9,7 +9,7 @@ export default function Login() {
 
     function handleSubmit(e) {
         e.preventDefault();
-        post('/login');
+        post(route('kasir.login.attempt'));
     }
 
     return (

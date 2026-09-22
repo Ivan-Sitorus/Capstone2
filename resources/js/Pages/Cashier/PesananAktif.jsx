@@ -41,18 +41,11 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         // cache prefetch Inertia (mis. buka dari Dashboard saat ada pesanan baru)
         reload();
 
-        // WebSocket (Reverb) — update instan saat ada event broadcast
-        if (window.Echo) {
-            window.Echo.channel('orders').listen('.OrderStatusUpdated', reload);
-        }
-
-        // Polling 5s sebagai fallback jika Reverb tidak aktif
         const id = setInterval(reload, 5_000);
         const onVisible = () => { if (document.visibilityState === 'visible') reload(); };
         document.addEventListener('visibilitychange', onVisible);
 
         return () => {
-            if (window.Echo) window.Echo.leaveChannel('orders');
             clearInterval(id);
             document.removeEventListener('visibilitychange', onVisible);
         };
@@ -89,7 +82,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         setQrisOrder(null);
 
         try {
-            await axios.patch(`/cashier/order/${orderId}/confirm-qris`);
+            await axios.patch(route('kasir.pesanan.konfirmasi-qris', { order: orderId }));
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => pendingStatusRef.current.delete(orderId),
@@ -106,7 +99,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         if (processing || !qrisOrder) return;
         setProcessing(true);
         try {
-            await axios.patch(`/cashier/order/${qrisOrder.id}/reject-qris`, { note: rejectNote });
+            await axios.patch(route('kasir.pesanan.tolak-qris', { order: qrisOrder.id }), { note: rejectNote });
             setQrisOrder(null);
             setRejectNote('');
             router.reload({ only: ['orders', 'counts'] });
@@ -128,7 +121,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         }
 
         try {
-            await axios.patch(`/cashier/order/${orderId}/status`, { status: targetStatus });
+            await axios.patch(route('kasir.pesanan.status', { order: orderId }), { status: targetStatus });
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => {
@@ -158,7 +151,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         setCancelReason('');
 
         try {
-            await axios.patch(`/cashier/order/${orderId}/cancel`, { reason: reason || null });
+            await axios.patch(route('kasir.pesanan.cancel', { order: orderId }), { reason: reason || null });
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => pendingRemoveRef.current.delete(orderId),
@@ -175,7 +168,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         if (processing) return;
         setProcessing(true);
         try {
-            await axios.patch(`/cashier/order/${orderId}/confirm-payment`, { payment_method: paymentMethod });
+            await axios.patch(route('kasir.pesanan.konfirmasi-bayar', { order: orderId }), { payment_method: paymentMethod });
             router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);
@@ -241,7 +234,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                         <OrderCard
                             key={order.id}
                             order={order}
-                            onDetail={id => router.visit(`/cashier/order/${id}`)}
+                            onDetail={id => router.visit(route('kasir.pesanan.detail', { order: id }))}
                             onOpenQrisModal={o => { setQrisOrder(o); setRejectNote(''); }}
                             onMarkDone={handleMarkDone}
                             onConfirmPayment={handleConfirmPayment}

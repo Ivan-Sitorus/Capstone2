@@ -54,19 +54,19 @@ export default function CustomerCart() {
         let customer = null;
         try { customer = JSON.parse(sessionStorage.getItem('w9_customer') || 'null'); } catch (_) {}
         if (!customer?.name || !customer?.phone) {
-            router.visit(`/order?table=${tableId ?? ''}`);
+            router.visit(route('customer.menu', tableId ? { table: tableId } : {}));
             return;
         }
         setLoading(true);
         try {
-            const res = await axios.post('/api/order', {
+            const res = await axios.post(route('customer.order.store'), {
                 customer_name:  customer.name,
                 customer_phone: customer.phone,
                 table_id:       customer.tableId,
                 is_mahasiswa:   isMahasiswa,
                 items: items.map(i => ({ menu_id: i.menuId, quantity: i.quantity })),
             });
-            router.visit(`/customer/payment/${res.data.order_id}/choose`);
+            router.visit(route('customer.payment.choose', { order: res.data.order_id }));
         } catch (err) {
             const msg = err.response?.data?.message ?? err.response?.data?.errors ?? 'Terjadi kesalahan. Coba lagi.';
             setErrorMsg(typeof msg === 'object' ? Object.values(msg).flat().join(' ') : msg);
@@ -158,7 +158,7 @@ export default function CustomerCart() {
                                 </p>
                             </div>
                             <button
-                                onClick={() => router.visit(`/customer/menu?table=${tableId ?? ''}`)}
+                                onClick={() => router.visit(route('customer.menu', tableId ? { table: tableId } : {}))}
                                 className="w9cart-btn"
                                 style={{
                                     marginTop: 4, height: 46, padding: '0 28px',

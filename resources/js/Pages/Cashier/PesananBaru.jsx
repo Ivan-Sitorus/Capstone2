@@ -118,7 +118,7 @@ export default function PesananBaru({ categories }) {
         const orderTotal = grandTotal;
         setProcessing(true);
         router.post(
-            '/cashier/pesanan-baru',
+            route('kasir.pesanan-baru.simpan'),
             { items: cartItems.map(i => ({ menu_id: i.menuId, quantity: i.quantity })), payment_method: method, customer_name: customerName.trim() || null, is_mahasiswa: isMahasiswa },
             {
                 // Pertahankan state komponen agar popup sukses muncul (tanpa ini

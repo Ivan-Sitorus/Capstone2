@@ -53,7 +53,7 @@ export default function RiwayatPesanan({ orders, filters }) {
     function apply(overrides = {}) {
         const params = { search, date, method, ...overrides };
         Object.keys(params).forEach(k => { if (params[k] === '') delete params[k]; });
-        router.get('/cashier/riwayat', params, { preserveState: true, replace: true });
+        router.get(route('kasir.riwayat-pesanan'), params, { preserveState: true, replace: true });
     }
 
     function handleSearch(e) {
@@ -293,7 +293,7 @@ function OrderRow({ order }) {
             </div>
             <div style={{ width: 70, flexShrink: 0 }}>
                 <Link
-                    href={`/cashier/order/${order.id}`}
+                    href={route('kasir.pesanan.detail', { order: order.id })}
                     style={{
                         fontSize: 13, fontWeight: 500,
                         color: T.accent, textDecoration: 'none',

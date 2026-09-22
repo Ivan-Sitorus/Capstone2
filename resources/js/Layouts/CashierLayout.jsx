@@ -14,11 +14,11 @@ import {
 } from 'lucide-react';
 
 const navItems = [
-    { label: 'Dashboard',       href: '/cashier/dashboard',     icon: LayoutDashboard },
-    { label: 'Pesanan Baru',    href: '/cashier/pesanan-baru',  icon: ShoppingCart },
-    { label: 'Pesanan Aktif',   href: '/cashier/pesanan-aktif', icon: ClipboardList },
-    { label: 'Riwayat Pesanan', href: '/cashier/riwayat',       icon: History },
-    { label: 'Profil',          href: '/cashier/profil',        icon: User },
+    { label: 'Dashboard',       href: route('kasir.dashboard'),       icon: LayoutDashboard },
+    { label: 'Pesanan Baru',    href: route('kasir.pesanan-baru'),    icon: ShoppingCart },
+    { label: 'Pesanan Aktif',   href: route('kasir.pesanan-aktif'),   icon: ClipboardList },
+    { label: 'Riwayat Pesanan', href: route('kasir.riwayat-pesanan'), icon: History },
+    { label: 'Profil',          href: route('kasir.profil'),          icon: User },
 ];
 
 export default function CashierLayout({ children, title = 'Dashboard', fullscreen = false }) {
@@ -48,26 +48,11 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
         setPendingCount(initialCount ?? 0);
     }, [initialCount]);
 
-    useEffect(() => {
-        // WebSocket via Laravel Reverb — zero polling, push-based update
-        if (!window.Echo) return;
-
-        const channel = window.Echo.channel('orders');
-
-        channel.listen('.OrderStatusUpdated', (e) => {
-            setPendingCount(e.pendingCount);
-        });
-
-        return () => {
-            window.Echo.leaveChannel('orders');
-        };
-    }, []);
-
     // Ambil pending count fresh setiap halaman dibuka — hindari angka stale
     // dari cache prefetch Inertia saat berpindah menu
     useEffect(() => {
         let cancelled = false;
-        window.axios?.get('/cashier/pending-count')
+        window.axios?.get(route('kasir.pesanan-menunggu'))
             .then(res => { if (!cancelled) setPendingCount(res.data.count); })
             .catch(() => {});
         return () => { cancelled = true; };
@@ -265,7 +250,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                 {/* Logout */}
                 <div style={{ padding: '12px 20px 24px', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
                     <button
-                        onClick={() => router.post('/logout')}
+                        onClick={() => router.post(route('logout'))}
                         style={{
                             display: 'flex',
                             alignItems: 'center',

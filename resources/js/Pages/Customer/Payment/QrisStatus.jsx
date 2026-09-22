@@ -92,7 +92,7 @@ export default function QrisStatus({ order }) {
                             Silakan ambil pesanan Anda di kasir.
                         </p>
                         <button
-                            onClick={() => router.visit('/customer/menu')}
+                            onClick={() => router.visit(route('customer.menu'))}
                             style={{
                                 width: '100%', height: 50, background: '#E8763A', color: 'white',
                                 border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 700, cursor: 'pointer',
@@ -125,7 +125,7 @@ export default function QrisStatus({ order }) {
                             Silakan upload ulang bukti pembayaran yang valid.
                         </p>
                         <button
-                            onClick={() => router.visit(`/customer/payment/${order.order_code}/qris`)}
+                            onClick={() => router.visit(route('customer.payment.qris', { order: order.id }))}
                             style={{
                                 width: '100%', height: 50, background: '#E8763A', color: 'white',
                                 border: 'none', borderRadius: 16, fontSize: 15, fontWeight: 700, cursor: 'pointer',
