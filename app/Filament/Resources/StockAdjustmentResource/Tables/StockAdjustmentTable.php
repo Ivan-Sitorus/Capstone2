@@ -37,7 +37,8 @@ class StockAdjustmentTable
                 TextColumn::make('ingredient.name')
                     ->label('Nama')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->limit(30),
                 TextColumn::make('quantity')
                     ->label('Jumlah')
                     ->formatStateUsing(fn ($state, $record) =>
