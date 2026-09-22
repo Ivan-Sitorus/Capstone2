@@ -2,14 +2,23 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\DataminingRun;
+use App\Filament\Widgets\PredictionChartWidget;
+use App\Filament\Widgets\PredictionSummaryWidget;
+use App\Services\DataMiningRunner;
 use Carbon\Carbon;
-use Filament\Pages\Page;
 use Filament\Actions\Action;
+use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
+use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
+use Filament\Pages\Page;
+use Filament\Schemas\Components\EmbeddedSchema;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Schema;
 
 class PrediksiMenu extends Page
 {
+    use HasFiltersForm;
+
     protected static string|\BackedEnum|null $navigationIcon = 'heroicon-o-chart-bar-square';
 
     protected static string|\UnitEnum|null $navigationGroup = 'Analitik';
@@ -20,86 +29,83 @@ class PrediksiMenu extends Page
 
     protected static ?int $navigationSort = 13;
 
-    // ── Input rentang tanggal dari admin ───────────────────────────────
-    public string $inputDateFrom  = '';
-    public string $inputDateTo    = '';
-    public string $dateRangeError = '';
-
-    // ── State ──────────────────────────────────────────────────────────
-    public bool    $hasResult = false;
-    public ?string $lastRunAt = null;
-    public ?string $errorMsg  = null;
-
-    // ── Hasil prediksi ─────────────────────────────────────────────────
-    public int    $totalMenu          = 0;
-    public int    $forecastDays       = 0;
-    public string $dateFrom           = '';
-    public string $dateTo             = '';
-    public string $dateForecastFrom   = '';
-    public string $dateForecastTo     = '';
-    public array  $predictions        = [];
-    public array  $summaryTable       = [];
-    public array  $preprocessLogs     = [];
-
-    // ── Grafik ─────────────────────────────────────────────────────────
-    public ?string $chartForecastAll       = null;
-    public ?string $chartFeatureImportance = null;
-    public ?string $chartAllItems          = null;
-    public array   $chartPerMenu           = [];
-
-    public function getView(): string
+    public function mount(): void
     {
-        return 'filament.pages.prediksi-menu';
+        $this->mountHasFilters();
+
+        if (empty($this->filters['from'])) {
+            $this->filters['from'] = now()->subMonths(3)->toDateString();
+        }
+        if (empty($this->filters['until'])) {
+            $this->filters['until'] = now()->toDateString();
+        }
     }
 
-    public function getTitle(): string
+    public function filtersForm(Schema $schema): Schema
     {
-        return 'Prediksi Menu';
+        return $schema->components([
+            DatePicker::make('from')
+                ->label('Dari Tanggal')
+                ->native(false)
+                ->displayFormat('d M Y')
+                ->maxDate(now()),
+            DatePicker::make('until')
+                ->label('Sampai Tanggal')
+                ->native(false)
+                ->displayFormat('d M Y')
+                ->maxDate(now()),
+        ]);
     }
 
-    // ── Validasi rentang tanggal (min 3 bulan) ─────────────────────────
+    public function content(Schema $schema): Schema
+    {
+        return $schema
+            ->components([
+                EmbeddedSchema::make('filtersForm'),
+                Grid::make()
+                    ->schema(fn (): array => $this->getWidgetsSchemaComponents($this->getWidgets())),
+            ]);
+    }
+
+    public function getWidgets(): array
+    {
+        return [
+            PredictionChartWidget::class,
+            PredictionSummaryWidget::class,
+        ];
+    }
+
     public function isDateRangeValid(): bool
     {
-        if (! $this->inputDateFrom || ! $this->inputDateTo) {
+        $from = $this->filters['from'] ?? null;
+        $to   = $this->filters['until'] ?? null;
+
+        if (! $from || ! $to) {
             return false;
         }
+
         try {
-            $from = Carbon::parse($this->inputDateFrom);
-            $to   = Carbon::parse($this->inputDateTo);
-            return $to->greaterThan($from) && $from->diffInMonths($to) >= 3;
+            return Carbon::parse($to)->greaterThan(Carbon::parse($from))
+                && Carbon::parse($from)->diffInMonths(Carbon::parse($to)) >= 3;
         } catch (\Throwable) {
             return false;
         }
     }
 
-    // ── Panggil FastAPI endpoint prediksi ──────────────────────────────
     public function runPrediction(): void
     {
-        $this->errorMsg       = null;
-        $this->dateRangeError = '';
+        if (! $this->isDateRangeValid()) {
+            Notification::make()
+                ->title('Rentang tanggal belum valid')
+                ->body('Pilih rentang tanggal data penjualan minimal 3 bulan.')
+                ->warning()
+                ->send();
 
-        if (! $this->inputDateFrom || ! $this->inputDateTo) {
-            $this->dateRangeError = 'Harap isi rentang tanggal data penjualan terlebih dahulu.';
             return;
         }
-
-        $from = Carbon::parse($this->inputDateFrom);
-        $to   = Carbon::parse($this->inputDateTo);
-
-        if ($to->lessThanOrEqualTo($from)) {
-            $this->dateRangeError = 'Tanggal akhir harus lebih besar dari tanggal awal.';
-            return;
-        }
-
-        if ($from->diffInMonths($to) < 3) {
-            $this->dateRangeError = 'Rentang tanggal data penjualan minimal 3 bulan.';
-            return;
-        }
-
-        $this->hasResult = false;
 
         try {
-            app(\App\Services\DataMiningRunner::class)->dispatch('prediction', $this->inputDateFrom, $this->inputDateTo);
+            app(DataMiningRunner::class)->dispatch('prediction', $this->filters['from'], $this->filters['until']);
 
             Notification::make()
                 ->title('Prediksi sedang diproses')
@@ -108,7 +114,6 @@ class PrediksiMenu extends Page
                 ->send();
         } catch (\Throwable $e) {
             report($e);
-            $this->errorMsg = $e->getMessage();
 
             Notification::make()
                 ->title('Prediksi gagal dimulai')
@@ -118,44 +123,6 @@ class PrediksiMenu extends Page
         }
     }
 
-    public function mount(): void
-    {
-        $this->loadLatestResult();
-    }
-
-    public function loadLatestResult(): void
-    {
-        $run = DataminingRun::latestCompleted('prediction');
-
-        if (! $run) {
-            return;
-        }
-
-        $this->hydrateResult($run->payload ?? []);
-        $this->lastRunAt = $run->created_at?->locale('id')->translatedFormat('d M Y, H:i');
-    }
-
-    protected function hydrateResult(array $data): void
-    {
-        $this->totalMenu        = $data['total_menu']             ?? 0;
-        $this->forecastDays     = $data['forecast_days']          ?? 0;
-        $this->dateFrom         = $data['date_range']['from']     ?? '';
-        $this->dateTo           = $data['date_range']['to']       ?? '';
-        $this->dateForecastFrom = $data['forecast_range']['from'] ?? '';
-        $this->dateForecastTo   = $data['forecast_range']['to']   ?? '';
-        $this->predictions      = $data['predictions']            ?? [];
-        $this->summaryTable     = $data['summary_table']          ?? [];
-        $this->preprocessLogs   = $data['preprocessing_logs']     ?? [];
-
-        $charts = $data['charts'] ?? [];
-        $this->chartForecastAll       = $charts['forecast_all']       ?? null;
-        $this->chartFeatureImportance = $charts['feature_importance'] ?? null;
-        $this->chartAllItems          = $charts['all_items']          ?? null;
-        $this->chartPerMenu           = $charts['per_menu']           ?? [];
-
-        $this->hasResult = true;
-    }
-
     protected function getHeaderActions(): array
     {
         return [
@@ -163,8 +130,8 @@ class PrediksiMenu extends Page
                 ->label('Jalankan Prediksi')
                 ->icon('heroicon-o-sparkles')
                 ->color('primary')
-                ->disabled(fn() => ! $this->isDateRangeValid())
-                ->action($this->runPrediction(...)),
+                ->disabled(fn () => ! $this->isDateRangeValid())
+                ->action(fn () => $this->runPrediction()),
         ];
     }
 }
