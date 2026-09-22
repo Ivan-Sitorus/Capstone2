@@ -5,7 +5,7 @@ namespace App\Filament\Pages;
 use Filament\Pages\Page;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Illuminate\Support\Facades\Cache;
+use App\Models\DataminingRun;
 
 class RingkasanAsosiatif extends Page
 {
@@ -38,15 +38,18 @@ class RingkasanAsosiatif extends Page
 
     public function mount(): void
     {
-        $this->loadFromCache();
+        $this->loadHistory();
     }
 
     public function refreshAsosiatifData(): void
     {
         $this->errorMsg = null;
-        $cached = Cache::get('asosiatif_menu_results', []);
+        $count = DataminingRun::query()
+            ->where('type', 'association')
+            ->where('status', 'completed')
+            ->count();
 
-        if (empty($cached)) {
+        if ($count === 0) {
             $this->errorMsg  = 'Belum ada hasil association rule. Jalankan proses di halaman Asosiatif Menu terlebih dahulu.';
             $this->hasResult = false;
 
@@ -58,7 +61,7 @@ class RingkasanAsosiatif extends Page
             return;
         }
 
-        $this->loadFromCache();
+        $this->loadHistory();
 
         $latestRunAt = $this->results[0]['last_run_at'] ?? '-';
         Notification::make()
@@ -73,11 +76,27 @@ class RingkasanAsosiatif extends Page
         return count($this->results);
     }
 
-    private function loadFromCache(): void
+    private function loadHistory(): void
     {
-        $cached          = Cache::get('asosiatif_menu_results', []);
-        $this->results   = $cached;
-        $this->hasResult = count($cached) > 0;
+        $results = DataminingRun::query()
+            ->where('type', 'association')
+            ->where('status', 'completed')
+            ->latest()
+            ->limit(100)
+            ->get()
+            ->map(fn (DataminingRun $run) => array_merge(
+                $run->payload ?? [],
+                [
+                    'last_run_at'     => $run->created_at?->locale('id')->translatedFormat('d M Y, H:i'),
+                    'input_date_from' => $run->parameters['date_from'] ?? '',
+                    'input_date_to'   => $run->parameters['date_to'] ?? '',
+                ]
+            ))
+            ->values()
+            ->all();
+
+        $this->results   = $results;
+        $this->hasResult = count($results) > 0;
     }
 
     protected function getHeaderActions(): array
