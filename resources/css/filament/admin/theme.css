@@ -2,3 +2,11 @@
 
 @source '../../../../app/Filament/**/*';
 @source '../../../../resources/views/filament/**/*';
+
+.fi-modal > .fi-modal-window-ctn > .fi-modal-window.fi-transition-enter,
+.fi-modal > .fi-modal-window-ctn > .fi-modal-window.fi-transition-leave {
+    transition-property: opacity, scale, translate, transform;
+    transition-duration: 300ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
