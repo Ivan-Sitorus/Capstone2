@@ -11,7 +11,7 @@
                 </h3>
 
                 <x-filament::button
-                    wire:click="refreshPreview"
+                    wire:click="refreshReceiptPreview"
                     color="gray"
                     size="sm"
                 >
@@ -23,12 +23,22 @@
                 @include('filament.pages.receipt-preview', ['data' => $this->previewData ?? []])
             </div>
 
-            @if (!empty($this->previewData['receipt_whatsapp_template']))
+            @if (!empty($this->whatsappPreview))
                 <div style="height: 30px;"></div>
                 <div class="mt-6">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">
-                        Pratinjau WhatsApp
-                    </h3>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                            Pratinjau WhatsApp
+                        </h3>
+
+                        <x-filament::button
+                            wire:click="refreshWhatsappPreview"
+                            color="gray"
+                            size="sm"
+                        >
+                            ↻ Refresh Pratinjau
+                        </x-filament::button>
+                    </div>
 
                     <div style="background-color: #efeae2; padding: 16px; border-radius: 8px; border: 1px solid #e5e7eb;" class="dark:border-gray-700 dark:bg-gray-900 shadow-sm">
 
@@ -44,7 +54,7 @@
                                     Kasir
                                 </div>
 
-                                <div style="font-size: 14px; line-height: 1.4; white-space: pre-line; word-break: break-word; overflow-wrap: break-word; color: #1f2937;" class="dark:text-gray-200">{!! trim(str_replace('(link)', 'https://w9cafe.com/struk/a1b2c3d4-e5f6-7890-abcd-ef1234567890', ($this->previewData['receipt_whatsapp_template'] ?? ''))) !!}<span style="display: inline-block; width: 38px;"></span></div>
+                                <div style="font-size: 14px; line-height: 1.4; white-space: pre-line; word-break: break-word; overflow-wrap: break-word; color: #1f2937;" class="dark:text-gray-200">                                            {!! trim(str_replace('(link)', 'https://w9cafe.com/struk/a1b2c3d4-e5f6-7890-abcd-ef1234567890', ($this->whatsappPreview ?? ''))) !!}<span style="display: inline-block; width: 38px;"></span></div>
 
                                 <div style="position: absolute; bottom: 4px; right: 8px; font-size: 10px; color: #6b7280;">
                                     {{ now()->format('H.i') }}

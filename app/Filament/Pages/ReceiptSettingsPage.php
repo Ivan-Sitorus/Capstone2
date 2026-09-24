@@ -30,6 +30,7 @@ class ReceiptSettingsPage extends Page implements HasForms
 
     public ?array $data = [];
     public ?array $previewData = [];
+    public ?string $whatsappPreview = null;
 
     public function getView(): string
     {
@@ -46,8 +47,12 @@ class ReceiptSettingsPage extends Page implements HasForms
         ]);
 
         $this->previewData = [
-            'receipt_whatsapp_template' => Setting::get('receipt_whatsapp_template') ?? '',
+            'receipt_title' => Setting::get('receipt_title') ?? '',
+            'receipt_header' => Setting::get('receipt_header') ?? '',
+            'receipt_footer' => Setting::get('receipt_footer') ?? '',
         ];
+
+        $this->whatsappPreview = Setting::get('receipt_whatsapp_template') ?? '';
     }
 
     public function form(Schema $schema): Schema
@@ -93,9 +98,22 @@ class ReceiptSettingsPage extends Page implements HasForms
             ->send();
     }
 
-    public function refreshPreview(): void
+    public function refreshReceiptPreview(): void
     {
-        $this->previewData = $this->form->getState();
+        $state = $this->form->getState();
+
+        $this->previewData = [
+            'receipt_title' => $state['receipt_title'] ?? '',
+            'receipt_header' => $state['receipt_header'] ?? '',
+            'receipt_footer' => $state['receipt_footer'] ?? '',
+        ];
+    }
+
+    public function refreshWhatsappPreview(): void
+    {
+        $state = $this->form->getState();
+
+        $this->whatsappPreview = $state['receipt_whatsapp_template'] ?? '';
     }
 
     protected function getHeaderActions(): array
