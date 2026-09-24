@@ -7,6 +7,9 @@ use App\Filament\Resources\AsosiatifMenuResource\Pages\ViewAsosiatifMenu;
 use App\Filament\Resources\AsosiatifMenuResource\Tables\AsosiatifMenuTable;
 use App\Filament\Widgets\AssociationChartWidget;
 use App\Filament\Widgets\AssociationSummaryWidget;
+use App\Filament\Widgets\DataminingPreprocessingLogsWidget;
+use App\Filament\Widgets\DataminingRunStatsWidget;
+use App\Filament\Widgets\FrequentItemsWidget;
 use App\Models\DataminingRun;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -57,8 +60,11 @@ class AsosiatifMenuResource extends Resource
     public static function getResultWidgets(): array
     {
         return [
+            DataminingRunStatsWidget::class,
             AssociationChartWidget::class,
             AssociationSummaryWidget::class,
+            FrequentItemsWidget::class,
+            DataminingPreprocessingLogsWidget::class,
         ];
     }
 

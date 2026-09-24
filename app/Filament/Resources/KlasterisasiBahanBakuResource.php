@@ -7,6 +7,10 @@ use App\Filament\Resources\KlasterisasiBahanBakuResource\Pages\ViewKlasterisasiB
 use App\Filament\Resources\KlasterisasiBahanBakuResource\Tables\KlasterisasiBahanBakuTable;
 use App\Filament\Widgets\ClusteringBahanBakuChartWidget;
 use App\Filament\Widgets\ClusteringBahanBakuSummaryWidget;
+use App\Filament\Widgets\DataminingPreprocessingLogsWidget;
+use App\Filament\Widgets\DataminingRunStatsWidget;
+use App\Filament\Widgets\ElbowChartWidget;
+use App\Filament\Widgets\SilhouetteChartWidget;
 use App\Models\DataminingRun;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -57,8 +61,12 @@ class KlasterisasiBahanBakuResource extends Resource
     public static function getResultWidgets(): array
     {
         return [
+            DataminingRunStatsWidget::class,
             ClusteringBahanBakuChartWidget::class,
+            ElbowChartWidget::class,
+            SilhouetteChartWidget::class,
             ClusteringBahanBakuSummaryWidget::class,
+            DataminingPreprocessingLogsWidget::class,
         ];
     }
 

@@ -7,6 +7,10 @@ use App\Filament\Resources\KlasterisasiMenuResource\Pages\ViewKlasterisasiMenu;
 use App\Filament\Resources\KlasterisasiMenuResource\Tables\KlasterisasiMenuTable;
 use App\Filament\Widgets\ClusteringChartWidget;
 use App\Filament\Widgets\ClusteringSummaryWidget;
+use App\Filament\Widgets\DataminingPreprocessingLogsWidget;
+use App\Filament\Widgets\DataminingRunStatsWidget;
+use App\Filament\Widgets\ElbowChartWidget;
+use App\Filament\Widgets\SilhouetteChartWidget;
 use App\Models\DataminingRun;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -57,8 +61,12 @@ class KlasterisasiMenuResource extends Resource
     public static function getResultWidgets(): array
     {
         return [
+            DataminingRunStatsWidget::class,
             ClusteringChartWidget::class,
+            ElbowChartWidget::class,
+            SilhouetteChartWidget::class,
             ClusteringSummaryWidget::class,
+            DataminingPreprocessingLogsWidget::class,
         ];
     }
 

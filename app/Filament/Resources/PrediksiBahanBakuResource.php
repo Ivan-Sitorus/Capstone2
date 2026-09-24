@@ -5,8 +5,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PrediksiBahanBakuResource\Pages\ListPrediksiBahanBaku;
 use App\Filament\Resources\PrediksiBahanBakuResource\Pages\ViewPrediksiBahanBaku;
 use App\Filament\Resources\PrediksiBahanBakuResource\Tables\PrediksiBahanBakuTable;
+use App\Filament\Widgets\DataminingPreprocessingLogsWidget;
+use App\Filament\Widgets\DataminingRunStatsWidget;
+use App\Filament\Widgets\FeatureImportanceChartWidget;
 use App\Filament\Widgets\PredictionBahanBakuChartWidget;
 use App\Filament\Widgets\PredictionBahanBakuSummaryWidget;
+use App\Filament\Widgets\PredictionsPerDayWidget;
 use App\Models\DataminingRun;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -57,8 +61,12 @@ class PrediksiBahanBakuResource extends Resource
     public static function getResultWidgets(): array
     {
         return [
+            DataminingRunStatsWidget::class,
             PredictionBahanBakuChartWidget::class,
+            PredictionsPerDayWidget::class,
+            FeatureImportanceChartWidget::class,
             PredictionBahanBakuSummaryWidget::class,
+            DataminingPreprocessingLogsWidget::class,
         ];
     }
 

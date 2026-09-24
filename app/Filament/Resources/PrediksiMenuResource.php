@@ -5,8 +5,12 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PrediksiMenuResource\Pages\ListPrediksiMenu;
 use App\Filament\Resources\PrediksiMenuResource\Pages\ViewPrediksiMenu;
 use App\Filament\Resources\PrediksiMenuResource\Tables\PrediksiMenuTable;
+use App\Filament\Widgets\DataminingPreprocessingLogsWidget;
+use App\Filament\Widgets\DataminingRunStatsWidget;
+use App\Filament\Widgets\FeatureImportanceChartWidget;
 use App\Filament\Widgets\PredictionChartWidget;
 use App\Filament\Widgets\PredictionSummaryWidget;
+use App\Filament\Widgets\PredictionsPerDayWidget;
 use App\Models\DataminingRun;
 use BackedEnum;
 use Filament\Resources\Resource;
@@ -57,8 +61,12 @@ class PrediksiMenuResource extends Resource
     public static function getResultWidgets(): array
     {
         return [
+            DataminingRunStatsWidget::class,
             PredictionChartWidget::class,
+            PredictionsPerDayWidget::class,
+            FeatureImportanceChartWidget::class,
             PredictionSummaryWidget::class,
+            DataminingPreprocessingLogsWidget::class,
         ];
     }
 
