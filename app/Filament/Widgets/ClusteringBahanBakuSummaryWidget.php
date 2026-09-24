@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\DataminingRun;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -33,8 +34,8 @@ class ClusteringBahanBakuSummaryWidget extends TableWidget
             ->columns([
                 TextColumn::make('Nama Bahan Baku')->label('Bahan Baku')->searchable(),
                 TextColumn::make('Satuan')->label('Satuan'),
-                TextColumn::make('Klaster')->label('Klaster')->badge()->color('primary'),
-                TextColumn::make('Total Penggunaan')->label('Total Penggunaan')->numeric(),
+                TextColumn::make('Klaster')->label(ColumnInfoTooltip::label('Klaster', 'Kelompok hasil K-Means berdasarkan total penggunaan bahan baku.'))->badge()->color('primary'),
+                TextColumn::make('Total Penggunaan')->label(ColumnInfoTooltip::label('Total Penggunaan', 'Total pemakaian bahan baku selama periode data.'))->numeric(),
             ]);
     }
 }

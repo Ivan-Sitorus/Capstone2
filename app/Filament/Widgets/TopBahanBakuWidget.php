@@ -36,19 +36,25 @@ class TopBahanBakuWidget extends BarChartWidget
     {
         $from = Carbon::parse($this->rangeFrom())->translatedFormat('d M Y');
         $until = Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
-        return "Top 10 Bahan Baku ({$from} – {$until})";
+        return "Top 10 Bahan Baku — Biaya Pemakaian ({$from} – {$until})";
     }
 
     protected function getData(): array
     {
         $rows = DB::table('stock_movements as m')
             ->join('ingredients as i', 'i.id', '=', 'm.ingredient_id')
+            ->leftJoin(
+                DB::raw('(SELECT ingredient_id, CASE WHEN SUM(initial_quantity) > 0 THEN SUM(total_cost) / SUM(initial_quantity) ELSE 0 END AS unit_cost FROM ingredient_batches WHERE deleted_at IS NULL GROUP BY ingredient_id) as b'),
+                'b.ingredient_id',
+                '=',
+                'i.id'
+            )
             ->whereNull('i.deleted_at')
             ->where('m.movement_type', 'sale')
             ->whereDate('m.created_at', '>=', $this->rangeFrom())
             ->whereDate('m.created_at', '<=', $this->rangeUntil())
-            ->selectRaw('i.name as ingredient_name, i.unit as unit, SUM(-m.quantity_change) as total')
-            ->groupBy('i.id', 'i.name', 'i.unit')
+            ->selectRaw('i.name as ingredient_name, i.unit as unit, SUM(-m.quantity_change) * COALESCE(b.unit_cost, 0) as total')
+            ->groupBy('i.id', 'i.name', 'i.unit', 'b.unit_cost')
             ->orderByDesc('total')
             ->limit(10)
             ->get();
@@ -56,8 +62,8 @@ class TopBahanBakuWidget extends BarChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Jumlah Dipakai',
-                    'data' => $rows->map(fn ($r) => (float) $r->total)->values()->all(),
+                    'label' => 'Biaya Pemakaian (Rp)',
+                    'data' => $rows->map(fn ($r) => round((float) $r->total, 2))->values()->all(),
                     'backgroundColor' => '#17A2B8',
                 ],
             ],

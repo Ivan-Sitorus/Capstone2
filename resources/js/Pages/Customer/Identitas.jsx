@@ -31,7 +31,7 @@ export default function Identitas({ table }) {
             const saved = sessionStorage.getItem('w9_customer');
             if (saved) {
                 const data = JSON.parse(saved);
-                if (data.name && data.phone && data.tableId === table.id) {
+                if (data.name && data.tableId === table.id) {
                     router.visit(route('customer.menu', { table: table.id }));
                 }
             }
@@ -49,7 +49,7 @@ export default function Identitas({ table }) {
         }
 
         const phoneClean = phone.replace(/\D/g, '');
-        if (!phoneClean || phoneClean.length < 10 || phoneClean.length > 15) {
+        if (phoneClean && (phoneClean.length < 10 || phoneClean.length > 15)) {
             setPhoneError('Nomor telepon tidak valid (min 10 digit)');
             valid = false;
         } else {
@@ -286,7 +286,7 @@ export default function Identitas({ table }) {
                                 display: 'block', fontSize: 13, fontWeight: 700,
                                 color: C.textPrimary, marginBottom: 8, fontFamily: F,
                             }}>
-                                Nomor Telepon
+                                Nomor Telepon (opsional)
                             </label>
                             <div style={{ position: 'relative' }}>
                                 <Phone size={18} color={C.textMuted} style={{
@@ -315,6 +315,9 @@ export default function Identitas({ table }) {
                                     {phoneError}
                                 </p>
                             )}
+                            <p style={{ color: C.textMuted, fontSize: 11, margin: '5px 0 0', fontFamily: F }}>
+                                Dipakai untuk kirim struk via WhatsApp & menampilkan riwayat pesanan Anda.
+                            </p>
                         </div>
 
                         {/* ── Mahasiswa checkbox ── */}

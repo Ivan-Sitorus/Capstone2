@@ -42,6 +42,21 @@ class BahanBakuWidgetValidityTest extends TestCase
         $ingredient = Ingredient::factory()->create(['name' => 'Bahan Uji', 'unit' => 'kg', 'batch_mode' => 'fefo']);
         $at = now()->subDay();
 
+        DB::table('ingredient_batches')->insert([
+            'ingredient_id' => $ingredient->id,
+            'quantity' => 10,
+            'expiry_date' => null,
+            'received_at' => $at,
+            'batch_code' => 'BATCH-UJI',
+            'allow_expired_usage' => false,
+            'initial_quantity' => 10,
+            'supplier_name' => null,
+            'total_cost' => 1000,
+            'payment_status' => 'paid',
+            'created_at' => $at,
+            'updated_at' => $at,
+        ]);
+
         $this->movement($ingredient->id, 'sale', -5, $at);
         $this->movement($ingredient->id, 'purchase', 100, $at);
         $this->movement($ingredient->id, 'adjustment_decrease', -3, $at);
@@ -53,7 +68,7 @@ class BahanBakuWidgetValidityTest extends TestCase
 
         $data = $this->invokeData($widget);
 
-        $this->assertSame([5.0], array_map('floatval', $data['datasets'][0]['data']));
+        $this->assertSame([500.0], array_map('floatval', $data['datasets'][0]['data']));
         $this->assertSame(['Bahan Uji (kg)'], $data['labels']);
     }
 

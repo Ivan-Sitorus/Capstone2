@@ -247,7 +247,7 @@ export default function CustomerMenu({ categories, table }) {
                 return;
             }
             const data = JSON.parse(saved);
-            if (!data.name || !data.phone) {
+            if (!data.name) {
                 sessionStorage.removeItem('w9_customer');
                 const fb = table?.id ?? '';
                 router.visit(fb ? route('customer.identitas', { table: fb }) : route('customer.identitas'));

@@ -53,7 +53,7 @@ export default function CustomerCart() {
         setErrorMsg('');
         let customer = null;
         try { customer = JSON.parse(sessionStorage.getItem('w9_customer') || 'null'); } catch (_) {}
-        if (!customer?.name || !customer?.phone) {
+        if (!customer?.name) {
             router.visit(route('customer.menu', tableId ? { table: tableId } : {}));
             return;
         }
@@ -61,7 +61,7 @@ export default function CustomerCart() {
         try {
             const res = await axios.post(route('customer.order.store'), {
                 customer_name:  customer.name,
-                customer_phone: customer.phone,
+                customer_phone: customer.phone || null,
                 table_id:       customer.tableId,
                 is_mahasiswa:   isMahasiswa,
                 items: items.map(i => ({ menu_id: i.menuId, quantity: i.quantity })),

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\DataminingRun;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -32,9 +33,9 @@ class ClusteringSummaryWidget extends TableWidget
             })
             ->columns([
                 TextColumn::make('Nama Item')->label('Menu')->searchable(),
-                TextColumn::make('Klaster')->label('Klaster')->badge()->color('primary'),
-                TextColumn::make('Total_Jumlah')->label('Total Jumlah')->numeric(),
-                TextColumn::make('Total_Keuntungan')->label('Total Keuntungan')->formatStateUsing(fn ($state) => 'Rp'.number_format((float) $state, 0, ',', '.')),
+                TextColumn::make('Klaster')->label(ColumnInfoTooltip::label('Klaster', 'Kelompok hasil K-Means berdasarkan total penjualan & keuntungan.'))->badge()->color('primary'),
+                TextColumn::make('Total_Jumlah')->label(ColumnInfoTooltip::label('Total Jumlah', 'Total unit terjual selama periode data.'))->numeric(),
+                TextColumn::make('Total_Keuntungan')->label(ColumnInfoTooltip::label('Total Keuntungan', 'Total keuntungan (Rp) selama periode data.'))->formatStateUsing(fn ($state) => 'Rp'.number_format((float) $state, 0, ',', '.')),
             ]);
     }
 }

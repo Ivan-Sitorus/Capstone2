@@ -21,7 +21,7 @@ class PlaceCustomerOrderAction
     {
         $request->validate([
             'customer_name'     => 'required|string|min:2|max:255',
-            'phone'             => ['required', 'string', 'regex:/^[0-9]{10,15}$/'],
+            'phone'             => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
             'table_id'          => 'required|integer|exists:cafe_tables,id',
             'is_mahasiswa'      => 'boolean',
             'items'             => 'required|array|min:1',

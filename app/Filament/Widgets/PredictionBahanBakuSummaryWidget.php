@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\DataminingRun;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -33,12 +34,12 @@ class PredictionBahanBakuSummaryWidget extends TableWidget
             ->columns([
                 TextColumn::make('nama_bahan_baku')->label('Bahan Baku')->searchable(),
                 TextColumn::make('satuan')->label('Satuan'),
-                TextColumn::make('total_forecast')->label('Total Forecast')->numeric(),
-                TextColumn::make('avg_per_day')->label('Rata-rata/hari')->numeric(),
-                TextColumn::make('mae')->label('MAE')->numeric(),
-                TextColumn::make('rmse')->label('RMSE')->numeric(),
-                TextColumn::make('mape')->label('MAPE')->numeric(),
-                TextColumn::make('smape')->label('SMAPE')->numeric(),
+                TextColumn::make('total_forecast')->label(ColumnInfoTooltip::label('Total Forecast', 'Jumlah prediksi penggunaan selama 2 hari ke depan.'))->numeric(),
+                TextColumn::make('avg_per_day')->label(ColumnInfoTooltip::label('Rata-rata/hari', 'Rata-rata prediksi penggunaan per hari.'))->numeric(),
+                TextColumn::make('mae')->label(ColumnInfoTooltip::label('MAE', 'Mean Absolute Error: rata-rata selisih absolut prediksi vs aktual. Makin kecil makin baik.'))->numeric(),
+                TextColumn::make('rmse')->label(ColumnInfoTooltip::label('RMSE', 'Root Mean Squared Error: seperti MAE tetapi menghukum error besar lebih kuat.'))->numeric(),
+                TextColumn::make('mape')->label(ColumnInfoTooltip::label('MAPE', 'Mean Absolute Percentage Error (%).'))->numeric(),
+                TextColumn::make('smape')->label(ColumnInfoTooltip::label('SMAPE', 'Symmetric MAPE (%): versi MAPE yang lebih stabil.'))->numeric(),
                 TextColumn::make('model')->label('Model'),
             ]);
     }
