@@ -48,9 +48,10 @@ services:
         environment:
             DB_HOST: 'pgsql'
             DB_PORT: '5432'
-            DB_DATABASE: '${DB_DATABASE:-pos_cafe}'
-            DB_USERNAME: '${DB_USERNAME:-postgres}'
+            DB_NAME: '${DB_DATABASE:-pos_cafe}'
+            DB_USER: '${DB_USERNAME:-postgres}'
             DB_PASSWORD: '${DB_PASSWORD:-secret}'
+            DB_TIMEZONE: '${DB_TIMEZONE:-Asia/Jakarta}'
         networks:
             - pos
         ports:

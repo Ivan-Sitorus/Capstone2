@@ -55,6 +55,7 @@ def get_connection():
         dbname=os.getenv("DB_NAME", "pos_cafe"),
         user=os.getenv("DB_USER", "postgres"),
         password=os.getenv("DB_PASSWORD", ""),
+        options=f"-c TimeZone={os.getenv('DB_TIMEZONE', 'Asia/Jakarta')}",
         cursor_factory=RealDictCursor,
     )
 

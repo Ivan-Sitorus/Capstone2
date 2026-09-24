@@ -87,6 +87,6 @@ class DataminingRunTable
             return '-';
         }
 
-        return max(0, $record->created_at->diffInSeconds($record->updated_at)) . ' s';
+        return (int) abs($record->created_at->diffInSeconds($record->updated_at)) . ' s';
     }
 }
