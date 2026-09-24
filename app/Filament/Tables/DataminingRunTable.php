@@ -87,6 +87,12 @@ class DataminingRunTable
             return '-';
         }
 
-        return (int) abs($record->created_at->diffInSeconds($record->updated_at)) . ' s';
+        $seconds = $record->created_at->diffInSeconds($record->updated_at);
+
+        if ($seconds < 0 || $seconds > 21600) {
+            return '-';
+        }
+
+        return (int) $seconds . ' s';
     }
 }
