@@ -60,8 +60,8 @@ class CustomerPaymentController extends Controller
 
         return Inertia::render('Customer/Payment/QrisUpload', [
             'order'           => $order->only(['id', 'order_code', 'total_amount']),
-            'qrisImage'       => asset('storage/' . Setting::get('qris_image', 'qris/qris-w9cafe.png')),
-            'qrisName'        => Setting::get('qris_name', 'W9 Cafe'),
+            'qrisImage'       => asset('storage/' . (Setting::get('qris_image') ?? '')),
+            'qrisName'        => Setting::get('qris_name') ?? '',
             'totalAmount'     => $order->total_amount,
             'rejectedMessage' => $rejectedMessage,
         ]);

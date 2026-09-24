@@ -19,7 +19,6 @@
     "laravel/mcp": "^0.7.0",
     "laravel/tinker": "^3.0",
     "maatwebsite/excel": "4.x-dev",
-    "predis/predis": "^3.4",
     "tightenco/ziggy": "^2.6"
   },
   "require-dev": {

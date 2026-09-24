@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\StockResource\Pages;
 
 use App\Enums\PaymentMethod;
+use App\Enums\PaymentStatus;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\StockResource;
 use App\Models\BatchPayment;
@@ -45,30 +46,34 @@ class RiwayatBayarBatch extends Page implements HasTable
 
     public function content(Schema $schema): Schema
     {
-        $totalPaid = (float) $this->batch->batchPayments()->sum('amount');
-        $totalCost = (float) ($this->batch->total_cost ?? 0);
-        $remaining = $totalCost - $totalPaid;
-
         return $schema->components([
             Section::make('Ringkasan Pembayaran Supplier')
                 ->schema([
                     TextEntry::make('total')
                         ->label('Total Utang')
-                        ->state('Rp' . number_format($totalCost, 0, ',', '.')),
+                        ->state(fn (): string => 'Rp' . number_format((float) ($this->batch->total_cost ?? 0), 0, ',', '.')),
                     TextEntry::make('dibayar')
                         ->label('Total Dibayar')
-                        ->state('Rp' . number_format($totalPaid, 0, ',', '.'))
+                        ->state(fn (): string => 'Rp' . number_format((float) $this->batch->batchPayments->sum('amount'), 0, ',', '.'))
                         ->color('success'),
                     TextEntry::make('sisa')
                         ->label('Sisa Utang')
-                        ->state('Rp' . number_format(max(0, $remaining), 0, ',', '.'))
-                        ->color($remaining > 0 ? 'danger' : 'success'),
+                        ->state(function (): string {
+                            $remaining = (float) ($this->batch->total_cost ?? 0) - (float) $this->batch->batchPayments->sum('amount');
+
+                            return 'Rp' . number_format(max(0, $remaining), 0, ',', '.');
+                        })
+                        ->color(function (): string {
+                            $remaining = (float) ($this->batch->total_cost ?? 0) - (float) $this->batch->batchPayments->sum('amount');
+
+                            return $remaining > 0 ? 'danger' : 'success';
+                        }),
                     TextEntry::make('status')
                         ->label('Status')
-                        ->state($this->batch->payment_status)
+                        ->state(fn () => $this->batch->payment_status)
                         ->badge()
-                        ->color(fn () => $this->batch->payment_status === 'lunas' ? 'success' : 'warning')
-                        ->formatStateUsing(fn () => $this->batch->payment_status === 'lunas' ? 'Lunas' : 'Belum Lunas'),
+                        ->color(fn (): string => $this->batch->payment_status === PaymentStatus::Paid ? 'success' : 'warning')
+                        ->formatStateUsing(fn (): string => $this->batch->payment_status === PaymentStatus::Paid ? 'Lunas' : 'Belum Lunas'),
                 ])->columns(4),
             EmbeddedTable::make(),
         ]);
@@ -134,7 +139,6 @@ class RiwayatBayarBatch extends Page implements HasTable
         return [
             Action::make('catat_pembayaran')
                 ->label('Catat Pembayaran')
-                ->icon('heroicon-o-plus')
                 ->modalHeading('Catat Pembayaran Supplier')
                 ->form([
                     NumericInput::money('amount')
@@ -178,6 +182,7 @@ class RiwayatBayarBatch extends Page implements HasTable
                     ]);
 
                     $this->batch->recalculatePaymentStatus();
+                    $this->batch->refresh();
 
                     Notification::make()
                         ->success()

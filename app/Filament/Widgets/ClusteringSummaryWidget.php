@@ -11,6 +11,8 @@ class ClusteringSummaryWidget extends TableWidget
 {
     protected int | string | array $columnSpan = 'full';
 
+    public ?int $runId = null;
+
     protected function getPollingInterval(): ?string
     {
         return '5s';
@@ -21,7 +23,7 @@ class ClusteringSummaryWidget extends TableWidget
         return $table
             ->heading('Hasil Clustering Menu')
             ->records(function () {
-                $run = DataminingRun::latestCompleted('clustering');
+                $run = DataminingRun::find($this->runId) ?? DataminingRun::latestCompleted('clustering');
                 $rows = $run?->payload['table_rows'] ?? [];
 
                 return collect($rows)
@@ -32,7 +34,7 @@ class ClusteringSummaryWidget extends TableWidget
                 TextColumn::make('Nama Item')->label('Menu')->searchable(),
                 TextColumn::make('Klaster')->label('Klaster')->badge()->color('primary'),
                 TextColumn::make('Total_Jumlah')->label('Total Jumlah')->numeric(),
-                TextColumn::make('Total_Keuntungan')->label('Total Keuntungan')->money('IDR'),
+                TextColumn::make('Total_Keuntungan')->label('Total Keuntungan')->formatStateUsing(fn ($state) => 'Rp'.number_format((float) $state, 0, ',', '.')),
             ]);
     }
 }

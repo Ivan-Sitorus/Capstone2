@@ -85,7 +85,7 @@ App runs on **http://localhost:8081**. The `prod` profile starts:
 
 - **app** — single-container NGINX + PHP-FPM + Supervisor (port 8081)
 - **pgsql** — PostgreSQL 18 (port 5432)
-- **redis** — Redis cache (port 6379)
+- **datamining** — FastAPI data mining service (port 8001)
 
 ```bash
 # Run migrations and seed on first launch

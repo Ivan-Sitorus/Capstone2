@@ -27,7 +27,7 @@ class OrderTable
                     ->sortable()
                     ->copyable(),
                 TextColumn::make('customer_name')
-                    ->label('Pelanggan')
+                    ->label('Nama Pelanggan')
                     ->searchable()
                     ->default('-'),
                 TextColumn::make('cashier.name')

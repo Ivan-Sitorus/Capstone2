@@ -46,37 +46,28 @@ class PenjualanChartWidget extends LineChartWidget
         $rangeDays = $fromDate->diffInDays($untilDate) + 1;
 
         $labels = [];
-        $days = [];
         for ($i = 0; $i < $rangeDays; $i++) {
-            $date = $fromDate->copy()->addDays($i)->toDateString();
-            $labels[] = Carbon::parse($date)->translatedFormat('d M');
-            $days[$date] = 0;
+            $labels[] = $fromDate->copy()->addDays($i)->translatedFormat('d M');
         }
 
-        $current = $this->dailySales($fromDate->toDateString(), $untilDate->toDateString(), $days);
-        $previous = $this->dailySales(
-            $fromDate->copy()->subDays($rangeDays)->toDateString(),
-            $fromDate->copy()->subDay()->toDateString(),
-            $days
-        );
+        $current = $this->dailyTotals($fromDate->toDateString(), $untilDate->toDateString());
 
-        $previousLabel = $this->formatDatePeriod(
-            $fromDate->copy()->subDays($rangeDays)->toDateString(),
-            $fromDate->copy()->subDay()->toDateString()
-        );
+        $previousFrom = $fromDate->copy()->subDays($rangeDays);
+        $previousUntil = $fromDate->copy()->subDay();
+        $previous = $this->dailyTotals($previousFrom->toDateString(), $previousUntil->toDateString());
 
         return [
             'datasets' => [
                 [
                     'label' => $fromDate->translatedFormat('d M Y') . ' – ' . $untilDate->translatedFormat('d M Y'),
-                    'data' => array_values($current),
+                    'data' => $current,
                     'borderColor' => '#3B6FD4',
                     'backgroundColor' => 'rgba(59, 111, 212, 0.1)',
                     'fill' => true,
                 ],
                 [
-                    'label' => $previousLabel,
-                    'data' => array_values($previous),
+                    'label' => $previousFrom->translatedFormat('d M Y') . ' – ' . $previousUntil->translatedFormat('d M Y'),
+                    'data' => $previous,
                     'borderColor' => '#E8692A',
                     'backgroundColor' => 'rgba(232, 105, 42, 0.1)',
                     'fill' => true,
@@ -87,9 +78,15 @@ class PenjualanChartWidget extends LineChartWidget
         ];
     }
 
-    private function dailySales(string $from, string $to, array $days): array
+    private function dailyTotals(string $from, string $to): array
     {
-        $result = $days;
+        $days = [];
+        $cursor = Carbon::parse($from)->startOfDay();
+        $end = Carbon::parse($to)->startOfDay();
+        while ($cursor->lte($end)) {
+            $days[$cursor->toDateString()] = 0.0;
+            $cursor->addDay();
+        }
 
         Order::query()
             ->selectRaw("to_char(created_at, 'YYYY-MM-DD') as day, sum(total_amount) as total")
@@ -98,17 +95,12 @@ class PenjualanChartWidget extends LineChartWidget
             ->where('status', '!=', 'cancelled')
             ->groupBy('day')
             ->get()
-            ->each(function ($row) use (&$result) {
-                if (array_key_exists($row->day, $result)) {
-                    $result[$row->day] = (float) $row->total;
+            ->each(function ($row) use (&$days) {
+                if (array_key_exists($row->day, $days)) {
+                    $days[$row->day] = (float) $row->total;
                 }
             });
 
-        return $result;
-    }
-
-    private function formatDatePeriod(string $from, string $to): string
-    {
-        return Carbon::parse($from)->translatedFormat('d M Y') . ' – ' . Carbon::parse($to)->translatedFormat('d M Y');
+        return array_values($days);
     }
 }

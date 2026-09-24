@@ -35,7 +35,6 @@ class ListReceivables extends ListRecords
         return [
             CreateAction::make()
                 ->label('Buat Piutang')
-                ->icon('heroicon-o-plus')
                 ->modalHeading('Buat Piutang Baru')
                 ->form([
                     Select::make('cashier_id')

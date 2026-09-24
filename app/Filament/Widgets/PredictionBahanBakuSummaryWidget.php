@@ -11,6 +11,8 @@ class PredictionBahanBakuSummaryWidget extends TableWidget
 {
     protected int | string | array $columnSpan = 'full';
 
+    public ?int $runId = null;
+
     protected function getPollingInterval(): ?string
     {
         return '5s';
@@ -21,7 +23,7 @@ class PredictionBahanBakuSummaryWidget extends TableWidget
         return $table
             ->heading('Ringkasan Prediksi per Bahan Baku')
             ->records(function () {
-                $run = DataminingRun::latestCompleted('prediction-bahan-baku');
+                $run = DataminingRun::find($this->runId) ?? DataminingRun::latestCompleted('prediction-bahan-baku');
                 $summary = $run?->payload['summary_table'] ?? [];
 
                 return collect($summary)

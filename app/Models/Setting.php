@@ -7,16 +7,18 @@ use Illuminate\Support\Facades\Cache;
 
 class Setting extends Model
 {
-    protected $fillable = ['key', 'value'];
+    protected $table = 'app_settings';
+
+    protected $fillable = ['setting_key', 'setting_value', 'group'];
 
     public static function get(string $key, $default = null): ?string
     {
         return Cache::remember("setting_{$key}", 3600, function () use ($key, $default) {
-            return static::where('key', $key)->value('value') ?? $default;
+            return static::where('setting_key', $key)->value('setting_value') ?? $default;
         });
     }
 
-    public static function set(string $key, mixed $value): void
+    public static function set(string $key, mixed $value, string $group = 'general'): void
     {
         // Normalize: DB column is NOT NULL, so null → empty string
         if ($value === null) {
@@ -29,7 +31,10 @@ class Setting extends Model
             $value = (string) $value;
         }
 
-        static::updateOrCreate(['key' => $key], ['value' => $value]);
+        static::updateOrCreate(
+            ['setting_key' => $key],
+            ['setting_value' => $value, 'group' => $group],
+        );
         Cache::forget("setting_{$key}");
     }
 }

@@ -19,7 +19,7 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
     const [showWhatsApp, setShowWhatsApp] = useState(false);
 
     useEffect(() => {
-        document.title = `Struk #${order.order_code} | ${cafe.name}`;
+        document.title = `Struk #${order.order_code} | ${cafe.receipt_title}`;
     }, []);
 
     const paymentLabel =
@@ -29,7 +29,7 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
 
     return (
         <>
-            <Head title={`Struk #${order.order_code} | ${cafe.name}`} />
+            <Head title={`Struk #${order.order_code} | ${cafe.receipt_title}`} />
             <div className="min-h-screen bg-gray-100 flex items-start justify-center py-10 px-4">
                 <Card
                     id="receipt"
@@ -39,21 +39,11 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
                     <CardContent className="p-0">
                         <div className="text-center pt-8 pb-4 px-6 border-b-2 border-dashed border-gray-200">
                             <h1 className="text-xl font-bold text-gray-900 m-0">
-                                {cafe.name}
+                                {cafe.receipt_title}
                             </h1>
-                            {cafe.address && (
-                                <p className="text-sm text-gray-500 m-0 mt-1 leading-relaxed">
-                                    {cafe.address}
-                                </p>
-                            )}
-                            {cafe.phone && (
-                                <p className="text-sm text-gray-500 m-0 mt-0.5">
-                                    {cafe.phone}
-                                </p>
-                            )}
-                            {cafe.receipt_show_npwp && cafe.receipt_npwp && (
-                                <p className="text-xs text-gray-400 m-0 mt-1">
-                                    NPWP: {cafe.receipt_npwp}
+                            {cafe.receipt_header && (
+                                <p className="text-sm text-gray-500 m-0 mt-1 leading-relaxed whitespace-pre-line">
+                                    {cafe.receipt_header}
                                 </p>
                             )}
                         </div>
@@ -204,8 +194,7 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
 
                         <div className="text-center py-5 px-6">
                             <p className="text-xs text-gray-500 m-0 leading-relaxed">
-                                {cafe.receipt_footer ||
-                                    `Terima kasih telah berbelanja di ${cafe.name}`}
+                                {cafe.receipt_footer}
                             </p>
                             <p className="text-[10px] text-gray-400 m-0 mt-1">
                                 #{order.order_code} ·{' '}

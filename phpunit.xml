@@ -30,6 +30,9 @@
         <env name="DB_PASSWORD" value="postgres" force="true"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="SEED_START_DATE" value="2026-09-01" force="true"/>
+        <env name="SEED_END_DATE" value="2026-09-05" force="true"/>
+        <env name="SEED_ORDERS_PER_DAY" value="3" force="true"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>

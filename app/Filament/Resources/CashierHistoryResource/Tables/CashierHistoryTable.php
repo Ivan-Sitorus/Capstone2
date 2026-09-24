@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\CashierHistoryResource\Tables;
 
-use App\Enums\UserRole;
 use App\Filament\Resources\CashierHistoryResource;
 use App\Models\CashierHistory;
 use App\Services\CashierHistoryService;
@@ -26,27 +25,18 @@ class CashierHistoryTable
             )
             ->columns([
                 TextColumn::make('user.name')
-                    ->label('Nama')
+                    ->label('Nama Kasir')
                     ->searchable(),
                 TextColumn::make('user.email')
                     ->label('Email')
                     ->searchable(),
-                TextColumn::make('user.role')
-                    ->label('Role')
-                    ->badge()
-                    ->formatStateUsing(fn (UserRole $state): string => $state->label())
-                    ->color(fn (UserRole $state): string => match ($state) {
-                        UserRole::Admin => 'success',
-                        UserRole::Cashier => 'info',
-                        default => 'gray',
-                    }),
                 TextColumn::make('started_at')
                     ->label('Waktu Masuk')
                     ->dateTime('d M Y, H:i')
                     ->sortable(),
                 TextColumn::make('ended_at')
                     ->label('Waktu Keluar')
-                    ->formatStateUsing(fn ($state) => $state ? $state->format('d M Y, H:i') : '—')
+                    ->formatStateUsing(fn ($state) => $state ? $state->format('d M Y, H:i') : 'Masih Aktif')
                     ->sortable(),
                 TextColumn::make('order_count')
                     ->label('Jumlah Pesanan')

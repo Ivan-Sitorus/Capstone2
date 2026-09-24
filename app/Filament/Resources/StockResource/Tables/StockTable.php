@@ -20,10 +20,10 @@ class StockTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->searchPlaceholder('Cari Nama Bahan')
+            ->searchPlaceholder('Cari Bahan Baku')
             ->columns([
                 TextColumn::make('name')
-                    ->label('Nama Bahan')
+                    ->label('Bahan Baku')
                     ->searchable()
                     ->sortable()
                     ->limit(30),

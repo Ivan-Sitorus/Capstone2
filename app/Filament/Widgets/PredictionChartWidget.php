@@ -2,12 +2,15 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Support\ChartPalette;
 use App\Models\DataminingRun;
 use Filament\Widgets\BarChartWidget;
 
 class PredictionChartWidget extends BarChartWidget
 {
     protected int | string | array $columnSpan = 'full';
+
+    public ?int $runId = null;
 
     public function getHeading(): string
     {
@@ -21,7 +24,7 @@ class PredictionChartWidget extends BarChartWidget
 
     protected function getData(): array
     {
-        $run = DataminingRun::latestCompleted('prediction');
+        $run = DataminingRun::find($this->runId) ?? DataminingRun::latestCompleted('prediction');
         $summary = $run?->payload['summary_table'] ?? [];
 
         return [
@@ -29,7 +32,7 @@ class PredictionChartWidget extends BarChartWidget
                 [
                     'label' => 'Total Prediksi (unit)',
                     'data' => array_column($summary, 'total_forecast'),
-                    'backgroundColor' => '#6366f1',
+                    'backgroundColor' => ChartPalette::colors(count($summary)),
                     'borderRadius' => 6,
                 ],
             ],

@@ -2,11 +2,11 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\DailyIngredientUsage;
 use App\Models\Ingredient;
 use Filament\Support\RawJs;
 use Filament\Widgets\LineChartWidget;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
 
 class PemakaianBahanBakuWidget extends LineChartWidget
@@ -28,12 +28,15 @@ class PemakaianBahanBakuWidget extends LineChartWidget
 
     private function topIngredient(): ?string
     {
-        return DailyIngredientUsage::query()
-            ->selectRaw('ingredient_name, SUM(quantity_used) as total')
-            ->whereBetween('usage_date', [$this->rangeFrom(), $this->rangeUntil()])
-            ->groupBy('ingredient_name')
+        return DB::table('stock_movements as m')
+            ->join('ingredients as i', 'i.id', '=', 'm.ingredient_id')
+            ->where('m.movement_type', 'sale')
+            ->whereDate('m.created_at', '>=', $this->rangeFrom())
+            ->whereDate('m.created_at', '<=', $this->rangeUntil())
+            ->selectRaw('i.name as ingredient_name, SUM(-m.quantity_change) as total')
+            ->groupBy('i.id', 'i.name')
             ->orderByDesc('total')
-            ->first()?->ingredient_name;
+            ->value('ingredient_name');
     }
 
     private function selectedIngredient(): ?string
@@ -114,37 +117,28 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         $rangeDays = $fromDate->diffInDays($untilDate) + 1;
 
         $labels = [];
-        $days = [];
         for ($i = 0; $i < $rangeDays; $i++) {
-            $date = $fromDate->copy()->addDays($i)->toDateString();
-            $labels[] = Carbon::parse($date)->translatedFormat('d M');
-            $days[$date] = 0;
+            $labels[] = $fromDate->copy()->addDays($i)->translatedFormat('d M');
         }
 
-        $current = $this->dailyUsage($fromDate->toDateString(), $untilDate->toDateString(), $days);
-        $previous = $this->dailyUsage(
-            $fromDate->copy()->subDays($rangeDays)->toDateString(),
-            $fromDate->copy()->subDay()->toDateString(),
-            $days
-        );
+        $current = $this->dailyUsage($fromDate->toDateString(), $untilDate->toDateString());
 
-        $previousLabel = $this->formatDatePeriod(
-            $fromDate->copy()->subDays($rangeDays)->toDateString(),
-            $fromDate->copy()->subDay()->toDateString()
-        );
+        $previousFrom = $fromDate->copy()->subDays($rangeDays);
+        $previousUntil = $fromDate->copy()->subDay();
+        $previous = $this->dailyUsage($previousFrom->toDateString(), $previousUntil->toDateString());
 
         return [
             'datasets' => [
                 [
                     'label' => $fromDate->translatedFormat('d M Y') . ' – ' . $untilDate->translatedFormat('d M Y'),
-                    'data' => array_values($current),
+                    'data' => $current,
                     'borderColor' => '#28A745',
                     'backgroundColor' => 'rgba(40, 167, 69, 0.1)',
                     'fill' => true,
                 ],
                 [
-                    'label' => $previousLabel,
-                    'data' => array_values($previous),
+                    'label' => $previousFrom->translatedFormat('d M Y') . ' – ' . $previousUntil->translatedFormat('d M Y'),
+                    'data' => $previous,
                     'borderColor' => '#E8692A',
                     'backgroundColor' => 'rgba(232, 105, 42, 0.1)',
                     'fill' => true,
@@ -155,34 +149,38 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         ];
     }
 
-    private function dailyUsage(string $from, string $to, array $days): array
+    private function dailyUsage(string $from, string $to): array
     {
-        $result = $days;
-        $ingredient = $this->selectedIngredient();
-
-        $query = DailyIngredientUsage::query()
-            ->selectRaw("usage_date::date as day, sum(quantity_used) as total")
-            ->whereDate('usage_date', '>=', $from)
-            ->whereDate('usage_date', '<=', $to);
-
-        if ($ingredient) {
-            $query->where('ingredient_name', $ingredient);
+        $days = [];
+        $cursor = Carbon::parse($from)->startOfDay();
+        $end = Carbon::parse($to)->startOfDay();
+        while ($cursor->lte($end)) {
+            $days[$cursor->toDateString()] = 0.0;
+            $cursor->addDay();
         }
 
-        $query->groupBy('day')
+        $ingredient = $this->selectedIngredient();
+
+        $query = DB::table('stock_movements as m')
+            ->join('ingredients as i', 'i.id', '=', 'm.ingredient_id')
+            ->where('m.movement_type', 'sale')
+            ->whereDate('m.created_at', '>=', $from)
+            ->whereDate('m.created_at', '<=', $to)
+            ->selectRaw('m.created_at::date as day, SUM(-m.quantity_change) as total');
+
+        if ($ingredient) {
+            $query->where('i.name', $ingredient);
+        }
+
+        $query->groupByRaw('m.created_at::date')
             ->get()
-            ->each(function ($row) use (&$result) {
+            ->each(function ($row) use (&$days) {
                 $day = $row->day instanceof \Carbon\CarbonInterface ? $row->day->toDateString() : substr((string) $row->day, 0, 10);
-                if (array_key_exists($day, $result)) {
-                    $result[$day] = (float) $row->total;
+                if (array_key_exists($day, $days)) {
+                    $days[$day] = (float) $row->total;
                 }
             });
 
-        return $result;
-    }
-
-    private function formatDatePeriod(string $from, string $to): string
-    {
-        return Carbon::parse($from)->translatedFormat('d M Y') . ' – ' . Carbon::parse($to)->translatedFormat('d M Y');
+        return array_values($days);
     }
 }

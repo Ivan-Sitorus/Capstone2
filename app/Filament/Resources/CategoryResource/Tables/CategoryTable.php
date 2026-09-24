@@ -14,7 +14,7 @@ class CategoryTable
     public static function configure(Table $table): Table
     {
         return $table
-            ->searchPlaceholder('Cari Nama Kategori')
+            ->searchPlaceholder('Cari Kategori Menu')
             ->columns([
                 TextColumn::make('name')
                     ->label('Kategori Menu')

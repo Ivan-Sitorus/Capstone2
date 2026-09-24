@@ -21,7 +21,7 @@ class StockForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('Nama Bahan')
+                    ->label('Bahan Baku')
                     ->required()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),

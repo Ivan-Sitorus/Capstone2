@@ -4,6 +4,7 @@ namespace App\Filament\Resources\StockAdjustmentResource\Tables;
 
 use App\Enums\AdjustmentType;
 use App\Filament\Resources\StockAdjustmentResource;
+use App\Models\Ingredient;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ActionGroup;
 use Filament\Forms\Components\DatePicker;
@@ -19,6 +20,7 @@ class StockAdjustmentTable
     {
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with(['ingredient', 'reportedBy']))
+            ->searchPlaceholder('Cari Kode Penyesuaian')
             ->columns([
                 TextColumn::make('adjusted_at')
                     ->label('Waktu')
@@ -35,8 +37,7 @@ class StockAdjustmentTable
                     ->color(fn (AdjustmentType $state): string => $state === AdjustmentType::Increase ? 'primary' : 'danger')
                     ->formatStateUsing(fn (AdjustmentType $state): string => $state === AdjustmentType::Increase ? 'Penambahan' : 'Pengurangan'),
                 TextColumn::make('ingredient.name')
-                    ->label('Nama')
-                    ->searchable()
+                    ->label('Nama Bahan Baku')
                     ->sortable()
                     ->limit(30),
                 TextColumn::make('quantity')
@@ -93,6 +94,10 @@ class StockAdjustmentTable
                         AdjustmentType::Increase->value => 'Penambahan',
                         AdjustmentType::Decrease->value => 'Pengurangan',
                     ]),
+                SelectFilter::make('ingredient_id')
+                    ->label('Nama Bahan Baku')
+                    ->searchable()
+                    ->options(fn () => Ingredient::query()->orderBy('name')->pluck('name', 'id')),
             ])
             ->recordAction('detail')
             ->recordActions([

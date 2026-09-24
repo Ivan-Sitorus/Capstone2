@@ -27,6 +27,7 @@ return new class extends Migration
             $table->index('ingredient_id');
             $table->index('order_id');
             $table->index(['ingredient_id', 'created_at']);
+            $table->index(['ingredient_id', 'movement_type', 'created_at']);
             $table->index(['movement_type', 'created_at']);
             $table->index(['source_type', 'source_id']);
         });

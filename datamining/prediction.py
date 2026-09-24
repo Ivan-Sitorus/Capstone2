@@ -14,13 +14,9 @@ Mengikuti notebook: 1 Model Menu Prophet preprocessing_prediction.ipynb
 - Prediksi 2 hari ke depan + nama hari Indonesia (cell 33)
 """
 
-import io, os, base64, warnings, math
+import os, warnings, math
 import numpy as np
 import pandas as pd
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 from prophet import Prophet
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
@@ -41,13 +37,6 @@ HARI_ID = {
 # Helper
 # ─────────────────────────────────────────────────────────────────────────────
 
-def _fig_to_base64(fig) -> str:
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight", dpi=90)
-    buf.seek(0)
-    b64 = base64.b64encode(buf.read()).decode()
-    plt.close(fig)
-    return b64
 
 
 def smape(y_true, y_pred):
@@ -137,15 +126,16 @@ def preprocess(df: pd.DataFrame):
         Q1      = df_item["Jumlah"].quantile(0.25)
         Q3      = df_item["Jumlah"].quantile(0.75)
         IQR     = Q3 - Q1
-        lower   = math.floor(Q1 - 1.5 * IQR)
-        upper   = math.ceil(Q3 + 1.5 * IQR)
-        outlier_total += int(
-            ((df_item["Jumlah"] < lower) | (df_item["Jumlah"] > upper)).sum()
-        )
-        df_item["Jumlah"] = np.where(
-            df_item["Jumlah"] > upper, upper,
-            np.where(df_item["Jumlah"] < lower, lower, df_item["Jumlah"]),
-        )
+        if IQR > 0:
+            lower   = math.floor(Q1 - 1.5 * IQR)
+            upper   = math.ceil(Q3 + 1.5 * IQR)
+            outlier_total += int(
+                ((df_item["Jumlah"] < lower) | (df_item["Jumlah"] > upper)).sum()
+            )
+            df_item["Jumlah"] = np.where(
+                df_item["Jumlah"] > upper, upper,
+                np.where(df_item["Jumlah"] < lower, lower, df_item["Jumlah"]),
+            )
         df_result_list.append(df_item)
 
     df_capped = pd.concat(df_result_list, ignore_index=True)
@@ -245,7 +235,7 @@ def evaluate_model(model: Prophet, df_test: pd.DataFrame):
 # VISUALISASI 1 — FEATURE IMPORTANCE: Weekday vs Weekend  (cell 30)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def plot_feature_importance(item_data: dict, items: list) -> str:
+def build_feature_importance(item_data: dict, items: list) -> list:
     fi_list = []
     for item in items:
         df_all       = item_data[item]["full"]
@@ -253,149 +243,9 @@ def plot_feature_importance(item_data: dict, items: list) -> str:
         weekend_data = df_all[df_all["is_weekend"] == 1]["y"]
         avg_weekday  = float(weekday_data.mean()) if len(weekday_data) > 0 else 0.0
         avg_weekend  = float(weekend_data.mean()) if len(weekend_data) > 0 else 0.0
-        fi_list.append({"item": item, "Weekday": avg_weekday, "Weekend": avg_weekend})
+        fi_list.append({"item": item, "Weekday": round(avg_weekday, 4), "Weekend": round(avg_weekend, 4)})
 
-    fig, ax = plt.subplots(figsize=(12, 5))
-    x     = np.arange(len(items))
-    width = 0.35
-
-    bars1 = ax.bar(x - width / 2, [f["Weekday"] for f in fi_list],
-                   width, label="Weekday", color="steelblue", alpha=0.85)
-    bars2 = ax.bar(x + width / 2, [f["Weekend"] for f in fi_list],
-                   width, label="Weekend", color="coral", alpha=0.85)
-
-    for bar in bars1:
-        ax.text(bar.get_x() + bar.get_width() / 2., bar.get_height() + 0.05,
-                f"{bar.get_height():.1f}", ha="center", va="bottom", fontsize=8)
-    for bar in bars2:
-        ax.text(bar.get_x() + bar.get_width() / 2., bar.get_height() + 0.05,
-                f"{bar.get_height():.1f}", ha="center", va="bottom", fontsize=8)
-
-    ax.set_xlabel("Item", fontsize=11)
-    ax.set_ylabel("Rata-rata Penjualan", fontsize=11)
-    ax.set_title(
-        "Analisis Rata-rata Penjualan per Menu: Weekday vs Weekend",
-        fontsize=13, fontweight="bold",
-    )
-    ax.set_xticks(x)
-    ax.set_xticklabels(items, rotation=30, ha="right")
-    ax.legend()
-    ax.grid(axis="y", linestyle="--", alpha=0.5)
-    fig.tight_layout()
-    return _fig_to_base64(fig)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# VISUALISASI 2 — EVALUASI 2×2 BAR CHART  (cell 31)
-# ─────────────────────────────────────────────────────────────────────────────
-
-def plot_evaluation(eval_results: dict, items: list) -> str:
-    rows = [
-        {
-            "Item":      m,
-            "MAE":       eval_results[m]["MAE"],
-            "RMSE":      eval_results[m]["RMSE"],
-            "MAPE (%)":  eval_results[m]["MAPE"],
-            "SMAPE (%)": eval_results[m]["SMAPE"],
-        }
-        for m in items
-    ]
-    df_eval = pd.DataFrame(rows)
-
-    fig, axes = plt.subplots(2, 2, figsize=(14, 8))
-    metrics   = ["MAE", "RMSE", "MAPE (%)", "SMAPE (%)"]
-    colors    = ["steelblue", "darkorange", "seagreen", "mediumpurple"]
-
-    for ax, metric, color in zip(axes.flatten(), metrics, colors):
-        bars = ax.bar(df_eval["Item"], df_eval[metric],
-                      color=color, alpha=0.85, edgecolor="white")
-        ax.set_title(metric, fontsize=12, fontweight="bold")
-        ax.set_xlabel("Item")
-        ax.set_ylabel(metric)
-        ax.tick_params(axis="x", rotation=30)
-        ax.grid(axis="y", linestyle="--", alpha=0.5)
-        for bar in bars:
-            ax.text(
-                bar.get_x() + bar.get_width() / 2., bar.get_height() * 0.5,
-                f"{bar.get_height():.1f}", ha="center", va="bottom",
-                fontsize=8, color="white", fontweight="bold",
-            )
-
-    fig.suptitle(
-        "Evaluasi Model Prophet per Item\n(pada data TEST 20%)",
-        fontsize=14, fontweight="bold", y=1.01,
-    )
-    fig.tight_layout()
-    return _fig_to_base64(fig)
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# VISUALISASI 3 — PREDIKSI vs AKTUAL PER ITEM  (cell 32)
-# ─────────────────────────────────────────────────────────────────────────────
-
-def _build_per_item_ax(ax, item: str, train_df, result_df):
-    """Gambar satu subplot untuk satu item."""
-    # Training (gray)
-    ax.plot(train_df["ds"], train_df["y"],
-            color="gray", linewidth=1, alpha=0.5, label="Data Training")
-    # Aktual test (steelblue)
-    ax.plot(result_df["ds"], result_df["y"],
-            color="steelblue", linewidth=2, marker="o", markersize=4, label="Aktual (Test)")
-    # Prediksi (tomato)
-    ax.plot(result_df["ds"], result_df["yhat"],
-            color="tomato", linewidth=2, linestyle="--", marker="s", markersize=4, label="Prediksi")
-    # CI band (tomato)
-    ax.fill_between(result_df["ds"], result_df["yhat_lower"], result_df["yhat_upper"],
-                    alpha=0.15, color="tomato", label="Interval Kepercayaan 95%")
-    # Weekend shading (gold)
-    for _, row in result_df.iterrows():
-        if row["Day_Type"] == "Weekend":
-            ax.axvspan(
-                row["ds"] - pd.Timedelta(hours=12),
-                row["ds"] + pd.Timedelta(hours=12),
-                alpha=0.08, color="gold",
-            )
-    ax.set_title(f"Prediksi vs Aktual — {item}", fontsize=13, fontweight="bold")
-    ax.set_xlabel("Tanggal")
-    ax.set_ylabel("Jumlah Penjualan")
-    ax.legend(loc="upper left", fontsize=9)
-    ax.grid(True, linestyle="--", alpha=0.4)
-    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b"))
-    plt.setp(ax.xaxis.get_majorticklabels(), rotation=30)
-    ax.text(0.99, 0.97, "Kuning = Weekend", transform=ax.transAxes,
-            fontsize=8, va="top", ha="right", alpha=0.7)
-
-
-def plot_per_item(items: list, item_data: dict, forecasts: dict):
-    """
-    Kembalikan:
-      - chart_all_items: semua item dalam 1 gambar (combined)
-      - charts_per_menu : list {'nama', 'chart'} per item
-    """
-    n = len(items)
-    fig_all, axes = plt.subplots(n, 1, figsize=(14, 5 * n))
-    if n == 1:
-        axes = [axes]
-
-    for ax, item in zip(axes, items):
-        _build_per_item_ax(ax, item, item_data[item]["train"], forecasts[item])
-
-    fig_all.suptitle(
-        "Visualisasi Prediksi vs Aktual per Item\n(Data Test 20%)",
-        fontsize=15, fontweight="bold", y=1.01,
-    )
-    fig_all.tight_layout()
-    chart_all_items = _fig_to_base64(fig_all)
-
-    # Individual per-menu charts
-    charts_per_menu = []
-    for item in items:
-        fig_single, ax_single = plt.subplots(figsize=(14, 5))
-        _build_per_item_ax(ax_single, item, item_data[item]["train"], forecasts[item])
-        fig_single.tight_layout()
-        charts_per_menu.append({"nama": item, "chart": _fig_to_base64(fig_single)})
-
-    return chart_all_items, charts_per_menu
+    return fi_list
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -473,10 +323,8 @@ def run_prediction_pipeline(df: pd.DataFrame) -> dict:
         ),
     })
 
-    # ── Visualisasi ────────────────────────────────────────────────────────
-    chart_feat_imp          = plot_feature_importance(item_data, items)
-    chart_eval              = plot_evaluation(eval_results, items)
-    chart_all_items, charts_per_menu = plot_per_item(items, item_data, forecasts)
+    # ── Feature importance (data saja; grafik dirender native) ─────────────
+    feature_importance = build_feature_importance(item_data, items)
 
     # ── Tahap 5: Prediksi 2 hari ke depan (cell 33) ───────────────────────
     future_dates = [max_date + pd.Timedelta(days=i) for i in range(1, 3)]
@@ -545,30 +393,6 @@ def run_prediction_pipeline(df: pd.DataFrame) -> dict:
         ),
     })
 
-    # ── Chart ringkasan total forecast semua menu ──────────────────────────
-    names  = [s["nama_menu"]      for s in summary_table]
-    totals = [s["total_forecast"] for s in summary_table]
-
-    fig_sum, ax_sum = plt.subplots(figsize=(max(7, len(names) * 1.6), 4.5))
-    bars = ax_sum.bar(names, totals, color="#6366f1", width=0.55, edgecolor="white")
-    for bar, val in zip(bars, totals):
-        ax_sum.text(
-            bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.06,
-            str(int(val)), ha="center", va="bottom",
-            fontsize=11, fontweight="bold", color="#374151",
-        )
-    ax_sum.set_title(
-        f"Total Prediksi Penjualan per Menu\n"
-        f"{future_dates[0].date()} ({d1_name})  s/d  {future_dates[1].date()} ({d2_name})",
-        fontsize=11, fontweight="bold", pad=12,
-    )
-    ax_sum.set_xlabel("Nama Menu", labelpad=8)
-    ax_sum.set_ylabel("Total Prediksi (unit)", labelpad=8)
-    ax_sum.yaxis.grid(True)
-    ax_sum.xaxis.grid(False)
-    fig_sum.tight_layout(pad=2)
-    chart_summary = _fig_to_base64(fig_sum)
-
     # ── Output akhir ───────────────────────────────────────────────────────
     return {
         "status":             "success",
@@ -585,11 +409,5 @@ def run_prediction_pipeline(df: pd.DataFrame) -> dict:
         "preprocessing_logs": logs,
         "predictions":        predictions_out,
         "summary_table":      summary_table,
-        "charts": {
-            "forecast_all":       chart_summary,
-            "feature_importance": chart_feat_imp,
-            "evaluation":         chart_eval,
-            "all_items":          chart_all_items,
-            "per_menu":           charts_per_menu,
-        },
+        "feature_importance": feature_importance,
     }

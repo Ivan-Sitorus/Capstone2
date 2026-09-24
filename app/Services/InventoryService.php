@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Enums\BatchMode;
 use App\Enums\MovementType;
 use App\Enums\SourceType;
-use App\Models\DailyIngredientUsage;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
 use App\Models\Menu;
@@ -244,14 +243,6 @@ class InventoryService
             ];
         }
 
-        if (($context['movement_type'] ?? MovementType::Sale) === MovementType::Sale) {
-            $this->recordDailyIngredientUsage(
-                ingredient: $ingredient,
-                usedQuantity: $requiredQuantity,
-                usageDate: $context['usage_date'] ?? null,
-            );
-        }
-
         return [
             'ingredient_id' => $ingredient->id,
             'ingredient_name' => $ingredient->name,
@@ -259,35 +250,5 @@ class InventoryService
             'unit' => $ingredient->unit,
             'batch_changes' => $batchChanges,
         ];
-    }
-
-    private function recordDailyIngredientUsage(Ingredient $ingredient, float $usedQuantity, ?string $usageDate = null): void
-    {
-        $resolvedUsageDate = $usageDate ?: now()->toDateString();
-
-        $dailyUsage = DailyIngredientUsage::query()
-            ->where('usage_date', $resolvedUsageDate)
-            ->where('ingredient_id', $ingredient->id)
-            ->lockForUpdate()
-            ->first();
-
-        if ($dailyUsage) {
-            $dailyUsage->fill([
-                'ingredient_name' => $ingredient->name,
-                'unit' => $ingredient->unit,
-                'quantity_used' => round(((float) $dailyUsage->quantity_used) + $usedQuantity, 2),
-            ]);
-            $dailyUsage->save();
-
-            return;
-        }
-
-        DailyIngredientUsage::create([
-            'usage_date' => $resolvedUsageDate,
-            'ingredient_id' => $ingredient->id,
-            'ingredient_name' => $ingredient->name,
-            'unit' => $ingredient->unit,
-            'quantity_used' => round($usedQuantity, 2),
-        ]);
     }
 }

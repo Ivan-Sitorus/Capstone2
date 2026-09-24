@@ -11,6 +11,8 @@ class ClusteringBahanBakuSummaryWidget extends TableWidget
 {
     protected int | string | array $columnSpan = 'full';
 
+    public ?int $runId = null;
+
     protected function getPollingInterval(): ?string
     {
         return '5s';
@@ -21,7 +23,7 @@ class ClusteringBahanBakuSummaryWidget extends TableWidget
         return $table
             ->heading('Hasil Clustering Bahan Baku')
             ->records(function () {
-                $run = DataminingRun::latestCompleted('clustering-bahan-baku');
+                $run = DataminingRun::find($this->runId) ?? DataminingRun::latestCompleted('clustering-bahan-baku');
                 $rows = $run?->payload['table_rows'] ?? [];
 
                 return collect($rows)

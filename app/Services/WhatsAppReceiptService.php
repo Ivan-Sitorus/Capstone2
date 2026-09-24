@@ -4,24 +4,9 @@ namespace App\Services;
 
 use App\Models\Order;
 use App\Models\Setting;
-use Illuminate\Support\Collection;
 
 class WhatsAppReceiptService
 {
-    /**
-     * Default WhatsApp receipt template. Available placeholders:
-     * {{cafe_name}}, {{order_code}}, {{total}}, {{date}}, {{receipt_url}}
-     */
-    const DEFAULT_TEMPLATE = "Struk Belanja di {{cafe_name}} total {{total}}. Lihat detail & beri saran di {{receipt_url}} [ABAIKAN BILA TIDAK MEMBELI]";
-
-    /**
-     * Format an amount as Indonesian Rupiah string.
-     */
-    public function formatRupiah(int $amount): string
-    {
-        return 'Rp ' . number_format($amount, 0, ',', '.');
-    }
-
     /**
      * Normalize an Indonesian phone number to international format (62-prefix).
      *
@@ -55,33 +40,14 @@ class WhatsAppReceiptService
     /**
      * Generate a WhatsApp message for the given order.
      *
-     * Reads template from Setting::get('receipt_whatsapp_template', self::DEFAULT_TEMPLATE),
-     * replaces placeholders, and prepends an item summary (max 2 items).
+     * Reads the `receipt_whatsapp_template` setting and replaces the `(link)`
+     * placeholder with the receipt URL.
      */
     public function generateMessage(Order $order): string
     {
-        $template = Setting::get('receipt_whatsapp_template', self::DEFAULT_TEMPLATE);
+        $template = Setting::get('receipt_whatsapp_template') ?? '';
 
-        $cafeName = Setting::get('cafe_name', config('app.name', 'W9 Cafe'));
-        $date = $order->created_at->format('d M Y');
-
-        $placeholders = [
-            '{{cafe_name}}'   => $cafeName,
-            '{{order_code}}'  => $order->order_code,
-            '{{total}}'       => $this->formatRupiah($order->total_amount),
-            '{{date}}'        => $date,
-            '{{receipt_url}}' => $order->receipt_url,
-        ];
-
-        $message = str_replace(array_keys($placeholders), array_values($placeholders), $template);
-
-        // Prepend item summary if items exist
-        $itemsSummary = $this->summarizeItems($order->items);
-        if ($itemsSummary) {
-            $message = "Pesanan: {$itemsSummary}\n\n{$message}";
-        }
-
-        return $message;
+        return str_replace('(link)', $order->receipt_url, $template);
     }
 
     /**
@@ -102,33 +68,5 @@ class WhatsAppReceiptService
         $encoded = urlencode($message);
 
         return "https://wa.me/{$normalizedPhone}?text={$encoded}";
-    }
-
-    /**
-     * Summarize order items for inclusion in the WhatsApp message.
-     *
-     * Takes up to 2 items, formats as "2x Kopi Robusta, 1x Roti Bakar".
-     * If more than 2 items exist, appends " dan N item lainnya".
-     */
-    protected function summarizeItems(Collection $items): string
-    {
-        if ($items->isEmpty()) {
-            return '';
-        }
-
-        $firstTwo = $items->take(2);
-        $parts = $firstTwo->map(function ($item) {
-            $menuName = $item->menu ? $item->menu->name : 'Menu #' . $item->menu_id;
-            return "{$item->quantity}x {$menuName}";
-        });
-
-        $summary = $parts->join(', ');
-
-        if ($items->count() > 2) {
-            $remaining = $items->count() - 2;
-            $summary .= " dan {$remaining} item lainnya";
-        }
-
-        return $summary;
     }
 }

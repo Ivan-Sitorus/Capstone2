@@ -2,7 +2,7 @@
     <div class="mx-auto" style="max-width: 320px; font-family: 'Courier New', Courier, monospace; background: #fff; padding: 24px; border: 1px dashed #d1d5db;">
         {{-- Judul --}}
         <div style="text-align: center; font-size: 18px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #1f2937;">
-            {{ $data['receipt_title'] ?? 'W9 Cafe' }}
+            {{ $data['receipt_title'] ?? '' }}
         </div>
 
         {{-- Header --}}

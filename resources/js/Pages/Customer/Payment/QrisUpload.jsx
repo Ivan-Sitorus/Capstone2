@@ -195,7 +195,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             {/* Merchant + amount (kompak) */}
                             <div style={{ textAlign: 'center', flexShrink: 0, marginBottom: 12 }}>
                                 <p style={{ fontSize: 12, fontWeight: 500, color: C.textSecond, fontFamily: F, margin: '0 0 4px' }}>
-                                    {qrisName || 'W9 Cafe STIE Totalwin'}
+                                    {qrisName || ''}
                                 </p>
                                 <p style={{ fontSize: 26, fontWeight: 700, color: C.textHead, fontFamily: F, letterSpacing: '-0.03em', margin: 0 }}>
                                     {formatRupiah(totalAmount)}

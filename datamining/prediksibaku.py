@@ -18,13 +18,9 @@ Input DataFrame kolom: Tanggal, Bahan_Baku, Unit, Jumlah_Digunakan
 Output: dict JSON sesuai kontrak PrediksiBahanBaku.php + prediksi-bahan-baku.blade.php
 """
 
-import io, base64, warnings, math
+import warnings, math
 import numpy as np
 import pandas as pd
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
-import matplotlib.dates as mdates
 from prophet import Prophet
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
@@ -40,38 +36,9 @@ HARI_ID = {
     "Sunday":    "Minggu",
 }
 
-plt.rcParams.update({
-    "font.family":       "DejaVu Sans",
-    "axes.spines.top":   False,
-    "axes.spines.right": False,
-    "axes.titlesize":    12,
-    "axes.titleweight":  "bold",
-    "axes.titlepad":     12,
-    "axes.labelsize":    10,
-    "axes.labelpad":     6,
-    "xtick.labelsize":   8.5,
-    "ytick.labelsize":   8.5,
-    "legend.fontsize":   8,
-    "figure.facecolor":  "white",
-    "axes.facecolor":    "#fafafa",
-    "axes.grid":         True,
-    "grid.color":        "#e5e7eb",
-    "grid.linewidth":    0.65,
-})
-
-
 # ─────────────────────────────────────────────────────────────────────────────
 # Helpers
 # ─────────────────────────────────────────────────────────────────────────────
-
-def _fig_to_b64(fig) -> str:
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight", dpi=110)
-    buf.seek(0)
-    b64 = base64.b64encode(buf.read()).decode()
-    plt.close(fig)
-    return b64
-
 
 def _smape(y_true, y_pred) -> float:
     y_true, y_pred = np.array(y_true), np.array(y_pred)
@@ -141,9 +108,10 @@ def _preprocess(df: pd.DataFrame):
         tmp = df_full[df_full["Bahan_Baku"] == bahan].copy()
         Q1, Q3 = tmp["Jumlah_Digunakan"].quantile(0.25), tmp["Jumlah_Digunakan"].quantile(0.75)
         IQR = Q3 - Q1
-        lo, hi = Q1 - 1.5 * IQR, Q3 + 1.5 * IQR
-        n_outlier += int(((tmp["Jumlah_Digunakan"] < lo) | (tmp["Jumlah_Digunakan"] > hi)).sum())
-        tmp["Jumlah_Digunakan"] = tmp["Jumlah_Digunakan"].clip(lower=lo, upper=hi)
+        if IQR > 0:
+            lo, hi = Q1 - 1.5 * IQR, Q3 + 1.5 * IQR
+            n_outlier += int(((tmp["Jumlah_Digunakan"] < lo) | (tmp["Jumlah_Digunakan"] > hi)).sum())
+            tmp["Jumlah_Digunakan"] = tmp["Jumlah_Digunakan"].clip(lower=lo, upper=hi)
         capped.append(tmp)
     df_capped = pd.concat(capped, ignore_index=True)
     logs.append({
@@ -166,8 +134,7 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
 
     predictions_out       = []
     summary_rows          = []
-    per_ingredient_charts = []
-    all_items_store       = []   # untuk chart gabungan
+    all_items_store = []
 
     for bahan in ingredients:
         df_b = df_capped[df_capped["Bahan_Baku"] == bahan].sort_values("Tanggal").reset_index(drop=True)
@@ -251,49 +218,6 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
             "model":           "Prophet",
         })
 
-        # ── Grafik individual per bahan baku ──────────────────────────
-        fig, ax = plt.subplots(figsize=(14, 3.8))
-
-        ax.plot(train["ds"], train["y"],
-                color="#93c5fd", linewidth=1.0, alpha=0.8, label="Training Aktual")
-        ax.plot(test["ds"],  y_true,
-                color="#059669", linewidth=1.4, marker="o", markersize=3, label="Test Aktual")
-        ax.plot(test["ds"],  y_pred,
-                color="#f97316", linewidth=1.4, linestyle="--", label="Test Prediksi")
-
-        if len(test) > 0:
-            ax.fill_between(
-                test_fc["ds"],
-                test_fc["yhat_lower"].clip(lower=0),
-                test_fc["yhat_upper"].clip(lower=0),
-                alpha=0.14, color="#f97316", label="CI 95%",
-            )
-
-        # Weekend shading
-        for dt in test["ds"]:
-            if dt.dayofweek >= 5:
-                ax.axvspan(dt - pd.Timedelta(hours=12), dt + pd.Timedelta(hours=12),
-                           alpha=0.07, color="#fbbf24")
-
-        # Garis pemisah train/test
-        if len(test) > 0:
-            ax.axvline(test["ds"].iloc[0], color="#6b7280", linestyle=":",
-                       linewidth=1.1, alpha=0.7, label="Train | Test")
-
-        ax.set_title(
-            f"{bahan}  —  Prediksi vs Aktual  "
-            f"| MAE={mae_v:.1f}  MAPE={mape_v:.1f}%  SMAPE={smape_v:.1f}%"
-        )
-        ax.set_xlabel("Tanggal")
-        ax.set_ylabel(f"Jumlah ({satuan})" if satuan else "Jumlah")
-        ax.legend(loc="upper left", ncol=2, fontsize=7.5)
-        ax.xaxis.set_major_formatter(mdates.DateFormatter("%d %b %y"))
-        ax.xaxis.set_major_locator(mdates.AutoDateLocator())
-        plt.setp(ax.get_xticklabels(), rotation=28, ha="right")
-        fig.tight_layout(pad=1.5)
-
-        per_ingredient_charts.append({"nama": bahan, "chart": _fig_to_b64(fig)})
-
         all_items_store.append({
             "bahan":   bahan,
             "satuan":  satuan,
@@ -306,119 +230,14 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
     # Sort summary by total_forecast desc
     summary_rows.sort(key=lambda x: x["total_forecast"], reverse=True)
 
-    # ─────────────────────────────────────────────────────────────────────
-    # GRAFIK 1 — forecast_all: bar total prediksi per bahan baku
-    # ─────────────────────────────────────────────────────────────────────
-    names_s  = [r["nama_bahan_baku"] for r in summary_rows]
-    totals_s = [r["total_forecast"]  for r in summary_rows]
-    palette  = ["#6366f1", "#8b5cf6", "#a78bfa", "#c4b5fd"]
-    colors_s = [palette[i % len(palette)] for i in range(len(names_s))]
-
-    fig_fa, ax_fa = plt.subplots(figsize=(max(10, n * 1.1), 5))
-    bars_fa = ax_fa.bar(names_s, totals_s, color=colors_s, width=0.6, alpha=0.88, edgecolor="white")
-    for bar, val in zip(bars_fa, totals_s):
-        ax_fa.text(
-            bar.get_x() + bar.get_width() / 2, bar.get_height() + max(totals_s, default=1) * 0.012,
-            f"{val:.1f}", ha="center", va="bottom", fontsize=8.5, color="#374151",
-        )
-    ax_fa.set_title("Total Prediksi Penggunaan 2 Hari ke Depan per Bahan Baku", pad=14)
-    ax_fa.set_xlabel("Bahan Baku", labelpad=8)
-    ax_fa.set_ylabel("Jumlah Prediksi (unit/satuan)", labelpad=8)
-    ax_fa.tick_params(axis="x", rotation=38)
-    ax_fa.set_xticklabels(ax_fa.get_xticklabels(), ha="right")
-    ax_fa.yaxis.grid(True); ax_fa.xaxis.grid(False)
-    fig_fa.tight_layout(pad=2)
-    chart_forecast_all = _fig_to_b64(fig_fa)
-
-    # ─────────────────────────────────────────────────────────────────────
-    # GRAFIK 2 — feature_importance: Weekday vs Weekend per bahan baku
-    # ─────────────────────────────────────────────────────────────────────
-    feat_rows = []
+    feature_importance = []
     for bahan in ingredients:
         tmp = df_capped[df_capped["Bahan_Baku"] == bahan]
-        feat_rows.append({
+        feature_importance.append({
             "bahan":   bahan,
-            "Weekday": float(tmp[tmp["Day_Type"] == "Weekday"]["Jumlah_Digunakan"].mean()),
-            "Weekend": float(tmp[tmp["Day_Type"] == "Weekend"]["Jumlah_Digunakan"].mean()),
+            "Weekday": round(float(tmp[tmp["Day_Type"] == "Weekday"]["Jumlah_Digunakan"].mean()), 4),
+            "Weekend": round(float(tmp[tmp["Day_Type"] == "Weekend"]["Jumlah_Digunakan"].mean()), 4),
         })
-    df_feat = pd.DataFrame(feat_rows).set_index("bahan")
-
-    fig_fi, ax_fi = plt.subplots(figsize=(max(10, n * 1.1), 5))
-    x_pos = np.arange(len(df_feat))
-    w = 0.38
-    ax_fi.bar(x_pos - w / 2, df_feat["Weekday"], width=w, label="Weekday", color="#3b82f6", alpha=0.87)
-    ax_fi.bar(x_pos + w / 2, df_feat["Weekend"], width=w, label="Weekend", color="#f59e0b", alpha=0.87)
-    ax_fi.set_xticks(x_pos)
-    ax_fi.set_xticklabels(df_feat.index, rotation=38, ha="right")
-    ax_fi.set_title("Analisis Rata-rata Jumlah Penggunaan Bahan Baku: Weekday vs Weekend", pad=14)
-    ax_fi.set_xlabel("Bahan Baku", labelpad=8)
-    ax_fi.set_ylabel("Rata-rata Jumlah Digunakan", labelpad=8)
-    ax_fi.legend(framealpha=0.9, edgecolor="#e5e7eb", fancybox=False)
-    ax_fi.yaxis.grid(True); ax_fi.xaxis.grid(False)
-    fig_fi.tight_layout(pad=2)
-    chart_feature_importance = _fig_to_b64(fig_fi)
-
-    # ─────────────────────────────────────────────────────────────────────
-    # GRAFIK 3 — evaluation 2×2: MAE, RMSE, MAPE, SMAPE
-    # ─────────────────────────────────────────────────────────────────────
-    metrics    = ["MAE",      "RMSE",     "MAPE (%)", "SMAPE (%)"]
-    metric_keys = ["mae",     "rmse",     "mape",     "smape"]
-    ev_colors  = ["#3b82f6",  "#10b981",  "#f59e0b",  "#ef4444"]
-
-    fig_ev, axes_ev = plt.subplots(2, 2, figsize=(14, 7))
-    for ax_ev, label, key, col in zip(axes_ev.flat, metrics, metric_keys, ev_colors):
-        vals_ev = [r[key] for r in summary_rows]
-        bars_ev = ax_ev.bar(names_s, vals_ev, color=col, alpha=0.82, width=0.6)
-        for bar, val in zip(bars_ev, vals_ev):
-            ax_ev.text(
-                bar.get_x() + bar.get_width() / 2,
-                bar.get_height() + max(vals_ev, default=1) * 0.012,
-                f"{val:.2f}", ha="center", va="bottom", fontsize=7.5, color="#374151",
-            )
-        ax_ev.set_title(f"Evaluasi {label}")
-        ax_ev.set_ylabel(label)
-        ax_ev.tick_params(axis="x", rotation=38)
-        ax_ev.set_xticklabels(ax_ev.get_xticklabels(), ha="right", fontsize=8)
-        ax_ev.yaxis.grid(True); ax_ev.xaxis.grid(False)
-
-    fig_ev.suptitle(
-        "Evaluasi Model Prophet per Bahan Baku — Data Test (25%)",
-        fontsize=12, fontweight="bold", y=1.01,
-    )
-    fig_ev.tight_layout(pad=2)
-    chart_evaluation = _fig_to_b64(fig_ev)
-
-    # ─────────────────────────────────────────────────────────────────────
-    # GRAFIK 4 — all_items: grid prediksi vs aktual semua bahan baku
-    # ─────────────────────────────────────────────────────────────────────
-    cols_g = 2
-    rows_g = math.ceil(n / cols_g)
-    fig_all, axes_all = plt.subplots(rows_g, cols_g, figsize=(16, rows_g * 3.6 + 1), squeeze=False)
-
-    for idx, it in enumerate(all_items_store):
-        r_i, c_i = divmod(idx, cols_g)
-        ax_i     = axes_all[r_i][c_i]
-        train_ds, train_y = it["train"]
-
-        ax_i.plot(train_ds, train_y, color="#93c5fd", linewidth=0.9, alpha=0.75, label="Train")
-        ax_i.plot(it["test_ds"], it["test_y"],
-                  color="#059669", linewidth=1.2, marker="o", markersize=2.5, label="Test Aktual")
-        ax_i.plot(it["test_ds"], it["pred_y"],
-                  color="#f97316", linewidth=1.2, linestyle="--", label="Test Pred")
-        ax_i.set_title(it["bahan"], fontsize=9.5)
-        ax_i.set_ylabel(it["satuan"] or "unit", fontsize=8)
-        ax_i.xaxis.set_major_formatter(mdates.DateFormatter("%b %y"))
-        ax_i.xaxis.set_major_locator(mdates.AutoDateLocator())
-        plt.setp(ax_i.get_xticklabels(), rotation=25, ha="right", fontsize=7.5)
-        ax_i.legend(fontsize=7, ncol=3)
-
-    for empty_idx in range(n, rows_g * cols_g):
-        r_e, c_e = divmod(empty_idx, cols_g)
-        axes_all[r_e][c_e].set_visible(False)
-
-    fig_all.suptitle("Prediksi vs Aktual — Semua Bahan Baku", fontsize=12, fontweight="bold")
-    fig_all.tight_layout(pad=2)
-    chart_all_items = _fig_to_b64(fig_all)
 
     # ─────────────────────────────────────────────────────────────────────
     # Forecast range dates
@@ -438,11 +257,6 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
         "predictions":        predictions_out,
         "summary_table":      summary_rows,
         "preprocessing_logs": logs,
-        "charts": {
-            "forecast_all":       chart_forecast_all,
-            "feature_importance": chart_feature_importance,
-            "evaluation":         chart_evaluation,
-            "all_items":          chart_all_items,
-            "per_ingredient":     per_ingredient_charts,
-        },
+        "feature_importance": feature_importance,
+        "all_items":          all_items_store,
     }

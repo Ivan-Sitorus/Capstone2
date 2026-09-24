@@ -36,7 +36,7 @@ class ReceivableTable
                     ->sortable()
                     ->copyable(),
                 TextColumn::make('customer_name')
-                    ->label('Pelanggan')
+                    ->label('Nama Pelanggan')
                     ->default('-')
                     ->searchable(),
                 TextColumn::make('cashier.name')

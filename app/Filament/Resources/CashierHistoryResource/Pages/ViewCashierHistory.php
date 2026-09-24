@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\CashierHistoryResource\Pages;
 
 use App\Enums\OrderStatus;
+use App\Filament\Concerns\HasOrderStatusBadge;
 use App\Filament\Resources\CashierHistoryResource;
+use App\Filament\Resources\OrderResource;
 use App\Models\CashierHistory;
 use App\Models\Order;
 use App\Services\CashierHistoryService;
@@ -22,6 +24,7 @@ use Filament\Tables\Table;
 class ViewCashierHistory extends Page implements HasTable
 {
     use InteractsWithTable;
+    use HasOrderStatusBadge;
 
     protected static string $resource = CashierHistoryResource::class;
 
@@ -35,25 +38,16 @@ class ViewCashierHistory extends Page implements HasTable
     public function content(Schema $schema): Schema
     {
         $session = $this->record;
-        $staff = $session->user;
-        $typeLabel = match ($session->type) {
-            'cashier' => 'Kasir',
-            'kitchen' => 'Dapur',
-            default => $session->type,
-        };
 
         return $schema->components([
             Section::make('Informasi Sesi')
                 ->schema([
                     TextEntry::make('staff_name')
-                        ->label('Nama Staff')
-                        ->state($staff->name),
+                        ->label('Nama Kasir')
+                        ->state($session->user->name),
                     TextEntry::make('staff_email')
                         ->label('Email')
-                        ->state($staff->email),
-                    TextEntry::make('staff_role')
-                        ->label('Role')
-                        ->state($typeLabel),
+                        ->state($session->user->email),
                     TextEntry::make('started_at')
                         ->label('Waktu Masuk')
                         ->state($session->started_at->format('d M Y, H:i')),
@@ -93,8 +87,8 @@ class ViewCashierHistory extends Page implements HasTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (OrderStatus $state): string => \App\Filament\Resources\OrderResource::getStatusColor($state->value))
-                    ->formatStateUsing(fn (OrderStatus $state): string => \App\Filament\Resources\OrderResource::getStatusLabel($state->value)),
+                    ->color(fn (OrderStatus $state): string => self::getStatusColor($state->value))
+                    ->formatStateUsing(fn (OrderStatus $state): string => self::getStatusLabel($state->value)),
                 TextColumn::make('total_amount')
                     ->label('Total')
                     ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
@@ -108,20 +102,16 @@ class ViewCashierHistory extends Page implements HasTable
                 Action::make('viewOrder')
                     ->label('Lihat Pesanan')
                     ->icon(Heroicon::OutlinedEye)
-                    ->url(fn (Order $record) => \App\Filament\Resources\OrderResource::getUrl('view', ['record' => $record])),
+                    ->infolist(OrderResource::getInfolistComponents())
+                    ->modalSubmitAction(false)
+                    ->modalCancelActionLabel('Tutup')
+                    ->modalAutofocus(false),
             ])
             ->defaultSort('created_at', 'desc');
     }
 
     public function getTitle(): string
     {
-        $session = $this->record;
-        $typeLabel = match ($session->type) {
-            'cashier' => 'Kasir',
-            'kitchen' => 'Dapur',
-            default => $session->type,
-        };
-
-        return "Detail Sesi {$typeLabel} — {$session->user->name}";
+        return 'Detail Sesi Kasir — '.$this->record->user->name;
     }
 }

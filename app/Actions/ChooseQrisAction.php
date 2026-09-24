@@ -18,8 +18,8 @@ class ChooseQrisAction
         $order->update(['payment_method' => 'qris']);
 
         [$qrisImage, $qrisName] = Cache::remember('qris_settings', 600, fn() => [
-            asset('storage/' . Setting::get('qris_image', 'qris/qris-w9cafe.png')),
-            Setting::get('qris_name', 'W9 Cafe'),
+            asset('storage/' . (Setting::get('qris_image') ?? '')),
+            Setting::get('qris_name') ?? '',
         ]);
 
         return response()->json([

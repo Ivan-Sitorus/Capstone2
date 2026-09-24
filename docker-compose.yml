@@ -17,17 +17,6 @@ services:
             test: ["CMD", "pg_isready", "-q", "-d", "${DB_DATABASE}", "-U", "${DB_USERNAME}"]
             retries: 3
             timeout: 5s
-    redis:
-        image: 'redis:alpine'
-        command: ["redis-server", "--save", "", "--appendonly", "no", "--maxmemory", "256mb", "--maxmemory-policy", "allkeys-lru"]
-        ports:
-            - '${FORWARD_REDIS_PORT:-6379}:6379'
-        networks:
-            - pos
-        healthcheck:
-            test: ["CMD", "redis-cli", "ping"]
-            retries: 3
-            timeout: 5s
     app:
         build:
             context: .
@@ -39,9 +28,6 @@ services:
             APP_ENV: '${APP_ENV:-production}'
             APP_DEBUG: '${APP_DEBUG:-false}'
             APP_URL: '${APP_URL:-http://localhost:8081}'
-            REDIS_HOST: 'redis'
-            REDIS_PORT: '${REDIS_PORT:-6379}'
-            REDIS_PASSWORD: '${REDIS_PASSWORD:-null}'
         volumes:
             - '.:/var/www/html'
             - 'storage-data:/var/www/html/storage/app/public'
@@ -51,8 +37,6 @@ services:
             - pos
         depends_on:
             pgsql:
-                condition: service_healthy
-            redis:
                 condition: service_healthy
         healthcheck:
             test: ["CMD", "curl", "-f", "http://localhost:80/up"]

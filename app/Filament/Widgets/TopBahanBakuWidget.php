@@ -2,9 +2,9 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\DailyIngredientUsage;
 use Filament\Widgets\BarChartWidget;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
 
 class TopBahanBakuWidget extends BarChartWidget
@@ -41,10 +41,13 @@ class TopBahanBakuWidget extends BarChartWidget
 
     protected function getData(): array
     {
-        $rows = DailyIngredientUsage::query()
-            ->selectRaw('ingredient_name, unit, SUM(quantity_used) as total')
-            ->whereBetween('usage_date', [$this->rangeFrom(), $this->rangeUntil()])
-            ->groupBy('ingredient_name', 'unit')
+        $rows = DB::table('stock_movements as m')
+            ->join('ingredients as i', 'i.id', '=', 'm.ingredient_id')
+            ->where('m.movement_type', 'sale')
+            ->whereDate('m.created_at', '>=', $this->rangeFrom())
+            ->whereDate('m.created_at', '<=', $this->rangeUntil())
+            ->selectRaw('i.name as ingredient_name, i.unit as unit, SUM(-m.quantity_change) as total')
+            ->groupBy('i.id', 'i.name', 'i.unit')
             ->orderByDesc('total')
             ->limit(10)
             ->get();
@@ -57,7 +60,7 @@ class TopBahanBakuWidget extends BarChartWidget
                     'backgroundColor' => '#17A2B8',
                 ],
             ],
-            'labels' => $rows->map(fn ($r) => $r->ingredient_name . ($r->unit?->value ? ' (' . $r->unit->value . ')' : ''))->values()->all(),
+            'labels' => $rows->map(fn ($r) => $r->ingredient_name . ($r->unit ? ' (' . $r->unit . ')' : ''))->values()->all(),
         ];
     }
 

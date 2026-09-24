@@ -39,17 +39,14 @@ class ReceiptSettingsPage extends Page implements HasForms
     public function mount(): void
     {
         $this->form->fill([
-            'receipt_title' => Setting::get('receipt_title', Setting::get('cafe_name', 'W9 Cafe')),
-            'receipt_header' => Setting::get('receipt_header', implode("\n", array_filter([
-                Setting::get('cafe_address', 'STIE Totalwin Semarang'),
-                Setting::get('cafe_phone', ''),
-            ]))),
-            'receipt_footer' => Setting::get('receipt_footer', 'Terima kasih telah berbelanja'),
-            'receipt_whatsapp_template' => Setting::get('receipt_whatsapp_template', "Struk Belanja di W9 Cafe:\n(link)\n\nAbaikan Jika Tidak Membeli"),
+            'receipt_title' => Setting::get('receipt_title') ?? '',
+            'receipt_header' => Setting::get('receipt_header') ?? '',
+            'receipt_footer' => Setting::get('receipt_footer') ?? '',
+            'receipt_whatsapp_template' => Setting::get('receipt_whatsapp_template') ?? '',
         ]);
 
         $this->previewData = [
-            'receipt_whatsapp_template' => Setting::get('receipt_whatsapp_template', "Struk Belanja di W9 Cafe:\n(link)\n\nAbaikan Jika Tidak Membeli"),
+            'receipt_whatsapp_template' => Setting::get('receipt_whatsapp_template') ?? '',
         ];
     }
 
@@ -85,7 +82,7 @@ class ReceiptSettingsPage extends Page implements HasForms
         $state = $this->form->getState();
 
         foreach ($state as $field => $value) {
-            Setting::set($field, $value);
+            Setting::set($field, $value, 'receipt');
         }
 
         Cache::flush();

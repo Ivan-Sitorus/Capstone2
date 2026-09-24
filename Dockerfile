@@ -49,7 +49,6 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
         intl \
         exif \
         pcntl && \
-    pecl install redis && docker-php-ext-enable redis && \
     pecl install imagick && docker-php-ext-enable imagick
 
 # ── PHP opcache (production settings) + custom ini ───────────────────

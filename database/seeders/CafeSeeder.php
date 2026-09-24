@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\CafeTable;
 use App\Models\Menu;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -11,18 +12,7 @@ use Illuminate\Support\Str;
 
 class CafeSeeder extends Seeder
 {
-    /** @var array<int, array<int, array{id:int,ingredient_id:int,quantity:float,expiry_date:string,received_at:string}>> */
-    private array $batchCache = [];
-
-    /** @var array<int, array> */
-    private array $stockMovements = [];
-
-    /**
-     * All 22 menu definitions.
-     * [name => [category_key, price, student_cashback, description, [ingredient_key => quantity_used]]]
-     */
     private const MENUS = [
-        // ── Kopi ──────────────────────────────────────
         'Espresso' => [
             'category' => 'kopi', 'price' => 12000, 'cashback' => 2000,
             'desc' => 'Espresso murni dari biji kopi Arabika pilihan',
@@ -43,8 +33,6 @@ class CafeSeeder extends Seeder
             'desc' => 'Kopi Susu dingin dengan es batu',
             'ingredients' => ['biji_kopi_robusta' => 0.015, 'susu_uht' => 0.1, 'krimer_kental_manis' => 1],
         ],
-
-        // ── Teh ───────────────────────────────────────
         'Teh Tawar' => [
             'category' => 'teh', 'price' => 4000, 'cashback' => 1000,
             'desc' => 'Teh celup seduh tanpa gula',
@@ -60,8 +48,6 @@ class CafeSeeder extends Seeder
             'desc' => 'Teh celup dengan susu UHT dan gula',
             'ingredients' => ['teh_celup' => 1, 'susu_uht' => 0.1, 'gula_pasir' => 0.01],
         ],
-
-        // ── Minuman Susu ──────────────────────────────
         'Susu Segar' => [
             'category' => 'minuman_susu', 'price' => 10000, 'cashback' => 2000,
             'desc' => 'Susu UHT segar dengan sedikit gula',
@@ -77,8 +63,6 @@ class CafeSeeder extends Seeder
             'desc' => 'Sirup vanilla dengan susu UHT creamy',
             'ingredients' => ['sirup_vanilla' => 0.03, 'susu_uht' => 0.2, 'gula_pasir' => 0.01],
         ],
-
-        // ── Coklat ────────────────────────────────────
         'Coklat Panas' => [
             'category' => 'coklat', 'price' => 10000, 'cashback' => 2000,
             'desc' => 'Bubuk coklat premium dengan susu hangat',
@@ -94,8 +78,6 @@ class CafeSeeder extends Seeder
             'desc' => 'Perpaduan coklat dan espresso Arabika',
             'ingredients' => ['bubuk_coklat' => 0.02, 'biji_kopi_arabika' => 0.01, 'susu_uht' => 0.15, 'gula_pasir' => 0.01],
         ],
-
-        // ── Jus & Segar ───────────────────────────────
         'Jeruk Nipis Peras' => [
             'category' => 'jus_segar', 'price' => 7000, 'cashback' => 2000,
             'desc' => 'Perasan jeruk nipis segar dengan gula',
@@ -106,8 +88,6 @@ class CafeSeeder extends Seeder
             'desc' => 'Jeruk nipis peras dingin menyegarkan',
             'ingredients' => ['jeruk_nipis' => 0.1, 'gula_pasir' => 0.015],
         ],
-
-        // ── Makanan Berat ─────────────────────────────
         'Nasi Goreng Telur' => [
             'category' => 'makanan_berat', 'price' => 15000, 'cashback' => 2000,
             'desc' => 'Nasi goreng dengan telur dan kecap manis',
@@ -123,8 +103,6 @@ class CafeSeeder extends Seeder
             'desc' => 'Ayam geprek crispy dengan nasi dan sambal',
             'ingredients' => ['beras' => 0.15, 'dada_ayam' => 0.2, 'tepung_bumbu' => 0.05, 'minyak_goreng' => 0.03, 'saus_sambal' => 0.01],
         ],
-
-        // ── Makanan Ringan ────────────────────────────
         'Pisang Coklat Keju' => [
             'category' => 'makanan_ringan', 'price' => 12000, 'cashback' => 2000,
             'desc' => 'Pisang goreng crispy dengan keju parut',
@@ -140,16 +118,123 @@ class CafeSeeder extends Seeder
             'desc' => 'Kentang goreng renyah ala French Fries',
             'ingredients' => ['kentang' => 0.2, 'minyak_goreng' => 0.02],
         ],
-
-        // ── Minuman Kemasan ───────────────────────────
         'Air Mineral Botol' => [
             'category' => 'minuman_kemasan', 'price' => 5000, 'cashback' => 1000,
             'desc' => 'Air mineral kemasan botol 600ml',
             'ingredients' => ['air_mineral_gelas' => 1],
         ],
+        'Cappuccino' => [
+            'category' => 'kopi', 'price' => 18000, 'cashback' => 3000,
+            'desc' => 'Espresso dengan busa susu lembut',
+            'ingredients' => ['biji_kopi_arabika' => 0.015, 'susu_uht' => 0.15, 'krimer_kental_manis' => 1],
+        ],
+        'Cafe Latte' => [
+            'category' => 'kopi', 'price' => 18000, 'cashback' => 3000,
+            'desc' => 'Espresso dengan susu UHT steamed',
+            'ingredients' => ['biji_kopi_arabika' => 0.015, 'susu_uht' => 0.2],
+        ],
+        'Kopi Tubruk' => [
+            'category' => 'kopi', 'price' => 10000, 'cashback' => 2000,
+            'desc' => 'Kopi robusta seduh tradisional',
+            'ingredients' => ['biji_kopi_robusta' => 0.02],
+        ],
+        'Caramel Macchiato' => [
+            'category' => 'kopi', 'price' => 20000, 'cashback' => 3000,
+            'desc' => 'Espresso dengan susu dan sirup vanilla',
+            'ingredients' => ['biji_kopi_arabika' => 0.015, 'susu_uht' => 0.2, 'sirup_vanilla' => 0.02],
+        ],
+        'Lemon Tea' => [
+            'category' => 'teh', 'price' => 8000, 'cashback' => 2000,
+            'desc' => 'Teh dengan perasan jeruk nipis',
+            'ingredients' => ['teh_celup' => 1, 'gula_pasir' => 0.015, 'jeruk_nipis' => 0.05],
+        ],
+        'Teh Melati' => [
+            'category' => 'teh', 'price' => 5000, 'cashback' => 1000,
+            'desc' => 'Teh melati seduh hangat',
+            'ingredients' => ['teh_celup' => 1],
+        ],
+        'Green Tea' => [
+            'category' => 'teh', 'price' => 7000, 'cashback' => 1000,
+            'desc' => 'Teh hijau dengan sedikit gula',
+            'ingredients' => ['teh_celup' => 1, 'gula_pasir' => 0.01],
+        ],
+        'Milk Tea' => [
+            'category' => 'minuman_susu', 'price' => 12000, 'cashback' => 2000,
+            'desc' => 'Teh susu dengan krimer',
+            'ingredients' => ['teh_celup' => 1, 'susu_uht' => 0.15, 'krimer_kental_manis' => 1, 'gula_pasir' => 0.01],
+        ],
+        'Strawberry Milk' => [
+            'category' => 'minuman_susu', 'price' => 15000, 'cashback' => 3000,
+            'desc' => 'Susu UHT dengan sirup stroberi',
+            'ingredients' => ['susu_uht' => 0.2, 'sirup_strawberry' => 0.03, 'gula_pasir' => 0.01],
+        ],
+        'Vanilla Latte' => [
+            'category' => 'minuman_susu', 'price' => 18000, 'cashback' => 3000,
+            'desc' => 'Espresso, susu, dan sirup vanilla',
+            'ingredients' => ['biji_kopi_arabika' => 0.015, 'susu_uht' => 0.2, 'sirup_vanilla' => 0.02],
+        ],
+        'Chocolate Latte' => [
+            'category' => 'coklat', 'price' => 18000, 'cashback' => 3000,
+            'desc' => 'Coklat dengan espresso dan susu',
+            'ingredients' => ['bubuk_coklat' => 0.03, 'biji_kopi_arabika' => 0.01, 'susu_uht' => 0.2, 'gula_pasir' => 0.01],
+        ],
+        'Dark Chocolate' => [
+            'category' => 'coklat', 'price' => 12000, 'cashback' => 2000,
+            'desc' => 'Coklat pekat dengan sedikit gula',
+            'ingredients' => ['bubuk_coklat' => 0.04, 'gula_pasir' => 0.015],
+        ],
+        'Es Lemon Tea' => [
+            'category' => 'jus_segar', 'price' => 9000, 'cashback' => 2000,
+            'desc' => 'Teh dingin dengan jeruk nipis',
+            'ingredients' => ['teh_celup' => 1, 'jeruk_nipis' => 0.08, 'gula_pasir' => 0.015],
+        ],
+        'Es Jeruk Peras' => [
+            'category' => 'jus_segar', 'price' => 8000, 'cashback' => 2000,
+            'desc' => 'Es perasan jeruk dengan gula',
+            'ingredients' => ['jeruk_nipis' => 0.12, 'gula_pasir' => 0.02],
+        ],
+        'Nasi Goreng Ayam' => [
+            'category' => 'makanan_berat', 'price' => 18000, 'cashback' => 3000,
+            'desc' => 'Nasi goreng dengan ayam dan telur',
+            'ingredients' => ['beras' => 0.15, 'telur' => 1, 'dada_ayam' => 0.1, 'minyak_goreng' => 0.02, 'kecap_manis' => 0.01],
+        ],
+        'Mie Goreng Spesial' => [
+            'category' => 'makanan_berat', 'price' => 15000, 'cashback' => 2000,
+            'desc' => 'Mie goreng dengan telur dan ayam',
+            'ingredients' => ['indomie_goreng' => 1, 'telur' => 1, 'dada_ayam' => 0.08, 'minyak_goreng' => 0.01, 'kecap_manis' => 0.005],
+        ],
+        'Nasi Telur Kecap' => [
+            'category' => 'makanan_berat', 'price' => 12000, 'cashback' => 2000,
+            'desc' => 'Nasi dengan telur kecap manis',
+            'ingredients' => ['beras' => 0.15, 'telur' => 1, 'kecap_manis' => 0.01, 'minyak_goreng' => 0.02],
+        ],
+        'Pisang Goreng' => [
+            'category' => 'makanan_ringan', 'price' => 8000, 'cashback' => 2000,
+            'desc' => 'Pisang goreng renyah',
+            'ingredients' => ['pisang' => 1, 'tepung_terigu' => 0.02, 'minyak_goreng' => 0.015],
+        ],
+        'Tahu Crispy' => [
+            'category' => 'makanan_ringan', 'price' => 8000, 'cashback' => 2000,
+            'desc' => 'Tahu goreng tepung crispy',
+            'ingredients' => ['tahu' => 3, 'tepung_bumbu' => 0.03, 'minyak_goreng' => 0.02],
+        ],
+        'Singkong Goreng' => [
+            'category' => 'makanan_ringan', 'price' => 9000, 'cashback' => 2000,
+            'desc' => 'Singkong goreng gurih',
+            'ingredients' => ['singkong' => 0.2, 'minyak_goreng' => 0.02],
+        ],
+        'Roti Bakar' => [
+            'category' => 'makanan_ringan', 'price' => 12000, 'cashback' => 2000,
+            'desc' => 'Roti bakar keju dengan gula',
+            'ingredients' => ['roti_tawar' => 2, 'keju_parut' => 0.03, 'gula_pasir' => 0.01],
+        ],
+        'Teh Kemasan' => [
+            'category' => 'minuman_kemasan', 'price' => 6000, 'cashback' => 1000,
+            'desc' => 'Teh kemasan botol dingin',
+            'ingredients' => ['teh_kemasan' => 1],
+        ],
     ];
 
-    /** Category keys → display names */
     private const CATEGORIES = [
         'kopi' => 'Kopi',
         'teh' => 'Teh',
@@ -161,7 +246,6 @@ class CafeSeeder extends Seeder
         'minuman_kemasan' => 'Minuman Kemasan',
     ];
 
-    /** Ingredient keys → [name, unit, low_stock_threshold] */
     private const INGREDIENTS = [
         'biji_kopi_arabika' => ['Biji Kopi Arabika', 'kg', 2],
         'biji_kopi_robusta' => ['Biji Kopi Robusta', 'kg', 2],
@@ -187,9 +271,13 @@ class CafeSeeder extends Seeder
         'tepung_terigu' => ['Tepung Terigu', 'kg', 3],
         'saus_sambal' => ['Saus Sambal', 'ml', 300],
         'air_mineral_gelas' => ['Air Mineral Gelas', 'pcs', 60],
+        'sirup_strawberry' => ['Sirup Strawberry', 'liter', 1],
+        'tahu' => ['Tahu', 'pcs', 20],
+        'singkong' => ['Singkong', 'kg', 5],
+        'roti_tawar' => ['Roti Tawar', 'pcs', 10],
+        'teh_kemasan' => ['Teh Kemasan', 'pcs', 30],
     ];
 
-    /** Ingredient key → [cost_per_unit, monthly_usage_estimate, batch_size, expiry_months] */
     private const BATCH_CONFIG = [
         'biji_kopi_arabika' => [80000, 2, 5, 12],
         'biji_kopi_robusta' => [50000, 3, 5, 12],
@@ -215,9 +303,13 @@ class CafeSeeder extends Seeder
         'tepung_terigu' => [10000, 1, 3, 12],
         'saus_sambal' => [20, 200, 300, 12],
         'air_mineral_gelas' => [1500, 40, 72, 24],
+        'sirup_strawberry' => [45000, 0.5, 2, 12],
+        'tahu' => [1000, 20, 30, 0.5],
+        'singkong' => [8000, 8, 12, 1],
+        'roti_tawar' => [15000, 10, 20, 0.5],
+        'teh_kemasan' => [4000, 30, 48, 6],
     ];
 
-    /** Supplier names for ingredient batches (already-paid purchases) */
     public const SUPPLIERS = [
         'PT Sumber Berkah' => 'PT Sumber Berkah',
         'CV Tani Makmur' => 'CV Tani Makmur',
@@ -227,201 +319,164 @@ class CafeSeeder extends Seeder
         'CV Susu Sejahtera' => 'CV Susu Sejahtera',
     ];
 
-    /** @var array<string, int> category key → DB id */
-    private array $categoryIds = [];
-
-    /** @var array<string, int> ingredient key → DB id */
-    private array $ingredientIds = [];
-
-    private array $ingredientUnits = [];
-
-    /** @var array<int, int> menu name → DB id */
-    private array $menuIds = [];
-
-    /** @var int cashier user ID pool */
-    private array $cashierIds = [2, 3, 4];
-
-    /** Monthly order distribution */
-    private const MONTHLY_ORDERS = [
-        '2025-06' => 25, '2025-07' => 12, '2025-08' => 15,
-        '2025-09' => 35, '2025-10' => 35, '2025-11' => 30,
-        '2025-12' => 15, '2026-01' => 12, '2026-02' => 30,
-        '2026-03' => 30, '2026-04' => 35, '2026-05' => 35,
+    private const FIFO_INGREDIENTS = [
+        'gula_pasir', 'susu_uht', 'krimer_kental_manis', 'teh_celup',
+        'indomie_goreng', 'beras', 'minyak_goreng', 'kecap_manis',
+        'tepung_bumbu', 'tepung_terigu', 'saus_sambal', 'air_mineral_gelas',
+        'sirup_strawberry', 'teh_kemasan',
     ];
 
-    // ──────────────────────────────────────────────────────────────
-    //  run()
-    // ──────────────────────────────────────────────────────────────
+    private array $categoryIds = [];
+    private array $ingredientIds = [];
+    private array $ingredientKeys = [];
+    private array $ingredientUnits = [];
+    private array $ingredientModes = [];
+    private array $menuIds = [];
+    private array $menuNormalPrice = [];
+    private array $menuStudentPrice = [];
+    private array $menuIngredientsByName = [];
+    private array $batchCache = [];
+    private array $batchPos = [];
+    private array $dailyUsageEma = [];
+    private array $cashierIds = [];
+    private int $adminId = 1;
+    private array $shiftIndex = [];
+    private int $batchSeq = 0;
+    private int $adjustmentSeq = 0;
+    private object $rng;
+    private Carbon $start;
+    private Carbon $end;
+    private int $ordersPerDay;
+    private float $dailyJitter;
+    private float $weekendMultiplier;
+    private array $monthlySeasonality;
+    private int $itemsMin;
+    private int $itemsMax;
+    private int $qtyMin;
+    private int $qtyMax;
+    private float $studentRate;
+    private array $paymentMix;
+    private float $payLaterFullRatio;
+    private float $payLaterPartialRatio;
+    private float $payableUnpaidRatio;
+    private int $insertChunk;
 
     public function run(): void
     {
-        $this->truncateTables();
+        $this->loadConfig();
+        $this->rng = $this->makeRng(20220101);
+        $this->resolveUserIds();
 
-        // 1–2. Categories + Ingredients
+        $this->truncateTables();
         $this->seedCategories();
         $this->seedIngredients();
-
-        // 3. IngredientBatches
-        $this->seedIngredientBatches();
-
-        // 4–5. Menus + MenuIngredients
         $this->seedMenus();
         $this->seedMenuIngredients();
-
-        // 6. CafeTables
         $this->seedCafeTables();
+        $this->seedInitialBatches();
+        $this->seedCashierShifts();
+        $this->seedOrdersAndStock();
+        $this->finalizeBatchesAndPayments();
 
-        // 7–9. Orders + OrderItems
-        $orderData = $this->seedOrders();
-        $this->seedOrderItems($orderData);
-
-        // 10. StockMovements from Orders (FEFO deduction)
-        $this->seedStockMovementsFromOrders($orderData);
-
-        // 11. StockAdjustments + StockMovements from Adjustments
-        $this->seedStockAdjustments();
-        $this->seedStockMovementsFromAdjustments();
+        $this->command?->info('CafeSeeder selesai: data ' . $this->start->toDateString() . ' s/d ' . $this->end->toDateString() . '.');
     }
 
-    // ──────────────────────────────────────────────────────────────
-    //  0. Truncate
-    // ──────────────────────────────────────────────────────────────
+    private function loadConfig(): void
+    {
+        $endRaw = config('seeding.end_date');
+        $this->start = Carbon::parse(config('seeding.start_date'))->startOfDay();
+        $this->end = ($endRaw ? Carbon::parse($endRaw) : now())->startOfDay();
+        if ($this->end->greaterThan(now())) {
+            $this->end = now()->startOfDay();
+        }
+
+        $this->ordersPerDay = max(0, (int) config('seeding.orders_per_day'));
+        $this->dailyJitter = (float) config('seeding.daily_jitter');
+        $this->weekendMultiplier = (float) config('seeding.weekend_multiplier');
+        $this->monthlySeasonality = (array) config('seeding.monthly_seasonality');
+        $this->itemsMin = max(1, (int) config('seeding.items_min'));
+        $this->itemsMax = max($this->itemsMin, (int) config('seeding.items_max'));
+        $this->qtyMin = max(1, (int) config('seeding.qty_min'));
+        $this->qtyMax = max($this->qtyMin, (int) config('seeding.qty_max'));
+        $this->studentRate = (float) config('seeding.student_discount_rate');
+        $this->paymentMix = (array) config('seeding.payment_mix');
+        $this->payLaterFullRatio = (float) config('seeding.pay_later_fully_paid_ratio');
+        $this->payLaterPartialRatio = (float) config('seeding.pay_later_partial_ratio');
+        $this->payableUnpaidRatio = (float) config('seeding.payable_unpaid_ratio');
+        $this->insertChunk = max(100, (int) config('seeding.insert_chunk'));
+    }
+
+    private function resolveUserIds(): void
+    {
+        $this->cashierIds = User::where('role', 'cashier')->orderBy('id')->pluck('id')->all();
+        if (empty($this->cashierIds)) {
+            $this->cashierIds = [User::factory()->create(['role' => 'cashier'])->id];
+        }
+        $this->adminId = (int) (User::where('role', 'admin')->orderBy('id')->value('id') ?? $this->cashierIds[0]);
+    }
 
     private function truncateTables(): void
     {
         DB::statement('SET session_replication_role = replica');
 
-        DB::table('stock_movements')->truncate();
-        DB::table('stock_adjustments')->truncate();
-        DB::table('order_items')->truncate();
-        DB::table('orders')->truncate();
-        DB::table('menu_ingredients')->truncate();
-        DB::table('menus')->truncate();
-        DB::table('ingredient_batches')->truncate();
-        DB::table('ingredients')->truncate();
-        DB::table('menu_categories')->truncate();
-        DB::table('cafe_tables')->truncate();
+        foreach ([
+            'stock_movements', 'stock_adjustments', 'order_payments', 'batch_payments',
+            'order_items', 'orders', 'menu_ingredients', 'menus',
+            'ingredient_batches', 'ingredients', 'menu_categories', 'cafe_tables',
+            'cashier_histories',
+        ] as $table) {
+            DB::table($table)->truncate();
+        }
 
         DB::statement('SET session_replication_role = DEFAULT');
     }
 
-    // ──────────────────────────────────────────────────────────────
-    //  1. Categories
-    // ──────────────────────────────────────────────────────────────
-
     private function seedCategories(): void
     {
         $rows = [];
-        foreach (self::CATEGORIES as $key => $name) {
+        foreach (self::CATEGORIES as $name) {
             $rows[] = ['name' => $name, 'created_at' => now(), 'updated_at' => now()];
         }
         DB::table('menu_categories')->insert($rows);
 
-        $this->categoryIds = DB::table('menu_categories')->pluck('id', 'name')
-            ->mapWithKeys(fn ($id, $name) => [array_search($name, self::CATEGORIES) => $id])
-            ->all();
+        $byName = DB::table('menu_categories')->pluck('id', 'name');
+        foreach (self::CATEGORIES as $key => $name) {
+            $this->categoryIds[$key] = $byName[$name];
+        }
     }
-
-    // ──────────────────────────────────────────────────────────────
-    //  2. Ingredients
-    // ──────────────────────────────────────────────────────────────
 
     private function seedIngredients(): void
     {
         $rows = [];
         foreach (self::INGREDIENTS as $key => [$name, $unit, $threshold]) {
+            $mode = in_array($key, self::FIFO_INGREDIENTS, true) ? 'fifo' : 'fefo';
             $rows[] = [
                 'name' => $name,
                 'unit' => $unit,
                 'low_stock_threshold' => $threshold,
-                'batch_mode' => 'fefo',
+                'batch_mode' => $mode,
                 'created_at' => now(),
                 'updated_at' => now(),
             ];
         }
         DB::table('ingredients')->insert($rows);
 
-        $this->ingredientIds = DB::table('ingredients')->pluck('id', 'name')
-            ->mapWithKeys(fn ($id, $name) => [
-                array_search($name, array_map(fn ($v) => $v[0], self::INGREDIENTS)) => $id,
-            ])
-            ->all();
-
-        $this->ingredientUnits = collect(self::INGREDIENTS)
-            ->mapWithKeys(fn ($def, $key) => [$key => $def[1]])
-            ->all();
-    }
-
-    // ──────────────────────────────────────────────────────────────
-    //  3. IngredientBatches (~55, 2-3 per ingredient)
-    // ──────────────────────────────────────────────────────────────
-
-    private function seedIngredientBatches(): void
-    {
-        $rows = [];
-        $startDate = Carbon::create(2025, 6, 1);
-        $rng = $this->rng(42);
-        $batchSeq = 0; // global counter to prevent unique constraint violations
-
+        $byName = DB::table('ingredients')->pluck('id', 'name');
         foreach (self::INGREDIENTS as $key => [$name, $unit]) {
-            $ingId = $this->ingredientIds[$key];
-            [$cost, , $batchSize, $expiryMonths] = self::BATCH_CONFIG[$key];
-            $numBatches = $rng->pick([2, 2, 2, 3, 3]);
-
-            for ($b = 0; $b < $numBatches; $b++) {
-                $receivedAt = (clone $startDate)->addDays($rng->int(0, 360))
-                    ->setTime($rng->int(7, 15), $rng->int(0, 59), 0);
-                $variation = $rng->float(0.8, 1.3);
-                $qty = round($batchSize * $variation, 2);
-                $expiry = $expiryMonths < 1
-                    ? (clone $receivedAt)->addDays(max(7, (int) ($expiryMonths * 30)))
-                    : (clone $receivedAt)->addMonths((int) $expiryMonths);
-
-                $unitCost = (int) round($cost * $rng->float(0.85, 1.15));
-
-                $rows[] = [
-                    'ingredient_id' => $ingId,
-                    'quantity' => $qty,
-                    'expiry_date' => $expiry->toDateString(),
-                    'received_at' => $receivedAt->toDateTimeString(),
-                    'initial_quantity' => $qty,
-                    'supplier_name' => $rng->pick(array_keys(self::SUPPLIERS)),
-                    'total_cost' => (int) round($qty * $unitCost),
-                    'payment_status' => 'paid',
-                    'batch_code' => sprintf('BCH-%s-%d', $receivedAt->format('dmy'), ++$batchSeq),
-                ];
-            }
-        }
-
-        DB::table('ingredient_batches')->insert($rows);
-
-        // Load all batches into in-memory cache keyed by ingredient_id
-        $allBatches = DB::table('ingredient_batches')
-            ->select('id', 'ingredient_id', 'quantity', 'expiry_date', 'received_at')
-            ->orderBy('expiry_date')
-            ->get();
-
-        foreach ($allBatches as $batch) {
-            $this->batchCache[$batch->ingredient_id][] = [
-                'id' => $batch->id,
-                'ingredient_id' => $batch->ingredient_id,
-                'quantity' => (float) $batch->quantity,
-                'expiry_date' => $batch->expiry_date,
-                'received_at' => $batch->received_at,
-            ];
+            $id = $byName[$name];
+            $this->ingredientIds[$key] = $id;
+            $this->ingredientKeys[$id] = $key;
+            $this->ingredientUnits[$key] = $unit;
+            $this->ingredientModes[$id] = in_array($key, self::FIFO_INGREDIENTS, true) ? 'fifo' : 'fefo';
+            $this->dailyUsageEma[$id] = max(0.001, self::BATCH_CONFIG[$key][1] / 30);
         }
     }
-
-    // ──────────────────────────────────────────────────────────────
-    //  4. Menus (22)
-    // ──────────────────────────────────────────────────────────────
 
     private function seedMenus(): void
     {
         foreach (self::MENUS as $name => $def) {
-            $catId = $this->categoryIds[$def['category']];
             $menu = Menu::create([
-                'category_id' => $catId,
+                'category_id' => $this->categoryIds[$def['category']],
                 'name' => $name,
                 'price' => $def['price'],
                 'cost_price' => (int) round($def['price'] * 0.6),
@@ -429,21 +484,19 @@ class CafeSeeder extends Seeder
                 'discounted_price' => $def['price'] - $def['cashback'],
             ]);
             $this->menuIds[$name] = $menu->id;
+            $this->menuNormalPrice[$name] = $def['price'];
+            $this->menuStudentPrice[$name] = $def['price'] - $def['cashback'];
+            $this->menuIngredientsByName[$name] = $def['ingredients'];
         }
     }
-
-    // ──────────────────────────────────────────────────────────────
-    //  5. MenuIngredients
-    // ──────────────────────────────────────────────────────────────
 
     private function seedMenuIngredients(): void
     {
         $rows = [];
         foreach (self::MENUS as $menuName => $def) {
-            $menuId = $this->menuIds[$menuName];
             foreach ($def['ingredients'] as $ingKey => $qty) {
                 $rows[] = [
-                    'menu_id' => $menuId,
+                    'menu_id' => $this->menuIds[$menuName],
                     'ingredient_id' => $this->ingredientIds[$ingKey],
                     'quantity_used' => $qty,
                     'unit' => $this->ingredientUnits[$ingKey] ?? null,
@@ -452,10 +505,6 @@ class CafeSeeder extends Seeder
         }
         DB::table('menu_ingredients')->insert($rows);
     }
-
-    // ──────────────────────────────────────────────────────────────
-    //  6. CafeTables (10)
-    // ──────────────────────────────────────────────────────────────
 
     private function seedCafeTables(): void
     {
@@ -467,489 +516,867 @@ class CafeSeeder extends Seeder
         }
     }
 
-    // ──────────────────────────────────────────────────────────────
-    //  7. Orders (300)
-    // ──────────────────────────────────────────────────────────────
-
-    private function seedOrders(): array
+    private function seedInitialBatches(): void
     {
-        $rng = $this->rng(123);
-        $menuNames = array_keys(self::MENUS);
-        $menuCount = count($menuNames);
-        $orderRows = [];
-        $orderMeta = []; // order_code → [menu_name => qty, ...]
-        $dailyCounter = []; // date key (dmy) → sequence number
+        $rows = [];
+        foreach (self::INGREDIENTS as $key => [$name, $unit]) {
+            $ingId = $this->ingredientIds[$key];
+            [$cost, , $batchSize, $expiryMonths] = self::BATCH_CONFIG[$key];
+            $receivedAt = $this->start->copy()->subDays($this->rng->int(3, 20))->setTime($this->rng->int(7, 15), $this->rng->int(0, 59));
+            $qty = round(max($batchSize, $this->dailyUsageEma[$ingId] * 14) * $this->rng->float(1.0, 1.5), 3);
+            $expiry = $expiryMonths < 1
+                ? $receivedAt->copy()->addDays(max(3, (int) ($expiryMonths * 30)))
+                : $receivedAt->copy()->addMonths((int) $expiryMonths);
+            $unitCost = (int) round($cost * $this->rng->float(0.85, 1.15));
 
-        foreach (self::MONTHLY_ORDERS as $yearMonth => $targetCount) {
-            [$year, $month] = explode('-', $yearMonth);
-            $y = (int) $year;
-            $m = (int) $month;
-            $daysInMonth = Carbon::create($y, $m, 1)->daysInMonth;
-
-            // Distribute targetCount across days, busier weekends
-            $dayWeights = [];
-            for ($d = 1; $d <= $daysInMonth; $d++) {
-                $dow = Carbon::create($y, $m, $d)->dayOfWeek;
-                $dayWeights[$d] = ($dow === 0 || $dow === 6) ? 3 : 1;
-            }
-            $totalWeight = array_sum($dayWeights);
-            $remaining = $targetCount;
-            $assigned = array_fill_keys(range(1, $daysInMonth), 0);
-
-            // Distribute proportionally, ensuring 0-3 per day
-            for ($d = 1; $d <= $daysInMonth && $remaining > 0; $d++) {
-                $prop = (int) round(($dayWeights[$d] / $totalWeight) * $targetCount);
-                $prop = min($prop, 3, $remaining);
-                $prop = max($prop, $remaining > ($daysInMonth - $d) * 3 ? min(3, $remaining) : 0);
-                $assigned[$d] = $prop;
-                $remaining -= $prop;
-            }
-            // Distribute any leftover
-            for ($d = 1; $d <= $daysInMonth && $remaining > 0; $d++) {
-                if ($assigned[$d] < 3) {
-                    $add = min(3 - $assigned[$d], $remaining);
-                    $assigned[$d] += $add;
-                    $remaining -= $add;
-                }
-            }
-
-            foreach ($assigned as $day => $count) {
-                if ($count <= 0) {
-                    continue;
-                }
-                $date = Carbon::create($y, $m, $day);
-                for ($i = 0; $i < $count; $i++) {
-                    $hour = $rng->int(7, 21);
-                    $minute = $rng->int(0, 59);
-                    $timestamp = (clone $date)->setTime($hour, $minute, $rng->int(0, 59));
-                    $dateKey = $timestamp->format('dmy');
-                    $dailyCounter[$dateKey] = ($dailyCounter[$dateKey] ?? 0) + 1;
-                    $orderCode = sprintf('ORD-%s-%d', $dateKey, $dailyCounter[$dateKey]);
-
-                    // Pick 1-4 menu items
-                    $numItems = $rng->pick([1, 1, 2, 2, 2, 3, 3, 4]);
-                    $items = [];
-                    $totalAmount = 0;
-                    $pickedKeys = $rng->sample($menuNames, $numItems);
-
-                    foreach ($pickedKeys as $menuName) {
-                        $qty = $rng->pick([1, 1, 1, 1, 2, 2, 3]);
-                        $items[$menuName] = ($items[$menuName] ?? 0) + $qty;
-                        $totalAmount += self::MENUS[$menuName]['price'] * $qty;
-                    }
-
-                    // Payment method distribution
-                    $pmRoll = $rng->int(1, 100);
-                    $paymentMethod = $pmRoll <= 60 ? 'cash' : ($pmRoll <= 90 ? 'qris' : 'pay_later');
-
-                    // Status: orders in last 1-2 months may vary, older are completed
-                    $monthsFromEnd = ($y === 2026 && $m >= 4) ? (($m - 4) * 30 + $day) / 30.0 : 999;
-                    $roll = $rng->int(1, 100);
-                    if ($monthsFromEnd <= 1.0 && $roll <= 40) {
-                        $status = $rng->pick(['processing', 'processing', 'pending', 'pending', 'cancelled']);
-                    } elseif ($monthsFromEnd <= 2.0 && $roll <= 15) {
-                        $status = $rng->pick(['processing', 'pending', 'cancelled']);
-                    } else {
-                        $status = 'completed';
-                    }
-
-                    $completedAt = $status === 'completed' ? (clone $timestamp)->addMinutes($rng->int(10, 45)) : null;
-                    $processedAt = in_array($status, ['processing', 'completed']) ? (clone $timestamp)->addMinutes($rng->int(2, 10)) : null;
-                    $cancelledAt = $status === 'cancelled' ? (clone $timestamp)->addMinutes($rng->int(5, 30)) : null;
-
-                    $isAvailable = $status !== 'cancelled';
-                    $tableId = $rng->int(1, 100) <= 70 ? $rng->int(1, 10) : null;
-
-                    $orderRows[] = [
-                        'order_code' => $orderCode,
-                        'table_id' => $tableId,
-                        'cashier_id' => $this->cashierIds[$rng->int(0, 2)],
-                        'customer_name' => $rng->pick([null, null, null, 'Budi', 'Ani', 'Citra', 'Dewi', 'Eko', 'Fajar']),
-                        'phone' => null,
-                        'status' => $status,
-                        'order_type' => $rng->pick(['qr', 'qr', 'qr', 'cashier', 'cashier']),
-                        'total_amount' => $totalAmount,
-                        'payment_method' => $paymentMethod,
-                        'uuid' => (string) Str::uuid7(),
-                        'processed_by' => $status !== 'pending' ? $this->cashierIds[$rng->int(0, 2)] : null,
-                        'processed_at' => $processedAt,
-                        'completed_at' => $completedAt,
-                        'cancelled_at' => $cancelledAt,
-                        'created_at' => $timestamp->toDateTimeString(),
-                        'updated_at' => $timestamp->toDateTimeString(),
-                    ];
-
-                    $orderMeta[$orderCode] = $items;
-                }
-            }
+            $rows[] = [
+                'ingredient_id' => $ingId,
+                'quantity' => $qty,
+                'expiry_date' => $expiry->toDateString(),
+                'received_at' => $receivedAt->toDateTimeString(),
+                'initial_quantity' => $qty,
+                'allow_expired_usage' => false,
+                'supplier_name' => $this->rng->pick(array_keys(self::SUPPLIERS)),
+                'total_cost' => (int) round($qty * $unitCost),
+                'payment_status' => 'unpaid',
+                'batch_code' => sprintf('BCH-%s-%d', $receivedAt->format('dmy'), ++$this->batchSeq),
+            ];
         }
+        DB::table('ingredient_batches')->insert($rows);
 
-        DB::table('orders')->insert($orderRows);
+        $batches = DB::table('ingredient_batches')
+            ->select('id', 'ingredient_id', 'quantity', 'expiry_date', 'received_at', 'total_cost', 'payment_status', 'batch_code')
+            ->orderBy('id')
+            ->get();
 
-        // Fetch back IDs
-        $orderIds = DB::table('orders')->pluck('id', 'order_code')->all();
+        $movements = [];
+        foreach ($batches as $b) {
+            $this->batchCache[$b->ingredient_id][] = [
+                'id' => $b->id,
+                'quantity' => (float) $b->quantity,
+                'expiry_date' => $b->expiry_date,
+                'received_at' => $b->received_at,
+                'total_cost' => (int) $b->total_cost,
+                'payment_status' => $b->payment_status,
+            ];
 
-        // Build return data: [order_id => [menu_name => qty, total_amount, payment_method, cashier_id, created_at]]
-        $result = [];
-        foreach ($orderRows as $row) {
-            $code = $row['order_code'];
-            $oid = $orderIds[$code];
-            $result[$oid] = [
-                'items' => $orderMeta[$code],
-                'total_amount' => $row['total_amount'],
-                'payment_method' => $row['payment_method'],
-                'cashier_id' => $row['cashier_id'],
-                'customer_name' => $row['customer_name'],
-                'created_at' => $row['created_at'],
-                'order_code' => $code,
-                'status' => $row['status'],
+            $movements[] = [
+                'ingredient_id' => $b->ingredient_id,
+                'ingredient_batch_id' => $b->id,
+                'order_id' => null,
+                'order_item_id' => null,
+                'stock_adjustment_id' => null,
+                'movement_type' => 'purchase',
+                'source_type' => null,
+                'source_id' => null,
+                'quantity_before' => 0,
+                'quantity_change' => round((float) $b->quantity, 3),
+                'quantity_after' => round((float) $b->quantity, 3),
+                'reference' => $b->batch_code,
+                'created_at' => $b->received_at,
+                'updated_at' => $b->received_at,
             ];
         }
 
-        return $result;
+        $this->insertChunked('stock_movements', $movements);
+
+        foreach (array_keys($this->batchCache) as $ingId) {
+            $this->sortBatches($ingId);
+        }
     }
 
-    // ──────────────────────────────────────────────────────────────
-    //  8. OrderItems (~600)
-    // ──────────────────────────────────────────────────────────────
-
-    private function seedOrderItems(array $orderData): void
+    private function seedCashierShifts(): void
     {
         $rows = [];
-        foreach ($orderData as $orderId => $data) {
-            $position = 0;
-            foreach ($data['items'] as $menuName => $qty) {
-                $menuId = $this->menuIds[$menuName];
-                $price = self::MENUS[$menuName]['price'];
+        $count = count($this->cashierIds);
+        $dayIndex = 0;
+
+        for ($date = $this->start->copy(); $date->lte($this->end); $date->addDay()) {
+            $key = $date->toDateString();
+            $shifts = [
+                [$this->cashierIds[$dayIndex % $count], 7, 15],
+                [$this->cashierIds[($dayIndex + 1) % $count], 14, 22],
+            ];
+
+            foreach ($shifts as $n => [$cashierId, $startHour, $endHour]) {
+                $startedAt = $date->copy()->setTime($startHour, 0, 0);
+                $endedAt = $date->copy()->setTime($endHour, 0, 0);
+
+                $this->shiftIndex[$key][] = [
+                    'cashier_id' => $cashierId,
+                    'start' => $startedAt,
+                    'end' => $endedAt,
+                ];
+
                 $rows[] = [
-                    'order_id' => $orderId,
-                    'menu_id' => $menuId,
-                    'item_position' => $position++,
-                    'quantity' => $qty,
-                    'unit_price' => $price,
-                    'subtotal' => $price * $qty,
-                    'created_at' => $data['created_at'],
-                    'updated_at' => $data['created_at'],
+                    'user_id' => $cashierId,
+                    'session_id' => 'shift-' . $date->format('Ymd') . '-' . ($n + 1),
+                    'started_at' => $startedAt->toDateTimeString(),
+                    'ended_at' => $endedAt->toDateTimeString(),
+                    'last_activity_at' => $endedAt->toDateTimeString(),
+                    'is_active' => false,
+                    'created_at' => $startedAt->toDateTimeString(),
+                    'updated_at' => $endedAt->toDateTimeString(),
                 ];
             }
+            $dayIndex++;
         }
-        DB::table('order_items')->insert($rows);
+
+        foreach (array_chunk($rows, $this->insertChunk) as $chunk) {
+            DB::table('cashier_histories')->insert($chunk);
+        }
     }
 
-    // ──────────────────────────────────────────────────────────────
-    //  10. StockMovements from Orders (FEFO deduction)
-    // ──────────────────────────────────────────────────────────────
-
-    // ──────────────────────────────────────────────────────────────
-    //  11. StockMovements from Orders — FEFO deduction
-    // ──────────────────────────────────────────────────────────────
-
-    private function seedStockMovementsFromOrders(array $orderData): void
+    private function seedOrdersAndStock(): void
     {
-        $movements = [];
+        $daySeq = [];
+        $totalDays = $this->start->diffInDays($this->end) + 1;
+        $processedDays = 0;
 
-        // Sort orders by created_at to process chronologically
-        uasort($orderData, fn ($a, $b) => $a['created_at'] <=> $b['created_at']);
+        for ($date = $this->start->copy(); $date->lte($this->end); $date->addDay()) {
+            $processedDays++;
+            $dayKey = $date->toDateString();
+            $target = $this->dayOrderTarget($date);
 
-        foreach ($orderData as $orderId => $data) {
-            foreach ($data['items'] as $menuName => $orderQty) {
-                $menuIngredients = self::MENUS[$menuName]['ingredients'];
-                foreach ($menuIngredients as $ingKey => $qtyPerPortion) {
-                    $ingId = $this->ingredientIds[$ingKey];
-                    $totalNeeded = $qtyPerPortion * $orderQty;
+            if ($target > 0 && ! empty($this->shiftIndex[$dayKey])) {
+                $this->processOrderDay($date, $dayKey, $target, $daySeq);
+            }
 
-                    $newMovements = $this->deductFefo(
-                        $ingId,
-                        $totalNeeded,
-                        $orderId,
-                        $data['order_code'],
-                        $data['cashier_id'],
-                        $data['created_at']
-                    );
-                    $movements = array_merge($movements, $newMovements);
+            $this->maybeSeedAdjustmentsForDay($date);
+
+            if ($processedDays % 30 === 0) {
+                $this->command?->info(sprintf('  seed: %s (%d/%d hari)', $dayKey, $processedDays, $totalDays));
+            }
+        }
+    }
+
+    private function processOrderDay(Carbon $date, string $dayKey, int $target, array &$daySeq): void
+    {
+        $maxTime = $date->isToday() ? now() : $date->copy()->endOfDay();
+        $drafts = [];
+
+        for ($i = 0; $i < $target; $i++) {
+            $shift = $this->pickShift($dayKey, $maxTime);
+            if ($shift === null) {
+                continue;
+            }
+
+            $time = $this->randomTimeIn($shift['start'], $shift['end']->lessThan($maxTime) ? $shift['end'] : $maxTime);
+            if ($time === null) {
+                continue;
+            }
+
+            $menus = $this->pickMenus();
+            $isStudent = $this->rng->int(1, 10000) <= (int) round($this->studentRate * 10000);
+            $paymentMethod = $this->pickPaymentMethod();
+            $outcome = $paymentMethod === 'pay_later' ? $this->pickPayLaterOutcome() : null;
+            $status = $paymentMethod === 'pay_later'
+                ? ($outcome === 'full' ? 'completed' : 'unpaid')
+                : $this->pickStatus($date);
+
+            $items = [];
+            $total = 0;
+            foreach ($menus as $menuName => $qty) {
+                $unitPrice = $isStudent ? $this->menuStudentPrice[$menuName] : $this->menuNormalPrice[$menuName];
+                $subtotal = $unitPrice * $qty;
+                $total += $subtotal;
+                $items[] = [
+                    'menu_id' => $this->menuIds[$menuName],
+                    'menu_name' => $menuName,
+                    'quantity' => $qty,
+                    'unit_price' => $unitPrice,
+                    'subtotal' => $subtotal,
+                ];
+            }
+
+            $processedAt = in_array($status, ['processing', 'completed'], true)
+                ? $time->copy()->addMinutes($this->rng->int(2, 10))->addSeconds($this->rng->int(0, 59))
+                : null;
+            $completedAt = $status === 'completed'
+                ? $time->copy()->addMinutes($this->rng->int(10, 45))->addSeconds($this->rng->int(0, 59))
+                : null;
+            $cancelledAt = $status === 'cancelled'
+                ? $time->copy()->addMinutes($this->rng->int(5, 30))->addSeconds($this->rng->int(0, 59))
+                : null;
+
+            $drafts[] = [
+                'time' => $time->copy(),
+                'row' => [
+                    'order_code' => null,
+                    'table_id' => $this->rng->int(1, 100) <= 70 ? $this->rng->int(1, 10) : null,
+                    'cashier_id' => $shift['cashier_id'],
+                    'customer_name' => $this->rng->int(1, 100) <= 65 ? fake('id_ID')->name() : null,
+                    'phone' => null,
+                    'status' => $status,
+                    'order_type' => $this->rng->pick(['qr', 'qr', 'qr', 'cashier', 'cashier']),
+                    'total_amount' => $total,
+                    'payment_method' => $paymentMethod,
+                    'uuid' => (string) Str::uuid7(),
+                    'processed_by' => $status !== 'pending' ? $shift['cashier_id'] : null,
+                    'processed_at' => $processedAt?->toDateTimeString(),
+                    'completed_at' => $completedAt?->toDateTimeString(),
+                    'cancelled_at' => $cancelledAt?->toDateTimeString(),
+                    'created_at' => $time->toDateTimeString(),
+                    'updated_at' => ($completedAt ?? $cancelledAt ?? $processedAt ?? $time)->toDateTimeString(),
+                ],
+                'items' => $items,
+                'meta' => [
+                    'total' => $total,
+                    'payment_method' => $paymentMethod,
+                    'outcome' => $outcome,
+                    'status' => $status,
+                    'cashier_id' => $shift['cashier_id'],
+                    'time' => $time->copy(),
+                ],
+            ];
+        }
+
+        if (empty($drafts)) {
+            return;
+        }
+
+        usort($drafts, fn (array $a, array $b): int => $a['time'] <=> $b['time']);
+
+        $orders = [];
+        $itemsByCode = [];
+        $metaByCode = [];
+
+        foreach ($drafts as $draft) {
+            $daySeq[$date->format('dmy')] = ($daySeq[$date->format('dmy')] ?? 0) + 1;
+            $code = sprintf('ORD-%s-%04d', $date->format('dmy'), $daySeq[$date->format('dmy')]);
+
+            $row = $draft['row'];
+            $row['order_code'] = $code;
+
+            $orders[] = $row;
+            $itemsByCode[$code] = $draft['items'];
+            $metaByCode[$code] = $draft['meta'];
+        }
+
+        foreach (array_chunk($orders, $this->insertChunk) as $chunk) {
+            DB::table('orders')->insert($chunk);
+        }
+
+        $ids = DB::table('orders')
+            ->whereIn('order_code', array_column($orders, 'order_code'))
+            ->pluck('id', 'order_code');
+
+        $itemRows = [];
+        $movementRows = [];
+        $paymentRows = [];
+
+        foreach ($orders as $order) {
+            $code = $order['order_code'];
+            $orderId = (int) $ids[$code];
+            $meta = $metaByCode[$code];
+
+            $position = 0;
+            foreach ($itemsByCode[$code] as $item) {
+                $itemRows[] = [
+                    'order_id' => $orderId,
+                    'menu_id' => $item['menu_id'],
+                    'item_position' => $position++,
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'subtotal' => $item['subtotal'],
+                    'created_at' => $order['created_at'],
+                    'updated_at' => $order['created_at'],
+                ];
+            }
+
+            if ($meta['status'] === 'completed') {
+                $this->deductOrderStock($code, $orderId, $itemsByCode[$code], $meta, $movementRows);
+            }
+
+            if ($meta['payment_method'] === 'pay_later') {
+                foreach ($this->buildOrderPayments($orderId, $meta) as $payment) {
+                    $paymentRows[] = $payment;
                 }
             }
         }
 
-        // Persist StockMovements
-        foreach (array_chunk($movements, 500) as $chunk) {
-            DB::table('stock_movements')->insert($chunk);
-        }
+        $this->insertChunked('order_items', $itemRows);
+        $this->insertChunked('stock_movements', $movementRows);
+        $this->insertChunked('order_payments', $paymentRows);
+    }
 
-        // Persist updated batch quantities
-        $batchUpdates = [];
-        foreach ($this->batchCache as $ingId => $batches) {
-            foreach ($batches as $batch) {
-                $batchUpdates[] = [
-                    'id' => $batch['id'],
-                    'quantity' => $batch['quantity'],
-                ];
+    private function deductOrderStock(string $code, int $orderId, array $items, array $meta, array &$movementRows): void
+    {
+        $neededByIngredient = [];
+        foreach ($items as $item) {
+            foreach ($this->menuIngredientsByName[$item['menu_name']] as $ingKey => $perPortion) {
+                $ingId = $this->ingredientIds[$ingKey];
+                $neededByIngredient[$ingId] = ($neededByIngredient[$ingId] ?? 0) + ($perPortion * $item['quantity']);
             }
         }
-        foreach ($batchUpdates as $update) {
-            DB::table('ingredient_batches')
-                ->where('id', $update['id'])
-                ->update(['quantity' => $update['quantity']]);
+
+        foreach ($neededByIngredient as $ingId => $needed) {
+            $this->deductStock($ingId, $needed, $orderId, $code, $meta, $movementRows);
         }
     }
 
-    /**
-     * Deduct ingredient from batches using FEFO (oldest expiry first).
-     * Updates in-memory batch cache and returns StockMovement rows.
-     */
-    private function deductFefo(
-        int $ingredientId,
-        float $qtyNeeded,
-        int $orderId,
-        string $orderCode,
-        int $cashierId,
-        string $timestamp
-    ): array {
-        $movements = [];
-        $remaining = $qtyNeeded;
+    private function deductStock(int $ingId, float $needed, int $orderId, string $code, array $meta, array &$movementRows): void
+    {
+        $remaining = round($needed, 3);
+        $index = $this->batchPos[$ingId] ?? 0;
+        $count = count($this->batchCache[$ingId]);
 
-        if (!isset($this->batchCache[$ingredientId])) {
-            return $movements;
-        }
+        while ($index < $count && $remaining > 0) {
+            $quantity = $this->batchCache[$ingId][$index]['quantity'];
 
-        // Sort batches by expiry_date ASC (oldest first) — already sorted from DB query
-        // But after deducing, we re-sort to maintain FEFO order
-        foreach ($this->batchCache[$ingredientId] as &$batch) {
-            if ($batch['quantity'] <= 0) {
+            if ($quantity <= 0) {
+                $index++;
                 continue;
             }
-            if ($remaining <= 0) {
-                break;
-            }
 
-            $deduct = min($batch['quantity'], $remaining);
-            $oldQty = $batch['quantity'];
-            $batch['quantity'] = round($oldQty - $deduct, 4);
-            $remaining = round($remaining - $deduct, 4);
+            $before = round($quantity, 3);
+            $take = min($before, $remaining);
+            $this->batchCache[$ingId][$index]['quantity'] = round($before - $take, 4);
+            $remaining = round($remaining - $take, 3);
 
-            $movements[] = [
-                'ingredient_id' => $ingredientId,
-                'ingredient_batch_id' => $batch['id'],
+            $movementRows[] = [
+                'ingredient_id' => $ingId,
+                'ingredient_batch_id' => $this->batchCache[$ingId][$index]['id'],
                 'order_id' => $orderId,
                 'order_item_id' => null,
                 'stock_adjustment_id' => null,
                 'movement_type' => 'sale',
                 'source_type' => null,
                 'source_id' => null,
-                'quantity_before' => round($oldQty, 2),
-                'quantity_change' => -round($deduct, 2),
-                'quantity_after' => round($batch['quantity'], 2),
-                'reference' => $orderCode,
-                'created_at' => $timestamp,
-                'updated_at' => $timestamp,
-            ];
-        }
-        unset($batch);
-
-        // Re-sort batches for this ingredient by expiry_date (FEFO)
-        usort($this->batchCache[$ingredientId], fn ($a, $b) => $a['expiry_date'] <=> $b['expiry_date']);
-
-        return $movements;
-    }
-
-    // ──────────────────────────────────────────────────────────────
-    //  12. StockAdjustments (16 total)
-    // ──────────────────────────────────────────────────────────────
-
-    private function seedStockAdjustments(): void
-    {
-        $rng = $this->rng(789);
-        $rows = [];
-        $ingKeys = array_keys(self::INGREDIENTS);
-        $adminId = 1;
-        $dailyAdjCounter = []; // date key (dmy) → sequence number
-        $seqDate = Carbon::create(2025, 6, 15);
-
-        // --- 8 increase adjustments ---
-        foreach (range(1, 8) as $i) {
-            $ingKey = $rng->pick($ingKeys);
-            $ingId = $this->ingredientIds[$ingKey];
-            $adjQty = $rng->float(1, 10);
-            $currentStock = $this->getTotalStock($ingId);
-            $newStock = round($currentStock + $adjQty, 2);
-
-            $adjustedAt = (clone $seqDate)->addDays($rng->int(0, 330))->setTime($rng->int(8, 16), $rng->int(0, 59), 0);
-            $adjDateKey = $adjustedAt->format('dmy');
-            $dailyAdjCounter[$adjDateKey] = ($dailyAdjCounter[$adjDateKey] ?? 0) + 1;
-            $code = sprintf('ADJ-%s-%d', $adjDateKey, $dailyAdjCounter[$adjDateKey]);
-
-            $rows[] = [
-                'ingredient_id' => $ingId,
-                'adjustment_type' => 'increase',
-                'quantity' => round($adjQty, 2),
-                'quantity_before' => $currentStock,
-                'quantity_after' => round($newStock, 2),
-                'reason' => 'Koreksi stok setelah stock opname',
-                'reported_by' => $adminId,
-                'adjusted_at' => $adjustedAt,
-                'code' => $code,
-                'created_at' => $adjustedAt,
-                'updated_at' => $adjustedAt,
+                'quantity_before' => $before,
+                'quantity_change' => -round($take, 3),
+                'quantity_after' => round($this->batchCache[$ingId][$index]['quantity'], 3),
+                'reference' => $code,
+                'created_at' => $meta['time']->toDateTimeString(),
+                'updated_at' => $meta['time']->toDateTimeString(),
             ];
 
-            // Reflect increase in batch cache
-            $this->addToBatch($ingId, $adjQty, $adjustedAt);
-        }
-
-        // --- 5 decrease adjustments ---
-        foreach (range(1, 5) as $i) {
-            $ingKey = $rng->pick($ingKeys);
-            $ingId = $this->ingredientIds[$ingKey];
-            $currentStock = $this->getTotalStock($ingId);
-            $adjQty = round($currentStock * $rng->float(0.05, 0.15), 2);
-            $adjQty = max($adjQty, 0.1);
-            $newStock = round(max(0, $currentStock - $adjQty), 2);
-
-            $adjustedAt = (clone $seqDate)->addDays($rng->int(30, 350))->setTime($rng->int(8, 16), $rng->int(0, 59), 0);
-            $adjDateKey = $adjustedAt->format('dmy');
-            $dailyAdjCounter[$adjDateKey] = ($dailyAdjCounter[$adjDateKey] ?? 0) + 1;
-            $code = sprintf('ADJ-%s-%d', $adjDateKey, $dailyAdjCounter[$adjDateKey]);
-
-            $rows[] = [
-                'ingredient_id' => $ingId,
-                'adjustment_type' => 'decrease',
-                'quantity' => round($adjQty, 2),
-                'quantity_before' => $currentStock,
-                'quantity_after' => round($newStock, 2),
-                'reason' => 'Bahan rusak / kedaluwarsa — penyesuaian stok',
-                'reported_by' => $adminId,
-                'adjusted_at' => $adjustedAt,
-                'code' => $code,
-                'created_at' => $adjustedAt,
-                'updated_at' => $adjustedAt,
-            ];
-
-            // Reflect decrease in batch cache
-            $this->deductFromBatch($ingId, $adjQty);
-        }
-
-        DB::table('stock_adjustments')->insert($rows);
-        $this->adjustmentRows = $rows;
-    }
-
-    // ──────────────────────────────────────────────────────────────
-    //  13. StockMovements from Adjustments
-    // ──────────────────────────────────────────────────────────────
-
-    private function seedStockMovementsFromAdjustments(): void
-    {
-        $adjustments = DB::table('stock_adjustments')
-            ->orderBy('id')
-            ->get();
-
-        // Build lookup ingredient_id → first active batch ID from cache
-        $batchIds = [];
-        foreach ($this->batchCache as $ingId => $batches) {
-            foreach ($batches as $b) {
-                if ($b['id'] > 0 && $b['quantity'] > 0) {
-                    $batchIds[$ingId] = $b['id'];
-                    break;
-                }
-            }
-            // Fallback: any real batch even if quantity = 0
-            if (!isset($batchIds[$ingId])) {
-                foreach ($batches as $b) {
-                    if ($b['id'] > 0) {
-                        $batchIds[$ingId] = $b['id'];
-                        break;
-                    }
-                }
+            if ($this->batchCache[$ingId][$index]['quantity'] <= 0) {
+                $index++;
             }
         }
 
-        $movements = [];
-        foreach ($adjustments as $adj) {
-            $movementType = $adj->adjustment_type === 'increase'
-                ? 'adjustment_increase'
-                : 'adjustment_decrease';
+        $this->batchPos[$ingId] = $index;
 
-            $change = $adj->adjustment_type === 'increase'
-                ? (float) $adj->quantity
-                : -(float) $adj->quantity;
+        if ($remaining > 0) {
+            $this->restock($ingId, $remaining, $meta['time'], $movementRows);
+            $lastIndex = array_key_last($this->batchCache[$ingId]);
+            $before = round($this->batchCache[$ingId][$lastIndex]['quantity'], 3);
+            $take = min($before, $remaining);
+            $this->batchCache[$ingId][$lastIndex]['quantity'] = round($before - $take, 4);
 
-            $movements[] = [
-                'ingredient_id' => $adj->ingredient_id,
-                'ingredient_batch_id' => $batchIds[$adj->ingredient_id] ?? null,
-                'order_id' => null,
+            $movementRows[] = [
+                'ingredient_id' => $ingId,
+                'ingredient_batch_id' => $this->batchCache[$ingId][$lastIndex]['id'],
+                'order_id' => $orderId,
                 'order_item_id' => null,
-                'stock_adjustment_id' => $adj->id,
-                'movement_type' => $movementType,
+                'stock_adjustment_id' => null,
+                'movement_type' => 'sale',
                 'source_type' => null,
                 'source_id' => null,
-                'quantity_before' => (float) $adj->quantity_before,
-                'quantity_change' => round($change, 2),
-                'quantity_after' => (float) $adj->quantity_after,
-                'reference' => $adj->code,
-                'created_at' => $adj->adjusted_at,
-                'updated_at' => $adj->adjusted_at,
+                'quantity_before' => $before,
+                'quantity_change' => -round($take, 3),
+                'quantity_after' => round($before - $take, 3),
+                'reference' => $code,
+                'created_at' => $meta['time']->toDateTimeString(),
+                'updated_at' => $meta['time']->toDateTimeString(),
             ];
-        }
 
-        if (!empty($movements)) {
-            DB::table('stock_movements')->insert($movements);
+            $this->batchPos[$ingId] = $this->batchCache[$ingId][$lastIndex]['quantity'] > 0
+                ? $lastIndex
+                : $lastIndex + 1;
         }
     }
 
-    // ──────────────────────────────────────────────────────────────
-    //  Helpers
-    // ──────────────────────────────────────────────────────────────
-
-    private function getTotalStock(int $ingredientId): float
+    private function restock(int $ingId, float $extraNeeded, Carbon $at, array &$movementRows): int
     {
-        return round(array_sum(array_column(
-            $this->batchCache[$ingredientId] ?? [], 'quantity'
-        )), 2);
-    }
+        $key = $this->ingredientKeys[$ingId];
+        [$cost, , $batchSize, $expiryMonths] = self::BATCH_CONFIG[$key];
+        $ema = max($this->dailyUsageEma[$ingId] ?? 0.001, 0.001);
+        $qty = max((float) $batchSize, round($ema * 14 + $extraNeeded, 3));
 
-    private function addToBatch(int $ingredientId, float $qty, Carbon $date): void
-    {
-        // Add as a new "virtual batch" for tracking
-        $this->batchCache[$ingredientId][] = [
-            'id' => -1, // placeholder — will not be referenced by FK
-            'ingredient_id' => $ingredientId,
+        $receivedAt = $at->copy()->subMinutes($this->rng->int(20, 90));
+        $expiry = $expiryMonths < 1
+            ? $receivedAt->copy()->addDays(max(3, (int) ($expiryMonths * 30)))
+            : $receivedAt->copy()->addMonths((int) $expiryMonths);
+        $unitCost = (int) round($cost * $this->rng->float(0.85, 1.15));
+        $batchCode = sprintf('BCH-%s-%d', $receivedAt->format('dmy'), ++$this->batchSeq);
+        $totalCost = (int) round($qty * $unitCost);
+
+        $id = DB::table('ingredient_batches')->insertGetId([
+            'ingredient_id' => $ingId,
             'quantity' => $qty,
-            'expiry_date' => $date->copy()->addMonths(12)->toDateString(),
-            'received_at' => $date->toDateTimeString(),
+            'expiry_date' => $expiry->toDateString(),
+            'received_at' => $receivedAt->toDateTimeString(),
+            'initial_quantity' => $qty,
+            'allow_expired_usage' => false,
+            'supplier_name' => $this->rng->pick(array_keys(self::SUPPLIERS)),
+            'total_cost' => $totalCost,
+            'payment_status' => 'unpaid',
+            'batch_code' => $batchCode,
+        ]);
+
+        $this->batchCache[$ingId][] = [
+            'id' => $id,
+            'quantity' => $qty,
+            'expiry_date' => $expiry->toDateString(),
+            'received_at' => $receivedAt->toDateTimeString(),
+            'total_cost' => $totalCost,
+            'payment_status' => 'unpaid',
+        ];
+
+        $movementRows[] = [
+            'ingredient_id' => $ingId,
+            'ingredient_batch_id' => $id,
+            'order_id' => null,
+            'order_item_id' => null,
+            'stock_adjustment_id' => null,
+            'movement_type' => 'purchase',
+            'source_type' => null,
+            'source_id' => null,
+            'quantity_before' => 0,
+            'quantity_change' => round($qty, 3),
+            'quantity_after' => round($qty, 3),
+            'reference' => $batchCode,
+            'created_at' => $receivedAt->toDateTimeString(),
+            'updated_at' => $receivedAt->toDateTimeString(),
+        ];
+
+        return (int) $id;
+    }
+
+    private function maybeSeedAdjustmentsForDay(Carbon $date): void
+    {
+        if ($this->rng->int(1, 10) > 1) {
+            return;
+        }
+
+        $time = $date->copy()->setTime($this->rng->int(8, 16), $this->rng->int(0, 59));
+        if ($time->greaterThan(now())) {
+            return;
+        }
+
+        $isIncrease = $this->rng->int(1, 100) <= 60;
+        $ingKey = $this->rng->pick(array_keys(self::INGREDIENTS));
+        $ingId = $this->ingredientIds[$ingKey];
+        $current = $this->getTotalStock($ingId);
+        $movementRows = [];
+
+        if ($isIncrease) {
+            $qty = max(0.5, round(($this->dailyUsageEma[$ingId] ?? 1) * $this->rng->int(1, 5), 3));
+            $before = $current;
+            $after = round($current + $qty, 3);
+            $movementRows[] = $this->adjustmentIncreaseBatch($ingId, $qty, $time);
+        } else {
+            $qty = min(round($current * $this->rng->float(0.05, 0.15), 3), max(0, $current - 0.001));
+            if ($qty <= 0) {
+                return;
+            }
+            $before = $current;
+            $after = round($current - $qty, 3);
+            $this->deductBatchesForAdjustment($ingId, $qty, $time, $movementRows);
+        }
+
+        if (empty($movementRows)) {
+            return;
+        }
+
+        $adjustmentId = DB::table('stock_adjustments')->insertGetId([
+            'ingredient_id' => $ingId,
+            'adjustment_type' => $isIncrease ? 'increase' : 'decrease',
+            'quantity' => $qty,
+            'quantity_before' => $before,
+            'quantity_after' => $after,
+            'reason' => $isIncrease ? 'Koreksi stok setelah stock opname' : 'Bahan rusak / kedaluwarsa — penyesuaian stok',
+            'reported_by' => $this->adminId,
+            'adjusted_at' => $time->toDateTimeString(),
+            'code' => sprintf('ADJ-%s-%d', $date->format('dmy'), ++$this->adjustmentSeq),
+            'created_at' => $time->toDateTimeString(),
+            'updated_at' => $time->toDateTimeString(),
+        ]);
+
+        foreach ($movementRows as &$movement) {
+            $movement['stock_adjustment_id'] = $adjustmentId;
+            $movement['movement_type'] = $isIncrease ? 'adjustment_increase' : 'adjustment_decrease';
+            $movement['reference'] = sprintf('ADJ-%d', $adjustmentId);
+        }
+        unset($movement);
+
+        $this->insertChunked('stock_movements', $movementRows);
+    }
+
+    private function adjustmentIncreaseBatch(int $ingId, float $qty, Carbon $time): array
+    {
+        $key = $this->ingredientKeys[$ingId];
+        $expiryMonths = self::BATCH_CONFIG[$key][3];
+        $expiry = $expiryMonths < 1
+            ? $time->copy()->addDays(max(3, (int) ($expiryMonths * 30)))
+            : $time->copy()->addMonths((int) $expiryMonths);
+        $batchCode = sprintf('BCH-%s-%d', $time->format('dmy'), ++$this->batchSeq);
+
+        $id = DB::table('ingredient_batches')->insertGetId([
+            'ingredient_id' => $ingId,
+            'quantity' => $qty,
+            'expiry_date' => $expiry->toDateString(),
+            'received_at' => $time->toDateTimeString(),
+            'initial_quantity' => $qty,
+            'allow_expired_usage' => false,
+            'supplier_name' => null,
+            'total_cost' => 0,
+            'payment_status' => 'paid',
+            'batch_code' => $batchCode,
+        ]);
+
+        $this->batchCache[$ingId][] = [
+            'id' => $id,
+            'quantity' => $qty,
+            'expiry_date' => $expiry->toDateString(),
+            'received_at' => $time->toDateTimeString(),
+            'total_cost' => 0,
+            'payment_status' => 'paid',
+        ];
+
+        return [
+            'ingredient_id' => $ingId,
+            'ingredient_batch_id' => $id,
+            'order_id' => null,
+            'order_item_id' => null,
+            'stock_adjustment_id' => null,
+            'movement_type' => 'adjustment_increase',
+            'source_type' => null,
+            'source_id' => null,
+            'quantity_before' => 0,
+            'quantity_change' => round($qty, 3),
+            'quantity_after' => round($qty, 3),
+            'reference' => $batchCode,
+            'created_at' => $time->toDateTimeString(),
+            'updated_at' => $time->toDateTimeString(),
         ];
     }
 
-    private function deductFromBatch(int $ingredientId, float $qty): void
+    private function deductBatchesForAdjustment(int $ingId, float $qty, Carbon $time, array &$movementRows): ?int
     {
-        $remaining = $qty;
-        if (!isset($this->batchCache[$ingredientId])) {
-            return;
-        }
-        foreach ($this->batchCache[$ingredientId] as &$batch) {
-            if ($batch['quantity'] <= 0) {
-                continue;
-            }
+        $remaining = round($qty, 3);
+        $lastBatchId = null;
+
+        foreach ($this->batchCache[$ingId] as &$batch) {
             if ($remaining <= 0) {
                 break;
             }
-            $deduct = min($batch['quantity'], $remaining);
-            $batch['quantity'] = round($batch['quantity'] - $deduct, 4);
-            $remaining = round($remaining - $deduct, 4);
+            if ($batch['quantity'] <= 0) {
+                continue;
+            }
+            $take = min($batch['quantity'], $remaining);
+            $before = round($batch['quantity'], 3);
+            $batch['quantity'] = round($before - $take, 4);
+            $remaining = round($remaining - $take, 3);
+            $lastBatchId = $batch['id'];
+
+            $movementRows[] = [
+                'ingredient_id' => $ingId,
+                'ingredient_batch_id' => $batch['id'],
+                'order_id' => null,
+                'order_item_id' => null,
+                'stock_adjustment_id' => null,
+                'movement_type' => 'adjustment_decrease',
+                'source_type' => null,
+                'source_id' => null,
+                'quantity_before' => $before,
+                'quantity_change' => -round($take, 3),
+                'quantity_after' => round($batch['quantity'], 3),
+                'reference' => null,
+                'created_at' => $time->toDateTimeString(),
+                'updated_at' => $time->toDateTimeString(),
+            ];
         }
         unset($batch);
+
+        return $lastBatchId;
     }
 
-    /**
-     * Simple reproducible RNG wrapper using mt_rand with a fixed seed.
-     */
-    private function rng(int $seed): object
+    private function sortBatches(int $ingId): void
+    {
+        if (empty($this->batchCache[$ingId])) {
+            return;
+        }
+
+        $mode = $this->ingredientModes[$ingId] ?? 'fefo';
+        usort($this->batchCache[$ingId], function (array $a, array $b) use ($mode): int {
+            if ($mode === 'fifo') {
+                return [$a['received_at'], $a['expiry_date'], $a['id']] <=> [$b['received_at'], $b['expiry_date'], $b['id']];
+            }
+
+            return [$a['expiry_date'], $a['received_at'], $a['id']] <=> [$b['expiry_date'], $b['received_at'], $b['id']];
+        });
+    }
+
+    private function finalizeBatchesAndPayments(): void
+    {
+        $paymentRows = [];
+        $batchRows = [];
+
+        foreach ($this->batchCache as $batches) {
+            foreach ($batches as $batch) {
+                $totalCost = (int) $batch['total_cost'];
+                $unpaid = $this->rng->int(1, 10000) <= (int) round($this->payableUnpaidRatio * 10000);
+
+                if ($unpaid && $totalCost > 0) {
+                    $partial = $this->rng->int(1, 100) <= 50;
+                    if ($partial) {
+                        $amount = (int) round($totalCost * $this->rng->float(0.3, 0.7));
+                        $paymentRows[] = $this->batchPaymentRow($batch['id'], $amount, $batch['received_at']);
+                    }
+                    $status = 'unpaid';
+                } else {
+                    if ($totalCost > 0) {
+                        $paymentRows[] = $this->batchPaymentRow($batch['id'], $totalCost, $batch['received_at']);
+                    }
+                    $status = 'paid';
+                }
+
+                $batchRows[] = [
+                    'id' => $batch['id'],
+                    'quantity' => round($batch['quantity'], 3),
+                    'payment_status' => $status,
+                ];
+            }
+        }
+
+        foreach (array_chunk($paymentRows, $this->insertChunk) as $chunk) {
+            DB::table('batch_payments')->insert($chunk);
+        }
+        foreach (array_chunk($batchRows, $this->insertChunk) as $chunk) {
+            $this->updateBatchRows($chunk);
+        }
+    }
+
+    private function updateBatchRows(array $rows): void
+    {
+        $values = [];
+        $bindings = [];
+        foreach ($rows as $row) {
+            $values[] = '(?::bigint, ?::numeric, ?)';
+            $bindings[] = $row['id'];
+            $bindings[] = $row['quantity'];
+            $bindings[] = $row['payment_status'];
+        }
+
+        $sql = 'UPDATE ingredient_batches AS ib SET quantity = v.quantity, payment_status = v.payment_status '
+            . 'FROM (VALUES ' . implode(', ', $values) . ') AS v(id, quantity, payment_status) WHERE ib.id = v.id';
+
+        DB::update($sql, $bindings);
+    }
+
+    private function batchPaymentRow(int $batchId, int $amount, string $receivedAt): array
+    {
+        $paidAt = Carbon::parse($receivedAt)->addDays($this->rng->int(0, 14))->setTime($this->rng->int(8, 16), $this->rng->int(0, 59));
+
+        return [
+            'ingredient_batch_id' => $batchId,
+            'amount' => $amount,
+            'payment_date' => $paidAt->toDateTimeString(),
+            'payment_method' => $this->rng->pick(['cash', 'transfer', 'qris']),
+            'created_at' => $paidAt->toDateTimeString(),
+            'updated_at' => $paidAt->toDateTimeString(),
+        ];
+    }
+
+    private function buildOrderPayments(int $orderId, array $meta): array
+    {
+        if ($meta['outcome'] === 'none') {
+            return [];
+        }
+
+        $total = (int) $meta['total'];
+        $amount = $meta['outcome'] === 'full'
+            ? $total
+            : (int) round($total * $this->rng->float(0.3, 0.7));
+
+        $paidAt = $meta['time']->copy()->addMinutes($this->rng->int(5, 240));
+
+        return [[
+            'order_id' => $orderId,
+            'amount' => $amount,
+            'payment_date' => $paidAt->toDateTimeString(),
+            'payment_method' => $this->rng->pick(['cash', 'qris']),
+            'created_at' => $paidAt->toDateTimeString(),
+            'updated_at' => $paidAt->toDateTimeString(),
+        ]];
+    }
+
+    private function getTotalStock(int $ingredientId): float
+    {
+        return round(array_sum(array_column($this->batchCache[$ingredientId] ?? [], 'quantity')), 3);
+    }
+
+    private function dayOrderTarget(Carbon $date): int
+    {
+        $multiplier = in_array($date->dayOfWeek, [Carbon::SATURDAY, Carbon::SUNDAY], true) ? $this->weekendMultiplier : 1.0;
+        $season = (float) ($this->monthlySeasonality[$date->month] ?? 1.0);
+        $jitter = 1 + $this->rng->float(-$this->dailyJitter, $this->dailyJitter);
+
+        return max(0, (int) round($this->ordersPerDay * $multiplier * $season * $jitter));
+    }
+
+    private function pickShift(string $dayKey, Carbon $maxTime): ?array
+    {
+        $shifts = $this->shiftIndex[$dayKey] ?? [];
+        $available = array_values(array_filter($shifts, fn (array $shift): bool => $shift['start']->lessThan($maxTime)));
+
+        if (empty($available)) {
+            return null;
+        }
+
+        return $available[$this->rng->int(0, count($available) - 1)];
+    }
+
+    private function randomTimeIn(Carbon $start, Carbon $end): ?Carbon
+    {
+        $startMinutes = $start->hour * 60 + $start->minute;
+        $endMinutes = $end->hour * 60 + $end->minute;
+
+        if ($endMinutes - $startMinutes < 1) {
+            return null;
+        }
+
+        $minute = $this->rng->int($startMinutes, $endMinutes - 1);
+
+        return $start->copy()->setTime(intdiv($minute, 60), $minute % 60, $this->rng->int(0, 59));
+    }
+
+    private function pickMenus(): array
+    {
+        $count = $this->rng->int($this->itemsMin, $this->itemsMax);
+        $names = array_keys(self::MENUS);
+        $count = min($count, count($names));
+        $picked = [];
+
+        while (count($picked) < $count) {
+            $weights = [];
+            foreach ($names as $name) {
+                if (isset($picked[$name])) {
+                    continue;
+                }
+                $weights[$name] = $this->menuWeight($name, $picked);
+            }
+            $chosen = $this->weightedPick($weights);
+            $picked[$chosen] = $this->rng->int($this->qtyMin, $this->qtyMax);
+        }
+
+        return $picked;
+    }
+
+    private function menuWeight(string $name, array $picked): float
+    {
+        $category = self::MENUS[$name]['category'];
+        $weight = match ($category) {
+            'makanan_berat' => 1.5,
+            'makanan_ringan' => 2.0,
+            'minuman_kemasan' => 2.0,
+            default => 3.0,
+        };
+
+        if (! empty($picked)) {
+            $pickedDrink = false;
+            $pickedFood = false;
+            foreach (array_keys($picked) as $pickedName) {
+                $pickedCategory = self::MENUS[$pickedName]['category'];
+                if (str_starts_with($pickedCategory, 'makanan')) {
+                    $pickedFood = true;
+                } else {
+                    $pickedDrink = true;
+                }
+            }
+            $isFood = str_starts_with($category, 'makanan');
+            if ($pickedDrink && $isFood) {
+                $weight *= 2.2;
+            }
+            if ($pickedFood && ! $isFood) {
+                $weight *= 2.2;
+            }
+        }
+
+        return $weight;
+    }
+
+    private function weightedPick(array $weights): string
+    {
+        $total = array_sum($weights);
+        $roll = $this->rng->float(0, $total);
+
+        foreach ($weights as $key => $weight) {
+            $roll -= $weight;
+            if ($roll <= 0) {
+                return (string) $key;
+            }
+        }
+
+        return (string) array_key_first($weights);
+    }
+
+    private function pickPaymentMethod(): string
+    {
+        $total = array_sum($this->paymentMix);
+        $roll = $this->rng->int(1, max(1, (int) $total));
+        $cumulative = 0;
+        foreach ($this->paymentMix as $method => $weight) {
+            $cumulative += $weight;
+            if ($roll <= $cumulative) {
+                return (string) $method;
+            }
+        }
+
+        return 'cash';
+    }
+
+    private function pickPayLaterOutcome(): string
+    {
+        $roll = $this->rng->float(0, 1);
+        if ($roll <= $this->payLaterFullRatio) {
+            return 'full';
+        }
+        if ($roll <= $this->payLaterFullRatio + $this->payLaterPartialRatio) {
+            return 'partial';
+        }
+
+        return 'none';
+    }
+
+    private function pickStatus(Carbon $date): string
+    {
+        if ($date->lessThan(now()->subDays(30)->startOfDay())) {
+            return 'completed';
+        }
+
+        $roll = $this->rng->int(1, 100);
+
+        return match (true) {
+            $roll <= 70 => 'completed',
+            $roll <= 85 => 'processing',
+            $roll <= 95 => 'pending',
+            default => 'cancelled',
+        };
+    }
+
+    private function insertChunked(string $table, array &$rows): void
+    {
+        if (empty($rows)) {
+            return;
+        }
+
+        foreach (array_chunk($rows, $this->insertChunk) as $chunk) {
+            DB::table($table)->insert($chunk);
+        }
+
+        $rows = [];
+    }
+
+    private function makeRng(int $seed): object
     {
         return new class($seed)
         {
-            private int $seed;
-
             public function __construct(int $seed)
             {
-                $this->seed = $seed;
                 mt_srand($seed);
             }
 
@@ -960,27 +1387,12 @@ class CafeSeeder extends Seeder
 
             public function float(float $min, float $max): float
             {
-                return round($min + mt_rand() / mt_getrandmax() * ($max - $min), 2);
+                return $min + mt_rand() / mt_getrandmax() * ($max - $min);
             }
 
             public function pick(array $items): mixed
             {
-                return $items[array_rand($items)];
-            }
-
-            public function sample(array $items, int $count): array
-            {
-                if ($count >= count($items)) {
-                    shuffle($items);
-
-                    return $items;
-                }
-                $keys = array_rand($items, $count);
-                if (!is_array($keys)) {
-                    $keys = [$keys];
-                }
-
-                return array_map(fn ($k) => $items[$k], $keys);
+                return $items[mt_rand(0, count($items) - 1)];
             }
         };
     }

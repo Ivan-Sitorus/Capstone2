@@ -46,29 +46,34 @@ class RiwayatBayar extends Page implements HasTable
 
     public function content(Schema $schema): Schema
     {
-        $totalPaid = (float) $this->order->orderPayments()->sum('amount');
-        $remaining = (float) $this->order->total_amount - $totalPaid;
-
         return $schema->components([
             Section::make('Ringkasan Pembayaran')
                 ->schema([
                     TextEntry::make('total')
                         ->label('Total Pesanan')
-                        ->state('Rp' . number_format($this->order->total_amount, 0, ',', '.')),
+                        ->state(fn (): string => 'Rp' . number_format((float) $this->order->total_amount, 0, ',', '.')),
                     TextEntry::make('dibayar')
                         ->label('Total Dibayar')
-                        ->state('Rp' . number_format($totalPaid, 0, ',', '.'))
+                        ->state(fn (): string => 'Rp' . number_format((float) $this->order->orderPayments->sum('amount'), 0, ',', '.'))
                         ->color('success'),
                     TextEntry::make('sisa')
                         ->label('Sisa')
-                        ->state('Rp' . number_format($remaining, 0, ',', '.'))
-                        ->color($remaining > 0 ? 'danger' : 'success'),
+                        ->state(function (): string {
+                            $remaining = (float) $this->order->total_amount - (float) $this->order->orderPayments->sum('amount');
+
+                            return 'Rp' . number_format($remaining, 0, ',', '.');
+                        })
+                        ->color(function (): string {
+                            $remaining = (float) $this->order->total_amount - (float) $this->order->orderPayments->sum('amount');
+
+                            return $remaining > 0 ? 'danger' : 'success';
+                        }),
                     TextEntry::make('status')
                         ->label('Status')
-                        ->state($this->order->status)
+                        ->state(fn () => $this->order->status)
                         ->badge()
-                        ->color(fn () => $this->order->status === OrderStatus::Completed ? 'success' : 'warning')
-                        ->formatStateUsing(fn () => $this->order->status === OrderStatus::Completed ? 'Lunas' : 'Belum Lunas'),
+                        ->color(fn (): string => $this->order->status === OrderStatus::Completed ? 'success' : 'warning')
+                        ->formatStateUsing(fn (): string => $this->order->status === OrderStatus::Completed ? 'Lunas' : 'Belum Lunas'),
                 ])->columns(4),
             EmbeddedTable::make(),
         ]);
@@ -138,7 +143,6 @@ class RiwayatBayar extends Page implements HasTable
         return [
             Action::make('catat_pembayaran')
                 ->label('Catat Pembayaran')
-                ->icon('heroicon-o-plus')
                 ->modalHeading('Catat Pembayaran Baru')
                 ->form([
                     NumericInput::money('amount')
@@ -181,6 +185,7 @@ class RiwayatBayar extends Page implements HasTable
                     ]);
 
                     $this->order->recalculatePaymentStatus();
+                    $this->order->refresh();
 
                     Notification::make()
                         ->success()

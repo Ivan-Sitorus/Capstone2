@@ -56,12 +56,9 @@ class ReceiptController extends Controller
                 'raw_total' => $rawTotal,
             ],
             'cafe' => [
-                'name' => Setting::get('cafe_name', 'W9 Cafe'),
-                'address' => Setting::get('cafe_address', 'STIE Totalwin Semarang'),
-                'phone' => Setting::get('cafe_phone', ''),
-                'receipt_footer' => Setting::get('receipt_footer', ''),
-                'receipt_show_npwp' => (bool) Setting::get('receipt_show_npwp', '0'),
-                'receipt_npwp' => Setting::get('receipt_npwp', ''),
+                'receipt_title' => Setting::get('receipt_title') ?? '',
+                'receipt_header' => Setting::get('receipt_header') ?? '',
+                'receipt_footer' => Setting::get('receipt_footer') ?? '',
             ],
             'receiptUrl' => $order->receipt_url,
         ]);
