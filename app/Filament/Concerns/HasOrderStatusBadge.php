@@ -2,39 +2,30 @@
 
 namespace App\Filament\Concerns;
 
+use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
+
 trait HasOrderStatusBadge
 {
     public static function getStatusColor(string $state): string
     {
-        return match ($state) {
-            'pending' => 'warning',
-            'processing' => 'info',
-            'completed' => 'success',
-            'cancelled' => 'danger',
-            'unpaid' => 'warning',
+        return match (OrderStatus::tryFrom($state)) {
+            OrderStatus::Pending => 'warning',
+            OrderStatus::Processing => 'info',
+            OrderStatus::Completed => 'success',
+            OrderStatus::Cancelled => 'danger',
+            OrderStatus::Unpaid => 'warning',
             default => 'gray',
         };
     }
 
     public static function getStatusLabel(string $state): string
     {
-        return match ($state) {
-            'pending' => 'Pending',
-            'processing' => 'Diproses',
-            'completed' => 'Selesai',
-            'cancelled' => 'Dibatalkan',
-            'unpaid' => 'Belum Lunas',
-            default => $state,
-        };
+        return OrderStatus::tryFrom($state)?->label() ?? $state;
     }
 
     public static function getPaymentLabel(?string $state): string
     {
-        return match ($state) {
-            'cash' => 'Tunai',
-            'qris' => 'QRIS',
-            'pay_later' => 'Bayar Nanti',
-            default => '-',
-        };
+        return PaymentMethod::tryFrom((string) $state)?->label() ?? '-';
     }
 }
