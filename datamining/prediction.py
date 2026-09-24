@@ -383,15 +383,15 @@ def run_prediction_pipeline(df: pd.DataFrame) -> dict:
 
     summary_table.sort(key=lambda x: x["total_forecast"], reverse=True)
 
-    d1_name = HARI_ID.get(future_dates[0].strftime("%A"), "")
-    d2_name = HARI_ID.get(future_dates[1].strftime("%A"), "")
-    logs.append({
-        "tahap":  "Prediksi 2 Hari ke Depan",
-        "detail": (
-            f"Forecast: {future_dates[0].date()} ({d1_name}) "
-            f"dan {future_dates[1].date()} ({d2_name})."
-        ),
-    })
+    forecast_test = []
+    for item in items:
+        res = forecasts[item]
+        forecast_test.append({
+            "nama": item,
+            "ds": [str(d.date()) for d in res["ds"]],
+            "actual": [float(v) for v in res["y"]],
+            "predicted": [float(v) for v in res["yhat"]],
+        })
 
     # ── Output akhir ───────────────────────────────────────────────────────
     return {
@@ -410,4 +410,5 @@ def run_prediction_pipeline(df: pd.DataFrame) -> dict:
         "predictions":        predictions_out,
         "summary_table":      summary_table,
         "feature_importance": feature_importance,
+        "forecast_test":      forecast_test,
     }

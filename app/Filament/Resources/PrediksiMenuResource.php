@@ -8,6 +8,7 @@ use App\Filament\Resources\PrediksiMenuResource\Tables\PrediksiMenuTable;
 use App\Filament\Widgets\DataminingPreprocessingLogsWidget;
 use App\Filament\Widgets\DataminingRunStatsWidget;
 use App\Filament\Widgets\FeatureImportanceChartWidget;
+use App\Filament\Widgets\ForecastVsActualChartWidget;
 use App\Filament\Widgets\PredictionChartWidget;
 use App\Filament\Widgets\PredictionSummaryWidget;
 use App\Filament\Widgets\PredictionsPerDayWidget;
@@ -65,6 +66,7 @@ class PrediksiMenuResource extends Resource
             PredictionChartWidget::class,
             PredictionsPerDayWidget::class,
             FeatureImportanceChartWidget::class,
+            ForecastVsActualChartWidget::class,
             PredictionSummaryWidget::class,
             DataminingPreprocessingLogsWidget::class,
         ];

@@ -10,6 +10,7 @@ use App\Filament\Widgets\ClusteringSummaryWidget;
 use App\Filament\Widgets\DataminingPreprocessingLogsWidget;
 use App\Filament\Widgets\DataminingRunStatsWidget;
 use App\Filament\Widgets\ElbowChartWidget;
+use App\Filament\Widgets\KategorisasiMenuWidget;
 use App\Filament\Widgets\SilhouetteChartWidget;
 use App\Models\DataminingRun;
 use BackedEnum;
@@ -66,6 +67,7 @@ class KlasterisasiMenuResource extends Resource
             ElbowChartWidget::class,
             SilhouetteChartWidget::class,
             ClusteringSummaryWidget::class,
+            KategorisasiMenuWidget::class,
             DataminingPreprocessingLogsWidget::class,
         ];
     }

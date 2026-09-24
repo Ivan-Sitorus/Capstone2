@@ -8,6 +8,7 @@ use App\Filament\Resources\PrediksiBahanBakuResource\Tables\PrediksiBahanBakuTab
 use App\Filament\Widgets\DataminingPreprocessingLogsWidget;
 use App\Filament\Widgets\DataminingRunStatsWidget;
 use App\Filament\Widgets\FeatureImportanceChartWidget;
+use App\Filament\Widgets\ForecastVsActualChartWidget;
 use App\Filament\Widgets\PredictionBahanBakuChartWidget;
 use App\Filament\Widgets\PredictionBahanBakuSummaryWidget;
 use App\Filament\Widgets\PredictionsPerDayWidget;
@@ -65,6 +66,7 @@ class PrediksiBahanBakuResource extends Resource
             PredictionBahanBakuChartWidget::class,
             PredictionsPerDayWidget::class,
             FeatureImportanceChartWidget::class,
+            ForecastVsActualChartWidget::class,
             PredictionBahanBakuSummaryWidget::class,
             DataminingPreprocessingLogsWidget::class,
         ];
