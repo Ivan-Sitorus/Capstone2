@@ -4,6 +4,8 @@ namespace App\Filament\Tables;
 
 use App\Models\DataminingRun;
 use Filament\Actions\Action;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -58,6 +60,10 @@ class DataminingRunTable
                     ->label('Detail')
                     ->icon(Heroicon::OutlinedEye)
                     ->url(fn (DataminingRun $record): string => $resource::getUrl('view', ['record' => $record])),
+                DeleteAction::make()->label('Hapus'),
+            ])
+            ->toolbarActions([
+                DeleteBulkAction::make(),
             ])
             ->poll('5s')
             ->defaultSort('created_at', 'desc');

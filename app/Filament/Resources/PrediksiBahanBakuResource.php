@@ -51,7 +51,7 @@ class PrediksiBahanBakuResource extends Resource
 
     public static function canDelete($record): bool
     {
-        return false;
+        return true;
     }
 
     public static function getResultWidgets(): array

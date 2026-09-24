@@ -5,6 +5,7 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\StockResource\Forms\StockForm;
 use App\Filament\Resources\StockResource\Pages\ListStocks;
 use App\Filament\Resources\StockResource\Pages\ManageBatches;
+use App\Filament\Resources\StockResource\Pages\RiwayatBayarBatch;
 use App\Filament\Resources\StockResource\Pages\ViewStockHistory;
 use App\Filament\Resources\StockResource\Tables\StockTable;
 use App\Models\Ingredient;
@@ -56,7 +57,7 @@ class StockResource extends Resource
             'index' => ListStocks::route('/'),
             'batches' => ManageBatches::route('/{record}/batches'),
             'history' => ViewStockHistory::route('/{record}/history'),
-            'riwayat-bayar-batch' => \App\Filament\Resources\StockResource\Pages\RiwayatBayarBatch::route('/{record}/riwayat-bayar'),
+            'riwayat-bayar-batch' => RiwayatBayarBatch::route('/{record}/riwayat-bayar'),
         ];
     }
 }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\StockAdjustmentResource\Tables;
 
 use App\Enums\AdjustmentType;
 use App\Filament\Resources\StockAdjustmentResource;
+use App\Filament\Resources\StockAdjustmentResource\Actions\DetailAdjustmentAction;
 use App\Models\Ingredient;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\ActionGroup;
@@ -102,7 +103,7 @@ class StockAdjustmentTable
             ->recordAction('detail')
             ->recordActions([
                 ActionGroup::make([
-                    \App\Filament\Resources\StockAdjustmentResource\Actions\DetailAdjustmentAction::make(),
+                    DetailAdjustmentAction::make(),
                     DeleteAction::make()
                         ->requiresConfirmation()
                         ->modalHeading('Hapus Penyesuaian Stok')

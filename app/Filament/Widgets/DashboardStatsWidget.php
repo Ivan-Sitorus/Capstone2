@@ -44,7 +44,7 @@ class DashboardStatsWidget extends StatsOverviewWidget
         $totalRange = (float) Order::whereBetween('created_at', [$fromDate, $untilDate])->sum('total_amount');
         $countRange = Order::whereBetween('created_at', [$fromDate, $untilDate])->count();
 
-        $stokMenipis = \App\Models\Ingredient::query()
+        $stokMenipis = Ingredient::query()
             ->select('id', 'name', 'low_stock_threshold')
             ->withSum('batches as total_stock', 'quantity')
             ->get()

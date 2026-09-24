@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\MenuResource\RelationManagers;
 
 use App\Filament\Forms\Components\NumericInput;
+use App\Models\Menu;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -74,7 +75,7 @@ class IngredientsRelationManager extends RelationManager
                 EditAction::make(),
                 DeleteAction::make()
                     ->before(function (DeleteAction $action) {
-                        /** @var \App\Models\Menu $menu */
+                        /** @var Menu $menu */
                         $menu = $this->getOwnerRecord();
                         if ($menu->menuIngredients()->count() <= 1) {
                             Notification::make()

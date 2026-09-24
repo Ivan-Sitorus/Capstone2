@@ -10,10 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Menu extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
     protected $fillable = [
         'category_id',
         'name',
@@ -38,7 +39,7 @@ class Menu extends Model
 
     protected static function booted(): void
     {
-        static::deleting(function (self $menu): void {
+        static::forceDeleting(function (self $menu): void {
             app(MenuImageService::class)->delete($menu->image);
         });
     }

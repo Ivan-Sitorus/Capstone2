@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ReceivableResource\Tables;
 
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
+use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Order;
 use Filament\Actions\Action;
@@ -62,8 +63,8 @@ class ReceivableTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (OrderStatus $state): string => \App\Filament\Resources\OrderResource::getStatusColor($state->value))
-                    ->formatStateUsing(fn (OrderStatus $state): string => \App\Filament\Resources\OrderResource::getStatusLabel($state->value)),
+                    ->color(fn (OrderStatus $state): string => OrderResource::getStatusColor($state->value))
+                    ->formatStateUsing(fn (OrderStatus $state): string => OrderResource::getStatusLabel($state->value)),
             ])
             ->filters([
                 SelectFilter::make('status')
@@ -89,7 +90,7 @@ class ReceivableTable
                 Action::make('detail')
                     ->label('Detail')
                     ->icon(Heroicon::OutlinedEye)
-                    ->infolist(\App\Filament\Resources\OrderResource::getInfolistComponents())
+                    ->infolist(OrderResource::getInfolistComponents())
                     ->modalAutofocus(false)
                     ->modalSubmitAction(false)
                     ->modalCancelActionLabel('Tutup'),

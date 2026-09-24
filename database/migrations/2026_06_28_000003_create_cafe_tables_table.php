@@ -13,6 +13,7 @@ return new class extends Migration
             $table->integer('table_number')->unique();
             $table->string('qr_code')->unique();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

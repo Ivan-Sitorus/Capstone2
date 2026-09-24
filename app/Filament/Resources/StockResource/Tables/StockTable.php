@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\StockResource\Tables;
 
 use App\Enums\BatchMode;
+use App\Filament\Resources\StockResource;
 use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\Ingredient;
 use Filament\Actions\Action;
@@ -78,11 +79,11 @@ class StockTable
                     Action::make('batches')
                         ->label('Stok Bahan')
                         ->icon(Heroicon::OutlinedCube)
-                        ->url(fn ($record) => \App\Filament\Resources\StockResource::getUrl('batches', ['record' => $record])),
+                        ->url(fn ($record) => StockResource::getUrl('batches', ['record' => $record])),
                     Action::make('history')
                         ->label('Riwayat Pemakaian')
                         ->icon(Heroicon::OutlinedClock)
-                        ->url(fn ($record) => \App\Filament\Resources\StockResource::getUrl('history', ['record' => $record])),
+                        ->url(fn ($record) => StockResource::getUrl('history', ['record' => $record])),
                     EditAction::make()->modal(),
                     DeleteAction::make()
                         ->before(function (DeleteAction $action, Ingredient $record) {

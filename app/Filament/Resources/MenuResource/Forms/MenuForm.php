@@ -6,6 +6,7 @@ use App\Enums\Unit;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\MenuResource;
 use App\Models\Ingredient;
+use App\Models\MenuIngredient;
 use App\Services\MenuImageService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
@@ -150,7 +151,7 @@ class MenuForm
 
                             return $ingredient?->unit?->unitType() === 'count';
                         })
-                        ->default(function (Get $get, ?\App\Models\MenuIngredient $record): ?string {
+                        ->default(function (Get $get, ?MenuIngredient $record): ?string {
                             if ($record?->unit) {
                                 return $record->unit->value;
                             }

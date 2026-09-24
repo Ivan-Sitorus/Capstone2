@@ -10,9 +10,12 @@ use chillerlan\QRCode\QRCode;
 use chillerlan\QRCode\QROptions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CafeTable extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'cafe_tables';
 
     protected $fillable = ['table_number', 'qr_code'];

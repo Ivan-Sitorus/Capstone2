@@ -43,6 +43,7 @@ class TopBahanBakuWidget extends BarChartWidget
     {
         $rows = DB::table('stock_movements as m')
             ->join('ingredients as i', 'i.id', '=', 'm.ingredient_id')
+            ->whereNull('i.deleted_at')
             ->where('m.movement_type', 'sale')
             ->whereDate('m.created_at', '>=', $this->rangeFrom())
             ->whereDate('m.created_at', '<=', $this->rangeUntil())

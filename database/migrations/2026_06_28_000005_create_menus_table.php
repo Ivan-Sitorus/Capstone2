@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('status');
             $table->integer('discounted_price')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

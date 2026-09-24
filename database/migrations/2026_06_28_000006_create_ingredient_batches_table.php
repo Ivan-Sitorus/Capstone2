@@ -21,6 +21,7 @@ return new class extends Migration
             $table->unsignedBigInteger('total_cost');
             $table->string('payment_status');
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index(['ingredient_id', 'expiry_date']);
             $table->index('received_at');

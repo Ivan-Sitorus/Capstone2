@@ -19,7 +19,7 @@ class StockReconciliationService
     public static function generateAdjustmentCode(): string
     {
         $dateKey = now()->format('dmy');
-        $todayCount = \App\Models\StockAdjustment::whereDate('created_at', today())->count();
+        $todayCount = StockAdjustment::whereDate('created_at', today())->count();
         return sprintf('ADJ-%s-%d', $dateKey, $todayCount + 1);
     }
 

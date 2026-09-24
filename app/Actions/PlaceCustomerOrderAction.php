@@ -9,6 +9,7 @@ use Exception;
 use App\Models\CafeTable;
 use App\Models\Menu;
 use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -93,7 +94,7 @@ class PlaceCustomerOrderAction
                 $total += $subtotal;
             }
 
-            \App\Models\OrderItem::insert($orderItemsToInsert);
+            OrderItem::insert($orderItemsToInsert);
 
             $order->update(['total_amount' => $total]);
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Enums\UserRole;
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\CashierHistoryService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -51,7 +52,7 @@ class AuthController extends Controller
         }
 
         // Role validation BEFORE authentication attempt
-        $existingUser = \App\Models\User::where('email', $request->email)->first();
+        $existingUser = User::where('email', $request->email)->first();
         if ($existingUser) {
             if ($request->is('kasir/*') && $existingUser->role !== UserRole::Cashier) {
                 return back()->withErrors([

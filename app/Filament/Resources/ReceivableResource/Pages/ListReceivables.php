@@ -8,6 +8,7 @@ use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Menu;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\User;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Repeater;
@@ -92,7 +93,7 @@ class ListReceivables extends ListRecords
                     $menuIds = array_column($data['items'], 'menu_id');
                     $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
-                    $resolveUnitPrice = function (array $item, \App\Models\Menu $menu): int {
+                    $resolveUnitPrice = function (array $item, Menu $menu): int {
                         if (($item['price_type'] ?? 'normal') === 'discount' && $menu->discounted_price) {
                             return $menu->discounted_price;
                         }
@@ -130,7 +131,7 @@ class ListReceivables extends ListRecords
                             'updated_at' => now(),
                         ];
                     }
-                    \App\Models\OrderItem::insert($items);
+                    OrderItem::insert($items);
 
                     if (($data['paid_amount'] ?? 0) > 0) {
                         $order->orderPayments()->create([

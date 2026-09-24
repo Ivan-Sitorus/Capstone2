@@ -5,6 +5,7 @@ namespace App\Filament\Resources\MenuResource\Tables;
 use App\Enums\MenuStatus;
 use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\Ingredient;
+use App\Models\Menu;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
@@ -92,7 +93,7 @@ class MenuTable
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make()->modal()
-                        ->before(function (EditAction $action, \App\Models\Menu $record) {
+                        ->before(function (EditAction $action, Menu $record) {
                             if (! $record->menuIngredients()->exists()) {
                                 Notification::make()
                                     ->warning()
@@ -102,22 +103,22 @@ class MenuTable
                             }
                         }),
                     Action::make('toggle_status')
-                        ->label(fn (\App\Models\Menu $record) => 
+                        ->label(fn (Menu $record) => 
                             $record->status === MenuStatus::Active ? 'Nonaktifkan' : 'Aktifkan')
-                        ->icon(fn (\App\Models\Menu $record) => 
+                        ->icon(fn (Menu $record) => 
                             $record->status === MenuStatus::Active 
                                 ? Heroicon::OutlinedArchiveBox 
                                 : Heroicon::OutlinedCheckCircle)
-                        ->color(fn (\App\Models\Menu $record) => 
+                        ->color(fn (Menu $record) => 
                             $record->status === MenuStatus::Active ? 'warning' : 'success')
                         ->requiresConfirmation()
-                        ->modalHeading(fn (\App\Models\Menu $record) => 
+                        ->modalHeading(fn (Menu $record) => 
                             $record->status === MenuStatus::Active ? 'Nonaktifkan Menu' : 'Aktifkan Menu')
-                        ->modalDescription(fn (\App\Models\Menu $record) => 
+                        ->modalDescription(fn (Menu $record) => 
                             $record->status === MenuStatus::Active 
                                 ? 'Menu akan dinonaktifkan dan tidak muncul di POS serta pelanggan. Data pesanan lama tetap aman.'
                                 : 'Menu akan diaktifkan kembali dan muncul di POS serta pelanggan.')
-                        ->action(function (\App\Models\Menu $record) {
+                        ->action(function (Menu $record) {
                             $status = $record->status === MenuStatus::Active ? MenuStatus::Inactive : MenuStatus::Active;
                             $record->update(['status' => $status]);
                             Notification::make()

@@ -30,6 +30,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
     {
         return DB::table('stock_movements as m')
             ->join('ingredients as i', 'i.id', '=', 'm.ingredient_id')
+            ->whereNull('i.deleted_at')
             ->where('m.movement_type', 'sale')
             ->whereDate('m.created_at', '>=', $this->rangeFrom())
             ->whereDate('m.created_at', '<=', $this->rangeUntil())
@@ -163,6 +164,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
 
         $query = DB::table('stock_movements as m')
             ->join('ingredients as i', 'i.id', '=', 'm.ingredient_id')
+            ->whereNull('i.deleted_at')
             ->where('m.movement_type', 'sale')
             ->whereDate('m.created_at', '>=', $from)
             ->whereDate('m.created_at', '<=', $to)

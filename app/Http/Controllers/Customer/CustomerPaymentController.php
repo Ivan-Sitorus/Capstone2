@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Actions\ChooseCashAction;
+use App\Actions\ChooseQrisAction;
+use App\Actions\UploadQrisProofAction;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
@@ -40,12 +43,12 @@ class CustomerPaymentController extends Controller
 
     public function chooseCash(Request $request, Order $order): JsonResponse
     {
-        return app(\App\Actions\ChooseCashAction::class)->handle($order);
+        return app(ChooseCashAction::class)->handle($order);
     }
 
     public function chooseQris(Request $request, Order $order): JsonResponse
     {
-        return app(\App\Actions\ChooseQrisAction::class)->handle($order);
+        return app(ChooseQrisAction::class)->handle($order);
     }
 
     public function showQrisUpload(Order $order): Response
@@ -69,7 +72,7 @@ class CustomerPaymentController extends Controller
 
     public function uploadQrisProof(Request $request, Order $order): JsonResponse
     {
-        return app(\App\Actions\UploadQrisProofAction::class)->handle($request, $order);
+        return app(UploadQrisProofAction::class)->handle($request, $order);
     }
 
     public function showQrisStatus(Order $order): Response
