@@ -3,8 +3,8 @@ import { Head } from '@inertiajs/react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Share2 } from 'lucide-react';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/Components/ui/card';
+import { Badge } from '@/Components/ui/badge';
 import {
     Table,
     TableBody,
@@ -12,7 +12,7 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from '@/components/ui/table';
+} from '@/Components/ui/table';
 import WhatsAppShareModal from '@/Components/Cashier/WhatsAppShareModal';
 
 export default function ReceiptShow({ order, cafe, receiptUrl }) {

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import axios from 'axios';
 import { QrCode, Check, X, RotateCcw, ExternalLink, AlertTriangle } from 'lucide-react';
 import Modal from '@/Components/Shared/Modal';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
 export default function QrisReviewModal({ isOpen, onClose, order }) {
