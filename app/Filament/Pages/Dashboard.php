@@ -35,12 +35,12 @@ class Dashboard extends BaseDashboard
             ->components([
                 DatePicker::make('from')
                     ->label('Dari')
-                    ->native(false)
+                    ->native(true)
                     ->displayFormat('d M Y')
                     ->maxDate(now()),
                 DatePicker::make('until')
                     ->label('Sampai')
-                    ->native(false)
+                    ->native(true)
                     ->displayFormat('d M Y')
                     ->maxDate(now()),
             ]);

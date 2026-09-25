@@ -24,13 +24,13 @@ class ListAsosiatifMenu extends ListRecords
                     DatePicker::make('date_from')
                         ->label('Dari Tanggal')
                         ->required()
-                        ->native(false)
+                        ->native(true)
                         ->displayFormat('d M Y')
                         ->maxDate(now()),
                     DatePicker::make('date_to')
                         ->label('Sampai Tanggal')
                         ->required()
-                        ->native(false)
+                        ->native(true)
                         ->displayFormat('d M Y')
                         ->after('date_from')
                         ->maxDate(now()),
