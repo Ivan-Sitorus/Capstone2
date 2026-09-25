@@ -27,6 +27,7 @@ class ReceiptSettingsPage extends Page implements HasForms
 
     protected static ?int $navigationSort = 5;
     protected static ?string $title = 'Pengaturan Struk & WhatsApp';
+    protected static ?string $slug = 'pengaturan-struk-dan-whatsapp';
 
     public ?array $data = [];
     public ?array $previewData = [];
@@ -35,6 +36,13 @@ class ReceiptSettingsPage extends Page implements HasForms
     public function getView(): string
     {
         return 'filament.pages.receipt-settings';
+    }
+
+    public function getBreadcrumbs(): array
+    {
+        return [
+            'Pengaturan Struk & WhatsApp',
+        ];
     }
 
     public function mount(): void
