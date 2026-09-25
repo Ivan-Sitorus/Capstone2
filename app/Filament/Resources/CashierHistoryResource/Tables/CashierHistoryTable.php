@@ -23,6 +23,7 @@ class CashierHistoryTable
                 CashierHistory::with('user')
                     ->orderByDesc('started_at')
             )
+            ->searchPlaceholder('Cari Nama Kasir/Email')
             ->columns([
                 TextColumn::make('user.name')
                     ->label('Nama Kasir')
@@ -32,11 +33,11 @@ class CashierHistoryTable
                     ->searchable(),
                 TextColumn::make('started_at')
                     ->label('Waktu Masuk')
-                    ->dateTime('d M Y, H:i')
+                    ->dateTime('d M Y, H:i:s')
                     ->sortable(),
                 TextColumn::make('ended_at')
                     ->label('Waktu Keluar')
-                    ->formatStateUsing(fn ($state) => $state ? $state->format('d M Y, H:i') : 'Masih Aktif')
+                    ->formatStateUsing(fn ($state) => $state ? $state->format('d M Y, H:i:s') : 'Masih Aktif')
                     ->sortable(),
                 TextColumn::make('order_count')
                     ->label('Jumlah Pesanan')

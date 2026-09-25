@@ -50,10 +50,10 @@ class ViewCashierHistory extends Page implements HasTable
                         ->state($session->user->email),
                     TextEntry::make('started_at')
                         ->label('Waktu Masuk')
-                        ->state($session->started_at->format('d M Y, H:i')),
+                        ->state($session->started_at->format('d M Y, H:i:s')),
                     TextEntry::make('ended_at')
                         ->label('Waktu Keluar')
-                        ->state($session->ended_at?->format('d M Y, H:i') ?? 'Masih Aktif'),
+                        ->state($session->ended_at?->format('d M Y, H:i:s') ?? 'Masih Aktif'),
                     TextEntry::make('order_count')
                         ->label('Jumlah Pesanan')
                         ->state(app(CashierHistoryService::class)->getOrderCount($session)),
@@ -95,7 +95,7 @@ class ViewCashierHistory extends Page implements HasTable
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Waktu')
-                    ->dateTime('d M Y, H:i')
+                    ->dateTime('d M Y, H:i:s')
                     ->sortable(),
             ])
             ->recordActions([
@@ -112,6 +112,6 @@ class ViewCashierHistory extends Page implements HasTable
 
     public function getTitle(): string
     {
-        return 'Detail Sesi Kasir — '.$this->record->user->name;
+        return 'Detail Sesi Kasir: '.$this->record->user->name;
     }
 }

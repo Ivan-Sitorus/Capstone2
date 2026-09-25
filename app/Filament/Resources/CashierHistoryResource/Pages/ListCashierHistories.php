@@ -8,4 +8,9 @@ use Filament\Resources\Pages\ListRecords;
 class ListCashierHistories extends ListRecords
 {
     protected static string $resource = CashierHistoryResource::class;
+
+    public function getTitle(): string
+    {
+        return 'Riwayat Kasir';
+    }
 }
