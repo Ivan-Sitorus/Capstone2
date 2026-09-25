@@ -31,12 +31,12 @@ class CafeTable extends Model
         return $this->hasMany(Order::class, 'table_id');
     }
 
-    public function getQrCodeUrlAttribute(): string
+    public function getQrUrlAttribute(): string
     {
         return route('customer.identity', ['table' => $this->qr_token]);
     }
 
-    public function getQrCodeSvgAttribute(): string
+    public function getQrSvgAttribute(): string
     {
         $options = new QROptions([
             'outputInterface' => QRMarkupSVG::class,
@@ -44,15 +44,15 @@ class CafeTable extends Model
             'outputBase64' => false,
         ]);
 
-        return (new QRCode($options))->render($this->qr_code_url);
+        return (new QRCode($options))->render($this->qr_url);
     }
 
-    public function getQrCodeSvgDataUriAttribute(): string
+    public function getQrSvgDataUriAttribute(): string
     {
-        return 'data:image/svg+xml;base64,'.base64_encode($this->qr_code_svg);
+        return 'data:image/svg+xml;base64,'.base64_encode($this->qr_svg);
     }
 
-    public function getQrCodePngDataUriAttribute(): string
+    public function getQrPngDataUriAttribute(): string
     {
         $options = new QROptions([
             'outputInterface' => QRGdImagePNG::class,
@@ -61,7 +61,7 @@ class CafeTable extends Model
             'scale' => 10,
         ]);
 
-        return 'data:image/png;base64,'.(new QRCode($options))->render($this->qr_code_url);
+        return 'data:image/png;base64,'.(new QRCode($options))->render($this->qr_url);
     }
 
     public function generatePngDownload(): string
@@ -72,7 +72,7 @@ class CafeTable extends Model
             'scale' => 10,
         ]);
 
-        $raw = (new QRCode($options))->render($this->qr_code_url);
+        $raw = (new QRCode($options))->render($this->qr_url);
 
         // render() returns data:image/png;base64,XXXX — strip the prefix
         $base64 = substr($raw, strpos($raw, ',') + 1);

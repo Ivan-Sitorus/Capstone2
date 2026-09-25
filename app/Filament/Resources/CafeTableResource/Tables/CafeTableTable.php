@@ -25,19 +25,19 @@ class CafeTableTable
                     ->label('Nomor Meja')
                     ->searchable()
                     ->sortable(),
-                TextColumn::make('qr_code_svg')
+                TextColumn::make('qr_svg')
                     ->label('QR Code')
                     ->html()
                     ->width(120)
                     ->alignCenter()
                     ->formatStateUsing(function (CafeTable $record): string {
-                        $dataUri = $record->qr_code_svg_data_uri;
+                        $dataUri = $record->qr_svg_data_uri;
 
                         return sprintf(
                             '<a href="%s" target="_blank" title="Buka URL">
                                 <img src="%s" width="80" height="80" style="border-radius:4px;border:1px solid #e5e7eb;padding:4px;" alt="QR Meja %d" />
                             </a>',
-                            e($record->qr_code_url),
+                            e($record->qr_url),
                             $dataUri,
                             $record->table_number
                         );
@@ -54,7 +54,7 @@ class CafeTableTable
                     ->infolist(fn (CafeTable $record) => [
                         ImageEntry::make('qr_image')
                             ->hiddenLabel()
-                            ->state(fn () => $record->qr_code_svg_data_uri)
+                            ->state(fn () => $record->qr_svg_data_uri)
                             ->width(200)
                             ->height(200)
                             ->extraImgAttributes([
@@ -62,7 +62,7 @@ class CafeTableTable
                             ]),
                         TextEntry::make('qr_url')
                             ->hiddenLabel()
-                            ->state(fn () => $record->qr_code_url)
+                            ->state(fn () => $record->qr_url)
                             ->color('primary')
                             ->extraAttributes([
                                 'class' => 'underline',

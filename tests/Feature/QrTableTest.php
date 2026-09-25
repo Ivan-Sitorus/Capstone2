@@ -26,7 +26,7 @@ class QrTableTest extends TestCase
 
         $this->assertSame(
             route('customer.identity', ['table' => $table->qr_token]),
-            $table->qr_code_url
+            $table->qr_url
         );
     }
 
@@ -34,9 +34,9 @@ class QrTableTest extends TestCase
     {
         $table = CafeTable::create(['table_number' => 3]);
 
-        $this->assertStringContainsString('<svg', $table->qr_code_svg);
+        $this->assertStringContainsString('<svg', $table->qr_svg);
 
-        $this->assertStringStartsWith('data:image/png;base64,', $table->qr_code_png_data_uri);
+        $this->assertStringStartsWith('data:image/png;base64,', $table->qr_png_data_uri);
 
         $this->assertSame("\x89PNG", substr($table->generatePngDownload(), 0, 4));
     }
