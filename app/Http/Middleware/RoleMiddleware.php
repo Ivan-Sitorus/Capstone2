@@ -14,6 +14,14 @@ class RoleMiddleware
             return redirect()->route('kasir.login');
         }
 
+        if (! Auth::user()->isActive()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('kasir.login');
+        }
+
         if (! in_array(Auth::user()->role->value, $roles)) {
             if ($request->is('admin') || $request->is('admin/*')) {
                 return redirect()->to('/admin/login');

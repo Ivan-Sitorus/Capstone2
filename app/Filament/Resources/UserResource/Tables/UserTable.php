@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\UserResource\Tables;
 
 use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
@@ -37,6 +38,12 @@ class UserTable
                     })
                     ->formatStateUsing(fn (UserRole $state): string => $state->label())
                     ->sortable(),
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->color(fn (UserStatus $state): string => $state->color())
+                    ->formatStateUsing(fn (UserStatus $state): string => $state->label())
+                    ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Terdaftar')
                     ->dateTime('d M Y')
@@ -49,6 +56,9 @@ class UserTable
                         UserRole::Admin->value => 'Admin',
                         UserRole::Cashier->value => 'Kasir',
                     ]),
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options(UserStatus::options()),
                 Filter::make('created_range')
                     ->label('Rentang Tanggal Daftar')
                     ->form([

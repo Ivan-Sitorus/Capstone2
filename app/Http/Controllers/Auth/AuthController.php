@@ -54,6 +54,12 @@ class AuthController extends Controller
         // Role validation BEFORE authentication attempt
         $existingUser = User::where('email', $request->email)->first();
         if ($existingUser) {
+            if (! $existingUser->isActive()) {
+                return back()->withErrors([
+                    'email' => 'Akun ini dinonaktifkan. Hubungi admin.',
+                ]);
+            }
+
             if ($request->is('kasir/*') && $existingUser->role !== UserRole::Cashier) {
                 return back()->withErrors([
                     'email' => 'Akun ini tidak memiliki akses ke Kasir.',

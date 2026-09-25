@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\UserResource\Forms;
 
 use App\Enums\UserRole;
+use App\Enums\UserStatus;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -38,6 +39,12 @@ class UserForm
                 ->required()
                 ->native(false)
                 ->default(UserRole::Cashier->value),
+            Select::make('status')
+                ->label('Status')
+                ->options(UserStatus::options())
+                ->required()
+                ->native(false)
+                ->default(UserStatus::Active->value),
         ]);
     }
 }
