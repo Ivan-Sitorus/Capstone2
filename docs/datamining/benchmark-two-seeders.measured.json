@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.1.0",
+  "report": "benchmark-two-seeders",
+  "status": "measured",
+  "generated_at": "2026-09-25",
+  "environment": {
+    "app": "Laravel 13 + Filament 5 (container capstone2-app-1)",
+    "datamining": "FastAPI + scikit-learn + Prophet (container capstone2-datamining-1)",
+    "database": "PostgreSQL 18 (pos_cafe)",
+    "python": "3.13"
+  },
+  "datasets": {
+    "A": {
+      "description": "seeder milik project (CafeSeeder)",
+      "range": "2025-01-01..2026-09-25",
+      "orders_total": 72299,
+      "orders_completed": 68619,
+      "order_items": 288921,
+      "menus": 44,
+      "ingredients": 29
+    },
+    "B": {
+      "description": "replikasi full DatabaseSeeder repo original (TransactionHistory + AssociationHistory + PredictionHistory + IngredientUsage + RecipeIngredient)",
+      "range": "2025-01-01..2026-04-10",
+      "orders_total": 6454,
+      "orders_completed": 6454,
+      "order_items": 7409,
+      "menus": 23,
+      "ingredients": 24,
+      "recipes": 82,
+      "loader": ".sisyphus/notepads/datamining-optimization-refactor/dataset_b_loader.py",
+      "original_code_adapted": "/tmp/orig_dm"
+    }
+  },
+  "timing_seconds": {
+    "dataset_A": {
+      "note": "original = comparison-findings.md; optimized_latest = run P11 pada data A",
+      "clustering_menu":        { "original": 17.35, "optimized_latest": 1.15 },
+      "association":            { "original": 15.36, "optimized_latest": 2.84 },
+      "prediction_menu":        { "original": 130.13, "optimized_latest": 9.65 },
+      "prediction_bahan_baku":  { "original": 72.11, "optimized_latest": 7.80 },
+      "clustering_bahan_baku":  { "original": 7.88, "optimized_latest": 0.27 },
+      "total":                  { "original": 242.83, "optimized_latest": 21.71, "speedup": 11.19 },
+      "total_optimized_earlier": 57.92
+    },
+    "dataset_B": {
+      "clustering_menu":       { "original": 3.24,  "optimized": 0.64, "speedup": 5.06 },
+      "association":           { "original": 2.16,  "optimized": 0.09, "speedup": 24.0 },
+      "prediction_menu":       { "original": 31.61, "optimized": 4.78, "speedup": 6.61 },
+      "prediction_bahan_baku": { "original": 31.12, "optimized": 7.44, "speedup": 4.18 },
+      "clustering_bahan_baku": { "original": 2.67,  "optimized": 0.25, "speedup": 10.68 },
+      "total":                 { "original": 70.80, "optimized": 13.20, "speedup": 5.36 }
+    }
+  },
+  "parity": {
+    "dataset_A": "identik (comparison-findings.md); asosiasi beda by design (min_support 0.01 -> 0.002)",
+    "synthetic_tests": [
+      "datamining/test_kmeans_parity.py",
+      "datamining/test_optimization_parity.py"
+    ],
+    "dataset_B": "tidak diverifikasi ulang pada sesi ini (hanya waktu yang diukur)"
+  },
+  "adaptations_for_original_on_dataset_B": [
+    "status 'selesai' -> 'completed'",
+    "menus.harga_modal -> menus.cost_price",
+    "sumber bahan baku dari view/table resep (daily_ingredient_usages dibangun dari resep)",
+    "patch matplotlib.cm.get_cmap"
+  ],
+  "notes": [
+    "Seeder Laravel repo original tidak bisa dijalankan fresh (migration expenses & cashier_sessions duplikat; seeder query menus.slug yang sudah di-drop).",
+    "Dataset B direplikasi dari spesifikasi seeder repo original ke schema POSMine.",
+    "Vercel Hobby (1 vCPU/2GB/300s): optimasi paralel (joblib/multiprocessing) sengaja TIDAK diterapkan."
+  ]
+}
