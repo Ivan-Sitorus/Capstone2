@@ -10,8 +10,11 @@ import numpy as np
 import pandas as pd
 
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
+
+try:
+    from .kmeans_utils import select_kmeans
+except ImportError:
+    from kmeans_utils import select_kmeans
 
 warnings.filterwarnings("ignore")
 
@@ -146,40 +149,22 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
             ),
         }
 
-    silhouette_scores = []
-    k_range = range(2, min(10, n_items))
-    for k in k_range:
-        km     = KMeans(n_clusters=k, random_state=42, n_init=10)
-        labels = km.fit_predict(x_train)
-        silhouette_scores.append(silhouette_score(x_train, labels))
+    sel = select_kmeans(x_train)
 
-    if not silhouette_scores:
-        best_k   = 2
-        km       = KMeans(n_clusters=best_k, random_state=42, n_init=10)
-        labels   = km.fit_predict(x_train)
-        best_sil = float(silhouette_score(x_train, labels))
-        silhouette_scores = [best_sil]
-        k_range  = range(2, 3)
-    else:
-        best_k   = list(k_range)[int(np.argmax(silhouette_scores))]
-        best_sil = float(max(silhouette_scores))
+    best_k            = sel["best_k"]
+    best_sil          = sel["best_sil"]
+    silhouette_scores = sel["sil_scores"]
+    inertias          = sel["inertias"]
+    k_range           = sel["k_range"]
+    k_range_e         = k_range
+    labels_by_k       = sel["labels_by_k"]
 
     logs.append({
         "tahap":  "Penentuan K Optimal (Silhouette)",
         "detail": f"K terbaik: {best_k} (Silhouette Score: {best_sil:.4f}). Range K: 2–{max(k_range)}.",
     })
 
-    # ── Elbow — hitung inertia ─────────────────────────────────────────
-    inertias  = []
-    k_range_e = range(2, min(10, n_items))
-    for k in k_range_e:
-        km = KMeans(n_clusters=k, random_state=42, n_init=10)
-        km.fit(x_train)
-        inertias.append(km.inertia_)
-
-    # ── K-Means fit (cell 29) ──────────────────────────────────────────
-    kmean = KMeans(n_clusters=best_k, random_state=42, n_init=10)
-    df_capped2["Klaster"] = kmean.fit_predict(x_train)
+    df_capped2["Klaster"] = labels_by_k[best_k]
 
     logs.append({
         "tahap":  "K-Means Clustering",

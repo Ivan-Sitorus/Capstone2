@@ -21,19 +21,19 @@ from dotenv import load_dotenv
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.cluster import KMeans
-from sklearn.metrics import silhouette_score
 
 try:
     from .prediction    import run_prediction_pipeline
     from .association   import run_association_pipeline
     from .bahanbaku     import run_bahan_baku_pipeline
     from .prediksibaku  import run_prediction_pipeline_bahan_baku
+    from .kmeans_utils  import select_kmeans
 except ImportError:
     from prediction    import run_prediction_pipeline
     from association   import run_association_pipeline
     from bahanbaku     import run_bahan_baku_pipeline
     from prediksibaku  import run_prediction_pipeline_bahan_baku
+    from kmeans_utils  import select_kmeans
 
 warnings.filterwarnings("ignore")
 load_dotenv()
@@ -307,16 +307,15 @@ def run_pipeline(df: pd.DataFrame) -> dict:
         "detail": "MinMaxScaler diterapkan pada [Total_Jumlah, Total_Keuntungan] → rentang [0, 1].",
     })
 
-    # ── Penentuan K optimal — Silhouette Score (cell-23) ─────────────────
-    sil_scores: list = []
-    k_range = range(2, min(10, len(x_train)))
-    for k in k_range:
-        km     = KMeans(n_clusters=k, random_state=42, n_init=10)
-        labels = km.fit_predict(x_train)
-        sil_scores.append(silhouette_score(x_train, labels))
+    sel = select_kmeans(x_train)
 
-    best_k   = list(k_range)[int(np.argmax(sil_scores))]
-    best_sil = float(max(sil_scores))
+    best_k      = sel["best_k"]
+    best_sil    = sel["best_sil"]
+    sil_scores  = sel["sil_scores"]
+    inertias    = sel["inertias"]
+    k_range     = sel["k_range"]
+    labels_by_k = sel["labels_by_k"]
+
     logs.append({
         "tahap":  "Penentuan K Optimal (Silhouette Score)",
         "detail": (
@@ -325,16 +324,7 @@ def run_pipeline(df: pd.DataFrame) -> dict:
         ),
     })
 
-    # Elbow (inertia) untuk grafik saja
-    inertias: list = []
-    for k in k_range:
-        km = KMeans(n_clusters=k, random_state=42, n_init=10)
-        km.fit(x_train)
-        inertias.append(km.inertia_)
-
-    # ── K-Means clustering final (cell-24) ────────────────────────────────
-    kmean = KMeans(n_clusters=best_k, random_state=42, n_init=10)
-    df_total["Klaster"] = kmean.fit_predict(x_train)
+    df_total["Klaster"] = labels_by_k[best_k]
     logs.append({
         "tahap":  "K-Means Clustering",
         "detail": f"K-Means dijalankan: K={best_k}, random_state=42, n_init=10.",
