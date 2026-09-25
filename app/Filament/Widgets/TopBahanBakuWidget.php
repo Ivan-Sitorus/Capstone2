@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\MovementType;
 use Filament\Widgets\BarChartWidget;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -50,7 +51,7 @@ class TopBahanBakuWidget extends BarChartWidget
                 'i.id'
             )
             ->whereNull('i.deleted_at')
-            ->where('m.movement_type', 'sale')
+            ->where('m.movement_type', MovementType::Sale->value)
             ->whereDate('m.created_at', '>=', $this->rangeFrom())
             ->whereDate('m.created_at', '<=', $this->rangeUntil())
             ->selectRaw('i.name as ingredient_name, i.unit as unit, SUM(-m.quantity_change) * COALESCE(b.unit_cost, 0) as total')

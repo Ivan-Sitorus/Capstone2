@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\OrderStatus;
 use App\Models\Order;
 use Filament\Widgets\LineChartWidget;
 use Illuminate\Support\Carbon;
@@ -92,7 +93,7 @@ class PenjualanChartWidget extends LineChartWidget
             ->selectRaw("to_char(created_at, 'YYYY-MM-DD') as day, sum(total_amount) as total")
             ->whereDate('created_at', '>=', $from)
             ->whereDate('created_at', '<=', $to)
-            ->where('status', '!=', 'cancelled')
+            ->where('status', '!=', OrderStatus::Cancelled->value)
             ->groupBy('day')
             ->get()
             ->each(function ($row) use (&$days) {

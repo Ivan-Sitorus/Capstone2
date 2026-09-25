@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\MovementType;
 use App\Models\Ingredient;
 use Filament\Support\RawJs;
 use Filament\Widgets\LineChartWidget;
@@ -31,7 +32,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         return DB::table('stock_movements as m')
             ->join('ingredients as i', 'i.id', '=', 'm.ingredient_id')
             ->whereNull('i.deleted_at')
-            ->where('m.movement_type', 'sale')
+            ->where('m.movement_type', MovementType::Sale->value)
             ->whereDate('m.created_at', '>=', $this->rangeFrom())
             ->whereDate('m.created_at', '<=', $this->rangeUntil())
             ->selectRaw('i.name as ingredient_name, SUM(-m.quantity_change) as total')
@@ -165,7 +166,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         $query = DB::table('stock_movements as m')
             ->join('ingredients as i', 'i.id', '=', 'm.ingredient_id')
             ->whereNull('i.deleted_at')
-            ->where('m.movement_type', 'sale')
+            ->where('m.movement_type', MovementType::Sale->value)
             ->whereDate('m.created_at', '>=', $from)
             ->whereDate('m.created_at', '<=', $to)
             ->selectRaw('m.created_at::date as day, SUM(-m.quantity_change) as total');

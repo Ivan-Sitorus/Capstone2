@@ -2,6 +2,7 @@
 
 namespace App\Filament\Tables;
 
+use App\Enums\DataminingRunStatus;
 use App\Models\DataminingRun;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -30,18 +31,8 @@ class DataminingRunTable
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()
-                    ->color(fn (?string $state): string => match ($state) {
-                        'completed' => 'success',
-                        'failed' => 'danger',
-                        'running' => 'warning',
-                        default => 'gray',
-                    })
-                    ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'completed' => 'Selesai',
-                        'failed' => 'Gagal',
-                        'running' => 'Diproses',
-                        default => (string) $state,
-                    }),
+                    ->color(fn (?string $state): string => DataminingRunStatus::tryFrom($state)?->color() ?? 'gray')
+                    ->formatStateUsing(fn (?string $state): string => DataminingRunStatus::tryFrom($state)?->label() ?? (string) $state),
                 TextColumn::make('jumlah')
                     ->label($countLabel)
                     ->state(fn (DataminingRun $record): int => count($record->payload[$countKey] ?? [])),
@@ -83,7 +74,7 @@ class DataminingRunTable
 
     private static function duration(DataminingRun $record): string
     {
-        if ($record->status === 'running' || ! $record->updated_at) {
+        if ($record->status === DataminingRunStatus::Running->value || ! $record->updated_at) {
             return '-';
         }
 
