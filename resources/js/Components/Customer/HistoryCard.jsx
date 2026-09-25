@@ -1,15 +1,16 @@
 import { Coffee } from 'lucide-react';
 import { formatRupiah } from '@/helpers';
+import { STONE_50, STONE_300, STONE_400, STONE_500, STONE_700, STONE_900, AMBER_400, BLUE_400, GREEN_400 } from '@/theme';
 
 const F = '"Inter", system-ui, sans-serif';
 
 /* stone-bg dari Stitch */
-const BG = '#F7F5F2';
+const BG = STONE_50;
 
 const STATUS_MAP = {
-    pending:  { label: 'Pending',  dot: '#FBBF24', bg: 'rgba(251,191,36,0.10)',  border: 'rgba(251,191,36,0.20)'  },
-    diproses: { label: 'Diproses', dot: '#60A5FA', bg: 'rgba(96,165,250,0.10)',  border: 'rgba(96,165,250,0.20)'  },
-    selesai:  { label: 'Selesai',  dot: '#4ADE80', bg: 'rgba(74,222,128,0.10)', border: 'rgba(74,222,128,0.20)' },
+    pending:  { label: 'Pending',  dot: AMBER_400, bg: 'rgba(251,191,36,0.10)',  border: 'rgba(251,191,36,0.20)'  },
+    diproses: { label: 'Diproses', dot: BLUE_400, bg: 'rgba(96,165,250,0.10)',  border: 'rgba(96,165,250,0.20)'  },
+    selesai:  { label: 'Selesai',  dot: GREEN_400, bg: 'rgba(74,222,128,0.10)', border: 'rgba(74,222,128,0.20)' },
 };
 
 function getPaymentLabel(method) {
@@ -18,8 +19,8 @@ function getPaymentLabel(method) {
     return '';
 }
 
-export default function RiwayatCard({ order, onDetail }) {
-    const s         = STATUS_MAP[order.status] ?? { label: order.status, dot: '#A8A29E', bg: 'rgba(168,162,158,0.10)', border: 'rgba(168,162,158,0.20)' };
+export default function HistoryCard({ order, onDetail }) {
+    const s         = STATUS_MAP[order.status] ?? { label: order.status, dot: STONE_400, bg: 'rgba(168,162,158,0.10)', border: 'rgba(168,162,158,0.20)' };
     const payLabel  = getPaymentLabel(order.payment_method);
     const itemCount = order.items?.length ?? 0;
     const subtitle  = [payLabel, itemCount ? `${itemCount} item` : ''].filter(Boolean).join(' • ');
@@ -30,7 +31,7 @@ export default function RiwayatCard({ order, onDetail }) {
             background: 'rgba(255,255,255,0.90)',
             backdropFilter: 'blur(6px)',
             borderRadius: 12,
-            border: '1px solid #E2DED8',
+            border: `1px solid ${STONE_300}`,
             padding: 20,
             marginBottom: 14,
             boxShadow: '0 2px 8px -2px rgba(0,0,0,0.05)',
@@ -45,11 +46,11 @@ export default function RiwayatCard({ order, onDetail }) {
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         flexShrink: 0,
                     }}>
-                        <Coffee size={18} color="#44403C" strokeWidth={1.75} />
+                        <Coffee size={18} color={STONE_700} strokeWidth={1.75} />
                     </div>
                     <div>
                         <h3 style={{
-                            fontSize: 14, fontWeight: 700, color: '#1C1917',
+                            fontSize: 14, fontWeight: 700, color: STONE_900,
                             fontFamily: F, margin: 0, letterSpacing: '-0.01em',
                         }}>
                             {order.order_code}
@@ -71,7 +72,7 @@ export default function RiwayatCard({ order, onDetail }) {
                 }}>
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
                     <span style={{
-                        fontSize: 10, fontWeight: 700, color: '#1C1917',
+                        fontSize: 10, fontWeight: 700, color: STONE_900,
                         fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.04em',
                     }}>
                         {s.label}
@@ -89,16 +90,16 @@ export default function RiwayatCard({ order, onDetail }) {
             }}>
                 {hasItems ? order.items.map((item, i) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                        <span style={{ color: '#44403C', fontFamily: F }}>
+                        <span style={{ color: STONE_700, fontFamily: F }}>
                             <span style={{ fontWeight: 600 }}>{item.quantity}×</span> {item.name}
                         </span>
-                        <span style={{ color: '#1C1917', fontWeight: 500, fontFamily: F }}>
+                        <span style={{ color: STONE_900, fontWeight: 500, fontFamily: F }}>
                             {formatRupiah(item.subtotal)}
                         </span>
                     </div>
                 )) : (
-                    <span style={{ fontSize: 13, color: '#78716C', fontFamily: F }}>
-                        {order.items_summary}
+                    <span style={{ fontSize: 13, color: STONE_500, fontFamily: F }}>
+                        {order.itemsSummary}
                     </span>
                 )}
             </div>
@@ -113,7 +114,7 @@ export default function RiwayatCard({ order, onDetail }) {
                     }}>
                         TOTAL
                     </p>
-                    <p style={{ fontSize: 20, fontWeight: 700, color: '#1C1917', fontFamily: F, letterSpacing: '-0.02em' }}>
+                    <p style={{ fontSize: 20, fontWeight: 700, color: STONE_900, fontFamily: F, letterSpacing: '-0.02em' }}>
                         {formatRupiah(order.total_amount)}
                     </p>
                 </div>
@@ -121,11 +122,11 @@ export default function RiwayatCard({ order, onDetail }) {
                     onClick={() => onDetail(order)}
                     style={{
                         padding: '8px 22px',
-                        border: '1px solid #E2DED8',
+                        border: `1px solid ${STONE_300}`,
                         borderRadius: 8,
                         background: 'transparent',
                         fontSize: 13, fontWeight: 700,
-                        color: '#44403C', fontFamily: F,
+                        color: STONE_700, fontFamily: F,
                         cursor: 'pointer',
                         transition: 'background 0.15s',
                     }}

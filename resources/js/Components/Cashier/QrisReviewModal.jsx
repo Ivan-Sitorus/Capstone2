@@ -32,7 +32,7 @@ export default function QrisReviewModal({ isOpen, onClose, order }) {
         setLoading(true);
         setError('');
         try {
-            await axios.post(route('kasir.pesanan.qris.accept', { order: order.id }));
+            await axios.post(route('kasir.order.qris.accept', { order: order.id }));
             handleClose();
             window.location.reload();
         } catch (err) {
@@ -51,8 +51,8 @@ export default function QrisReviewModal({ isOpen, onClose, order }) {
         setError('');
         try {
             const endpoint = selectedAction === 'reject'
-                ? route('kasir.pesanan.qris.reject', { order: order.id })
-                : route('kasir.pesanan.qris.resubmit', { order: order.id });
+                ? route('kasir.order.qris.reject', { order: order.id })
+                : route('kasir.order.qris.resubmit', { order: order.id });
 
             await axios.post(endpoint, { reason: reason.trim() });
             handleClose();

@@ -1,12 +1,13 @@
 import { formatRupiah } from '@/helpers';
+import { WHITE, GRAY_300, GRAY_500, GRAY_900, BLUE } from '@/theme';
 
 export default function MenuGridItem({ menu, onAdd }) {
     return (
         <div
             onClick={() => onAdd(menu)}
             style={{
-                background: '#FFFFFF',
-                border: '1.5px solid #D1D5DB',
+                background: WHITE,
+                border: `1.5px solid ${GRAY_300}`,
                 borderRadius: 8,
                 padding: '20px 16px',
                 cursor: 'pointer',
@@ -27,13 +28,13 @@ export default function MenuGridItem({ menu, onAdd }) {
                 e.currentTarget.style.transform = 'translateY(0)';
             }}
         >
-            <div style={{ fontSize: 11, textTransform: 'uppercase', color: '#6B7280', letterSpacing: '0.6px', fontWeight: 600 }}>
+            <div style={{ fontSize: 11, textTransform: 'uppercase', color: GRAY_500, letterSpacing: '0.6px', fontWeight: 600 }}>
                 {menu.category?.name}
             </div>
-            <div style={{ fontSize: 15, fontWeight: 700, color: '#111827', lineHeight: 1.3 }}>
+            <div style={{ fontSize: 15, fontWeight: 700, color: GRAY_900, lineHeight: 1.3 }}>
                 {menu.name}
             </div>
-            <div style={{ fontSize: 14, fontWeight: 700, color: '#3B6FD4', fontFamily: "'DM Sans', 'Inter', system-ui" }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: BLUE, fontFamily: "'DM Sans', 'Inter', system-ui" }}>
                 {formatRupiah(menu.price)}
             </div>
         </div>

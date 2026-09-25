@@ -12,13 +12,14 @@ import {
     PanelLeftClose,
     PanelLeftOpen,
 } from 'lucide-react';
+import { SLATE_900, SLATE_800, SLATE_200, SLATE_400, SLATE_50, WHITE, BLUE, RED, RED_DARK, RED_50, RED_200, GREEN_50, GREEN_300, GREEN_700 } from '@/theme';
 
 const navItems = [
     { label: 'Dashboard',       href: route('kasir.dashboard'),       icon: LayoutDashboard },
-    { label: 'Pesanan Baru',    href: route('kasir.pesanan-baru'),    icon: ShoppingCart },
-    { label: 'Pesanan Aktif',   href: route('kasir.pesanan-aktif'),   icon: ClipboardList },
-    { label: 'Riwayat Pesanan', href: route('kasir.riwayat-pesanan'), icon: History },
-    { label: 'Profil',          href: route('kasir.profil'),          icon: User },
+    { label: 'Pesanan Baru',    href: route('kasir.new-order'),    icon: ShoppingCart },
+    { label: 'Pesanan Aktif',   href: route('kasir.active-orders'),   icon: ClipboardList },
+    { label: 'Riwayat Pesanan', href: route('kasir.order-history'), icon: History },
+    { label: 'Profil',          href: route('kasir.profile'),          icon: User },
 ];
 
 export default function CashierLayout({ children, title = 'Dashboard', fullscreen = false }) {
@@ -52,7 +53,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
     // dari cache prefetch Inertia saat berpindah menu
     useEffect(() => {
         let cancelled = false;
-        window.axios?.get(route('kasir.pesanan-menunggu'))
+        window.axios?.get(route('kasir.pending-count'))
             .then(res => { if (!cancelled) setPendingCount(res.data.count); })
             .catch(() => {});
         return () => { cancelled = true; };
@@ -84,7 +85,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
             <aside style={{
                 width: sidebarWidth,
                 minHeight: '100vh',
-                background: '#0F172A',
+                background: SLATE_900,
                 display: 'flex',
                 flexDirection: 'column',
                 flexShrink: 0,
@@ -110,8 +111,8 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                                 height: 40,
                                 borderRadius: 10,
                                 border: '1px solid rgba(255,255,255,0.14)',
-                                background: '#1E293B',
-                                color: '#E2E8F0',
+                                background: SLATE_800,
+                                color: SLATE_200,
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -153,8 +154,8 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                                 height: 32,
                                 borderRadius: 8,
                                 border: '1px solid rgba(255,255,255,0.14)',
-                                background: '#1E293B',
-                                color: '#E2E8F0',
+                                background: SLATE_800,
+                                color: SLATE_200,
                                 display: 'inline-flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
@@ -188,20 +189,20 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                                     textDecoration: 'none',
                                     fontSize: 14,
                                     fontWeight: active ? 600 : 500,
-                                    color: active ? '#FFFFFF' : '#94A3B8',
-                                    background: active ? '#3B6FD4' : 'transparent',
+                                    color: active ? WHITE : SLATE_400,
+                                    background: active ? BLUE : 'transparent',
                                     transition: 'background 0.15s, color 0.15s',
                                     justifyContent: isSidebarCollapsed ? 'center' : 'flex-start',
                                 }}
-                                onMouseEnter={e => { if (!active) e.currentTarget.style.background = '#1E293B'; }}
+                                onMouseEnter={e => { if (!active) e.currentTarget.style.background = SLATE_800; }}
                                 onMouseLeave={e => { if (!active) e.currentTarget.style.background = 'transparent'; }}
                             >
                                 <span style={{ position: 'relative', display: 'inline-flex' }}>
                                     <Icon size={20} />
                                     {isSidebarCollapsed && showBadge && (
                                         <span style={{
-                                            background: '#EF4444',
-                                            color: '#FFFFFF',
+                                            background: RED,
+                                            color: WHITE,
                                             borderRadius: '50%',
                                             minWidth: 16,
                                             height: 16,
@@ -224,8 +225,8 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                                 {showBadge && (
                                     !isSidebarCollapsed && (
                                         <span style={{
-                                            background: '#EF4444',
-                                            color: '#FFFFFF',
+                                            background: RED,
+                                            color: WHITE,
                                             borderRadius: pendingCount > 9 ? 10 : '50%',
                                             minWidth: 20,
                                             height: 20,
@@ -261,7 +262,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                             width: '100%',
                             background: 'transparent',
                             border: 'none',
-                            color: '#DC2626',
+                            color: RED_DARK,
                             fontSize: 14,
                             fontWeight: 500,
                             cursor: 'pointer',
@@ -283,13 +284,13 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                     {children}
                 </main>
             ) : (
-                <main style={{ flex: 1, background: '#F8FAFC', padding: 32, minHeight: '100vh' }}>
+                <main style={{ flex: 1, background: SLATE_50, padding: 32, minHeight: '100vh' }}>
                     <div style={{
                         background: 'white',
                         borderRadius: 12,
                         padding: 24,
                         minHeight: 'calc(100vh - 64px)',
-                        border: '1px solid #E2E8F0',
+                        border: `1px solid ${SLATE_200}`,
                         boxShadow: '0 2px 8px rgba(15,23,42,0.03)',
                     }}>
                         {children}
@@ -304,15 +305,15 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                     top: 24,
                     right: 24,
                     zIndex: 9999,
-                    background: toast.type === 'success' ? '#F0FDF4' : '#FEF2F2',
-                    border: `1px solid ${toast.type === 'success' ? '#86EFAC' : '#FCA5A5'}`,
+                    background: toast.type === 'success' ? GREEN_50 : RED_50,
+                    border: `1px solid ${toast.type === 'success' ? GREEN_300 : RED_200}`,
                     borderRadius: 10,
                     padding: '12px 16px',
                     display: 'flex',
                     alignItems: 'center',
                     gap: 10,
                     fontSize: 14,
-                    color: toast.type === 'success' ? '#15803D' : '#DC2626',
+                    color: toast.type === 'success' ? GREEN_700 : RED_DARK,
                     boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
                     minWidth: 280,
                     maxWidth: 380,

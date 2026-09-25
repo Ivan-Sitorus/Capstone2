@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
 import { MoreVertical, Banknote, QrCode, Check, Clock, Ban } from 'lucide-react';
+import { AMBER_50, AMBER_700, INDIGO_50, BLUE, SALMON, GOLD, GREEN_MUTED, WHITE, RED, RED_50, RED_DARK, SLATE_100, SLATE_200, SLATE_500, SLATE_700, SLATE_900, NEUTRAL_50, NEUTRAL_200, NEUTRAL_300, NEUTRAL_400, NEUTRAL_900, GREEN_500 } from '@/theme';
 
 const METHOD_META = {
-    cash:        { label: 'Tunai',       bg: '#FEF9EC', color: '#B45309', Icon: Banknote },
-    qris:        { label: 'QRIS',        bg: '#EEF2FF', color: '#3B6FD4', Icon: QrCode   },
-    bayar_nanti: { label: 'Bayar Nanti', bg: '#EEF2FF', color: '#3B6FD4', Icon: Clock    },
+    cash:        { label: 'Tunai',       bg: AMBER_50,  color: AMBER_700, Icon: Banknote },
+    qris:        { label: 'QRIS',        bg: INDIGO_50, color: BLUE,      Icon: QrCode   },
+    bayar_nanti: { label: 'Bayar Nanti', bg: INDIGO_50, color: BLUE,      Icon: Clock    },
 };
 
 import StatusBadge from '@/Components/Common/StatusBadge';
@@ -12,9 +13,9 @@ import { formatRupiah, formatDate, formatTime } from '@/helpers';
 
 
 const STATUS_META = {
-    pending:    { dot: '#D08068', label: 'Pending'  },
-    processing: { dot: '#D4A64A', label: 'Diproses' },
-    completed:  { dot: '#4D9B6A', label: 'Selesai'  },
+    pending:    { dot: SALMON,      label: 'Pending'  },
+    processing: { dot: GOLD,        label: 'Diproses' },
+    completed:  { dot: GREEN_MUTED, label: 'Selesai'  },
 };
 
 export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone, onConfirmPayment, onCancel }) {
@@ -43,20 +44,20 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
 
     const isQrisPending  = order.status === 'pending' && order.payment_method === 'qris';
     const hasProof       = !!order.payment_proof;
-    const belumBayar     = order.is_paid === false;
+    const notPaid     = order.is_paid === false;
     const ALL_STATUSES   = ['pending', 'processing', 'completed'];
     const statusIndex    = ALL_STATUSES.indexOf(order.status);
 
     return (
         <div style={{
-            background: '#FFFFFF',
-            border: belumBayar ? '2px solid #EF4444' : '1px solid #E2E8F0',
+            background: WHITE,
+            border: notPaid ? `2px solid ${RED}` : `1px solid ${SLATE_200}`,
             borderRadius: 16,
             padding: 16,
             display: 'flex',
             flexDirection: 'column',
             gap: 10,
-            boxShadow: belumBayar
+            boxShadow: notPaid
                 ? '0 4px 14px rgba(239,68,68,0.10)'
                 : '0 4px 14px rgba(15,23,42,0.06)',
             position: 'relative',
@@ -67,7 +68,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                 {/* Left */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0, overflow: 'hidden' }}>
                     <span style={{
-                        fontSize: 15, fontWeight: 600, color: '#0F172A', fontFamily: 'Outfit, system-ui',
+                        fontSize: 15, fontWeight: 600, color: SLATE_900, fontFamily: 'Outfit, system-ui',
                         overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                     }}>
                         #{order.order_code}
@@ -104,10 +105,10 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                 aria-label="Opsi pesanan"
                                 style={{
                                     width: 28, height: 28, borderRadius: 8,
-                                    background: menuOpen ? '#F1F5F9' : 'transparent',
+                                    background: menuOpen ? SLATE_100 : 'transparent',
                                     border: 'none', cursor: 'pointer',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    color: '#475569',
+                                    color: SLATE_700,
                                     transition: 'background 0.1s',
                                 }}
                             >
@@ -118,9 +119,9 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                 <div style={{
                                     position: 'absolute', right: 0, top: 32, zIndex: 100,
                                     width: 200,
-                                    background: '#FFFFFF',
+                                    background: WHITE,
                                     borderRadius: 14,
-                                    border: '1px solid #E5E4E1',
+                                    border: `1px solid ${NEUTRAL_300}`,
                                     boxShadow: '0 6px 20px rgba(15,23,42,0.094), 0 1px 3px rgba(15,23,42,0.031)',
                                     padding: 6,
                                     display: 'flex', flexDirection: 'column',
@@ -129,7 +130,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                         padding: '6px 10px 4px',
                                         fontSize: 11, fontWeight: 600,
                                         letterSpacing: '0.5px',
-                                        color: '#9C9B99',
+                                        color: NEUTRAL_400,
                                         fontFamily: 'Outfit, system-ui',
                                     }}>
                                         Ubah Status
@@ -141,7 +142,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                         const isNext     = i === statusIndex + 1;
                                         const isDisabled = !isCurrent && !isNext;
                                         // Blok "Selesai" jika belum bayar
-                                        const isBlocked  = s === 'completed' && belumBayar;
+                                        const isBlocked  = s === 'completed' && notPaid;
 
                                         return (
                                             <button
@@ -159,17 +160,17 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                                     padding: 10, gap: 10,
                                                     borderRadius: 8,
                                                     border: 'none',
-                                                    background: isCurrent ? '#FAFAF8' : 'transparent',
+                                                    background: isCurrent ? NEUTRAL_50 : 'transparent',
                                                     cursor: (isNext && !isBlocked) ? 'pointer' : 'default',
                                                     opacity: (isDisabled || isBlocked) ? 0.4 : 1,
                                                     transition: 'background 0.1s',
                                                     textAlign: 'left',
                                                 }}
                                                 onMouseEnter={e => {
-                                                    if (isNext && !isBlocked) e.currentTarget.style.background = '#F1F5F9';
+                                                    if (isNext && !isBlocked) e.currentTarget.style.background = SLATE_100;
                                                 }}
                                                 onMouseLeave={e => {
-                                                    e.currentTarget.style.background = isCurrent ? '#FAFAF8' : 'transparent';
+                                                    e.currentTarget.style.background = isCurrent ? NEUTRAL_50 : 'transparent';
                                                 }}
                                             >
                                                 <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -181,21 +182,21 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                                     <span style={{
                                                         fontSize: 13,
                                                         fontWeight: isCurrent ? 600 : 500,
-                                                        color: '#1A1918',
+                                                        color: NEUTRAL_900,
                                                         fontFamily: 'Outfit, system-ui',
                                                     }}>
                                                         {meta.label}
                                                     </span>
                                                 </span>
                                                 {isCurrent && (
-                                                    <Check size={14} color="#3D8A5A" strokeWidth={2.5} />
+                                                    <Check size={14} color={GREEN_500} strokeWidth={2.5} />
                                                 )}
                                             </button>
                                         );
                                     })}
 
                                     {/* Divider + Batalkan Pesanan */}
-                                    <div style={{ height: 1, background: '#EFEEEB', margin: '4px 6px' }} />
+                                    <div style={{ height: 1, background: NEUTRAL_200, margin: '4px 6px' }} />
                                     <button
                                         onClick={() => { setMenuOpen(false); onCancel?.(order); }}
                                         style={{
@@ -205,12 +206,12 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                             background: 'transparent', cursor: 'pointer',
                                             textAlign: 'left', transition: 'background 0.1s',
                                         }}
-                                        onMouseEnter={e => e.currentTarget.style.background = '#FEF2F2'}
+                                        onMouseEnter={e => e.currentTarget.style.background = RED_50}
                                         onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                                     >
-                                        <Ban size={15} color="#DC2626" strokeWidth={2.2} />
+                                        <Ban size={15} color={RED_DARK} strokeWidth={2.2} />
                                         <span style={{
-                                            fontSize: 13, fontWeight: 600, color: '#DC2626',
+                                            fontSize: 13, fontWeight: 600, color: RED_DARK,
                                             fontFamily: 'Outfit, system-ui',
                                         }}>
                                             Batalkan Pesanan
@@ -224,15 +225,15 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
             </div>
 
             {/* ── Time ── */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>
                 <span>{formatTime(order.created_at)} · {formatDate(order.created_at)}</span>
                 {order.table_number && (
-                    <span style={{ color: '#64748B' }}>· Meja {order.table_number}</span>
+                    <span style={{ color: SLATE_500 }}>· Meja {order.table_number}</span>
                 )}
-                {belumBayar && (
+                {notPaid && (
                     <span style={{
                         display: 'flex', alignItems: 'center', gap: 3,
-                        background: '#FEF2F2', color: '#EF4444',
+                        background: RED_50, color: RED,
                         borderRadius: 6, padding: '2px 7px',
                         fontSize: 11, fontWeight: 700,
                     }}>
@@ -243,15 +244,15 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
 
             {/* ── Items summary ── */}
             <div style={{
-                fontSize: 13, color: '#64748B', fontFamily: 'Outfit, system-ui',
+                fontSize: 13, color: SLATE_500, fontFamily: 'Outfit, system-ui',
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
             }}>
-                {order.items_summary || '-'}
+                {order.itemsSummary || '-'}
             </div>
 
             {/* ── Bottom: total + buttons ── */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 2, gap: 8 }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>
                     {formatRupiah(order.total_amount)}
                 </span>
 
@@ -261,7 +262,7 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                             onClick={() => onOpenQrisModal(order)}
                             style={{
                                 height: 32, padding: '0 12px',
-                                background: '#3B6FD4', color: '#FFFFFF',
+                                background: BLUE, color: WHITE,
                                 border: 'none', borderRadius: 8,
                                 fontSize: 12, fontWeight: 600, cursor: 'pointer',
                                 fontFamily: 'Outfit, system-ui',
@@ -272,13 +273,13 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                     )}
 
                     {/* Tombol Konfirmasi Lunas + Popover */}
-                    {belumBayar && order.status === 'processing' && (
+                    {notPaid && order.status === 'processing' && (
                         <div ref={payRef} style={{ position: 'relative' }}>
                             <button
                                 onClick={() => setPayPopover(v => !v)}
                                 style={{
                                     height: 32, padding: '0 12px',
-                                    background: '#EF4444', color: '#FFFFFF',
+                                    background: RED, color: WHITE,
                                     border: 'none', borderRadius: 8,
                                     fontSize: 12, fontWeight: 600, cursor: 'pointer',
                                     fontFamily: 'Outfit, system-ui',
@@ -291,16 +292,16 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                             {payPopover && (
                                 <div style={{
                                     position: 'absolute', bottom: 38, right: 0, zIndex: 200,
-                                    background: '#FFFFFF',
+                                    background: WHITE,
                                     borderRadius: 12,
-                                    border: '1px solid #E2E8F0',
+                                    border: `1px solid ${SLATE_200}`,
                                     boxShadow: '0 6px 20px rgba(15,23,42,0.12)',
                                     padding: 8,
                                     display: 'flex', flexDirection: 'column', gap: 4,
                                     minWidth: 150,
                                 }}>
                                     <span style={{
-                                        fontSize: 11, fontWeight: 600, color: '#64748B',
+                                        fontSize: 11, fontWeight: 600, color: SLATE_500,
                                         padding: '2px 8px 4px',
                                         fontFamily: 'Outfit, system-ui', letterSpacing: 0.4,
                                     }}>
@@ -321,13 +322,13 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                                                 padding: '8px 10px', borderRadius: 8,
                                                 border: 'none', background: 'transparent',
                                                 cursor: 'pointer', textAlign: 'left',
-                                                fontSize: 13, fontWeight: 500, color: '#0F172A',
+                                                fontSize: 13, fontWeight: 500, color: SLATE_900,
                                                 fontFamily: 'Outfit, system-ui',
                                             }}
-                                            onMouseEnter={e => e.currentTarget.style.background = '#F1F5F9'}
+                                            onMouseEnter={e => e.currentTarget.style.background = SLATE_100}
                                             onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
                                         >
-                                            <Icon size={15} color="#64748B" />
+                                            <Icon size={15} color={SLATE_500} />
                                             {label}
                                         </button>
                                     ))}
@@ -340,9 +341,9 @@ export default function OrderCard({ order, onDetail, onOpenQrisModal, onMarkDone
                         onClick={() => onDetail(order.id)}
                         style={{
                             height: 32, padding: '0 14px',
-                            background: '#FFFFFF', border: '1px solid #E2E8F0',
+                            background: WHITE, border: `1px solid ${SLATE_200}`,
                             borderRadius: 8, fontSize: 13, fontWeight: 500,
-                            color: '#0F172A', cursor: 'pointer',
+                            color: SLATE_900, cursor: 'pointer',
                             fontFamily: 'Outfit, system-ui',
                         }}
                     >

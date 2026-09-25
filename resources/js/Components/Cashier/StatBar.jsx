@@ -1,19 +1,20 @@
 import { formatRupiah } from '@/helpers';
+import { WHITE, SLATE_200, SLATE_500, SLATE_900 } from '@/theme';
 
-const metrics = (totalPenjualan, jumlahTransaksi, pesananAktif) => [
-    { value: formatRupiah(totalPenjualan), label: 'Total Penjualan Hari Ini' },
-    { value: jumlahTransaksi,             label: 'Jumlah Transaksi' },
-    { value: pesananAktif,                label: 'Pesanan Aktif' },
+const metrics = (totalSales, transactionCount, activeOrders) => [
+    { value: formatRupiah(totalSales), label: 'Total Penjualan Hari Ini' },
+    { value: transactionCount,         label: 'Jumlah Transaksi' },
+    { value: activeOrders,             label: 'Pesanan Aktif' },
 ];
 
-export default function StatBar({ totalPenjualan, jumlahTransaksi, pesananAktif }) {
+export default function StatBar({ totalSales, transactionCount, activeOrders }) {
     return (
         <div style={{ display: 'flex', gap: 20, marginBottom: 24 }}>
-            {metrics(totalPenjualan, jumlahTransaksi, pesananAktif).map((m, i) => (
+            {metrics(totalSales, transactionCount, activeOrders).map((m, i) => (
                 <div key={i} style={{
                     flex: 1,
-                    background: '#FFFFFF',
-                    border: '1px solid #E2E8F0',
+                    background: WHITE,
+                    border: `1px solid ${SLATE_200}`,
                     borderRadius: 16,
                     padding: 20,
                     display: 'flex',
@@ -24,13 +25,13 @@ export default function StatBar({ totalPenjualan, jumlahTransaksi, pesananAktif 
                     <div style={{
                         fontSize: 28,
                         fontWeight: 700,
-                        color: '#0F172A',
+                        color: SLATE_900,
                         letterSpacing: '-1px',
                         lineHeight: 1,
                     }}>
                         {m.value}
                     </div>
-                    <div style={{ fontSize: 13, fontWeight: 500, color: '#64748B' }}>
+                    <div style={{ fontSize: 13, fontWeight: 500, color: SLATE_500 }}>
                         {m.label}
                     </div>
                 </div>

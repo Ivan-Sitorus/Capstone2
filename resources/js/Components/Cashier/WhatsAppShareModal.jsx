@@ -27,7 +27,7 @@ export default function WhatsAppShareModal({ isOpen, onClose, order, onSkip }) {
         setError('');
         try {
             const { data } = await axios.post(
-                route('kasir.pesanan.whatsapp-link', { order: order.id }),
+                route('kasir.order.whatsapp-link', { order: order.id }),
                 { phone },
             );
             window.open(data.wa_link, '_blank');

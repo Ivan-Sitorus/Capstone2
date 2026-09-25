@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Coffee, Plus } from 'lucide-react';
 import { formatRupiah } from '@/helpers';
+import { WHITE, WARM_BORDER, WARM_BG, WARM_ICON, WARM_TEXT, WARM_TEXT_MUTED, BRAND_ORANGE, BRAND_ORANGE_DARK } from '@/theme';
 
 export default function MenuCard({ menu, onAdd }) {
     const [pressing, setPressing] = useState(false);
@@ -11,15 +12,15 @@ export default function MenuCard({ menu, onAdd }) {
 
     return (
         <div style={{
-            background: '#FFFFFF',
+            background: WHITE,
             borderRadius: 18,
-            border: '1px solid #EDE8E2',
+            border: `1px solid ${WARM_BORDER}`,
             overflow: 'hidden',
             boxShadow: '0 4px 14px rgba(45,32,22,0.06)',
         }}>
             {/* Image placeholder */}
             <div style={{
-                background: '#F5F0EB',
+                background: WARM_BG,
                 height: 110,
                 borderRadius: '12px 12px 0 0',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -31,7 +32,7 @@ export default function MenuCard({ menu, onAdd }) {
                         alt={menu.name}
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
-                    : <Coffee size={32} color="#B5A898" />
+                    : <Coffee size={32} color={WARM_ICON} />
                 }
             </div>
 
@@ -41,7 +42,7 @@ export default function MenuCard({ menu, onAdd }) {
                 display: 'flex', flexDirection: 'column', gap: 6,
             }}>
                 <div style={{
-                    fontSize: 14, fontWeight: 700, color: '#2D2016',
+                    fontSize: 14, fontWeight: 700, color: WARM_TEXT,
                     fontFamily: '"DM Sans", system-ui, sans-serif',
                     lineHeight: 1.3,
                 }}>
@@ -49,12 +50,12 @@ export default function MenuCard({ menu, onAdd }) {
                 </div>
 
                 {menu.is_student_discount && menu.student_price && (
-                    <div style={{ fontSize: 11, color: '#8C7B6B', textDecoration: 'line-through' }}>
+                    <div style={{ fontSize: 11, color: WARM_TEXT_MUTED, textDecoration: 'line-through' }}>
                         {formatRupiah(menu.price)}
                     </div>
                 )}
 
-                <div style={{ fontSize: 13, fontWeight: 600, color: '#E8763A' }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: BRAND_ORANGE }}>
                     {formatRupiah(displayPrice)}
                 </div>
 
@@ -66,8 +67,8 @@ export default function MenuCard({ menu, onAdd }) {
                     onMouseLeave={() => setPressing(false)}
                     style={{
                         width: '100%', height: 34,
-                        background: pressing ? '#D0682F' : '#E8763A',
-                        color: '#FFFFFF', border: 'none', borderRadius: 14,
+                        background: pressing ? BRAND_ORANGE_DARK : BRAND_ORANGE,
+                        color: WHITE, border: 'none', borderRadius: 14,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         gap: 6, fontSize: 12, fontWeight: 700, cursor: 'pointer',
                         boxShadow: '0 2px 8px rgba(232,118,58,0.22)',

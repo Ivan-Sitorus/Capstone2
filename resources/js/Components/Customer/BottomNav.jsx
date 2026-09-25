@@ -1,18 +1,19 @@
 import { Link } from '@inertiajs/react';
 import { Home, ShoppingCart, Clock } from 'lucide-react';
 import useCart from '@/Hooks/useCart';
+import { WHITE, INK, STONE_400, AMBER_600 } from '@/theme';
 
 const F = '"Inter", system-ui, sans-serif';
 
-function getRiwayatHref() {
+function getHistoryHref() {
     try {
         const saved = sessionStorage.getItem('w9_customer');
         if (saved) {
             const data = JSON.parse(saved);
-            if (data?.phone) return route('customer.riwayat', { phone: data.phone });
+            if (data?.phone) return route('customer.history', { phone: data.phone });
         }
     } catch (_) {}
-    return route('customer.riwayat');
+    return route('customer.history');
 }
 
 export default function BottomNav({ activeTab }) {
@@ -21,7 +22,7 @@ export default function BottomNav({ activeTab }) {
     const TABS = [
         { key: 'menu',    label: 'Menu',      Icon: Home,         href: route('customer.menu') },
         { key: 'cart',    label: 'Keranjang', Icon: ShoppingCart, href: route('customer.cart') },
-        { key: 'riwayat', label: 'Riwayat',   Icon: Clock,        href: getRiwayatHref() },
+        { key: 'riwayat', label: 'Riwayat',   Icon: Clock,        href: getHistoryHref() },
     ];
 
     return (
@@ -32,7 +33,7 @@ export default function BottomNav({ activeTab }) {
             transform:       'translateX(-50%)',
             width:           '100%',
             maxWidth:        430,
-            background:      '#FFFFFF',
+            background:      WHITE,
             borderRadius:    '20px 20px 0 0',
             boxShadow:       '0 -2px 16px rgba(28,25,23,0.08)',
             zIndex:          100,
@@ -69,7 +70,7 @@ export default function BottomNav({ activeTab }) {
                                 width:           active ? 44 : 32,
                                 height:          active ? 32 : 32,
                                 borderRadius:    10,
-                                background:      active ? '#2C2A27' : 'transparent',
+                                background:      active ? INK : 'transparent',
                                 display:         'flex',
                                 alignItems:      'center',
                                 justifyContent:  'center',
@@ -78,7 +79,7 @@ export default function BottomNav({ activeTab }) {
                             }}>
                                 <Icon
                                     size={18}
-                                    color={active ? '#FFFFFF' : '#A8A29E'}
+                                    color={active ? WHITE : STONE_400}
                                     strokeWidth={active ? 2.2 : 1.75}
                                 />
                                 {showBadge && (
@@ -86,8 +87,8 @@ export default function BottomNav({ activeTab }) {
                                         position:       'absolute',
                                         top:            -4,
                                         right:          -4,
-                                        background:     '#D97706',
-                                        color:          '#FFFFFF',
+                                        background:     AMBER_600,
+                                        color:          WHITE,
                                         borderRadius:   '50%',
                                         width:          15,
                                         height:         15,
@@ -97,7 +98,7 @@ export default function BottomNav({ activeTab }) {
                                         display:        'flex',
                                         alignItems:     'center',
                                         justifyContent: 'center',
-                                        border:         '1.5px solid #FFFFFF',
+                                        border:         `1.5px solid ${WHITE}`,
                                     }}>
                                         {count > 9 ? '9+' : count}
                                     </span>
@@ -108,7 +109,7 @@ export default function BottomNav({ activeTab }) {
                             <span style={{
                                 fontSize:      10,
                                 fontWeight:    active ? 600 : 400,
-                                color:         active ? '#2C2A27' : '#A8A29E',
+                                color:         active ? INK : STONE_400,
                                 letterSpacing: '0.01em',
                                 lineHeight:    1,
                             }}>

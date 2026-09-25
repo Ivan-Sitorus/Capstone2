@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import BottomNav from '@/Components/Customer/BottomNav';
+import { ORANGE_100, ORANGE_200, ORANGE_700 } from '@/theme';
 
 export default function CustomerLayout({ children, activeTab = 'menu', showBottomNav = true }) {
     const { flash } = usePage().props;
@@ -36,12 +37,12 @@ export default function CustomerLayout({ children, activeTab = 'menu', showBotto
                     transform: 'translateX(-50%)',
                     width: 'calc(100% - 32px)',
                     maxWidth: 398,
-                    background: '#FEF3EC',
-                    border: '1px solid #F0C4A0',
+                    background: ORANGE_100,
+                    border: `1px solid ${ORANGE_200}`,
                     borderRadius: 14,
                     padding: '12px 16px',
                     fontSize: 13,
-                    color: '#C05A1A',
+                    color: ORANGE_700,
                     fontFamily: 'Outfit, system-ui, sans-serif',
                     boxShadow: '0 4px 16px rgba(45,32,22,0.12)',
                     zIndex: 9999,

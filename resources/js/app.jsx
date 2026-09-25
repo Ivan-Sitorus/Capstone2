@@ -2,6 +2,7 @@ import './bootstrap';
 import { createInertiaApp } from '@inertiajs/react';
 import { createRoot } from 'react-dom/client';
 import { route } from 'ziggy-js';
+import { ORANGE } from '@/theme';
 import '../css/app.css';
 
 // Make route() available globally (used in components)
@@ -14,5 +15,5 @@ createInertiaApp({
     setup({ el, App, props }) {
         createRoot(el).render(<App {...props} />);
     },
-    progress: { color: '#E8692A' },
+    progress: { color: ORANGE },
 });
