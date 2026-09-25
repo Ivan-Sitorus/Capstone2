@@ -46,8 +46,8 @@ class UserTable
                 SelectFilter::make('role')
                     ->label('Role')
                     ->options([
-                        'admin' => 'Admin',
-                        'cashier' => 'Kasir',
+                        UserRole::Admin->value => 'Admin',
+                        UserRole::Cashier->value => 'Kasir',
                     ]),
                 Filter::make('created_range')
                     ->label('Rentang Tanggal Daftar')

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\AsosiatifMenuResource\Pages;
 
+use App\Enums\DataminingRunStatus;
 use App\Filament\Resources\AsosiatifMenuResource;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\ViewRecord;
@@ -30,18 +31,8 @@ class ViewAsosiatifMenu extends ViewRecord
                     TextEntry::make('status')
                         ->label('Status')
                         ->badge()
-                        ->formatStateUsing(fn (?string $state): string => match ($state) {
-                            'completed' => 'Selesai',
-                            'failed' => 'Gagal',
-                            'running' => 'Diproses',
-                            default => (string) $state,
-                        })
-                        ->color(fn (?string $state): string => match ($state) {
-                            'completed' => 'success',
-                            'failed' => 'danger',
-                            'running' => 'warning',
-                            default => 'gray',
-                        }),
+                        ->formatStateUsing(fn (?string $state): string => DataminingRunStatus::tryFrom($state)?->label() ?? (string) $state)
+                        ->color(fn (?string $state): string => DataminingRunStatus::tryFrom($state)?->color() ?? 'gray'),
                     TextEntry::make('rentang')
                         ->label('Rentang Data')
                         ->state(fn (): string => ($this->record->parameters['date_from'] ?? '-') . ' s/d ' . ($this->record->parameters['date_to'] ?? '-')),

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\UserResource\Forms;
 
+use App\Enums\UserRole;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -31,12 +32,12 @@ class UserForm
             Select::make('role')
                 ->label('Role')
                 ->options([
-                    'admin' => 'Admin',
-                    'cashier' => 'Kasir',
+                    UserRole::Admin->value => 'Admin',
+                    UserRole::Cashier->value => 'Kasir',
                 ])
                 ->required()
                 ->native(false)
-                ->default('cashier'),
+                ->default(UserRole::Cashier->value),
         ]);
     }
 }
