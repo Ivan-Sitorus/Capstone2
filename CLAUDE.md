@@ -1,11 +1,11 @@
-# CLAUDE.md — POS Cafe W9 STIE Totalwin
-# FASE AKTIF: Modul Transaksi (Pelanggan + Kasir)
+# CLAUDE.md — POSMine (POSMine)
+# FASE AKTIF: Transaksi (Pelanggan + Kasir) + Panel Admin (Filament) + Data Mining
 
 ## Gambaran Proyek
 
-Sistem Point of Sale (POS) berbasis web PWA untuk W9 Cafe STIE Totalwin Semarang.
-Fase ini mencakup modul Pelanggan (mobile PWA) & Kasir (desktop web).
-Modul Admin, Inventori, Data Mining dikerjakan di fase terpisah.
+Sistem Point of Sale (POS) berbasis web PWA untuk kafe (studi kasus POSMine STIE Totalwin Semarang).
+**Nama software:** POSMine.
+Fase ini mencakup modul Pelanggan (mobile PWA), Kasir (desktop web), Panel Admin (Filament v5), dan Data Mining (FastAPI).
 
 - **Dokumen Referensi:** C100.S2T25K09 (Proposal Capstone)
 - **Tim:** Ruben (Data Mining), Ivan (Fullstack Transaction), Nio (Fullstack Inventory)
@@ -17,22 +17,34 @@ Modul Admin, Inventori, Data Mining dikerjakan di fase terpisah.
 
 | Layer | Teknologi |
 |---|---|
-| Framework Backend | Laravel 13.8 |
-| Bahasa | PHP 8.5.6 |
+| Framework Backend | Laravel 13 |
+| Bahasa | PHP 8.5 |
+| Panel Admin | Filament v5 (Livewire) |
 | Database Utama | PostgreSQL 18 |
 | Database Offline | IndexedDB (browser, via `idb`) |
 | ORM | Eloquent |
-| Auth | Laravel Sanctum (session-based, multi-role) |
+| Auth | Session-based multi-guard (web/admin) |
 | SPA Bridge | Inertia.js v2 |
-| UI Library | React 18 |
-| CSS Framework | Bootstrap 5 |
+| UI Library | React 19 |
+| CSS Framework | Bootstrap 5 + Tailwind 4 |
 | State Management | Zustand (cart) |
-| Build Tool | Vite |
-| Web Server | Nginx |
-| Deployment | Docker (PHP-FPM + NGINX + Supervisor) |
+| Build Tool | Vite 7 |
+| Web Server | FrankenPHP / Nginx |
+| Deployment | Docker (FrankenPHP) + Vercel (opsional) |
 | Payment | Manual (Cash / QRIS) |
+| Data Mining | Python 3.13 + FastAPI + scikit-learn + Prophet |
 
-> **Data Mining (FastAPI + Colab):** Di-skip untuk fase ini.
+> **Data Mining:** Terintegrasi — FastAPI di `datamining/`, dipanggil `App\Services\DataMiningRunner`, hasil disimpan di tabel `datamining_runs`.
+
+---
+
+## Panel Admin (Filament v5)
+
+Panel `/admin` (guard `admin`; hanya role admin **dan** status `active` yang boleh masuk) berisi:
+Dashboard (filter rentang tanggal), Menu & Kategori, Bahan Baku (+batch/riwayat), Penyesuaian Stok, Pesanan, Piutang, QR Code Meja (token opaque `qr_token`), Riwayat Kasir, Akun Staff (status Aktif/Nonaktif), Pengaturan Struk & WhatsApp (`/admin/pengaturan-struk-dan-whatsapp`), dan 5 halaman Data Mining (prediksi/klasterisasi menu & bahan baku, asosiasi menu).
+
+Aturan tampilan admin: label Bahasa Indonesia, tanggal `d M Y` atau `d M Y, H:i:s`, rentang data `d M Y s/d d M Y`, durasi `N detik`, tanpa bulk action, tombol aksi `Buat …`. Date picker dashboard & data mining memakai `native(true)` (bisa diklik dan diketik).
+
 
 ---
 
@@ -142,7 +154,7 @@ export const summarizeItems = (items) =>
 │  background: #1A2332          │  background: #F8F9FA             │
 │                               │  padding: 24px                   │
 │  ┌─────────────────────────┐  │  ┌──────────────────────────┐    │
-│  │ [w9] W9 Cafe            │  │  │ white card               │    │
+│  │ [posmine] POSMine            │  │  │ white card               │    │
 │  │ (logo area, #0F1621)    │  │  │ border-radius: 12px      │    │
 │  ├─────────────────────────┤  │  │ padding: 24px            │    │
 │  │ • Dashboard             │  │  │                          │    │
@@ -160,7 +172,7 @@ export const summarizeItems = (items) =>
 **Sidebar detail:**
 - Background: `#1A2332`
 - Logo area background: `#0F1621` (lebih gelap), padding 20px 16px, border-bottom `#2A3441`
-- Logo: kotak rounded 32px bg `#2A3441` + teks "w9" putih bold 12px, diikuti "W9 Cafe" putih 15px semibold
+- Logo: kotak rounded 32px bg `#2A3441` + teks "posmine" putih bold 12px, diikuti "POSMine" putih 15px semibold
 - Nav item default: color `#9AA3AF`, padding 10px 12px, border-radius 8px, font 14px
 - Nav item **active**: background `#3B6FD4`, color white
 - Nav item hover: background `rgba(255,255,255,0.05)`
@@ -179,8 +191,8 @@ export const summarizeItems = (items) =>
 │   KIRI (#1A2332)     │   KANAN (#FFFFFF)              │
 │   50vw               │   50vw                         │
 │                      │                                │
-│   [logo W9]          │   Masuk ke Akun Anda          │
-│   W9 Cafe            │   subtitle gray                │
+│   [logo POSMine]          │   Masuk ke Akun Anda          │
+│   POSMine            │   subtitle gray                │
 │   Sistem Point of Sale│                               │
 │                      │   Email [_______________]      │
 │                      │   Kata Sandi [___________]     │
@@ -191,8 +203,8 @@ export const summarizeItems = (items) =>
 
 **Detail kiri:**
 - Background `#1A2332`, flex center
-- Logo: kotak rounded 16px (80px × 80px), bg `#2A3441`, icon "w9" script putih
-- "W9 Cafe" — putih, 28px bold, margin-top 16px
+- Logo: kotak rounded 16px (80px × 80px), bg `#2A3441`, icon "posmine" script putih
+- "POSMine" — putih, 28px bold, margin-top 16px
 - "Sistem Point of Sale" — `#9AA3AF`, 14px
 
 **Detail kanan:**
@@ -310,7 +322,7 @@ export const summarizeItems = (items) =>
     - Teks: "BAYAR {formatRupiah(total)}"
     - Disabled & opacity 0.5 jika cart kosong
 
-**File:** `resources/js/Pages/Cashier/PesananBaru.jsx`
+**File:** `resources/js/Pages/Cashier/NewOrder.jsx`
 
 ---
 
@@ -347,7 +359,7 @@ Per card:
 - Card: bg white, border 1px `#E9ECEF`, border-radius 12px, padding 16px, margin-bottom 12px
 - Tombol "Detail": border 1px `#D1D5DB`, bg white, color `#374151`, border-radius 6px, padding 5px 14px, font 13px
 
-**File:** `resources/js/Pages/Cashier/PesananAktif.jsx`
+**File:** `resources/js/Pages/Cashier/ActiveOrders.jsx`
 
 ---
 
@@ -376,7 +388,7 @@ Per card:
 - Row: border-bottom 1px `#E9ECEF`
 - Row hover: bg `#F8F9FA`
 
-**File:** `resources/js/Pages/Cashier/RiwayatPesanan.jsx`
+**File:** `resources/js/Pages/Cashier/OrderHistory.jsx`
 
 ---
 
@@ -451,7 +463,7 @@ Per card:
 - **Aksi jika Menunggu:** tombol teks "Setujui" (color `#28A745`, no bg, no border) + "Tolak" (color `#DC3545`) — gap 8px
 - **Aksi lainnya:** link teks "Detail" (color `#3B6FD4`)
 
-**File:** `resources/js/Pages/Cashier/VerifikasiAkun.jsx`
+**File:** `resources/js/Pages/Cashier/(dihapus — fitur verifikasi mahasiswa belum diimplementasikan)`
 
 ---
 
@@ -478,7 +490,7 @@ Per card:
   - Input: bg `#F8F9FA`, border 1px `#E9ECEF`, border-radius 8px, padding 11px 16px, font 14px, disabled/read-only
   - Fields: Nama Lengkap | Email | Peran / Role | Terdaftar Sejak
 
-**File:** `resources/js/Pages/Cashier/Profil.jsx`
+**File:** `resources/js/Pages/Cashier/Profile.jsx`
 
 ---
 
@@ -617,7 +629,7 @@ Per card (bg white, border-radius 12px, padding 16px, margin-bottom 10px, box-sh
 - Badge "Selesai": bg `#E8F5E9`, color `#28A745`, border-radius 50px
 - Tombol "Detail": bg `#E8692A`, color white, border-radius 8px, padding 6px 16px, font 13px
 
-**File:** `resources/js/Pages/Customer/Riwayat/Index.jsx`
+**File:** `resources/js/Pages/Customer/History/Index.jsx`
 
 ---
 
@@ -628,8 +640,8 @@ Per card (bg white, border-radius 12px, padding 16px, margin-bottom 10px, box-sh
 **Background:** `#FAFAFA`, padding 24px, centered
 
 **Logo area (text-center, margin-bottom 24px):**
-- Kotak rounded 16px (80px × 80px), bg `#1A2332`, teks script "w9" putih — atau gunakan gambar logo
-- "W9 Cafe" — 22px bold, margin-top 12px
+- Kotak rounded 16px (80px × 80px), bg `#1A2332`, teks script "posmine" putih — atau gunakan gambar logo
+- "POSMine" — 22px bold, margin-top 12px
 - "Pemesanan Online" — 14px gray
 
 **Info box mahasiswa (bg `#FFF0E8`, border-radius 12px, padding 14px 16px, margin-bottom 20px):**
@@ -673,9 +685,9 @@ pos-cafe/
 │   │   │   │   └── CustomerAuthController.php
 │   │   │   ├── Cashier/
 │   │   │   │   ├── CashierDashboardController.php
-│   │   │   │   ├── CashierPesananBaruController.php
-│   │   │   │   ├── CashierPesananAktifController.php
-│   │   │   │   ├── CashierRiwayatController.php
+│   │   │   │   ├── CashierNewOrderController.php
+│   │   │   │   ├── CashierActiveOrdersController.php
+│   │   │   │   ├── CashierOrderHistoryController.php
 │   │   │   │   ├── CashierOrderController.php
 │   │   │   │   └── CashierVerifikasiController.php
 │   │   │   └── Api/
@@ -715,11 +727,11 @@ pos-cafe/
 │       │   │       └── Index.jsx                ← C3: riwayat pesanan
 │       │   └── Cashier/
 │       │       ├── Dashboard.jsx                ← K2: dashboard
-│       │       ├── PesananBaru.jsx              ← K3: POS interface
-│       │       ├── PesananAktif.jsx             ← K4: pesanan aktif
-│       │       ├── RiwayatPesanan.jsx           ← K5: riwayat
-│       │       ├── VerifikasiAkun.jsx           ← K7: verifikasi mahasiswa
-│       │       ├── Profil.jsx                   ← K8: profil kasir
+│       │       ├── NewOrder.jsx              ← K3: POS interface
+│       │       ├── ActiveOrders.jsx             ← K4: pesanan aktif
+│       │       ├── OrderHistory.jsx           ← K5: riwayat
+│       │       ├── (dihapus — fitur verifikasi mahasiswa belum diimplementasikan)           ← K7: verifikasi mahasiswa
+│       │       ├── Profile.jsx                   ← K8: profil kasir
 │       │       └── Order/
 │       │           └── Show.jsx                 ← K6: detail pesanan
 │       ├── Components/
@@ -766,60 +778,51 @@ pos-cafe/
 
 **users** *(modifikasi default Laravel)*
 ```sql
-id, name, email, password,
-role                 ENUM('customer','cashier','admin') DEFAULT 'customer',
-nim                  VARCHAR(20) NULL,
-phone                VARCHAR(20) NULL,
-is_student_verified  BOOLEAN DEFAULT false,
-remember_token, timestamps
+id, name, email UNIQUE, role VARCHAR, status VARCHAR DEFAULT 'active',
+email_verified_at TIMESTAMP NULL, password, remember_token, timestamps
 ```
+> `role` & `status` disimpan sebagai string; di PHP memakai enum `UserRole` & `UserStatus`.
 
-**categories** — `id, name(100), slug UNIQUE, is_active BOOL DEFAULT true, timestamps`
+**menu_categories** (dipakai model `Category`) — `id, name, timestamps`
 
 **menus**
 ```sql
-id, category_id FK→categories CASCADE,
-name, slug UNIQUE, description TEXT NULL,
-price DECIMAL(10,2), image VARCHAR NULL,
-is_available BOOL DEFAULT true,
-is_student_discount BOOL DEFAULT false,
-student_price DECIMAL(10,2) NULL,
-timestamps
+id, category_id FK→menu_categories RESTRICT,
+name, price INT, cost_price INT DEFAULT 0, discounted_price INT NULL,
+image VARCHAR NULL, status VARCHAR, timestamps, softDeletes
+```
+> `cost_price` = Biaya Modal (hard-saved). Nilainya di-snapshot ke `order_items.cost_price` saat transaksi agar keuntungan historis tidak ikut berubah ketika biaya diubah.
+
+**ingredients / ingredient_batches / menu_ingredients**
+```sql
+ingredients        : id, name, unit, low_stock_threshold, batch_mode, timestamps, softDeletes
+ingredient_batches : id, ingredient_id FK, quantity, initial_quantity, total_cost, expiry_date, received_at,
+                     batch_code, allow_expired_usage, supplier_name, payment_status, timestamps, softDeletes
+menu_ingredients   : id, menu_id FK, ingredient_id FK NULL, quantity_used, unit
 ```
 
 **cafe_tables**
 ```sql
-id, table_number INT UNIQUE,
-qr_code VARCHAR(500) UNIQUE,
-is_available BOOL DEFAULT true, timestamps
+id, table_number INT UNIQUE, qr_token VARCHAR(64) NULL UNIQUE, qr_code VARCHAR UNIQUE, timestamps, softDeletes
 ```
+> QR memakai `qr_token` (opaque, anti-enumerasi), bukan id sekuensial.
 
 **orders**
 ```sql
-id, order_code VARCHAR(50) UNIQUE,
-table_id     FK→cafe_tables NULL RESTRICT,
-customer_id  FK→users NULL SET NULL,
-cashier_id   FK→users NULL SET NULL,
-status       ENUM('pending','confirmed','preparing','ready','completed','cancelled') DEFAULT 'pending',
-order_type   ENUM('qr','cashier') DEFAULT 'qr',
-payment_status ENUM('unpaid','paid') DEFAULT 'unpaid',
-total_amount DECIMAL(15,2) DEFAULT 0,
-notes TEXT NULL, timestamps
-INDEX: (status), (created_at)
+id, customer_name NULL, phone NULL, order_code UNIQUE,
+table_id FK→cafe_tables NULL RESTRICT,
+cashier_id FK→users NULL, processed_by FK→users NULL,
+status VARCHAR, order_type VARCHAR, uuid UUID NULL,
+qris_resubmit_attempts INT DEFAULT 0, qris_status VARCHAR NULL,
+total_amount BIGINT, payment_method VARCHAR NULL, payment_proof VARCHAR NULL, rejection_note VARCHAR NULL,
+processed_at, completed_at, cancelled_at, timestamps
 ```
 
-**order_items** — `id, order_id FK CASCADE, menu_id FK RESTRICT, quantity INT, unit_price DECIMAL(15,2), subtotal DECIMAL(15,2), notes VARCHAR NULL, timestamps`
+**order_items** — `id, order_id FK CASCADE, menu_id FK RESTRICT, item_position INT, quantity INT, unit_price INT, cost_price INT, subtotal BIGINT, timestamps`
 
-**payments**
-```sql
-id, order_id FK CASCADE,
-payment_method  ENUM('qris','ewallet','cash','transfer'),
-payment_gateway ENUM('manual'),
-transaction_id  VARCHAR NULL UNIQUE,
-amount DECIMAL(15,2),
-status ENUM('pending','success','failed') DEFAULT 'pending',
-paid_at TIMESTAMP NULL, timestamps
-```
+**order_payments** — `id, order_id FK CASCADE, amount BIGINT, payment_date TIMESTAMP, payment_method VARCHAR, timestamps`
+
+**datamining_runs** — `id, type VARCHAR, status VARCHAR DEFAULT 'running', parameters JSON, payload JSON, error TEXT NULL, timestamps`
 
 ---
 
@@ -869,7 +872,7 @@ export default function StatusBadge({ status }) {
 ## Environment Variables
 
 ```env
-APP_NAME="W9 Cafe POS"
+APP_NAME="POSMine POS"
 APP_ENV=local
 APP_KEY=
 APP_PORT=8080
@@ -892,12 +895,10 @@ VITE_APP_URL="${APP_URL}"
 1. **Kasir**: desktop only, sidebar navy `#1A2332`, konten dalam white card `border-radius 12px`
 2. **Pelanggan**: mobile-first, max-width 430px, bottom nav fixed, warna orange `#E8692A`
 3. **Login kasir**: email + password → tombol biru `#3B6FD4`
-4. **Login pelanggan**: nama lengkap (username) + NIM (password) → tombol orange, khusus mahasiswa dengan diskon 10%
-5. **Verifikasi mahasiswa**: kasir approve sebelum diskon aktif di `is_student_verified`
+4. **Login pelanggan**: nama lengkap (username) + NIM (password) → tombol orange. Saat ini masih stub (redirect ke menu); verifikasi/diskon mahasiswa belum aktif.
+5. **Status staff**: kolom `users.status` (`active`/`inactive`) — akun nonaktif tidak bisa login ke kasir maupun panel admin.
 6. **POS K3**: kasir pilih menu dari grid → keranjang panel kanan → modal bayar → selesai
 7. **Cart pelanggan**: Zustand (runtime) + IndexedDB (offline persistence), sync via `useCart.js`
-8. **Polling**: halaman status & kanban kasir → `router.reload({ only: ['...'] })` tiap 5-10 detik
-9. **formatRupiah**: gunakan dari `@/helpers.js` — TIDAK boleh hardcode format angka manual
-10. **QR Code**: statis per meja, format `{APP_URL}/order?table={id}`
-
-11. Untuk UI dapat dilihata dari "C:\Users\sitor\OneDrive\Documents\capstone.pen"
+8. **Polling**: halaman status & kanban kasir → `router.reload({ only: ['...'] })` atau hook `usePolling` tiap 5-10 detik
+9. **Format**: `formatRupiah` dkk dari `@/helpers.js`; warna dari `@/theme.js` — TIDAK boleh hardcode format angka/warna manual
+10. **QR Code**: per meja, format `{APP_URL}/order?table={qr_token}` (token opaque, bukan id sekuensial)
