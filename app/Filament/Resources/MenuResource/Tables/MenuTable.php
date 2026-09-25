@@ -36,12 +36,12 @@ class MenuTable
                     ->label("Kategori Menu")
                     ->sortable()
                     ->searchable(),
-                TextColumn::make("price")
-                    ->label("Harga")
+                TextColumn::make("cost_price")
+                    ->label("Biaya Modal")
                     ->formatStateUsing(fn ($state) => "Rp".number_format($state, 0, ",", "."))
                     ->sortable(),
-                TextColumn::make("cost_price")
-                    ->label("Harga Modal")
+                TextColumn::make("price")
+                    ->label("Harga")
                     ->formatStateUsing(fn ($state) => "Rp".number_format($state, 0, ",", "."))
                     ->sortable(),
                 TextColumn::make("discounted_price")

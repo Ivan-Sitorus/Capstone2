@@ -58,6 +58,7 @@ class PlaceCashierOrderAction
                         'item_position' => $position,
                         'quantity' => $item['quantity'],
                         'unit_price' => $unitPrice,
+                        'cost_price' => (int) $menu->cost_price,
                         'subtotal' => $subtotal,
                         'created_at' => now(),
                         'updated_at' => now(),

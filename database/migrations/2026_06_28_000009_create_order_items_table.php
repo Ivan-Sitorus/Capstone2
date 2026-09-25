@@ -15,6 +15,7 @@ return new class extends Migration
             $table->integer('item_position')->default(0);
             $table->integer('quantity');
             $table->integer('unit_price');
+            $table->integer('cost_price')->default(0);
             $table->unsignedBigInteger('subtotal');
             $table->timestamps();
 

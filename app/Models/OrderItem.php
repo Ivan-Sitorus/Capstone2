@@ -13,6 +13,7 @@ class OrderItem extends Model
         'item_position',
         'quantity',
         'unit_price',
+        'cost_price',
         'subtotal',
     ];
 
@@ -21,6 +22,7 @@ class OrderItem extends Model
         return [
             'item_position' => 'integer',
             'unit_price' => 'integer',
+            'cost_price' => 'integer',
             'subtotal' => 'integer',
         ];
     }

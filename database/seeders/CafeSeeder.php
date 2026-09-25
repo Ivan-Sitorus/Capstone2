@@ -334,6 +334,7 @@ class CafeSeeder extends Seeder
     private array $menuIds = [];
     private array $menuNormalPrice = [];
     private array $menuStudentPrice = [];
+    private array $menuCostPrice = [];
     private array $menuIngredientsByName = [];
     private array $batchCache = [];
     private array $batchPos = [];
@@ -486,6 +487,7 @@ class CafeSeeder extends Seeder
             $this->menuIds[$name] = $menu->id;
             $this->menuNormalPrice[$name] = $def['price'];
             $this->menuStudentPrice[$name] = $def['price'] - $def['cashback'];
+            $this->menuCostPrice[$name] = (int) round($def['price'] * 0.6);
             $this->menuIngredientsByName[$name] = $def['ingredients'];
         }
     }
@@ -685,6 +687,7 @@ class CafeSeeder extends Seeder
                     'menu_name' => $menuName,
                     'quantity' => $qty,
                     'unit_price' => $unitPrice,
+                    'cost_price' => (int) round($this->menuCostPrice[$menuName] * $this->rng->float(0.9, 1.1)),
                     'subtotal' => $subtotal,
                 ];
             }
@@ -778,6 +781,7 @@ class CafeSeeder extends Seeder
                     'item_position' => $position++,
                     'quantity' => $item['quantity'],
                     'unit_price' => $item['unit_price'],
+                    'cost_price' => $item['cost_price'],
                     'subtotal' => $item['subtotal'],
                     'created_at' => $order['created_at'],
                     'updated_at' => $order['created_at'],

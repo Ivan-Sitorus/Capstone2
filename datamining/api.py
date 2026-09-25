@@ -80,7 +80,7 @@ def fetch_order_data(date_from: Optional[str] = None,
             o.created_at::date                                          AS "Tanggal",
             m.name                                                      AS "Nama Item",
             SUM(oi.quantity)::float                                     AS "Jumlah",
-            SUM(oi.subtotal - COALESCE(m.cost_price, 0) * oi.quantity)::float AS "Keuntungan"
+            SUM(oi.subtotal - COALESCE(oi.cost_price, 0) * oi.quantity)::float AS "Keuntungan"
         FROM order_items oi
         JOIN orders o ON o.id = oi.order_id
         JOIN menus  m ON m.id = oi.menu_id

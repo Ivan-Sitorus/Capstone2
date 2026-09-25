@@ -55,15 +55,15 @@ class MenuForm
                 ->saveUploadedFileUsing(function ($file) {
                     return app(MenuImageService::class)->convertAndStore($file);
                 }),
+            NumericInput::money("cost_price")
+                ->label("Biaya Modal")
+                ->required()
+                ->minValue(0)
+                ->prefix("Rp"),
             NumericInput::money("price")
                 ->label("Harga")
                 ->required()
                 ->minValue(1)
-                ->prefix("Rp"),
-            NumericInput::money("cost_price")
-                ->label("Harga Modal")
-                ->required()
-                ->minValue(0)
                 ->prefix("Rp"),
             Select::make('status')
                 ->label('Status')
