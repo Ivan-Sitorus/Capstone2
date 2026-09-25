@@ -70,8 +70,8 @@ class ReceivableTable
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
-                        'unpaid' => 'Belum Lunas',
-                        'completed' => 'Lunas',
+                        OrderStatus::Unpaid->value => 'Belum Lunas',
+                        OrderStatus::Completed->value => 'Lunas',
                     ]),
                 Filter::make('created_at')
                     ->label('Rentang Waktu')

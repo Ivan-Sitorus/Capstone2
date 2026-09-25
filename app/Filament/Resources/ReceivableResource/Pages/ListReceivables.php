@@ -2,8 +2,10 @@
 
 namespace App\Filament\Resources\ReceivableResource\Pages;
 
+use App\Enums\MenuStatus;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
+use App\Enums\UserRole;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Menu;
@@ -40,7 +42,7 @@ class ListReceivables extends ListRecords
                 ->form([
                     Select::make('cashier_id')
                         ->label('Kasir')
-                        ->options(fn () => User::whereIn('role', ['cashier', 'admin'])->orderBy('name')->pluck('name', 'id'))
+                        ->options(fn () => User::whereIn('role', [UserRole::Cashier->value, UserRole::Admin->value])->orderBy('name')->pluck('name', 'id'))
                         ->default(fn () => auth()->id())
                         ->searchable()
                         ->native(false)
@@ -54,7 +56,7 @@ class ListReceivables extends ListRecords
                         ->schema([
                             Select::make('menu_id')
                                 ->label('Menu')
-                                ->options(fn () => Menu::where('status', 'active')->orderBy('name')->pluck('name', 'id'))
+                                ->options(fn () => Menu::where('status', MenuStatus::Active->value)->orderBy('name')->pluck('name', 'id'))
                                 ->required()
                                 ->searchable()
                                 ->native(false)
@@ -137,7 +139,7 @@ class ListReceivables extends ListRecords
                         $order->orderPayments()->create([
                             'amount' => $data['paid_amount'],
                             'payment_date' => now(),
-                            'payment_method' => 'cash',
+                            'payment_method' => PaymentMethod::Cash->value,
                         ]);
                     }
                 }),

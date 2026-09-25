@@ -4,7 +4,10 @@ namespace App\Filament\Resources\StockResource\Pages;
 
 use App\Enums\BatchMode;
 use App\Enums\AdjustmentType;
+use App\Enums\MovementType;
+use App\Enums\PaymentMethod;
 use App\Enums\PaymentStatus;
+use App\Enums\SourceType;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\StockResource;
 use App\Models\Ingredient;
@@ -149,8 +152,8 @@ class ManageBatches extends Page implements HasTable
                         StockMovement::create([
                             'ingredient_id' => $batch->ingredient_id,
                             'ingredient_batch_id' => $batch->id,
-                            'movement_type' => 'purchase',
-                            'source_type' => 'batch_addition',
+                            'movement_type' => MovementType::Purchase->value,
+                            'source_type' => SourceType::BatchAddition->value,
                             'quantity_before' => 0,
                             'quantity_change' => $batch->quantity,
                             'quantity_after' => $batch->quantity,
@@ -162,7 +165,7 @@ class ManageBatches extends Page implements HasTable
                             $batch->batchPayments()->create([
                                 'amount' => $totalDibayar,
                                 'payment_date' => now(),
-                                'payment_method' => 'cash',
+                                'payment_method' => PaymentMethod::Cash->value,
                             ]);
                         }
 

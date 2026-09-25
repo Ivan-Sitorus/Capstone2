@@ -110,9 +110,9 @@ class RiwayatBayarBatch extends Page implements HasTable
                         Select::make('payment_method')
                             ->label('Metode')
                             ->options([
-                                'cash' => 'Tunai',
+                                PaymentMethod::Cash->value => 'Tunai',
                                 'transfer' => 'Transfer',
-                                'qris' => 'QRIS',
+                                PaymentMethod::Qris->value => 'QRIS',
                             ])
                             ->native(false)
                             ->required(),
@@ -149,12 +149,12 @@ class RiwayatBayarBatch extends Page implements HasTable
                     Select::make('payment_method')
                         ->label('Metode')
                         ->options([
-                            'cash' => 'Tunai',
+                            PaymentMethod::Cash->value => 'Tunai',
                             'transfer' => 'Transfer',
-                            'qris' => 'QRIS',
+                            PaymentMethod::Qris->value => 'QRIS',
                         ])
                         ->native(false)
-                        ->default('cash')
+                        ->default(PaymentMethod::Cash->value)
                         ->required(),
                     DateTimePicker::make('payment_date')
                         ->label('Tanggal')
