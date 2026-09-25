@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Enums\OrderStatus;
+use App\Enums\OrderType;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Menu;
 use App\Models\Order;
@@ -29,7 +30,7 @@ class PlaceCashierOrderAction
                 $order = Order::create([
                     'uuid' => $uuid,
                     'cashier_id' => Auth::id(),
-                    'order_type' => 'cashier',
+                    'order_type' => OrderType::Cashier->value,
                     'payment_method' => $request->payment_method,
                     'customer_name' => $request->customer_name,
                     'status' => OrderStatus::Pending->value,

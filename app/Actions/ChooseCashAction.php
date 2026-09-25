@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ class ChooseCashAction
         }
         DB::transaction(function () use ($order) {
             $order->update([
-                'payment_method' => 'cash',
+                'payment_method' => PaymentMethod::Cash->value,
                 'order_code'     => Order::generateCode(),
             ]);
         });

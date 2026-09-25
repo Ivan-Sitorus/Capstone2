@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -30,7 +31,7 @@ class UploadQrisProofAction
         DB::transaction(function () use ($order, $path) {
             $updates = [
                 'payment_proof'  => $path,
-                'payment_method' => 'qris',
+                'payment_method' => PaymentMethod::Qris->value,
                 'rejection_note' => null,
             ];
             if (!$order->order_code) {

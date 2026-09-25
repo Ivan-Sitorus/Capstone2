@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Models\Order;
 use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
@@ -15,7 +16,7 @@ class ChooseQrisAction
         if ($order->status !== OrderStatus::Pending) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
-        $order->update(['payment_method' => 'qris']);
+        $order->update(['payment_method' => PaymentMethod::Qris->value]);
 
         [$qrisImage, $qrisName] = Cache::remember('qris_settings', 600, fn() => [
             asset('storage/' . (Setting::get('qris_image') ?? '')),
