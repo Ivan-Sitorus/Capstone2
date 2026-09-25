@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Cashier;
 
 use App\Actions\PlaceCashierOrderAction;
+use App\Enums\MenuStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Category;
@@ -11,13 +12,13 @@ use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class CashierPesananBaruController extends Controller
+class CashierNewOrderController extends Controller
 {
     public function index(): Response
     {
         // Cache 5 minutes — menu rarely changes, admin can clear cache when updating menu
         $categories = Cache::remember('menu_categories_cashier', 300, fn () => Category::with([
-            'menus' => fn ($q) => $q->where('status', 'active')->orderBy('name')
+            'menus' => fn ($q) => $q->where('status', MenuStatus::Active->value)->orderBy('name')
                 ->with(['menuIngredients.ingredient.batches' => fn ($q) => $q
                     ->where('quantity', '>', 0)
                     ->where(fn ($q) => $q
@@ -36,7 +37,7 @@ class CashierPesananBaruController extends Controller
             })
         );
 
-        return Inertia::render('Cashier/PesananBaru', ['categories' => $categories]);
+        return Inertia::render('Cashier/NewOrder', ['categories' => $categories]);
     }
 
     public function store(StoreOrderRequest $request, PlaceCashierOrderAction $action): RedirectResponse

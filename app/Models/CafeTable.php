@@ -32,7 +32,7 @@ class CafeTable extends Model
 
     public function getQrCodeUrlAttribute(): string
     {
-        return route('customer.identitas', ['table' => $this->table_number]);
+        return route('customer.identity', ['table' => $this->table_number]);
     }
 
     public function getQrCodeSvgAttribute(): string
@@ -83,13 +83,13 @@ class CafeTable extends Model
     {
         static::creating(function (CafeTable $table) {
             if (empty($table->qr_code)) {
-                $table->qr_code = route('customer.identitas', ['table' => $table->table_number]);
+                $table->qr_code = route('customer.identity', ['table' => $table->table_number]);
             }
         });
 
         static::updating(function (CafeTable $table) {
             if ($table->isDirty('table_number')) {
-                $table->qr_code = route('customer.identitas', ['table' => $table->table_number]);
+                $table->qr_code = route('customer.identity', ['table' => $table->table_number]);
             }
         });
     }

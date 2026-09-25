@@ -80,7 +80,7 @@ class AuthController extends Controller
             return redirect()->to('/admin');
         }
 
-        return redirect()->route('kasir.pesanan-baru');
+        return redirect()->route('kasir.new-order');
     }
 
     public function logout(Request $request): RedirectResponse

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Customer;
 
+use App\Enums\MenuStatus;
 use App\Http\Controllers\Controller;
 use App\Models\CafeTable;
 use App\Models\Category;
@@ -22,7 +23,7 @@ class CustomerMenuController extends Controller
         );
     }
 
-    public function showIdentitas(Request $request): Response
+    public function showIdentity(Request $request): Response
     {
         $table = $this->findTable($request->query('table'));
 
@@ -33,10 +34,10 @@ class CustomerMenuController extends Controller
             }
         }
 
-        return Inertia::render('Customer/Identitas', ['table' => $table]);
+        return Inertia::render('Customer/Identity', ['table' => $table]);
     }
 
-    public function submitIdentitas(Request $request): RedirectResponse
+    public function submitIdentity(Request $request): RedirectResponse
     {
         $request->validate([
             'customer_name' => 'required|string|max:255',
@@ -53,7 +54,7 @@ class CustomerMenuController extends Controller
             return Category::with([
                     'menus' => fn ($q) => $q
                         ->select(['id', 'category_id', 'name', 'price', 'image', 'status'])
-                        ->where('status', 'active')
+                        ->where('status', MenuStatus::Active->value)
                         ->orderBy('name'),
             ])
                 ->select(['id', 'name'])

@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class CashierRiwayatController extends Controller
+class CashierOrderHistoryController extends Controller
 {
     public function index(Request $request): Response
     {
@@ -33,7 +33,7 @@ class CashierRiwayatController extends Controller
                 'status' => $o->status,
             ]);
 
-        return Inertia::render('Cashier/RiwayatPesanan', [
+        return Inertia::render('Cashier/OrderHistory', [
             'orders' => $orders,
             'filters' => $request->only(['search', 'date', 'method']),
         ]);

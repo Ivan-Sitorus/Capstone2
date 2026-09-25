@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Customer;
 
 use App\Actions\PlaceCustomerOrderAction;
 use App\Enums\OrderStatus;
+use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -17,7 +19,7 @@ class CustomerOrderController extends Controller
         return app(PlaceCustomerOrderAction::class)->handle($request);
     }
 
-    public function riwayat(Request $request): Response
+    public function history(Request $request): Response
     {
         // History by phone number from sessionStorage (sent via query param)
         $phone = $request->query('phone');
@@ -31,7 +33,7 @@ class CustomerOrderController extends Controller
                 ->where('phone', $phone)
                 ->whereNot(function ($q) {
                     // Hide QRIS orders without proof that have not been confirmed by cashier
-                    $q->where('payment_method', 'qris')
+                    $q->where('payment_method', PaymentMethod::Qris->value)
                       ->whereNull('payment_proof')
                       ->whereNotIn('status', [OrderStatus::Processing->value, OrderStatus::Completed->value]);
                 })
@@ -46,7 +48,7 @@ class CustomerOrderController extends Controller
                     'created_at'     => $o->created_at->toISOString(),
                     'payment_method' => $o->payment_method,
                     'customer_name'  => $o->customer_name,
-                    'items_summary'  => $o->items
+                    'itemsSummary'  => $o->items
                         ->map(fn($i) => "{$i->quantity}x {$i->menu->name}")
                         ->join(', '),
                     'items' => $o->items->map(fn($i) => [
@@ -57,7 +59,7 @@ class CustomerOrderController extends Controller
                 ])
             : collect();
 
-        return Inertia::render('Customer/Riwayat/Index', ['orders' => $orders]);
+        return Inertia::render('Customer/History/Index', ['orders' => $orders]);
     }
 
     public function status(string $code): Response

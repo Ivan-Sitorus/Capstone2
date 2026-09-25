@@ -16,22 +16,22 @@ class CashierDashboardController extends Controller
     public function index(): Response
     {
         $stats = $this->dashboardService->getTodayStats();
-        $pesananAktif = $this->dashboardService->getActiveOrdersCount();
-        $transaksiTerbaru = $this->dashboardService->getRecentTransactions();
+        $activeOrders = $this->dashboardService->getActiveOrdersCount();
+        $recentTransactions = $this->dashboardService->getRecentTransactions();
 
         return Inertia::render('Cashier/Dashboard', [
-            'totalPenjualan'   => (float) ($stats->total_penjualan ?? 0),
-            'jumlahTransaksi'  => (int)   ($stats->jumlah_transaksi ?? 0),
-            'pesananAktif'     => $pesananAktif,
-            'cashPending'      => (int)   ($stats->cash_pending ?? 0),
-            'qrisPending'      => (int)   ($stats->qris_pending ?? 0),
-            'transaksiTerbaru' => $transaksiTerbaru,
+            'totalSales'        => (float) ($stats->total_penjualan ?? 0),
+            'transactionCount'  => (int)   ($stats->jumlah_transaksi ?? 0),
+            'activeOrders'      => $activeOrders,
+            'cashPending'       => (int)   ($stats->cash_pending ?? 0),
+            'qrisPending'       => (int)   ($stats->qris_pending ?? 0),
+            'recentTransactions' => $recentTransactions,
         ]);
     }
 
-    public function profil(): Response
+    public function profile(): Response
     {
-        return Inertia::render('Cashier/Profil', [
+        return Inertia::render('Cashier/Profile', [
             'user' => auth()->user(),
         ]);
     }

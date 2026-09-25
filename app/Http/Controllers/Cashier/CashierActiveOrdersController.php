@@ -3,13 +3,14 @@
 namespace App\Http\Controllers\Cashier;
 
 use App\Enums\OrderStatus;
+use App\Enums\OrderType;
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Inertia\Inertia;
 use Inertia\Response;
 
-class CashierPesananAktifController extends Controller
+class CashierActiveOrdersController extends Controller
 {
     public function index(): Response
     {
@@ -18,14 +19,14 @@ class CashierPesananAktifController extends Controller
             ->where('status', '!=', OrderStatus::Unpaid->value)
             ->where(function ($q) {
                 // Orders from cashier: always shown
-                $q->where('order_type', 'cashier')
+                $q->where('order_type', OrderType::Cashier->value)
                   // Orders from customer via QR:
-                    ->orWhere(fn ($q2) => $q2->where('order_type', 'qr')
+                    ->orWhere(fn ($q2) => $q2->where('order_type', OrderType::Qr->value)
                         ->where(fn ($q3) =>
                             // Cash: shown as soon as selected
-                            $q3->where('payment_method', 'cash')
+                            $q3->where('payment_method', PaymentMethod::Cash->value)
                                // QRIS: shown when proof is submitted (pending) OR confirmed (processing, proof removed)
-                                ->orWhere(fn ($q4) => $q4->where('payment_method', 'qris')
+                                ->orWhere(fn ($q4) => $q4->where('payment_method', PaymentMethod::Qris->value)
                                     ->where(fn ($q5) => $q5->whereNotNull('payment_proof')
                                         ->orWhere('status', OrderStatus::Processing->value)
                                     )
@@ -51,7 +52,7 @@ class CashierPesananAktifController extends Controller
             'customer_name' => $o->customer_name,
             'table_number' => $o->cafeTable?->table_number,
             'created_at' => $o->created_at->toISOString(),
-            'items_summary' => $o->items->map(fn ($i) => $i->quantity.'x '.$i->menu->name)->join(', '),
+            'itemsSummary' => $o->items->map(fn ($i) => $i->quantity.'x '.$i->menu->name)->join(', '),
             'total_amount' => $o->total_amount,
             'payment_proof' => $o->payment_proof ? asset('storage/'.$o->payment_proof) : null,
             'rejection_note' => $o->rejection_note,
@@ -63,7 +64,7 @@ class CashierPesananAktifController extends Controller
             ]),
         ]);
 
-        return Inertia::render('Cashier/PesananAktif', [
+        return Inertia::render('Cashier/ActiveOrders', [
             'orders' => $ordersData,
             'counts' => $counts,
         ]);
