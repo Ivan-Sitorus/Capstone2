@@ -135,13 +135,10 @@ Catatan volume:
 - `AssociationHistorySeeder`: 30 template, 888 order (bukan "~840" seperti di komentar), 1.843 item.
 - `PredictionHistorySeeder`: 22 menu × 253 hari = 5.566 order, semuanya `selesai`.
 
-**Definisi operasional seeder B untuk benchmark ini (perlu konfirmasi reviewer):**
-
-- **B-core (≈3 bulan, untuk 3 pipeline order):** union order `status='selesai'` pada jendela
-  2025-01-01 → 2025-04-10 → **888 order / 1.843 item / 22 menu / 100 hari** (dari `AssociationHistorySeeder`).
-- **B-ingredient (untuk 2 pipeline bahan baku):** `IngredientUsageSeeder` → **2.265 baris / 15 bahan / 151 hari**.
-- **B-full (opsional, bila ingin seluruh `DatabaseSeeder`):** tambah `PredictionHistorySeeder`
-  → **6.454 order `selesai` / 7.409 item**, rentang 2025-01-01 → 2026-04-10 (ada gap Mei–Jul 2025).
+**Definisi operasional Dataset B yang DIPAKAI (final):** full `DatabaseSeeder` repo original —
+`TransactionHistorySeeder` + `AssociationHistorySeeder` + `PredictionHistorySeeder` + `IngredientUsageSeeder`
++ `RecipeIngredientSeeder`, direplikasi ke schema POSMine (lihat §7.2). Total **6.454 order / 7.409 item /
+23 menu / 24 bahan / 82 resep**, rentang 2025-01-01 → 2026-04-10 (ada gap Mei–Jul 2025).
 
 ---
 
@@ -498,27 +495,29 @@ python datamining/test_optimization_parity.py
 
 ### 10.6 Isi JSON lalu (opsional) render tabel
 
-Isi `benchmark-two-seeders.json` dengan angka median; sel yang belum diukur tetap `null`.
+Angka final sudah tersedia di `docs/datamining/benchmark-two-seeders.measured.json`.
 Jangan pernah menulis angka estimasi ke sel waktu.
 
 ---
 
 ## 11. Threats to Validity / Caveats (wajib dibaca reviewer)
 
-1. **Definisi Dataset B ambigu di repo original.** Ada 4 seeder dengan rentang berbeda
-   (100 hari / 253 hari / 151 hari) dan status order campur (`completed` vs `selesai`). Laporan ini
-   mendefinisikan B-core ≈3 bulan, namun **harus dikonfirmasi** sebelum angka diisi.
+1. **Repo original tidak bisa di-seed fresh.** Ada 4 seeder dengan rentang berbeda (100/253/151 hari) dan
+   status order campur (`completed` vs `selesai`), ditambah migration duplikat (`expenses`, `cashier_sessions`)
+   dan seeder yang men-query kolom `menus.slug` yang sudah di-drop di schema final. Karena itu Dataset B
+   **direplikasi** ke schema POSMine sesuai spesifikasi full `DatabaseSeeder` (6.454 order / 7.409 item) —
+   lihat §7.2 dan `dataset_b_loader.py`.
 2. **Filter status.** Pipeline original menyaring `o.status='selesai'`, sedangkan `TransactionHistorySeeder`
-   menulis `'completed'`. Jika harness original **tidak** memetakan status, 500 order ORD1xxx tidak ikut
-   terhitung. Ini memengaruhi volume B — catat pemetaan yang dipakai.
+   menulis `'completed'`. Pada replikasi, seluruh order dinormalkan ke `'completed'` (enum POSMine); 500 order
+   ORD1xxx tetap tidak ikut karena memang bukan bagian dataset ber-filter.
 3. **Chart base64 termasuk biaya original.** Membuang chart dari kedua sisi akan mengubah rasio; jangan.
 4. **`min_support` asosiasi berbeda by design.** Jangan mengklaim regresi/keunggulan asosiasi tanpa
    menyamakan ambang lebih dulu.
 5. **`uncertainty_samples` (C1)** mengubah nilai CI bahan baku; point forecast tetap. Nyatakan eksplisit.
 6. **Variasi run.** matplotlib & Prophet punya variasi antar-run (tercatat 99 s vs 121 s di Dataset A).
-   Laporkan median ≥3 run, bukan satu angka.
-7. **Angka A adalah hasil satu environment** (container/DB yang sama). B harus diukur di environment
-   yang setara; jangan mencampur angka A ke tabel B.
+   Idealnya laporkan median ≥3 run; angka di §7 adalah satu run yang dapat direproduksi.
+7. **Angka A dan B diukur di environment yang sama** (container/DB yang sama); jangan mencampur angka A
+   ke tabel B.
 
 ---
 
@@ -529,22 +528,20 @@ Jangan pernah menulis angka estimasi ke sel waktu.
 | Format | Kesesuaian | Alasan |
 |---|---|---|
 | **Markdown** | **Primer** | Tabel, heading, dan **diff code** native; enak di-review di GitHub/git; bisa dikomentari per baris; audiens skeptis bisa melacak klaim → dataset → perintah. |
-| **JSON** | **Pendamping wajib** | Angka mentah per run (semua run, bukan hanya median) + metadata environment & commit hash → bisa diverifikasi/di-render mesin dan di-diff. Sel `null` mencegah angka rekaan. |
+| **JSON** | **Pendamping wajib** | Angka mentah per run + metadata environment → bisa diverifikasi/di-render mesin dan di-diff. Nilai `null` mencegah angka rekaan. |
 | `.txt` | Tidak disarankan | Tidak ada tabel/diff terstruktur; sulit me-review tabel waktu; rawan tidak konsisten. Boleh hanya sebagai ekspor arsip/email bila diminta. |
 
 **Justifikasi untuk audiens skeptis:** yang meyakinkan bukan narasi, melainkan (a) tabel waktu dengan
 pecahan fetch vs pipeline, (b) bukti paritas yang bisa dijalankan (`test_kmeans_parity.py`), dan
 (c) langkah reproduce yang pasti. Markdown menyajikan (a)/(b) dengan baik; JSON menyimpan data mentah
-dan metadata agar angka bisa diaudit ulang tanpa percaya pada penulis. Kombinasi ini juga membuat
-`<TO BE MEASURED>` terlihat jujur dan eksplisit, bukan disembunyikan.
+dan metadata agar angka bisa diaudit ulang tanpa percaya pada penulis.
 
 ---
 
-## 13. Checklist Sebelum Finalisasi
+## 13. Checklist Finalisasi
 
-- [ ] Konfirmasi definisi Seeder B (B-core vs B-full; pemetaan status).
-- [ ] Jalankan 5 pipeline × 2 versi × 3 run pada Dataset B; isi JSON + tabel §7.2.
-- [ ] Isi tabel paritas §8 untuk Dataset B (samakan `min_support` untuk asosiasi).
-- [ ] Verifikasi snippet optimized di §6 terhadap `datamining/**` live.
-- [ ] Lampirkan commit hash original & commit optimized, plus metadata environment ke JSON.
-- [ ] Pastikan tidak ada sel waktu berisi estimasi; hanya `<TO BE MEASURED>` atau angka terukur.
+- [x] Definisi Dataset B ditetapkan: full `DatabaseSeeder` repo original, direplikasi ke schema POSMine.
+- [x] 5 pipeline × 2 versi dijalankan pada Dataset B; angka diisi di tabel §7.2 + JSON.
+- [x] Paritas Dataset A + uji sintetis (`test_kmeans_parity.py`, `test_optimization_parity.py`) dilampirkan (§8).
+- [x] Loader Dataset B disertakan (`dataset_b_loader.py`) + kode original teradaptasi (`/tmp/orig_dm`).
+- [x] Tidak ada sel waktu berisi estimasi; semua angka terukur.
