@@ -2,25 +2,26 @@ import { useState, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { User, Phone, Check, MapPin } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
+import { STONE_50, WHITE, STONE_300, STONE_700, STONE_800, STONE_900, STONE_500, STONE_400, NAVY, NAVY_DEEP, DANGER } from '@/theme';
 
 const F = '"Inter", system-ui, sans-serif';
 const C = {
-    bg:          '#F7F5F2',
-    surface:     '#FFFFFF',
-    border:      '#E2DED8',
-    accent:      '#44403C',
-    accentHover: '#292524',
-    textPrimary: '#1C1917',
-    textSecond:  '#78716C',
-    textMuted:   '#A8A29E',
-    headerBg:    '#1E3A4C',
-    headerDark:  '#112D3E',
+    bg:          STONE_50,
+    surface:     WHITE,
+    border:      STONE_300,
+    accent:      STONE_700,
+    accentHover: STONE_800,
+    textPrimary: STONE_900,
+    textSecond:  STONE_500,
+    textMuted:   STONE_400,
+    headerBg:    NAVY,
+    headerDark:  NAVY_DEEP,
 };
 
 export default function Identitas({ table }) {
     const [name,        setName]        = useState('');
     const [phone,       setPhone]       = useState('');
-    const [isMahasiswa, setIsMahasiswa] = useState(false);
+    const [isStudent, setIsStudent] = useState(false);
     const [nameError,   setNameError]   = useState('');
     const [phoneError,  setPhoneError]  = useState('');
 
@@ -38,7 +39,7 @@ export default function Identitas({ table }) {
         } catch (_) {}
     }, []);
 
-    function handleLanjut() {
+    function handleSubmit() {
         let valid = true;
 
         if (!name.trim() || name.trim().length < 2) {
@@ -61,7 +62,7 @@ export default function Identitas({ table }) {
         sessionStorage.setItem('w9_customer', JSON.stringify({
             name:        name.trim(),
             phone:       phoneClean,
-            isMahasiswa: isMahasiswa,
+            isMahasiswa: isStudent,
             tableId:     table?.id ?? null,
             tableNumber: table?.table_number ?? null,
         }));
@@ -203,11 +204,11 @@ export default function Identitas({ table }) {
                         </h1>
                         <div style={{
                             display: 'inline-flex', alignItems: 'center', gap: 6,
-                            background: C.accent, color: '#FFFFFF',
+                            background: C.accent, color: WHITE,
                             borderRadius: 999, padding: '6px 16px',
                             boxShadow: '0 2px 8px rgba(68,64,60,0.25)',
                         }}>
-                            <MapPin size={12} color="#FFFFFF" strokeWidth={2.5} />
+                            <MapPin size={12} color={WHITE} strokeWidth={2.5} />
                             <span style={{
                                 fontSize: 11, fontWeight: 700,
                                 letterSpacing: '0.10em', textTransform: 'uppercase',
@@ -260,13 +261,13 @@ export default function Identitas({ table }) {
                                     type="text"
                                     value={name}
                                     onChange={e => setName(e.target.value)}
-                                    onKeyDown={e => e.key === 'Enter' && handleLanjut()}
+                                    onKeyDown={e => e.key === 'Enter' && handleSubmit()}
                                     placeholder="Masukkan nama lengkap"
                                     maxLength={100}
                                     className="w9id-input"
                                     style={{
                                         width: '100%', height: 48, boxSizing: 'border-box',
-                                        border: `1px solid ${nameError ? '#DC3545' : C.border}`,
+                                        border: `1px solid ${nameError ? DANGER : C.border}`,
                                         borderRadius: 8, paddingLeft: 40, paddingRight: 12,
                                         fontSize: 13, color: C.textPrimary,
                                         background: C.bg, fontFamily: F,
@@ -274,7 +275,7 @@ export default function Identitas({ table }) {
                                 />
                             </div>
                             {nameError && (
-                                <p style={{ color: '#DC3545', fontSize: 12, margin: '5px 0 0', fontFamily: F }}>
+                                <p style={{ color: DANGER, fontSize: 12, margin: '5px 0 0', fontFamily: F }}>
                                     {nameError}
                                 </p>
                             )}
@@ -297,13 +298,13 @@ export default function Identitas({ table }) {
                                     type="tel"
                                     value={phone}
                                     onChange={e => setPhone(e.target.value.replace(/[^0-9]/g, ''))}
-                                    onKeyDown={e => e.key === 'Enter' && handleLanjut()}
+                                    onKeyDown={e => e.key === 'Enter' && handleSubmit()}
                                     placeholder="0812 3456 7890"
                                     maxLength={15}
                                     className="w9id-input"
                                     style={{
                                         width: '100%', height: 48, boxSizing: 'border-box',
-                                        border: `1px solid ${phoneError ? '#DC3545' : C.border}`,
+                                        border: `1px solid ${phoneError ? DANGER : C.border}`,
                                         borderRadius: 8, paddingLeft: 40, paddingRight: 12,
                                         fontSize: 13, color: C.textPrimary,
                                         background: C.bg, fontFamily: F,
@@ -311,7 +312,7 @@ export default function Identitas({ table }) {
                                 />
                             </div>
                             {phoneError && (
-                                <p style={{ color: '#DC3545', fontSize: 12, margin: '5px 0 0', fontFamily: F }}>
+                                <p style={{ color: DANGER, fontSize: 12, margin: '5px 0 0', fontFamily: F }}>
                                     {phoneError}
                                 </p>
                             )}
@@ -322,17 +323,17 @@ export default function Identitas({ table }) {
 
                         {/* ── Mahasiswa checkbox ── */}
                         <div
-                            onClick={() => setIsMahasiswa(p => !p)}
+                            onClick={() => setIsStudent(p => !p)}
                             style={{ display: 'flex', alignItems: 'flex-start', gap: 12, cursor: 'pointer' }}
                         >
                             <div style={{
                                 width: 20, height: 20, borderRadius: 4, flexShrink: 0, marginTop: 1,
-                                border: `1.5px solid ${isMahasiswa ? C.accent : C.border}`,
-                                background: isMahasiswa ? C.accent : C.surface,
+                                border: `1.5px solid ${isStudent ? C.accent : C.border}`,
+                                background: isStudent ? C.accent : C.surface,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 transition: 'all 0.15s',
                             }}>
-                                {isMahasiswa && <Check size={12} color="#FFFFFF" strokeWidth={2.5} />}
+                                {isStudent && <Check size={12} color={WHITE} strokeWidth={2.5} />}
                             </div>
                             <div>
                                 <p style={{ fontSize: 13, fontWeight: 600, color: C.textPrimary, margin: 0, fontFamily: F }}>
@@ -347,11 +348,11 @@ export default function Identitas({ table }) {
                         {/* ── CTA Button ── */}
                         <div style={{ paddingTop: 4 }}>
                             <button
-                                onClick={handleLanjut}
+                                onClick={handleSubmit}
                                 className="w9id-btn"
                                 style={{
                                     width: '100%', height: 52,
-                                    background: C.accent, color: '#FFFFFF',
+                                    background: C.accent, color: WHITE,
                                     border: 'none', borderRadius: 8,
                                     fontSize: 15, fontWeight: 700, cursor: 'pointer',
                                     fontFamily: F, transition: 'background 0.15s',

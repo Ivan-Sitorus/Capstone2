@@ -2,18 +2,20 @@ import { useState, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { ClipboardList, X } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
-import RiwayatCard from '@/Components/Customer/RiwayatCard';
+import HistoryCard from '@/Components/Customer/HistoryCard';
+import usePolling from '@/Hooks/usePolling';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import { WHITE, STONE_50, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, NAVY_DARK } from '@/theme';
 
 const F  = '"Inter", system-ui, sans-serif';
 const C  = {
-    surface:    '#FFFFFF',
-    bg:         '#F7F5F2',
-    border:     '#E2DED8',
-    accent:     '#44403C',
-    accentDark: '#1C1917',
-    textSecond: '#78716C',
-    textMuted:  '#A8A29E',
+    surface:    WHITE,
+    bg:         STONE_50,
+    border:     STONE_300,
+    accent:     STONE_700,
+    accentDark: STONE_900,
+    textSecond: STONE_500,
+    textMuted:  STONE_400,
     shadow:     '0 2px 8px -2px rgba(0,0,0,0.05)',
 };
 
@@ -61,7 +63,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                 if (saved) {
                     const data = JSON.parse(saved);
                     if (data?.phone) {
-                        router.visit(route('customer.riwayat', { phone: data.phone }), {
+                        router.visit(route('customer.history', { phone: data.phone }), {
                             preserveState: true, replace: true,
                         });
                     }
@@ -70,15 +72,11 @@ export default function CustomerRiwayat({ orders = [] }) {
         }
     }, []);
 
-    /* Auto-refresh tiap 8 detik selama ada order aktif */
-    useEffect(() => {
-        const hasActive = orders.some(o => o.status !== 'completed');
-        if (!hasActive) return;
-        const id = setInterval(() => {
-            router.reload({ only: ['orders'], preserveState: true });
-        }, 30000);
-        return () => clearInterval(id);
-    }, [orders]);
+    usePolling(
+        () => router.reload({ only: ['orders'], preserveState: true }),
+        30_000,
+        { enabled: orders.some(o => o.status !== 'completed') },
+    );
 
     const filteredOrders = orders.filter(o =>
         activeTab === 'all' ? true : o.status === activeTab
@@ -94,10 +92,10 @@ export default function CustomerRiwayat({ orders = [] }) {
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
                 <style>{`
-                    html, body { background: #F7F5F2; }
+                    html, body { background: ${STONE_50}; }
                     .w9r-scroll::-webkit-scrollbar { display: none; }
                     .w9r-tab { transition: background 0.175s, color 0.175s, box-shadow 0.175s; }
-                    .w9r-detail-btn:hover { background: #F7F5F2 !important; }
+                    .w9r-detail-btn:hover { background: ${STONE_50} !important; }
                 `}</style>
             </Head>
 
@@ -164,7 +162,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                                                 ? C.accent
                                                 : 'rgba(255,255,255,0.50)',
                                             backdropFilter: active ? 'none' : 'blur(4px)',
-                                            color: active ? '#FFFFFF' : C.accent,
+                                            color: active ? WHITE : C.accent,
                                             boxShadow: active
                                                 ? '0 4px 12px rgba(68,64,60,0.30)'
                                                 : 'none',
@@ -220,7 +218,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                                 </div>
 
                                 {groupOrders.map(order => (
-                                    <RiwayatCard
+                                    <HistoryCard
                                         key={order.id}
                                         order={order}
                                         onDetail={setReceiptOrder}
@@ -284,7 +282,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, paddingBottom: 18 }}>
                                 <div style={{
                                     width: 54, height: 54, borderRadius: 14,
-                                    overflow: 'hidden', background: '#1B3A4B',
+                                    overflow: 'hidden', background: NAVY_DARK,
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                     boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
                                 }}>
@@ -379,7 +377,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                                 onClick={() => setReceiptOrder(null)}
                                 style={{
                                     width: '100%', height: 50,
-                                    background: C.accent, color: '#FFFFFF',
+                                    background: C.accent, color: WHITE,
                                     border: 'none', borderRadius: 12,
                                     fontSize: 15, fontWeight: 700, cursor: 'pointer',
                                     fontFamily: F,

@@ -5,16 +5,17 @@ import { ArrowLeft, X, CircleCheck } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
 import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import { WHITE, SLATE_100, SLATE_900, SLATE_500, SLATE_400, SLATE_200, BLUE, SLATE_50, GREEN_MUTED_LIGHT, BLUE_SOFT, BLUE_MUTED_BG, BLUE_LIGHT, BLUE_DARK, RED_MUTED } from '@/theme';
 
-// Cashier blue theme (consistent with Dashboard, PesananAktif, etc.)
+// Cashier blue theme (consistent with Dashboard, ActiveOrders, etc.)
 const T = {
-    surface:  '#FFFFFF',
-    elevated: '#F1F5F9',
-    textPri:  '#0F172A',
-    textSec:  '#64748B',
-    textTer:  '#94A3B8',
-    border:   '#E2E8F0',
-    accent:   '#3B6FD4',
+    surface:  WHITE,
+    elevated: SLATE_100,
+    textPri:  SLATE_900,
+    textSec:  SLATE_500,
+    textTer:  SLATE_400,
+    border:   SLATE_200,
+    accent:   BLUE,
     shadow:   '0 4px 14px rgba(15,23,42,0.06)',
     shadowSm: '0 2px 8px rgba(15,23,42,0.04)',
 };
@@ -35,7 +36,7 @@ export default function OrderShow({ order }) {
         setProcessing(true);
         try {
             await axios.patch(url, body);
-            router.reload();
+            router.reload({ only: ['order'] });
         } finally {
             setProcessing(false);
         }
@@ -47,19 +48,19 @@ export default function OrderShow({ order }) {
         if (typeof window !== 'undefined' && window.history.length > 1) {
             window.history.back();
         } else {
-            router.visit(route('kasir.pesanan-aktif'));
+            router.visit(route('kasir.active-orders'));
         }
     }
 
-    function handleAdvance()      { handleAction(route('kasir.pesanan.status', { order: order.id }), { status: 'completed' }); }
-    function handleConfirmCash()  { handleAction(route('kasir.pesanan.konfirmasi-tunai', { order: order.id })); }
-    function handleConfirmQris()  { handleAction(route('kasir.pesanan.konfirmasi-qris', { order: order.id })); setShowRejectModal(false); }
-    function handleRejectQris()   { handleAction(route('kasir.pesanan.tolak-qris', { order: order.id }), { note: rejectNote }); setShowRejectModal(false); setRejectNote(''); }
+    function handleAdvance()      { handleAction(route('kasir.order.update-status', { order: order.id }), { status: 'completed' }); }
+    function handleConfirmCash()  { handleAction(route('kasir.order.confirm-cash', { order: order.id })); }
+    function handleConfirmQris()  { handleAction(route('kasir.order.confirm-qris', { order: order.id })); setShowRejectModal(false); }
+    function handleRejectQris()   { handleAction(route('kasir.order.reject-qris', { order: order.id }), { note: rejectNote }); setShowRejectModal(false); setRejectNote(''); }
 
     return (
         <CashierLayout title={`Detail Pesanan ${order.order_code}`} fullscreen>
-            <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: '#F8FAFC' }}>
-            <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 24, border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: SLATE_50 }}>
+            <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
             {/* ── Header ── */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 28 }}>
@@ -94,8 +95,8 @@ export default function OrderShow({ order }) {
                             disabled={processing}
                             style={{
                                 height: 36, padding: '0 18px',
-                                background: processing ? '#8EC4A0' : T.accent,
-                                color: '#FFFFFF', border: 'none', borderRadius: 8,
+                                background: processing ? GREEN_MUTED_LIGHT : T.accent,
+                                color: WHITE, border: 'none', borderRadius: 8,
                                 fontSize: 13, fontWeight: 600,
                                 fontFamily: 'Outfit, system-ui',
                                 cursor: processing ? 'not-allowed' : 'pointer',
@@ -116,7 +117,7 @@ export default function OrderShow({ order }) {
                         disabled={processing}
                         style={{
                             height: 40, padding: '0 20px',
-                            background: processing ? '#93AEDF' : T.accent, color: '#FFFFFF',
+                            background: processing ? BLUE_SOFT : T.accent, color: WHITE,
                             border: 'none', borderRadius: 8,
                             fontSize: 13, fontWeight: 700,
                             fontFamily: 'Outfit, system-ui',
@@ -131,12 +132,12 @@ export default function OrderShow({ order }) {
             {/* ── QRIS Proof Banner ── */}
             {isQrisPending && (
                 <div style={{
-                    background: '#E3F2FD', border: '1px solid #90CAF9', borderRadius: 12,
+                    background: BLUE_MUTED_BG, border: `1px solid ${BLUE_LIGHT}`, borderRadius: 12,
                     padding: '16px 20px', marginBottom: 20,
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-                        <span style={{ fontSize: 14, fontWeight: 700, color: '#1565C0', fontFamily: '"DM Sans", system-ui' }}>
+                        <span style={{ fontSize: 14, fontWeight: 700, color: BLUE_DARK, fontFamily: '"DM Sans", system-ui' }}>
                             Bukti Pembayaran QRIS Diterima
                         </span>
                         <span style={{ fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
@@ -148,8 +149,8 @@ export default function OrderShow({ order }) {
                             onClick={() => setShowRejectModal(true)}
                             style={{
                                 height: 36, padding: '0 14px',
-                                background: '#FFFFFF', color: '#C95D4A',
-                                border: '1.5px solid #C95D4A', borderRadius: 8,
+                                background: WHITE, color: RED_MUTED,
+                                border: `1.5px solid ${RED_MUTED}`, borderRadius: 8,
                                 fontSize: 13, fontWeight: 600,
                                 fontFamily: 'Outfit, system-ui', cursor: 'pointer',
                             }}
@@ -161,7 +162,7 @@ export default function OrderShow({ order }) {
                             disabled={processing}
                             style={{
                                 height: 36, padding: '0 14px',
-                                background: T.accent, color: '#FFFFFF',
+                                background: T.accent, color: WHITE,
                                 border: 'none', borderRadius: 8,
                                 fontSize: 13, fontWeight: 700,
                                 fontFamily: 'Outfit, system-ui', cursor: processing ? 'not-allowed' : 'pointer',
@@ -350,7 +351,7 @@ export default function OrderShow({ order }) {
                                 onClick={handleRejectQris}
                                 style={{
                                     flex: 1, height: 42,
-                                    background: '#C95D4A', color: '#FFFFFF',
+                                    background: RED_MUTED, color: WHITE,
                                     border: 'none', borderRadius: 8,
                                     fontSize: 14, fontWeight: 700, cursor: 'pointer',
                                     fontFamily: 'Outfit, system-ui',

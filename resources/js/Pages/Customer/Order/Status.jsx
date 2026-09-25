@@ -1,28 +1,26 @@
-import { useEffect } from 'react';
 import { router } from '@inertiajs/react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
+import usePolling from '@/Hooks/usePolling';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import { GOLD_DARK, CREAM, GREEN_SAGE, GREEN_TINT, BLUE_DEEP, BLUE_TINT, RED_DEEP, RED_TINT_BG, WARM_TEXT_MUTED, WHITE, WARM_BORDER, WARM_TEXT, WARM_BG, WARM_ICON, BRAND_ORANGE } from '@/theme';
 
 const STATUS_CONFIG = {
-    pending:    { icon: '⏳', label: 'Menunggu Pembayaran', color: '#D4A04A', bg: '#FDF6E8' },
-    confirmed:  { icon: '✓',  label: 'Pesanan Dikonfirmasi', color: '#5A9A6E', bg: '#EDF7F0' },
-    preparing:  { icon: '👨‍🍳', label: 'Sedang Diproses',    color: '#4A7EC9', bg: '#EBF2FB' },
-    ready:      { icon: '🛎', label: 'Siap Diambil',        color: '#5A9A6E', bg: '#EDF7F0' },
-    completed:  { icon: '✅', label: 'Selesai',             color: '#5A9A6E', bg: '#EDF7F0' },
-    cancelled:  { icon: '✕',  label: 'Dibatalkan',          color: '#C0544A', bg: '#FDEDEC' },
+    pending:    { icon: '⏳', label: 'Menunggu Pembayaran', color: GOLD_DARK, bg: CREAM },
+    confirmed:  { icon: '✓',  label: 'Pesanan Dikonfirmasi', color: GREEN_SAGE, bg: GREEN_TINT },
+    preparing:  { icon: '👨‍🍳', label: 'Sedang Diproses',    color: BLUE_DEEP, bg: BLUE_TINT },
+    ready:      { icon: '🛎', label: 'Siap Diambil',        color: GREEN_SAGE, bg: GREEN_TINT },
+    completed:  { icon: '✅', label: 'Selesai',             color: GREEN_SAGE, bg: GREEN_TINT },
+    cancelled:  { icon: '✕',  label: 'Dibatalkan',          color: RED_DEEP, bg: RED_TINT_BG },
 };
 
 export default function OrderStatus({ order }) {
     const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
 
-    // Poll status tiap 30 detik selama masih aktif (jeda saat tab tersembunyi)
-    useEffect(() => {
-        if (['completed', 'cancelled'].includes(order.status)) return;
-        const id = setInterval(() => {
-            if (document.visibilityState !== 'hidden') router.reload({ only: ['order'] });
-        }, 30_000);
-        return () => clearInterval(id);
-    }, [order.status]);
+    usePolling(
+        () => router.reload({ only: ['order'] }),
+        30_000,
+        { enabled: !['completed', 'cancelled'].includes(order.status) },
+    );
 
     return (
         <CustomerLayout activeTab="riwayat">
@@ -45,37 +43,37 @@ export default function OrderStatus({ order }) {
                     }}>
                         {cfg.label}
                     </div>
-                    <div style={{ fontSize: 13, color: '#8C7B6B', fontFamily: 'Outfit, system-ui, sans-serif' }}>
+                    <div style={{ fontSize: 13, color: WARM_TEXT_MUTED, fontFamily: 'Outfit, system-ui, sans-serif' }}>
                         #{order.order_code}
                     </div>
                 </div>
 
                 {/* Detail card */}
                 <div style={{
-                    background: '#FFFFFF', borderRadius: 20,
-                    border: '1px solid #EDE8E2', padding: 20,
+                    background: WHITE, borderRadius: 20,
+                    border: `1px solid ${WARM_BORDER}`, padding: 20,
                     boxShadow: '0 4px 14px rgba(45,32,22,0.06)',
                     display: 'flex', flexDirection: 'column', gap: 14,
                 }}>
-                    <span style={{ fontSize: 15, fontWeight: 700, color: '#2D2016', fontFamily: '"DM Sans", system-ui, sans-serif' }}>
+                    <span style={{ fontSize: 15, fontWeight: 700, color: WARM_TEXT, fontFamily: '"DM Sans", system-ui, sans-serif' }}>
                         Detail Pesanan
                     </span>
 
                     {[
                         ['Tanggal', `${formatTime(order.created_at)} - ${formatDate(order.created_at)}`],
-                        ['Item',    order.items_summary],
+                        ['Item',    order.itemsSummary],
                         ['Metode',  order.payment_method ? order.payment_method.toUpperCase() : '-'],
                         ['Total',   formatRupiah(order.total_amount)],
                     ].map(([label, value]) => (
                         <div key={label} style={{
                             display: 'flex', justifyContent: 'space-between',
-                            paddingBottom: 12, borderBottom: '1px solid #F5F0EB',
+                            paddingBottom: 12, borderBottom: `1px solid ${WARM_BG}`,
                         }}>
-                            <span style={{ fontSize: 13, color: '#B5A898', fontFamily: 'Outfit, system-ui, sans-serif' }}>
+                            <span style={{ fontSize: 13, color: WARM_ICON, fontFamily: 'Outfit, system-ui, sans-serif' }}>
                                 {label}
                             </span>
                             <span style={{
-                                fontSize: 13, fontWeight: 600, color: '#2D2016',
+                                fontSize: 13, fontWeight: 600, color: WARM_TEXT,
                                 fontFamily: 'Outfit, system-ui, sans-serif',
                                 maxWidth: '55%', textAlign: 'right',
                             }}>
@@ -89,7 +87,7 @@ export default function OrderStatus({ order }) {
                 <button
                     onClick={() => router.visit(route('customer.menu'))}
                     style={{
-                        background: '#E8763A', color: '#FFFFFF',
+                        background: BRAND_ORANGE, color: WHITE,
                         border: 'none', borderRadius: 50,
                         height: 52, width: '100%',
                         fontSize: 15, fontWeight: 600,

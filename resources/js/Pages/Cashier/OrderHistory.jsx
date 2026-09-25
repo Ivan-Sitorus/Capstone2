@@ -4,19 +4,20 @@ import { Search, Calendar, CreditCard, ChevronDown } from 'lucide-react';
 import CashierLayout from '@/Layouts/CashierLayout';
 import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import { WHITE, SLATE_100, SLATE_900, SLATE_500, SLATE_400, SLATE_200, BLUE, SLATE_700, SLATE_50 } from '@/theme';
 
 const METHOD_LABELS = { cash: 'Tunai', qris: 'QRIS', bayar_nanti: 'Bayar Nanti' };
 const TODAY = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
 
 // Cashier blue theme
 const T = {
-    surface:  '#FFFFFF',
-    elevated: '#F1F5F9',
-    textPri:  '#0F172A',
-    textSec:  '#64748B',
-    textTer:  '#94A3B8',
-    border:   '#E2E8F0',
-    accent:   '#3B6FD4',
+    surface:  WHITE,
+    elevated: SLATE_100,
+    textPri:  SLATE_900,
+    textSec:  SLATE_500,
+    textTer:  SLATE_400,
+    border:   SLATE_200,
+    accent:   BLUE,
     shadow:   '0 4px 14px rgba(15,23,42,0.06)',
     shadowSm: '0 2px 8px rgba(15,23,42,0.04)',
 };
@@ -32,7 +33,7 @@ const COLS = [
     { key: 'action',  label: 'Aksi',        width: 70  },
 ];
 
-export default function RiwayatPesanan({ orders, filters }) {
+export default function OrderHistory({ orders, filters }) {
     // orders is a Laravel paginator object: { data: [], links: {}, meta: {} }
     const rows      = orders.data ?? [];
     const prevUrl   = orders.prev_page_url ?? null;
@@ -53,7 +54,7 @@ export default function RiwayatPesanan({ orders, filters }) {
     function apply(overrides = {}) {
         const params = { search, date, method, ...overrides };
         Object.keys(params).forEach(k => { if (params[k] === '') delete params[k]; });
-        router.get(route('kasir.riwayat-pesanan'), params, { preserveState: true, replace: true });
+        router.get(route('kasir.order-history'), params, { preserveState: true, replace: true });
     }
 
     function handleSearch(e) {
@@ -68,8 +69,8 @@ export default function RiwayatPesanan({ orders, filters }) {
 
     return (
         <><Head title="Riwayat Pesanan | W9 Cafe" /><CashierLayout title="Riwayat Pesanan" fullscreen>
-            <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: '#F8FAFC' }}>
-            <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 24, border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
+            <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: SLATE_50 }}>
+            <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
             {/* ── Header ── */}
             <div style={{ marginBottom: 28, display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -178,7 +179,7 @@ export default function RiwayatPesanan({ orders, filters }) {
                     {COLS.map(col => (
                         <div key={col.key} style={{ width: col.width, flex: col.flex, flexShrink: col.flex ? undefined : 0 }}>
                             <span style={{
-                                fontSize: 12, fontWeight: 600, color: '#475569',
+                                fontSize: 12, fontWeight: 600, color: SLATE_700,
                                 fontFamily: 'Outfit, system-ui',
                             }}>
                                 {col.label}
@@ -226,7 +227,7 @@ export default function RiwayatPesanan({ orders, filters }) {
                                 href={nextUrl}
                                 style={{
                                     padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
-                                    background: T.accent, color: '#fff', border: 'none',
+                                    background: T.accent, color: WHITE, border: 'none',
                                     textDecoration: 'none', fontFamily: 'Outfit, system-ui',
                                 }}
                             >Berikutnya →</Link>
@@ -293,7 +294,7 @@ function OrderRow({ order }) {
             </div>
             <div style={{ width: 70, flexShrink: 0 }}>
                 <Link
-                    href={route('kasir.pesanan.detail', { order: order.id })}
+                    href={route('kasir.order.show', { order: order.id })}
                     style={{
                         fontSize: 13, fontWeight: 500,
                         color: T.accent, textDecoration: 'none',

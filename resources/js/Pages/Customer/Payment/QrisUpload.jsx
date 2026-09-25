@@ -5,17 +5,18 @@ import { ChevronLeft, Camera, Send, CheckCircle } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
 import useCart from '@/Hooks/useCart';
+import { STONE_50, WHITE, STONE_100, STONE_TINT, STONE_700, STONE_900, STONE_500, STONE_400, RED_50, RED_TINT, RED_DARK, RED_400, GREEN_400 } from '@/theme';
 
 const F = '"Inter", system-ui, sans-serif';
 const C = {
-    bg:         '#F7F5F2',
-    surface:    '#FFFFFF',
-    alt:        '#EFEDE9',
-    border:     '#E7E5E4',
-    accent:     '#44403C',
-    textHead:   '#1C1917',
-    textSecond: '#78716C',
-    textMuted:  '#A8A29E',
+    bg:         STONE_50,
+    surface:    WHITE,
+    alt:        STONE_100,
+    border:     STONE_TINT,
+    accent:     STONE_700,
+    textHead:   STONE_900,
+    textSecond: STONE_500,
+    textMuted:  STONE_400,
     shadow:     '0 4px 20px -2px rgba(0,0,0,0.05)',
 };
 
@@ -72,7 +73,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
                 <style>{`
-                    html, body { background: #F7F5F2; }
+                    html, body { background: ${STONE_50}; }
                     .w9q-upload { transition: background 0.15s; }
                     .w9q-upload:hover { background: rgba(239,237,233,0.60) !important; }
                     .w9q-btn { transition: background 0.15s, transform 0.1s; }
@@ -144,10 +145,10 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                         {rejectedMessage && (
                             <div style={{
                                 margin: '0 20px 8px',
-                                background: '#FEF2F2', border: '1px solid #FECACA',
+                                background: RED_50, border: `1px solid ${RED_TINT}`,
                                 borderRadius: 10, padding: '8px 12px', flexShrink: 0,
                             }}>
-                                <p style={{ fontSize: 12, fontWeight: 700, color: '#DC2626', margin: '0 0 2px', fontFamily: F }}>
+                                <p style={{ fontSize: 12, fontWeight: 700, color: RED_DARK, margin: '0 0 2px', fontFamily: F }}>
                                     Bukti Ditolak Kasir
                                 </p>
                                 <p style={{ fontSize: 12, color: C.textSecond, margin: 0, fontFamily: F }}>{rejectedMessage}</p>
@@ -211,7 +212,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             {/* Upload section (kompak) */}
                             <div style={{ flexShrink: 0 }}>
                                 <label style={{ fontSize: 13, fontWeight: 600, color: C.textHead, fontFamily: F, display: 'block', marginBottom: 8 }}>
-                                    Upload Bukti Pembayaran <span style={{ color: '#F87171' }}>*</span>
+                                    Upload Bukti Pembayaran <span style={{ color: RED_400 }}>*</span>
                                 </label>
 
                                 <label htmlFor="proof-upload" style={{ cursor: 'pointer', display: 'block' }}>
@@ -259,7 +260,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                 </label>
 
                                 {error && (
-                                    <p style={{ color: '#DC2626', fontSize: 12, fontFamily: F, margin: '6px 0 0' }}>
+                                    <p style={{ color: RED_DARK, fontSize: 12, fontFamily: F, margin: '6px 0 0' }}>
                                         {error}
                                     </p>
                                 )}
@@ -304,7 +305,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             border: '1px solid rgba(74,222,128,0.25)',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>
-                            <CheckCircle size={36} color="#4ADE80" strokeWidth={1.75} />
+                            <CheckCircle size={36} color={GREEN_400} strokeWidth={1.75} />
                         </div>
                         <div>
                             <h2 style={{ fontSize: 20, fontWeight: 700, color: C.textHead, fontFamily: F, margin: '0 0 8px' }}>
@@ -325,7 +326,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             </span>
                         </div>
                         <button
-                            onClick={() => router.visit(route('customer.riwayat'))}
+                            onClick={() => router.visit(route('customer.history'))}
                             className="w9q-btn"
                             style={{
                                 width: '100%', padding: '14px 0',

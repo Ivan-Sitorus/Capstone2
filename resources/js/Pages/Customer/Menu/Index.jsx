@@ -3,28 +3,30 @@ import { router, Head } from '@inertiajs/react';
 import { Search, ShoppingBag, Coffee } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
+import usePolling from '@/Hooks/usePolling';
 import { formatRupiah } from '@/helpers';
+import { STONE_50, WHITE, STONE_100, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, GREEN_600, AMBER_400, STONE_250, STONE_200 } from '@/theme';
 
 const F = '"Inter", system-ui, sans-serif';
 
 const C = {
-    bg:          '#F7F5F2',
-    surface:     '#FFFFFF',
-    surfaceAlt:  '#EFEDE9',
-    border:      '#E2DED8',
-    accent:      '#44403C',
-    accentHover: '#1C1917',
-    textPrimary: '#1C1917',
-    textSecond:  '#78716C',
-    textMuted:   '#A8A29E',
-    success:     '#16A34A',
-    warning:     '#FBBF24',
+    bg:          STONE_50,
+    surface:     WHITE,
+    surfaceAlt:  STONE_100,
+    border:      STONE_300,
+    accent:      STONE_700,
+    accentHover: STONE_900,
+    textPrimary: STONE_900,
+    textSecond:  STONE_500,
+    textMuted:   STONE_400,
+    success:     GREEN_600,
+    warning:     AMBER_400,
     shadow:      '0 4px 20px -2px rgba(0,0,0,0.05)',
     shadowLift:  '0 8px 24px -2px rgba(0,0,0,0.10)',
 };
 
 /* ── Menu card ─────────────────────────────────────────────────── */
-function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false, isMahasiswa = false }) {
+function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false, isStudent = false }) {
     const cashback = Number(menu.cashback ?? 0);
     const soldOut  = menu.is_available === false;
 
@@ -71,7 +73,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                     }}>
                         <span style={{
                             background:    'rgba(68,64,60,0.90)',
-                            color:         '#FFFFFF',
+                            color:         WHITE,
                             fontSize:      10,
                             fontWeight:    700,
                             fontFamily:    F,
@@ -118,7 +120,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                 </p>
 
                 {/* Cashback badge */}
-                {isMahasiswa && cashback > 0 && (
+                {isStudent && cashback > 0 && (
                     <p style={{
                         fontSize:   10,
                         fontWeight: 500,
@@ -139,7 +141,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                     {soldOut ? (
                         <button disabled style={{
                             width:        '100%',
-                            background:   '#E5E1DB',
+                            background:   STONE_250,
                             color:        C.textMuted,
                             border:       'none',
                             borderRadius: 8,
@@ -229,12 +231,7 @@ export default function CustomerMenu({ categories, table }) {
     const [customer,       setCustomer]       = useState(null);
     const [ready,          setReady]          = useState(false);
 
-    useEffect(() => {
-        const id = setInterval(() => {
-            if (document.visibilityState !== 'hidden') router.reload({ only: ['categories'] });
-        }, 60000);
-        return () => clearInterval(id);
-    }, []);
+    usePolling(() => router.reload({ only: ['categories'] }), 60_000);
 
     const { items, addItem, updateQty, setTable, total, count } = useCart();
 
@@ -243,26 +240,26 @@ export default function CustomerMenu({ categories, table }) {
             const saved = sessionStorage.getItem('w9_customer');
             if (!saved) {
                 const fb = table?.id ?? '';
-                router.visit(fb ? route('customer.identitas', { table: fb }) : route('customer.identitas'));
+                router.visit(fb ? route('customer.identity', { table: fb }) : route('customer.identity'));
                 return;
             }
             const data = JSON.parse(saved);
             if (!data.name) {
                 sessionStorage.removeItem('w9_customer');
                 const fb = table?.id ?? '';
-                router.visit(fb ? route('customer.identitas', { table: fb }) : route('customer.identitas'));
+                router.visit(fb ? route('customer.identity', { table: fb }) : route('customer.identity'));
                 return;
             }
             if (table?.id && data.tableId !== table.id) {
                 sessionStorage.removeItem('w9_customer');
-                router.visit(route('customer.identitas', { table: table.id }));
+                router.visit(route('customer.identity', { table: table.id }));
                 return;
             }
             setCustomer(data);
             setTable(table?.id ?? data.tableId ?? null);
             setReady(true);
         } catch (_) {
-            router.visit(route('customer.identitas'));
+            router.visit(route('customer.identity'));
         }
     }, [table?.id]);
 
@@ -308,7 +305,7 @@ export default function CustomerMenu({ categories, table }) {
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
                 <style>{`
-                    html, body { background: #F7F5F2; }
+                    html, body { background: ${STONE_50}; }
                     .w9-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
                     .w9-card:hover { box-shadow: ${C.shadowLift} !important; transform: translateY(-2px); }
                     .w9-add-btn { transition: background 0.15s ease; }
@@ -320,7 +317,7 @@ export default function CustomerMenu({ categories, table }) {
                     .w9-wallpaper {
                         position: fixed; top: 0; left: 50%; transform: translateX(-50%);
                         width: 100%; max-width: 430px; height: 100vh;
-                        z-index: 0; pointer-events: none; overflow: hidden; background: #F2EFE9;
+                        z-index: 0; pointer-events: none; overflow: hidden; background: ${STONE_200};
                     }
                 `}</style>
             </Head>
@@ -360,7 +357,7 @@ export default function CustomerMenu({ categories, table }) {
                                 style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.90 }}
                                 onError={e => {
                                     e.target.style.display = 'none';
-                                    e.target.parentElement.innerHTML = '<span style="color:#fff;font-size:16px;font-style:italic;font-weight:700">w9</span>';
+                                    e.target.parentElement.innerHTML = `<span style="color:${WHITE};font-size:16px;font-style:italic;font-weight:700">w9</span>`;
                                 }}
                             />
                         </div>
@@ -481,7 +478,7 @@ export default function CustomerMenu({ categories, table }) {
                                 <MenuItemCard
                                     key={menu.id} menu={menu} priority={idx < 4}
                                     cartItem={cartMap[menu.id]}
-                                    isMahasiswa={!!customer?.isMahasiswa}
+                                    isStudent={!!customer?.isMahasiswa}
                                     onAdd={() => addItem(menu)}
                                     onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
                                     onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}
@@ -511,7 +508,7 @@ export default function CustomerMenu({ categories, table }) {
                                         <MenuItemCard
                                             key={menu.id} menu={menu}
                                             cartItem={cartMap[menu.id]}
-                                            isMahasiswa={!!customer?.isMahasiswa}
+                                            isStudent={!!customer?.isMahasiswa}
                                             onAdd={() => addItem(menu)}
                                             onIncrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) + 1)}
                                             onDecrement={() => updateQty(menu.id, (cartMap[menu.id]?.quantity ?? 0) - 1)}

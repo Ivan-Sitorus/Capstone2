@@ -5,19 +5,20 @@ import useCart from '@/Hooks/useCart';
 import { ChevronLeft, Banknote, QrCode, MapPin, Wallet } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
+import { WHITE, STONE_50, GRAY_100, GRAY_200, STONE_700, STONE_900, STONE_500, RED_50, RED_TINT, RED_DARK, STONE_GREY } from '@/theme';
 
 const F = '"Inter", system-ui, sans-serif';
 
 /* stone-minimalist tokens — sesuai Stitch */
 const C = {
-    surface:    '#FFFFFF',
-    bg:         '#F7F5F2',   /* stone-bg */
-    border:     '#F3F4F6',   /* gray-100 */
-    borderMd:   '#E5E7EB',   /* gray-200 */
-    accent:     '#44403C',   /* stone-primary */
-    accentDark: '#1C1917',   /* stone-heading / hover */
-    textHead:   '#1C1917',
-    textSecond: '#78716C',
+    surface:    WHITE,
+    bg:         STONE_50,   /* stone-bg */
+    border:     GRAY_100,   /* gray-100 */
+    borderMd:   GRAY_200,   /* gray-200 */
+    accent:     STONE_700,   /* stone-primary */
+    accentDark: STONE_900,   /* stone-heading / hover */
+    textHead:   STONE_900,
+    textSecond: STONE_500,
     shadow:     '0 2px 8px -2px rgba(0,0,0,0.05)',
 };
 
@@ -44,7 +45,7 @@ export default function PaymentChoose({ order, items, table_number }) {
     const [cashOrderCode, setCashOrderCode] = useState('');
     const { clearCart } = useCart();
 
-    async function handleLanjut() {
+    async function handleSubmit() {
         if (!selected || loading) return;
         setLoading(true);
         setError('');
@@ -65,7 +66,7 @@ export default function PaymentChoose({ order, items, table_number }) {
         }
     }
 
-    function handleMengerti() {
+    function handleAcknowledge() {
         let tableId = null;
         try {
             const saved = sessionStorage.getItem('w9_customer');
@@ -82,10 +83,10 @@ export default function PaymentChoose({ order, items, table_number }) {
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
                 <style>{`
-                    html, body { background: #F7F5F2; }
+                    html, body { background: ${STONE_50}; }
                     .w9p-scroll::-webkit-scrollbar { display: none; }
                     .w9p-btn-back { transition: background 0.15s; }
-                    .w9p-btn-back:hover { background: #F3F4F6 !important; }
+                    .w9p-btn-back:hover { background: ${GRAY_100} !important; }
                     .w9p-method { transition: border-color 0.2s, box-shadow 0.2s; }
                     .w9p-confirm {
                         transition: background 0.15s, transform 0.1s;
@@ -325,22 +326,22 @@ export default function PaymentChoose({ order, items, table_number }) {
                     {error && (
                         <div style={{
                             marginBottom: 10,
-                            background: '#FEF2F2', border: '1px solid #FECACA',
+                            background: RED_50, border: `1px solid ${RED_TINT}`,
                             borderRadius: 10, padding: '10px 14px',
-                            fontSize: 13, color: '#DC2626', fontFamily: F,
+                            fontSize: 13, color: RED_DARK, fontFamily: F,
                         }}>
                             {error}
                         </div>
                     )}
                     <button
-                        onClick={handleLanjut}
+                        onClick={handleSubmit}
                         disabled={!selected || loading}
                         className="w9p-confirm"
                         style={{
                             width: '100%',
                             padding: '16px 0',
-                            background: !selected || loading ? '#D6D3D1' : C.accent,
-                            color: '#FFFFFF',
+                            background: !selected || loading ? STONE_GREY : C.accent,
+                            color: WHITE,
                             border: 'none', borderRadius: 12,
                             fontSize: 15, fontWeight: 700,
                             cursor: !selected || loading ? 'not-allowed' : 'pointer',
@@ -441,11 +442,11 @@ export default function PaymentChoose({ order, items, table_number }) {
 
                         {/* Button */}
                         <button
-                            onClick={handleMengerti}
+                            onClick={handleAcknowledge}
                             className="w9p-confirm"
                             style={{
                                 width: '100%', padding: '13px 0',
-                                background: C.accent, color: '#FFFFFF',
+                                background: C.accent, color: WHITE,
                                 border: 'none', borderRadius: 12,
                                 fontSize: 15, fontWeight: 700, cursor: 'pointer',
                                 fontFamily: F,

@@ -5,36 +5,37 @@ import { Coffee } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
 import { formatRupiah } from '@/helpers';
+import { STONE_50, WHITE, STONE_100, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, EMERALD_600, RED_50, RED_TINT, RED_DARK } from '@/theme';
 
 const F = '"Inter", system-ui, sans-serif';
 const C = {
-    bg:          '#F7F5F2',
-    surface:     '#FFFFFF',
-    alt:         '#EFEDE9',
-    border:      '#E2DED8',
-    accent:      '#44403C',
-    textPrimary: '#1C1917',
-    textSecond:  '#78716C',
-    textMuted:   '#A8A29E',
-    success:     '#059669',
+    bg:          STONE_50,
+    surface:     WHITE,
+    alt:         STONE_100,
+    border:      STONE_300,
+    accent:      STONE_700,
+    textPrimary: STONE_900,
+    textSecond:  STONE_500,
+    textMuted:   STONE_400,
+    success:     EMERALD_600,
 };
 
 export default function CustomerCart() {
     const { items, tableId, updateQty, total, count } = useCart();
     const [loading,     setLoading]     = useState(false);
     const [errorMsg,    setErrorMsg]    = useState('');
-    const [isMahasiswa, setIsMahasiswa] = useState(false);
+    const [isStudent, setIsStudent] = useState(false);
 
     const isEmpty = items.length === 0;
 
     useEffect(() => {
         try {
             const saved = sessionStorage.getItem('w9_customer');
-            if (saved) setIsMahasiswa(JSON.parse(saved).isMahasiswa === true);
+            if (saved) setIsStudent(JSON.parse(saved).isMahasiswa === true);
         } catch (_) {}
     }, []);
 
-    const totalCashback = isMahasiswa
+    const totalCashback = isStudent
         ? items.reduce((s, i) => s + (i.cashback ?? 0) * i.quantity, 0)
         : 0;
     const grandTotal = total - totalCashback;
@@ -63,7 +64,7 @@ export default function CustomerCart() {
                 customer_name:  customer.name,
                 customer_phone: customer.phone || null,
                 table_id:       customer.tableId,
-                is_mahasiswa:   isMahasiswa,
+                is_mahasiswa:   isStudent,
                 items: items.map(i => ({ menu_id: i.menuId, quantity: i.quantity })),
             });
             router.visit(route('customer.payment.choose', { order: res.data.order_id }));
@@ -176,7 +177,7 @@ export default function CustomerCart() {
 
                             {/* ── Item cards ── */}
                             {items.map((item) => {
-                                const cb       = isMahasiswa ? (item.cashback ?? 0) : 0;
+                                const cb       = isStudent ? (item.cashback ?? 0) : 0;
                                 const effPrice = item.price - cb;
                                 const subtotal = effPrice * item.quantity;
                                 return (
@@ -247,7 +248,7 @@ export default function CustomerCart() {
                                                     width: 26, height: 26, borderRadius: 6,
                                                     background: C.accent, border: 'none',
                                                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    fontSize: 15, fontWeight: 600, color: '#FFFFFF', fontFamily: F, transition: 'opacity 0.1s',
+                                                    fontSize: 15, fontWeight: 600, color: WHITE, fontFamily: F, transition: 'opacity 0.1s',
                                                 }}>+</button>
                                         </div>
                                     </article>
@@ -278,7 +279,7 @@ export default function CustomerCart() {
                                         <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>Subtotal</span>
                                         <span style={{ fontSize: 13, color: C.textPrimary, fontFamily: F }}>{formatRupiah(total)}</span>
                                     </div>
-                                    {isMahasiswa && totalCashback > 0 && (
+                                    {isStudent && totalCashback > 0 && (
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                             <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>Cashback Mahasiswa</span>
                                             <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>− {formatRupiah(totalCashback)}</span>
@@ -302,9 +303,9 @@ export default function CustomerCart() {
                             {/* ── Error ── */}
                             {errorMsg && (
                                 <div style={{
-                                    background: '#FEF2F2', border: '1px solid #FECACA',
+                                    background: RED_50, border: `1px solid ${RED_TINT}`,
                                     borderRadius: 10, padding: '10px 14px',
-                                    fontSize: 13, color: '#DC2626', fontFamily: F,
+                                    fontSize: 13, color: RED_DARK, fontFamily: F,
                                 }}>
                                     {errorMsg}
                                 </div>

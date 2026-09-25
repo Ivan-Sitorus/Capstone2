@@ -6,8 +6,10 @@ import CashierLayout from '@/Layouts/CashierLayout';
 import OrderCard from '@/Components/Cashier/OrderCard';
 import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import usePolling from '@/Hooks/usePolling';
+import { SLATE_700, SLATE_100, SLATE_300, AMBER_600, AMBER_TINT, AMBER_300, BLUE, BLUE_50, BLUE_300, RED, RED_50, RED_200, SLATE_50, WHITE, SLATE_200, SLATE_900, SLATE_500, SALMON_LIGHT, RED_DARK, RED_MUTED, GREEN_MUTED_LIGHT, GREEN_SAGE } from '@/theme';
 
-export default function PesananAktif({ orders: initialOrders, counts }) {
+export default function ActiveOrders({ orders: initialOrders, counts }) {
     const [activeTab,    setActiveTab]    = useState('all');
     const [qrisOrder,    setQrisOrder]    = useState(null);
     const [rejectNote,   setRejectNote]   = useState('');
@@ -30,40 +32,21 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         );
     }, [initialOrders]);
 
-    /* ── Auto-refresh: 20s saat tab aktif, pause saat tersembunyi ── */
-    useEffect(() => {
-        const reload = () => {
-            if (document.visibilityState === 'hidden') return;
-            router.reload({ only: ['orders', 'counts'] });
-        };
-
-        // Ambil data fresh segera saat halaman dibuka — hindari data stale dari
-        // cache prefetch Inertia (mis. buka dari Dashboard saat ada pesanan baru)
-        reload();
-
-        const id = setInterval(reload, 30_000);
-        const onVisible = () => { if (document.visibilityState === 'visible') reload(); };
-        document.addEventListener('visibilitychange', onVisible);
-
-        return () => {
-            clearInterval(id);
-            document.removeEventListener('visibilitychange', onVisible);
-        };
-    }, []);
+    usePolling(() => router.reload({ only: ['orders', 'counts'] }), 30_000, { immediate: true });
 
     /* ── Tabs ── */
     const tabs = [
-        { key: 'all',         label: `Semua (${counts.all})`,                  color: { text: '#475569', bg: '#F1F5F9', border: '#CBD5E1' } },
-        { key: 'pending',     label: `Pending (${counts.pending})`,             color: { text: '#D97706', bg: '#FFFBEB', border: '#FCD34D' } },
-        { key: 'processing',                    label: `Diproses (${counts.processing})`,           color: { text: '#3B6FD4', bg: '#EFF6FF', border: '#93C5FD' } },
-        { key: 'belum_bayar', label: `Belum Bayar (${counts.belum_bayar ?? 0})`, color: { text: '#EF4444', bg: '#FEF2F2', border: '#FCA5A5' } },
+        { key: 'all',         label: `Semua (${counts.all})`,                  color: { text: SLATE_700, bg: SLATE_100, border: SLATE_300 } },
+        { key: 'pending',     label: `Pending (${counts.pending})`,             color: { text: AMBER_600, bg: AMBER_TINT, border: AMBER_300 } },
+        { key: 'processing',                    label: `Diproses (${counts.processing})`,           color: { text: BLUE, bg: BLUE_50, border: BLUE_300 } },
+        { key: 'unpaid', label: `Belum Bayar (${counts.belum_bayar ?? 0})`, color: { text: RED, bg: RED_50, border: RED_200 } },
     ];
 
     const filteredOrders = (() => {
         switch (activeTab) {
             case 'pending':     return localOrders.filter(o => o.status === 'pending');
             case 'processing':    return localOrders.filter(o => o.status === 'processing');
-            case 'belum_bayar': return localOrders.filter(o => o.is_paid === false);
+            case 'unpaid': return localOrders.filter(o => o.is_paid === false);
             default:            return localOrders;
         }
     })();
@@ -82,7 +65,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         setQrisOrder(null);
 
         try {
-            await axios.patch(route('kasir.pesanan.konfirmasi-qris', { order: orderId }));
+            await axios.patch(route('kasir.order.confirm-qris', { order: orderId }));
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => pendingStatusRef.current.delete(orderId),
@@ -99,7 +82,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         if (processing || !qrisOrder) return;
         setProcessing(true);
         try {
-            await axios.patch(route('kasir.pesanan.tolak-qris', { order: qrisOrder.id }), { note: rejectNote });
+            await axios.patch(route('kasir.order.reject-qris', { order: qrisOrder.id }), { note: rejectNote });
             setQrisOrder(null);
             setRejectNote('');
             router.reload({ only: ['orders', 'counts'] });
@@ -121,7 +104,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         }
 
         try {
-            await axios.patch(route('kasir.pesanan.status', { order: orderId }), { status: targetStatus });
+            await axios.patch(route('kasir.order.update-status', { order: orderId }), { status: targetStatus });
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => {
@@ -151,7 +134,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         setCancelReason('');
 
         try {
-            await axios.patch(route('kasir.pesanan.cancel', { order: orderId }), { reason: reason || null });
+            await axios.patch(route('kasir.order.cancel', { order: orderId }), { reason: reason || null });
             router.reload({
                 only: ['orders', 'counts'],
                 onFinish: () => pendingRemoveRef.current.delete(orderId),
@@ -168,7 +151,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
         if (processing) return;
         setProcessing(true);
         try {
-            await axios.patch(route('kasir.pesanan.konfirmasi-bayar', { order: orderId }), { payment_method: paymentMethod });
+            await axios.patch(route('kasir.order.confirm-payment', { order: orderId }), { payment_method: paymentMethod });
             router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);
@@ -177,18 +160,18 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
 
     return (
         <><Head title="Pesanan Aktif | W9 Cafe" /><CashierLayout title="Pesanan Aktif" fullscreen>
-            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 32, background: '#F8FAFC', minWidth: 0 }}>
-            <div style={{ background: '#FFFFFF', borderRadius: 12, padding: 24, border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
+            <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 32, background: SLATE_50, minWidth: 0 }}>
+            <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
             {/* ── Header ── */}
             <div style={{ marginBottom: 20 }}>
                 <h1 style={{
-                    fontSize: 26, fontWeight: 700, color: '#0F172A',
+                    fontSize: 26, fontWeight: 700, color: SLATE_900,
                     margin: '0 0 4px', letterSpacing: '-0.5px',
                 }}>
                     Pesanan Aktif
                 </h1>
-                <p style={{ fontSize: 14, color: '#64748B', margin: 0 }}>
+                <p style={{ fontSize: 14, color: SLATE_500, margin: 0 }}>
                     Kelola semua pesanan yang sedang diproses
                 </p>
             </div>
@@ -220,7 +203,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
 
             {/* ── Order Grid ── */}
             {filteredOrders.length === 0 ? (
-                <div style={{ textAlign: 'center', color: '#64748B', paddingTop: 64, fontSize: 14 }}>
+                <div style={{ textAlign: 'center', color: SLATE_500, paddingTop: 64, fontSize: 14 }}>
                     Tidak ada pesanan aktif
                 </div>
             ) : (
@@ -234,7 +217,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                         <OrderCard
                             key={order.id}
                             order={order}
-                            onDetail={id => router.visit(route('kasir.pesanan.detail', { order: id }))}
+                            onDetail={id => router.visit(route('kasir.order.show', { order: id }))}
                             onOpenQrisModal={o => { setQrisOrder(o); setRejectNote(''); }}
                             onMarkDone={handleMarkDone}
                             onConfirmPayment={handleConfirmPayment}
@@ -254,7 +237,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                     padding: 16,
                 }}>
                     <div style={{
-                        background: '#FFFFFF', borderRadius: 18,
+                        background: WHITE, borderRadius: 18,
                         width: '100%', maxWidth: 400,
                         boxShadow: '0 12px 40px rgba(15,23,42,0.18)',
                         overflow: 'hidden',
@@ -262,15 +245,15 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                         <div style={{ padding: '20px 22px 14px' }}>
                             <h3 style={{
                                 margin: '0 0 6px', fontSize: 17, fontWeight: 700,
-                                color: '#0F172A', fontFamily: '"DM Sans", system-ui',
+                                color: SLATE_900, fontFamily: '"DM Sans", system-ui',
                             }}>
                                 Batalkan Pesanan?
                             </h3>
-                            <p style={{ margin: 0, fontSize: 13, color: '#64748B', fontFamily: 'Outfit, system-ui', lineHeight: 1.5 }}>
-                                Pesanan <strong style={{ color: '#0F172A' }}>#{cancelTarget.order_code}</strong>{cancelTarget.table_number ? ` · Meja ${cancelTarget.table_number}` : ''} akan dibatalkan. Tindakan ini tidak dapat dibatalkan kembali.
+                            <p style={{ margin: 0, fontSize: 13, color: SLATE_500, fontFamily: 'Outfit, system-ui', lineHeight: 1.5 }}>
+                                Pesanan <strong style={{ color: SLATE_900 }}>#{cancelTarget.order_code}</strong>{cancelTarget.table_number ? ` · Meja ${cancelTarget.table_number}` : ''} akan dibatalkan. Tindakan ini tidak dapat dibatalkan kembali.
                             </p>
 
-                            <label style={{ display: 'block', margin: '16px 0 6px', fontSize: 12, fontWeight: 600, color: '#475569', fontFamily: 'Outfit, system-ui' }}>
+                            <label style={{ display: 'block', margin: '16px 0 6px', fontSize: 12, fontWeight: 600, color: SLATE_700, fontFamily: 'Outfit, system-ui' }}>
                                 Alasan pembatalan (opsional)
                             </label>
                             <textarea
@@ -281,8 +264,8 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                                 maxLength={255}
                                 style={{
                                     width: '100%', boxSizing: 'border-box',
-                                    border: '1px solid #E2E8F0', borderRadius: 10,
-                                    padding: '10px 12px', fontSize: 13, color: '#0F172A',
+                                    border: `1px solid ${SLATE_200}`, borderRadius: 10,
+                                    padding: '10px 12px', fontSize: 13, color: SLATE_900,
                                     fontFamily: 'Outfit, system-ui', resize: 'none', outline: 'none',
                                 }}
                             />
@@ -292,7 +275,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                                 onClick={() => { setCancelTarget(null); setCancelReason(''); }}
                                 disabled={processing}
                                 style={{
-                                    flex: 1, height: 42, background: '#F1F5F9', color: '#475569',
+                                    flex: 1, height: 42, background: SLATE_100, color: SLATE_700,
                                     border: 'none', borderRadius: 10, fontSize: 13, fontWeight: 600,
                                     fontFamily: 'Outfit, system-ui', cursor: processing ? 'not-allowed' : 'pointer',
                                 }}
@@ -303,8 +286,8 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                                 onClick={handleCancelOrder}
                                 disabled={processing}
                                 style={{
-                                    flex: 1, height: 42, background: processing ? '#E8A898' : '#DC2626',
-                                    color: '#FFFFFF', border: 'none', borderRadius: 10,
+                                    flex: 1, height: 42, background: processing ? SALMON_LIGHT : RED_DARK,
+                                    color: WHITE, border: 'none', borderRadius: 10,
                                     fontSize: 13, fontWeight: 700, fontFamily: '"DM Sans", system-ui',
                                     cursor: processing ? 'not-allowed' : 'pointer',
                                 }}
@@ -326,7 +309,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                     padding: '16px',
                 }}>
                     <div style={{
-                        background: '#FFFFFF',
+                        background: WHITE,
                         borderRadius: 20,
                         width: '100%', maxWidth: 600,
                         maxHeight: 'calc(100vh - 32px)',
@@ -338,18 +321,18 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                         <div style={{
                             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                             padding: '14px 20px',
-                            borderBottom: '1px solid #E2E8F0',
+                            borderBottom: `1px solid ${SLATE_200}`,
                             flexShrink: 0,
                         }}>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                                 <span style={{
-                                    fontSize: 16, fontWeight: 700, color: '#0F172A',
+                                    fontSize: 16, fontWeight: 700, color: SLATE_900,
                                     fontFamily: '"DM Sans", system-ui',
                                 }}>
                                     Konfirmasi Pembayaran QRIS
                                 </span>
                                 <span style={{
-                                    fontSize: 12, color: '#64748B',
+                                    fontSize: 12, color: SLATE_500,
                                     fontFamily: 'Outfit, system-ui',
                                 }}>
                                     #{qrisOrder.order_code}{qrisOrder.table_number ? ` · Meja ${qrisOrder.table_number}` : ''}
@@ -360,9 +343,9 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                                 aria-label="Tutup modal"
                                 style={{
                                     width: 32, height: 32, borderRadius: 8, flexShrink: 0,
-                                    background: '#F1F5F9', border: 'none', cursor: 'pointer',
+                                    background: SLATE_100, border: 'none', cursor: 'pointer',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                    color: '#64748B',
+                                    color: SLATE_500,
                                 }}
                             >
                                 <X size={16} />
@@ -375,14 +358,14 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                             {/* LEFT: Bukti gambar */}
                             <div style={{ flex: '0 0 200px', display: 'flex', flexDirection: 'column', gap: 8 }}>
                                 <span style={{
-                                    fontSize: 11, fontWeight: 600, color: '#64748B',
+                                    fontSize: 11, fontWeight: 600, color: SLATE_500,
                                     fontFamily: 'Outfit, system-ui', letterSpacing: '0.3px',
                                 }}>
                                     BUKTI TRANSFER
                                 </span>
                                 <div style={{
-                                    background: '#F1F5F9', borderRadius: 10,
-                                    border: '1px solid #E2E8F0', padding: 6,
+                                    background: SLATE_100, borderRadius: 10,
+                                    border: `1px solid ${SLATE_200}`, padding: 6,
                                     display: 'flex', flexDirection: 'column', gap: 5,
                                 }}>
                                     <img
@@ -395,7 +378,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                                         }}
                                         onClick={() => window.open(qrisOrder.payment_proof, '_blank')}
                                     />
-                                    <span style={{ fontSize: 10, color: '#64748B', fontFamily: 'Outfit, system-ui', textAlign: 'center' }}>
+                                    <span style={{ fontSize: 10, color: SLATE_500, fontFamily: 'Outfit, system-ui', textAlign: 'center' }}>
                                         Klik untuk perbesar
                                     </span>
                                 </div>
@@ -406,36 +389,36 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
 
                                 {/* Payment info */}
                                 <div style={{
-                                    background: '#F8FAFC', borderRadius: 10,
-                                    border: '1px solid #E2E8F0', padding: '10px 14px',
+                                    background: SLATE_50, borderRadius: 10,
+                                    border: `1px solid ${SLATE_200}`, padding: '10px 14px',
                                     display: 'flex', flexDirection: 'column', gap: 7,
                                 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>Metode</span>
+                                        <span style={{ fontSize: 12, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>Metode</span>
                                         <span style={{
                                             display: 'flex', alignItems: 'center', gap: 4,
-                                            fontSize: 12, fontWeight: 600, color: '#0F172A',
+                                            fontSize: 12, fontWeight: 600, color: SLATE_900,
                                             fontFamily: 'Outfit, system-ui',
                                         }}>
-                                            <QrCode size={12} color="#3B6FD4" />
+                                            <QrCode size={12} color={BLUE} />
                                             QRIS
                                         </span>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>Waktu Bayar</span>
-                                        <span style={{ fontSize: 12, fontWeight: 500, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>
+                                        <span style={{ fontSize: 12, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>Waktu Bayar</span>
+                                        <span style={{ fontSize: 12, fontWeight: 500, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>
                                             {formatTime(qrisOrder.created_at)} · {formatDate(qrisOrder.created_at)}
                                         </span>
                                     </div>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>Status</span>
+                                        <span style={{ fontSize: 12, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>Status</span>
                                         <StatusBadge status={qrisOrder.status} />
                                     </div>
-                                    <div style={{ height: 1, background: '#E2E8F0' }} />
+                                    <div style={{ height: 1, background: SLATE_200 }} />
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 13, fontWeight: 700, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>Total</span>
+                                        <span style={{ fontSize: 13, fontWeight: 700, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>Total</span>
                                         <span style={{
-                                            fontSize: 16, fontWeight: 700, color: '#3B6FD4',
+                                            fontSize: 16, fontWeight: 700, color: BLUE,
                                             fontFamily: '"DM Sans", system-ui',
                                         }}>
                                             {formatRupiah(qrisOrder.total_amount)}
@@ -445,12 +428,12 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
 
                                 {/* Detail pesanan */}
                                 <div style={{
-                                    background: '#F8FAFC', borderRadius: 10,
-                                    border: '1px solid #E2E8F0', padding: '10px 14px',
+                                    background: SLATE_50, borderRadius: 10,
+                                    border: `1px solid ${SLATE_200}`, padding: '10px 14px',
                                     display: 'flex', flexDirection: 'column', gap: 6,
                                 }}>
                                     <span style={{
-                                        fontSize: 11, fontWeight: 600, color: '#64748B',
+                                        fontSize: 11, fontWeight: 600, color: SLATE_500,
                                         fontFamily: 'Outfit, system-ui', letterSpacing: '0.3px',
                                     }}>
                                         DETAIL PESANAN
@@ -460,14 +443,14 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                                             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                                         }}>
                                             <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                                                <span style={{ fontSize: 12, fontWeight: 600, color: '#3B6FD4', fontFamily: 'Outfit, system-ui' }}>
+                                                <span style={{ fontSize: 12, fontWeight: 600, color: BLUE, fontFamily: 'Outfit, system-ui' }}>
                                                     {item.quantity}x
                                                 </span>
-                                                <span style={{ fontSize: 12, fontWeight: 500, color: '#0F172A', fontFamily: 'Outfit, system-ui' }}>
+                                                <span style={{ fontSize: 12, fontWeight: 500, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>
                                                     {item.name}
                                                 </span>
                                             </span>
-                                            <span style={{ fontSize: 12, color: '#64748B', fontFamily: 'Outfit, system-ui' }}>
+                                            <span style={{ fontSize: 12, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>
                                                 {formatRupiah(item.subtotal)}
                                             </span>
                                         </div>
@@ -480,7 +463,7 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                         {/* ── Footer ── */}
                         <div style={{
                             padding: '12px 20px 14px',
-                            borderTop: '1px solid #E2E8F0',
+                            borderTop: `1px solid ${SLATE_200}`,
                             display: 'flex', gap: 10,
                             flexShrink: 0,
                         }}>
@@ -490,8 +473,8 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                                 disabled={processing}
                                 style={{
                                     flex: 1, height: 40,
-                                    background: processing ? '#E8A898' : '#C95D4A',
-                                    color: '#FFFFFF', border: 'none', borderRadius: 10,
+                                    background: processing ? SALMON_LIGHT : RED_MUTED,
+                                    color: WHITE, border: 'none', borderRadius: 10,
                                     fontSize: 13, fontWeight: 600,
                                     fontFamily: 'Outfit, system-ui',
                                     cursor: processing ? 'not-allowed' : 'pointer',
@@ -506,8 +489,8 @@ export default function PesananAktif({ orders: initialOrders, counts }) {
                                 disabled={processing}
                                 style={{
                                     flex: 2, height: 40,
-                                    background: processing ? '#8EC4A0' : '#5A9A6E',
-                                    color: '#FFFFFF', border: 'none', borderRadius: 10,
+                                    background: processing ? GREEN_MUTED_LIGHT : GREEN_SAGE,
+                                    color: WHITE, border: 'none', borderRadius: 10,
                                     fontSize: 13, fontWeight: 700,
                                     fontFamily: '"DM Sans", system-ui',
                                     cursor: processing ? 'not-allowed' : 'pointer',
