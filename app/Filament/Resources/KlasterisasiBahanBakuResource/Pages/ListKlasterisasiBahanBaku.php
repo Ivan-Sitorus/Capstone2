@@ -16,10 +16,10 @@ class ListKlasterisasiBahanBaku extends ListRecords
     {
         return [
             Action::make('jalankan')
-                ->label('Jalankan')
+                ->label('Buat Klasterisasi Bahan Baku')
                 ->icon('heroicon-o-sparkles')
                 ->color('primary')
-                ->modalHeading('Jalankan Klasterisasi Bahan Baku')
+                ->modalHeading('Buat Klasterisasi Bahan Baku')
                 ->form([
                     DatePicker::make('date_from')
                         ->label('Dari Tanggal')

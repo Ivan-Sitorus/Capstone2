@@ -16,10 +16,10 @@ class ListAsosiatifMenu extends ListRecords
     {
         return [
             Action::make('jalankan')
-                ->label('Jalankan')
+                ->label('Buat Asosiasi Menu')
                 ->icon('heroicon-o-sparkles')
                 ->color('primary')
-                ->modalHeading('Jalankan Asosiatif Menu')
+                ->modalHeading('Buat Asosiasi Menu')
                 ->form([
                     DatePicker::make('date_from')
                         ->label('Dari Tanggal')

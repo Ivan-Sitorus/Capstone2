@@ -16,10 +16,10 @@ class ListPrediksiBahanBaku extends ListRecords
     {
         return [
             Action::make('jalankan')
-                ->label('Jalankan')
+                ->label('Buat Prediksi Bahan Baku')
                 ->icon('heroicon-o-sparkles')
                 ->color('primary')
-                ->modalHeading('Jalankan Prediksi Bahan Baku')
+                ->modalHeading('Buat Prediksi Bahan Baku')
                 ->form([
                     DatePicker::make('date_from')
                         ->label('Dari Tanggal')

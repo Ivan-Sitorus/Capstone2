@@ -16,10 +16,10 @@ class ListKlasterisasiMenu extends ListRecords
     {
         return [
             Action::make('jalankan')
-                ->label('Jalankan')
+                ->label('Buat Klasterisasi Menu')
                 ->icon('heroicon-o-sparkles')
                 ->color('primary')
-                ->modalHeading('Jalankan Klasterisasi Menu')
+                ->modalHeading('Buat Klasterisasi Menu')
                 ->form([
                     DatePicker::make('date_from')
                         ->label('Dari Tanggal')

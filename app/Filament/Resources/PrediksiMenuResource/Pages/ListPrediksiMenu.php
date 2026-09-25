@@ -16,10 +16,10 @@ class ListPrediksiMenu extends ListRecords
     {
         return [
             Action::make('jalankan')
-                ->label('Jalankan')
+                ->label('Buat Prediksi Menu')
                 ->icon('heroicon-o-sparkles')
                 ->color('primary')
-                ->modalHeading('Jalankan Prediksi Menu')
+                ->modalHeading('Buat Prediksi Menu')
                 ->form([
                     DatePicker::make('date_from')
                         ->label('Dari Tanggal')

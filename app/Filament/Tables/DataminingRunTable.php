@@ -6,10 +6,10 @@ use App\Enums\DataminingRunStatus;
 use App\Models\DataminingRun;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Throwable;
 
 class DataminingRunTable
 {
@@ -53,23 +53,35 @@ class DataminingRunTable
                     ->url(fn (DataminingRun $record): string => $resource::getUrl('view', ['record' => $record])),
                 DeleteAction::make()->label('Hapus'),
             ])
-            ->toolbarActions([
-                DeleteBulkAction::make(),
-            ])
             ->poll('5s')
             ->defaultSort('created_at', 'desc');
     }
 
     private static function range(DataminingRun $record): string
     {
-        $from = $record->parameters['date_from'] ?? null;
-        $to = $record->parameters['date_to'] ?? null;
+        $from = self::formatDate($record->parameters['date_from'] ?? null);
+        $to = self::formatDate($record->parameters['date_to'] ?? null);
 
         if (! $from && ! $to) {
             return '-';
         }
 
         return ($from ?? '-') . ' s/d ' . ($to ?? '-');
+    }
+
+    private static function formatDate(mixed $value): ?string
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        try {
+            $date = \Illuminate\Support\Carbon::parse($value);
+        } catch (Throwable) {
+            return (string) $value;
+        }
+
+        return $date->translatedFormat('d M Y');
     }
 
     private static function duration(DataminingRun $record): string
@@ -84,6 +96,6 @@ class DataminingRunTable
             return '-';
         }
 
-        return (int) $seconds . ' s';
+        return (int) $seconds . ' detik';
     }
 }
