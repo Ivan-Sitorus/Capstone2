@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\MenuResource\Forms;
 
+use App\Enums\MenuStatus;
 use App\Enums\Unit;
 use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\MenuResource;
@@ -67,10 +68,10 @@ class MenuForm
             Select::make('status')
                 ->label('Status')
                 ->options([
-                    'active' => 'Aktif',
-                    'inactive' => 'Nonaktif',
+                    MenuStatus::Active->value => 'Aktif',
+                    MenuStatus::Inactive->value => 'Nonaktif',
                 ])
-                ->default('active')
+                ->default(MenuStatus::Active->value)
                 ->native(false)
                 ->required(),
             NumericInput::money("discounted_price")
@@ -188,8 +189,8 @@ class MenuForm
                         ->mutateStateForValidationUsing(fn ($state) => NumericInput::normalizeState($state))
                         ->dehydrateStateUsing(fn ($state) => NumericInput::normalizeState($state))
                         ->disabled(fn (Get $get): bool => blank($get('ingredient_id')))
-                        ->minValue(fn (Get $get): float => in_array($get('unit'), ['gram', 'ml'], true) ? 1 : 0.001)
-                        ->step(fn (Get $get): float => in_array($get('unit'), ['gram', 'ml'], true) ? 1 : 0.001)
+                        ->minValue(fn (Get $get): float => in_array($get('unit'), [Unit::Gram->value, Unit::Milliliter->value], true) ? 1 : 0.001)
+                        ->step(fn (Get $get): float => in_array($get('unit'), [Unit::Gram->value, Unit::Milliliter->value], true) ? 1 : 0.001)
                         ->suffix(fn (Get $get) => $get('unit') ?? ''),
                 ]),
         ]);

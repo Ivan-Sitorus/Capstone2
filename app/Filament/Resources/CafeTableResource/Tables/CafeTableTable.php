@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\CafeTableResource\Tables;
 
+use App\Enums\OrderStatus;
 use App\Models\CafeTable;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -89,7 +90,7 @@ class CafeTableTable
                     ->requiresConfirmation()
                     ->modalHeading(fn (CafeTable $record) => 'Hapus Meja '.$record->table_number)
                     ->before(function (DeleteAction $action, CafeTable $record) {
-                        if ($record->orders()->whereIn('status', ['pending', 'processing'])->exists()) {
+                        if ($record->orders()->whereIn('status', [OrderStatus::Pending->value, OrderStatus::Processing->value])->exists()) {
                             Notification::make()
                                 ->danger()
                                 ->title('Meja tidak dapat dihapus')

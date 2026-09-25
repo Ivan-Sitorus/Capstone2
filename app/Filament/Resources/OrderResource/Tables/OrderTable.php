@@ -56,16 +56,16 @@ class OrderTable
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
-                        'pending' => 'Pending',
-                        'processing' => 'Diproses',
-                        'completed' => 'Selesai',
+                        OrderStatus::Pending->value => 'Pending',
+                        OrderStatus::Processing->value => 'Diproses',
+                        OrderStatus::Completed->value => 'Selesai',
                     ]),
                 SelectFilter::make('payment_method')
                     ->label('Metode Bayar')
                     ->options([
-                        'cash' => 'Tunai',
-                        'qris' => 'QRIS',
-                        'pay_later' => 'Bayar Nanti',
+                        PaymentMethod::Cash->value => 'Tunai',
+                        PaymentMethod::Qris->value => 'QRIS',
+                        PaymentMethod::PayLater->value => 'Bayar Nanti',
                     ]),
                 Filter::make('created_range')
                     ->label('Rentang Tanggal')

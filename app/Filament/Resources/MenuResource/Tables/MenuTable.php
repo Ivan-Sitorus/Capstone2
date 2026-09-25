@@ -74,8 +74,8 @@ class MenuTable
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
-                        'active' => 'Aktif',
-                        'inactive' => 'Nonaktif',
+                        MenuStatus::Active->value => 'Aktif',
+                        MenuStatus::Inactive->value => 'Nonaktif',
                     ]),
                 SelectFilter::make("ingredient")
                     ->label("Bahan Baku")
