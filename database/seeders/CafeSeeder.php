@@ -713,7 +713,7 @@ class CafeSeeder extends Seeder
                     'order_type' => $this->rng->pick(['qr', 'qr', 'qr', 'cashier', 'cashier']),
                     'total_amount' => $total,
                     'payment_method' => $paymentMethod,
-                    'uuid' => (string) Str::uuid(),
+                    'receipt_token' => (string) Str::uuid(),
                     'processed_by' => $status !== 'pending' ? $shift['cashier_id'] : null,
                     'processed_at' => $processedAt?->toDateTimeString(),
                     'completed_at' => $completedAt?->toDateTimeString(),

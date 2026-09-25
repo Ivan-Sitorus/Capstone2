@@ -194,7 +194,7 @@ def main():
         cur_day += timedelta(days=1)
 
     cur.executemany("""INSERT INTO orders
-        (order_code,status,order_type,payment_method,total_amount,created_at,updated_at,uuid)
+        (order_code,status,order_type,payment_method,total_amount,created_at,updated_at,receipt_token)
         VALUES (%s,%s,%s,%s,%s,%s,%s,%s)""", orders)
     cur.execute("SELECT id, order_code FROM orders")
     code_to_id = {c: i for i, c in cur.fetchall()}

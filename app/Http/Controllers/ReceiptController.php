@@ -18,7 +18,7 @@ class ReceiptController extends Controller
         return $this->renderReceipt($order);
     }
 
-    public function showByUuid(Order $order): Response
+    public function showByReceiptToken(Order $order): Response
     {
         $order->load(['items.menu', 'cafeTable', 'cashier']);
 
@@ -41,7 +41,7 @@ class ReceiptController extends Controller
         return Inertia::render('Receipt/Show', [
             'order' => [
                 'id' => $order->id,
-                'uuid' => $order->uuid,
+                'receipt_token' => $order->receipt_token,
                 'order_code' => $order->order_code,
                 'status' => $order->status,
                 'total_amount' => $order->total_amount,

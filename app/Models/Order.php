@@ -30,7 +30,7 @@ class Order extends Model
 
     public function uniqueIds(): array
     {
-        return ['uuid'];
+        return ['receipt_token'];
     }
 
     public function newUniqueId(): string
@@ -61,7 +61,7 @@ class Order extends Model
         'processed_at',
         'completed_at',
         'cancelled_at',
-        'uuid',
+        'receipt_token',
         'qris_resubmit_attempts',
         'qris_status',
     ];
@@ -132,9 +132,9 @@ class Order extends Model
             )->count();
     }
 
-    public function scopeByUuid(Builder $query, string $uuid): Builder
+    public function scopeByReceiptToken(Builder $query, string $token): Builder
     {
-        return $query->where('uuid', $uuid);
+        return $query->where('receipt_token', $token);
     }
 
     public function isQrisResubmitable(): bool
@@ -170,6 +170,6 @@ class Order extends Model
 
     public function getReceiptUrlAttribute(): string
     {
-        return url('/struk-pesanan/' . $this->uuid);
+        return url('/struk-pesanan/' . $this->receipt_token);
     }
 }

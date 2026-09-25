@@ -66,5 +66,5 @@ Route::prefix('pelanggan')->group(function () {
 Route::get('/order', fn () => redirect()->route('customer.identity', request()->only('table')))
     ->name('customer.order.entry');
 
-// Receipt (public — no auth required, UUIDv7 only for privacy)
-Route::get('/struk-pesanan/{order:uuid}', [ReceiptController::class, 'showByUuid'])->name('receipt.show-by-uuid');
+// Receipt (public — no auth required, unguessable capability token)
+Route::get('/struk-pesanan/{order:receipt_token}', [ReceiptController::class, 'showByReceiptToken'])->name('receipt.show-by-token');

@@ -19,7 +19,7 @@ class CafeTable extends Model
 
     protected $table = 'cafe_tables';
 
-    protected $fillable = ['table_number', 'qr_token', 'qr_code'];
+    protected $fillable = ['table_number', 'qr_token'];
 
     protected function casts(): array
     {
@@ -44,7 +44,7 @@ class CafeTable extends Model
             'outputBase64' => false,
         ]);
 
-        return (new QRCode($options))->render($this->qr_code);
+        return (new QRCode($options))->render($this->qr_code_url);
     }
 
     public function getQrCodeSvgDataUriAttribute(): string
@@ -61,7 +61,7 @@ class CafeTable extends Model
             'scale' => 10,
         ]);
 
-        return 'data:image/png;base64,'.(new QRCode($options))->render($this->qr_code);
+        return 'data:image/png;base64,'.(new QRCode($options))->render($this->qr_code_url);
     }
 
     public function generatePngDownload(): string
@@ -72,7 +72,7 @@ class CafeTable extends Model
             'scale' => 10,
         ]);
 
-        $raw = (new QRCode($options))->render($this->qr_code);
+        $raw = (new QRCode($options))->render($this->qr_code_url);
 
         // render() returns data:image/png;base64,XXXX — strip the prefix
         $base64 = substr($raw, strpos($raw, ',') + 1);
@@ -85,10 +85,6 @@ class CafeTable extends Model
         static::creating(function (CafeTable $table) {
             if (empty($table->qr_token)) {
                 $table->qr_token = (string) Str::uuid();
-            }
-
-            if (empty($table->qr_code)) {
-                $table->qr_code = route('customer.identity', ['table' => $table->qr_token]);
             }
         });
     }

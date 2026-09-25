@@ -22,13 +22,13 @@ class PlaceCashierOrderAction
 
     public function handle(StoreOrderRequest $request): array
     {
-        $uuid = $request->uuid ?? (string) Str::uuid();
+        $receiptToken = (string) Str::uuid();
         $orderModel = null;
 
-        $attempt = function () use ($request, &$uuid, &$orderModel) {
-            DB::transaction(function () use ($request, &$uuid, &$orderModel) {
+        $attempt = function () use ($request, &$receiptToken, &$orderModel) {
+            DB::transaction(function () use ($request, &$receiptToken, &$orderModel) {
                 $order = Order::create([
-                    'uuid' => $uuid,
+                    'receipt_token' => $receiptToken,
                     'cashier_id' => Auth::id(),
                     'order_type' => OrderType::Cashier->value,
                     'payment_method' => $request->payment_method,
@@ -79,7 +79,7 @@ class PlaceCashierOrderAction
         try {
             $attempt();
         } catch (UniqueConstraintViolationException) {
-            $uuid = (string) Str::uuid();
+            $receiptToken = (string) Str::uuid();
             $attempt();
         }
 

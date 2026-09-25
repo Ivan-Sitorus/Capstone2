@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('processed_by')->nullable()->constrained('users')->nullOnDelete();
             $table->string('status');
             $table->string('order_type');
-            $table->uuid('uuid')->nullable();
+            $table->uuid('receipt_token')->unique();
             $table->integer('qris_resubmit_attempts')->default(0);
             $table->string('qris_status')->nullable();
             $table->unsignedBigInteger('total_amount');
