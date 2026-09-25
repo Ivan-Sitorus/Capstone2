@@ -39,7 +39,6 @@ const useCartStore = create((set, get) => ({
 
     total:    () => get().items.reduce((s, i) => s + i.price * i.quantity, 0),
     count:    () => get().items.reduce((s, i) => s + i.quantity, 0),
-    totalQty: () => get().items.reduce((s, i) => s + i.quantity, 0),
 }));
 
 export default useCartStore;

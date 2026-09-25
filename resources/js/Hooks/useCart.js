@@ -14,6 +14,5 @@ export default function useCart() {
     return {
         items, tableId, setTable, addItem, removeItem, updateQty, clearCart,
         total, count,
-        totalQty: count, /* backward-compat alias used in Menu/Index */
     };
 }
