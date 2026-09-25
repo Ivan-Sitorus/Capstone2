@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\MovementType;
+use App\Filament\Support\ChartPalette;
 use App\Models\Ingredient;
 use Filament\Support\RawJs;
 use Filament\Widgets\LineChartWidget;
@@ -27,26 +28,28 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         return $this->until ?? now()->toDateString();
     }
 
-    private function topIngredient(): ?string
+    private function defaultIngredient(): ?string
     {
-        return DB::table('stock_movements as m')
-            ->join('ingredients as i', 'i.id', '=', 'm.ingredient_id')
-            ->whereNull('i.deleted_at')
-            ->where('m.movement_type', MovementType::Sale->value)
-            ->whereDate('m.created_at', '>=', $this->rangeFrom())
-            ->whereDate('m.created_at', '<=', $this->rangeUntil())
-            ->selectRaw('i.name as ingredient_name, SUM(-m.quantity_change) as total')
-            ->groupBy('i.id', 'i.name')
-            ->orderByDesc('total')
-            ->value('ingredient_name');
+        return Ingredient::query()->orderBy('name')->value('name');
     }
 
     private function selectedIngredient(): ?string
     {
-        if ($this->filter === 'top') {
-            return $this->topIngredient();
+        return $this->filter ?: $this->defaultIngredient();
+    }
+
+    private function selectedUnit(): ?string
+    {
+        $ingredientName = $this->selectedIngredient();
+
+        if (! $ingredientName) {
+            return null;
         }
-        return $this->filter;
+
+        $unit = Ingredient::query()->where('name', $ingredientName)->value('unit');
+
+        // Eloquent menerapkan cast enum pada value() — ambil ->value bila BackedEnum.
+        return $unit instanceof \BackedEnum ? $unit->value : $unit;
     }
 
     #[On('dashboard-filters-changed')]
@@ -54,48 +57,57 @@ class PemakaianBahanBakuWidget extends LineChartWidget
     {
         $this->from = $from;
         $this->until = $until;
-        $this->filter = $this->topIngredient();
+
+        if (blank($this->filter)) {
+            $this->filter = $this->defaultIngredient();
+        }
+
         $this->cachedData = null;
     }
 
     public function mount(): void
     {
         parent::mount();
-        $this->filter ??= $this->topIngredient();
+        $this->filter ??= $this->defaultIngredient();
     }
 
     protected function getFilters(): ?array
     {
-        $top = $this->topIngredient();
-        $options = $top ? ['top' => "Terpopuler: {$top}"] : [];
-
-        $allNames = Ingredient::orderBy('name')->pluck('name', 'name');
-        foreach ($allNames as $name) {
-            $options[$name] = $name;
-        }
+        $options = Ingredient::query()->orderBy('name')->pluck('name', 'name')->all();
 
         return $options ?: null;
     }
 
     protected function getOptions(): array | RawJs | null
     {
-        $ingredientName = $this->selectedIngredient();
-        $unit = $ingredientName
-            ? Ingredient::where('name', $ingredientName)->value('unit')
-            : null;
-
-        // Eloquent menerapkan cast enum pada value() — ambil ->value bila BackedEnum
-        $unitValue = $unit instanceof \BackedEnum ? $unit->value : $unit;
-        $unitLabel = $unitValue ? " {$unitValue}" : '';
+        $nf = ChartPalette::idNumberFormat();
 
         // RawJs wajib sebagai return penuh (bukan bersarang di array) agar
         // @js() merender callback sebagai function, bukan JSON string/object.
         return RawJs::make(<<<JS
             {
+                interaction: { mode: 'index', intersect: false },
+                hover: { mode: 'index', intersect: false },
                 scales: {
                     y: {
                         ticks: {
-                            callback: (value) => value + '{$unitLabel}',
+                            callback: function (value) {
+                                const datasets = this.chart && this.chart.data ? this.chart.data.datasets : [];
+                                const unit = (datasets[0] && datasets[0].unit) || '';
+                                const formatted = {$nf}.format(value);
+                                return unit ? formatted + ' ' + unit : formatted;
+                            },
+                        },
+                    },
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => {
+                                const unit = (ctx.dataset && ctx.dataset.unit) || '';
+                                const formatted = {$nf}.format(ctx.parsed.y);
+                                return ctx.dataset.label + ': ' + formatted + (unit ? ' ' + unit : '');
+                            },
                         },
                     },
                 },
@@ -129,6 +141,11 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         $previousUntil = $fromDate->copy()->subDay();
         $previous = $this->dailyUsage($previousFrom->toDateString(), $previousUntil->toDateString());
 
+        // Satuan dibawa di dataset (bukan di-bake ke options) agar label sumbu Y ikut
+        // berubah saat filter bahan diganti. `wire:ignore` mencegah options di-render ulang,
+        // sedangkan data ter-update lewat event `updateChartData`.
+        $unit = $this->selectedUnit();
+
         return [
             'datasets' => [
                 [
@@ -137,6 +154,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
                     'borderColor' => '#28A745',
                     'backgroundColor' => 'rgba(40, 167, 69, 0.1)',
                     'fill' => true,
+                    'unit' => $unit,
                 ],
                 [
                     'label' => $previousFrom->translatedFormat('d M Y') . ' – ' . $previousUntil->translatedFormat('d M Y'),
@@ -145,6 +163,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
                     'backgroundColor' => 'rgba(232, 105, 42, 0.1)',
                     'fill' => true,
                     'borderDash' => [4, 4],
+                    'unit' => $unit,
                 ],
             ],
             'labels' => $labels,

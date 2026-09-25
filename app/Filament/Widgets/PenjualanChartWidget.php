@@ -3,7 +3,9 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\OrderStatus;
+use App\Filament\Support\ChartPalette;
 use App\Models\Order;
+use Filament\Support\RawJs;
 use Filament\Widgets\LineChartWidget;
 use Illuminate\Support\Carbon;
 use Livewire\Attributes\On;
@@ -77,6 +79,32 @@ class PenjualanChartWidget extends LineChartWidget
             ],
             'labels' => $labels,
         ];
+    }
+
+    protected function getOptions(): array | RawJs | null
+    {
+        $nf = ChartPalette::idNumberFormat();
+
+        return RawJs::make(<<<JS
+            {
+                interaction: { mode: 'index', intersect: false },
+                hover: { mode: 'index', intersect: false },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => 'Rp' + {$nf}.format(value),
+                        },
+                    },
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => ctx.dataset.label + ': Rp' + {$nf}.format(ctx.parsed.y),
+                        },
+                    },
+                },
+            }
+        JS);
     }
 
     private function dailyTotals(string $from, string $to): array

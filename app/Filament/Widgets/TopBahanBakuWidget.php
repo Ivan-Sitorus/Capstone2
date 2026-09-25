@@ -3,6 +3,8 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\MovementType;
+use App\Filament\Support\ChartPalette;
+use Filament\Support\RawJs;
 use Filament\Widgets\BarChartWidget;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -37,7 +39,7 @@ class TopBahanBakuWidget extends BarChartWidget
     {
         $from = Carbon::parse($this->rangeFrom())->translatedFormat('d M Y');
         $until = Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
-        return "Top 10 Bahan Baku — Biaya Pemakaian ({$from} – {$until})";
+        return "Top 10 Bahan Baku Berdasarkan Biaya Pemakaian ({$from} – {$until})";
     }
 
     protected function getData(): array
@@ -65,20 +67,39 @@ class TopBahanBakuWidget extends BarChartWidget
                 [
                     'label' => 'Biaya Pemakaian (Rp)',
                     'data' => $rows->map(fn ($r) => round((float) $r->total, 2))->values()->all(),
-                    'backgroundColor' => '#17A2B8',
+                    'backgroundColor' => ChartPalette::colors($rows->count()),
+                    'borderWidth' => 0,
                 ],
             ],
             'labels' => $rows->map(fn ($r) => $r->ingredient_name . ($r->unit ? ' (' . $r->unit . ')' : ''))->values()->all(),
         ];
     }
 
-    protected function getOptions(): array
+    protected function getOptions(): array | RawJs | null
     {
-        return [
-            'indexAxis' => 'y',
-            'plugins' => [
-                'legend' => ['display' => false],
-            ],
-        ];
+        $nf = ChartPalette::idNumberFormat();
+
+        return RawJs::make(<<<JS
+            {
+                indexAxis: 'y',
+                interaction: { mode: 'index', intersect: false },
+                hover: { mode: 'index', intersect: false },
+                scales: {
+                    x: {
+                        ticks: {
+                            callback: (value) => 'Rp' + {$nf}.format(value),
+                        },
+                    },
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => ctx.dataset.label + ': Rp' + {$nf}.format(ctx.parsed.x),
+                        },
+                    },
+                },
+            }
+        JS);
     }
 }

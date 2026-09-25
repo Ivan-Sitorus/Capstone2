@@ -2,7 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Support\ChartPalette;
 use App\Models\DataminingRun;
+use Filament\Support\RawJs;
 use Filament\Widgets\LineChartWidget;
 
 class ForecastVsActualChartWidget extends LineChartWidget
@@ -59,6 +61,32 @@ class ForecastVsActualChartWidget extends LineChartWidget
             ],
             'labels' => $selected['labels'],
         ];
+    }
+
+    protected function getOptions(): array | RawJs | null
+    {
+        $nf = ChartPalette::idNumberFormat();
+
+        return RawJs::make(<<<JS
+            {
+                interaction: { mode: 'index', intersect: false },
+                hover: { mode: 'index', intersect: false },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => {$nf}.format(value),
+                        },
+                    },
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => ctx.dataset.label + ': ' + {$nf}.format(ctx.parsed.y),
+                        },
+                    },
+                },
+            }
+        JS);
     }
 
     private function payload(): array

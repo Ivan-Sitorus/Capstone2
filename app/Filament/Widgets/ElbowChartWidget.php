@@ -2,7 +2,9 @@
 
 namespace App\Filament\Widgets;
 
+use App\Filament\Support\ChartPalette;
 use App\Models\DataminingRun;
+use Filament\Support\RawJs;
 use Filament\Widgets\LineChartWidget;
 
 class ElbowChartWidget extends LineChartWidget
@@ -33,5 +35,31 @@ class ElbowChartWidget extends LineChartWidget
             ],
             'labels' => array_map('strval', $elbow['k'] ?? []),
         ];
+    }
+
+    protected function getOptions(): array | RawJs | null
+    {
+        $nf = ChartPalette::idNumberFormat();
+
+        return RawJs::make(<<<JS
+            {
+                interaction: { mode: 'index', intersect: false },
+                hover: { mode: 'index', intersect: false },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: (value) => {$nf}.format(value),
+                        },
+                    },
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: (ctx) => ctx.dataset.label + ': ' + {$nf}.format(ctx.parsed.y),
+                        },
+                    },
+                },
+            }
+        JS);
     }
 }

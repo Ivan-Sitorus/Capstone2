@@ -15,4 +15,14 @@ class ChartPalette
 
         return $colors;
     }
+
+    /**
+     * JS expression for Indonesian (id-ID) number formatting.
+     * Thousands separator ".", decimal separator "," (e.g. 1.234,5).
+     * Used inside RawJs chart callbacks.
+     */
+    public static function idNumberFormat(): string
+    {
+        return "new Intl.NumberFormat('id-ID')";
+    }
 }
