@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Enums\DataminingRunStatus;
 use App\Models\DataminingRun;
 use Illuminate\Support\Facades\Http;
 
@@ -11,7 +12,7 @@ class DataMiningRunner
     {
         $run = DataminingRun::create([
             'type'       => $type,
-            'status'     => 'running',
+            'status'     => DataminingRunStatus::Running->value,
             'parameters' => [
                 'date_from' => $dateFrom,
                 'date_to'   => $dateTo,

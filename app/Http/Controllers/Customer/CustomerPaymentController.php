@@ -94,7 +94,7 @@ class CustomerPaymentController extends Controller
 
     public function choose(Request $request, Order $order): JsonResponse
     {
-        return $request->input('payment_method') === 'qris'
+        return $request->input('payment_method') === PaymentMethod::Qris->value
             ? $this->chooseQris($request, $order)
             : $this->chooseCash($request, $order);
     }

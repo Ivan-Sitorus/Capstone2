@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\DataminingRunStatus;
 use Illuminate\Database\Eloquent\Model;
 
 class DataminingRun extends Model
@@ -26,7 +27,7 @@ class DataminingRun extends Model
     {
         return static::query()
             ->where('type', $type)
-            ->where('status', 'completed')
+            ->where('status', DataminingRunStatus::Completed->value)
             ->latest()
             ->first();
     }
@@ -43,7 +44,7 @@ class DataminingRun extends Model
     {
         return static::query()
             ->where('type', $type)
-            ->where('status', 'completed')
+            ->where('status', DataminingRunStatus::Completed->value)
             ->latest()
             ->limit($limit)
             ->get();

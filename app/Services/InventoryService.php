@@ -227,7 +227,7 @@ class InventoryService
                 'order_id' => $context['order_id'] ?? null,
                 'order_item_id' => $context['order_item_id'] ?? null,
                 'stock_adjustment_id' => $context['stock_adjustment_id'] ?? null,
-                'movement_type' => $context['movement_type'] ?? 'sale',
+                'movement_type' => $context['movement_type'] ?? MovementType::Sale->value,
                 'source_type' => $context['source_type'] ?? null,
                 'source_id' => isset($context['source_id']) ? (string) $context['source_id'] : null,
                 'quantity_before' => $before,

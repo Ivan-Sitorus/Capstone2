@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Enums\DataminingRunStatus;
 use App\Models\DataminingRun;
 use Filament\Notifications\Notification;
 use Livewire\Component;
@@ -24,7 +25,7 @@ class DataMiningStatus extends Component
         $user = auth('admin')->user();
 
         $finished = DataminingRun::query()
-            ->whereIn('status', ['completed', 'failed'])
+            ->whereIn('status', [DataminingRunStatus::Completed->value, DataminingRunStatus::Failed->value])
             ->where('id', '>', $this->lastSeenId)
             ->orderBy('id')
             ->get();
@@ -45,12 +46,12 @@ class DataMiningStatus extends Component
             $label = $labels[$run->type] ?? $run->type;
 
             $notification = Notification::make()
-                ->title($run->status === 'completed' ? "{$label} selesai" : "{$label} gagal")
-                ->body($run->status === 'completed'
+                ->title($run->status === DataminingRunStatus::Completed->value ? "{$label} selesai" : "{$label} gagal")
+                ->body($run->status === DataminingRunStatus::Completed->value
                     ? 'Hasil sudah tersedia dan dapat dilihat pada halaman ringkasan.'
                     : ($run->error ?: 'Terjadi kesalahan saat memproses data.'));
 
-            if ($run->status === 'completed') {
+            if ($run->status === DataminingRunStatus::Completed->value) {
                 $notification->success();
             } else {
                 $notification->danger();

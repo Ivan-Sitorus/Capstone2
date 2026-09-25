@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Enums\OrderStatus;
+use App\Enums\OrderType;
+use App\Enums\PaymentMethod;
 use App\Models\Order;
 
 class DashboardService
@@ -17,13 +19,15 @@ class DashboardService
             ->selectRaw("
                 SUM(CASE WHEN status = ? THEN total_amount ELSE 0 END) AS total_penjualan,
                 SUM(CASE WHEN status = ? THEN 1 ELSE 0 END)            AS jumlah_transaksi,
-                SUM(CASE WHEN status = ? AND payment_method = 'cash'   THEN 1 ELSE 0 END) AS cash_pending,
-                SUM(CASE WHEN status = ? AND payment_method = 'qris' AND payment_proof IS NOT NULL THEN 1 ELSE 0 END) AS qris_pending
+                SUM(CASE WHEN status = ? AND payment_method = ? THEN 1 ELSE 0 END) AS cash_pending,
+                SUM(CASE WHEN status = ? AND payment_method = ? AND payment_proof IS NOT NULL THEN 1 ELSE 0 END) AS qris_pending
             ", [
             OrderStatus::Completed->value,
             OrderStatus::Completed->value,
             OrderStatus::Pending->value,
+            PaymentMethod::Cash->value,
             OrderStatus::Pending->value,
+            PaymentMethod::Qris->value,
             ])
             ->first();
     }
@@ -32,12 +36,12 @@ class DashboardService
     {
         return Order::whereNotIn('status', [OrderStatus::Completed->value, OrderStatus::Cancelled->value])
             ->where(fn($q) =>
-                $q->where('order_type', 'cashier')
+                $q->where('order_type', OrderType::Cashier->value)
                   ->orWhere(fn($q2) =>
-                      $q2->where('order_type', 'qr')
+                      $q2->where('order_type', OrderType::Qr->value)
                          ->where(fn($q3) =>
-                             $q3->where('payment_method', 'cash')
-                                ->orWhere(fn($q4) => $q4->where('payment_method', 'qris')->whereNotNull('payment_proof'))
+                             $q3->where('payment_method', PaymentMethod::Cash->value)
+                                ->orWhere(fn($q4) => $q4->where('payment_method', PaymentMethod::Qris->value)->whereNotNull('payment_proof'))
                          )
                   )
             )->count();
@@ -56,7 +60,7 @@ class DashboardService
                 'id'             => $o->id,
                 'order_code'     => $o->order_code,
                 'customer_name'  => $o->customer_name,
-                'items_summary'  => $o->items->map(fn($i) => $i->quantity . 'x ' . $i->menu->name)->join(', '),
+                'itemsSummary'  => $o->items->map(fn($i) => $i->quantity . 'x ' . $i->menu->name)->join(', '),
                 'total_amount'   => $o->total_amount,
                 'payment_method' => $o->payment_method,
                 'status'         => $o->status,
