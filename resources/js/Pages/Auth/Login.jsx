@@ -29,7 +29,7 @@ export default function Login() {
                 {/* Logo */}
                 <img
                     src="/images/logo.jpg"
-                    alt="W9 Cafe"
+                    alt="POSMine"
                     style={{
                         width: 120,
                         height: 120,
@@ -45,7 +45,7 @@ export default function Login() {
                     fontWeight: 700,
                     margin: '4px 0 0',
                     letterSpacing: '-0.5px',
-                }}>W9 Cafe</h1>
+                }}>POSMine</h1>
 
                 <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: 15, margin: 0 }}>
                     Sistem Point of Sale

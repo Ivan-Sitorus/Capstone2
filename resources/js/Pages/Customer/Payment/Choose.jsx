@@ -69,7 +69,7 @@ export default function PaymentChoose({ order, items, table_number }) {
     function handleAcknowledge() {
         let tableId = null;
         try {
-            const saved = sessionStorage.getItem('w9_customer');
+            const saved = sessionStorage.getItem('posmine_customer');
             if (saved) tableId = JSON.parse(saved)?.tableId;
         } catch (_) {}
         router.visit(tableId ? route('customer.menu', { table: tableId }) : route('customer.menu'));
@@ -78,21 +78,21 @@ export default function PaymentChoose({ order, items, table_number }) {
     return (
         <CustomerLayout activeTab="cart">
             <Head>
-                <title>Pilih Pembayaran — W9 Cafe</title>
+                <title>Pilih Pembayaran — POSMine</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
                 <style>{`
                     html, body { background: ${STONE_50}; }
-                    .w9p-scroll::-webkit-scrollbar { display: none; }
-                    .w9p-btn-back { transition: background 0.15s; }
-                    .w9p-btn-back:hover { background: ${GRAY_100} !important; }
-                    .w9p-method { transition: border-color 0.2s, box-shadow 0.2s; }
-                    .w9p-confirm {
+                    .posminep-scroll::-webkit-scrollbar { display: none; }
+                    .posminep-btn-back { transition: background 0.15s; }
+                    .posminep-btn-back:hover { background: ${GRAY_100} !important; }
+                    .posminep-method { transition: border-color 0.2s, box-shadow 0.2s; }
+                    .posminep-confirm {
                         transition: background 0.15s, transform 0.1s;
                     }
-                    .w9p-confirm:active { transform: scale(0.98); }
-                    .w9p-confirm:hover:not(:disabled) { background: ${C.accentDark} !important; }
+                    .posminep-confirm:active { transform: scale(0.98); }
+                    .posminep-confirm:hover:not(:disabled) { background: ${C.accentDark} !important; }
                 `}</style>
             </Head>
 
@@ -124,7 +124,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                 }}>
                     <button
                         onClick={() => router.visit(route('customer.cart'))}
-                        className="w9p-btn-back"
+                        className="posminep-btn-back"
                         style={{
                             marginTop: 2,
                             width: 36, height: 36, borderRadius: '50%',
@@ -164,7 +164,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                 </header>
 
                 {/* ── Scroll area ── */}
-                <div className="w9p-scroll" style={{
+                <div className="posminep-scroll" style={{
                     flex: 1, overflowY: 'auto',
                     scrollbarWidth: 'none',
                     WebkitOverflowScrolling: 'touch',
@@ -251,7 +251,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                                     <div
                                         key={key}
                                         onClick={() => setSelected(key)}
-                                        className="w9p-method"
+                                        className="posminep-method"
                                         style={{
                                             background: C.surface,
                                             borderRadius: 12,
@@ -336,7 +336,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                     <button
                         onClick={handleSubmit}
                         disabled={!selected || loading}
-                        className="w9p-confirm"
+                        className="posminep-confirm"
                         style={{
                             width: '100%',
                             padding: '16px 0',
@@ -443,7 +443,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                         {/* Button */}
                         <button
                             onClick={handleAcknowledge}
-                            className="w9p-confirm"
+                            className="posminep-confirm"
                             style={{
                                 width: '100%', padding: '13px 0',
                                 background: C.accent, color: WHITE,

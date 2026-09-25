@@ -52,8 +52,8 @@ export default function WhatsAppShareModal({ isOpen, onClose, order, onSkip }) {
             .map((i) => `${i.quantity}x ${i.name}`)
             .join(', ') ?? '';
     const previewMessage = itemSummary
-        ? `Pesanan: ${itemSummary}${order.items.length > 2 ? ` dan ${order.items.length - 2} item lainnya` : ''}\n\nStruk Belanja di W9 Cafe total ${formatRupiah(order?.total_amount || 0)}.`
-        : `Struk Belanja di W9 Cafe total ${formatRupiah(order?.total_amount || 0)}.`;
+        ? `Pesanan: ${itemSummary}${order.items.length > 2 ? ` dan ${order.items.length - 2} item lainnya` : ''}\n\nStruk Belanja di POSMine total ${formatRupiah(order?.total_amount || 0)}.`
+        : `Struk Belanja di POSMine total ${formatRupiah(order?.total_amount || 0)}.`;
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Kirim Struk via WhatsApp" size="sm">

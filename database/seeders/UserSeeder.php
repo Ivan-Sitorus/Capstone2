@@ -12,8 +12,8 @@ class UserSeeder extends Seeder
     {
         User::insertOrIgnore([
             [
-                'name' => 'Admin W9',
-                'email' => 'admin@w9cafe.com',
+                'name' => 'Admin POSMine',
+                'email' => 'admin@posmine.com',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
                 'created_at' => now(),
@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Ahmad Kasir',
-                'email' => 'kasir@w9cafe.com',
+                'email' => 'kasir@posmine.com',
                 'password' => Hash::make('password'),
                 'role' => 'cashier',
                 'created_at' => now(),
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Siti Kasir',
-                'email' => 'siti@w9cafe.com',
+                'email' => 'siti@posmine.com',
                 'password' => Hash::make('password'),
                 'role' => 'cashier',
                 'created_at' => now(),
@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Budi Kasir',
-                'email' => 'budi@w9cafe.com',
+                'email' => 'budi@posmine.com',
                 'password' => Hash::make('password'),
                 'role' => 'cashier',
                 'created_at' => now(),

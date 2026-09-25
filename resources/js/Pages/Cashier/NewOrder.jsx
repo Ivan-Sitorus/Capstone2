@@ -170,7 +170,7 @@ export default function NewOrder({ categories }) {
     };
 
     return (
-        <><Head title="Pesanan Baru | W9 Cafe" /><CashierLayout title="Pesanan Baru" fullscreen>
+        <><Head title="Pesanan Baru | POSMine" /><CashierLayout title="Pesanan Baru" fullscreen>
             <div style={{ display: 'flex', flexDirection: isPortrait ? 'column' : 'row', height: '100vh', overflow: 'hidden' }}>
 
                 {/* ══ PANEL TENGAH ══ */}

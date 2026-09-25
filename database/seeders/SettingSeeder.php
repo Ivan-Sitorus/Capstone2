@@ -11,14 +11,14 @@ class SettingSeeder extends Seeder
     {
         $settings = [
             'receipt' => [
-                'receipt_title' => 'W9 Cafe',
+                'receipt_title' => 'POSMine',
                 'receipt_header' => 'STIE Totalwin Semarang',
                 'receipt_footer' => 'Terima kasih telah berbelanja',
-                'receipt_whatsapp_template' => "Struk Belanja di W9 Cafe:\n(link)\n\nAbaikan Jika Tidak Membeli",
+                'receipt_whatsapp_template' => "Terima kasih telah berbelanja di POSMine.\nStruk: (link)",
             ],
             'payment' => [
-                'qris_image' => 'qris/qris-w9cafe.png',
-                'qris_name' => 'W9 Cafe',
+                'qris_image' => 'qris/qris-posmine.png',
+                'qris_name' => 'POSMine',
             ],
         ];
 

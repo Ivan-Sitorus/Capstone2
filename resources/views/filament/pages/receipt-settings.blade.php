@@ -54,7 +54,7 @@
                                     Kasir
                                 </div>
 
-                                <div style="font-size: 14px; line-height: 1.4; white-space: pre-line; word-break: break-word; overflow-wrap: break-word; color: #1f2937;" class="dark:text-gray-200">                                            {!! trim(str_replace('(link)', 'https://w9cafe.com/struk/a1b2c3d4-e5f6-7890-abcd-ef1234567890', ($this->whatsappPreview ?? ''))) !!}<span style="display: inline-block; width: 38px;"></span></div>
+                                <div style="font-size: 14px; line-height: 1.4; white-space: pre-line; word-break: break-word; overflow-wrap: break-word; color: #1f2937;" class="dark:text-gray-200">                                            {!! trim(str_replace('(link)', 'https://posmine.com/struk/a1b2c3d4-e5f6-7890-abcd-ef1234567890', ($this->whatsappPreview ?? ''))) !!}<span style="display: inline-block; width: 38px;"></span></div>
 
                                 <div style="position: absolute; bottom: 4px; right: 8px; font-size: 10px; color: #6b7280;">
                                     {{ now()->format('H.i') }}

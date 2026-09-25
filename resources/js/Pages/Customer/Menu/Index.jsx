@@ -31,7 +31,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
     const soldOut  = menu.is_available === false;
 
     return (
-        <article className="w9-card" style={{
+        <article className="posmine-card" style={{
             background:    'rgba(255,255,255,0.90)',
             backdropFilter: 'blur(6px)',
             borderRadius:  12,
@@ -202,7 +202,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                             }}>+</button>
                         </div>
                     ) : (
-                        <button onClick={onAdd} className="w9-add-btn" style={{
+                        <button onClick={onAdd} className="posmine-add-btn" style={{
                             width:         '100%',
                             background:    C.accent,
                             color:         C.surface,
@@ -237,7 +237,7 @@ export default function CustomerMenu({ categories, table }) {
 
     useEffect(() => {
         try {
-            const saved = sessionStorage.getItem('w9_customer');
+            const saved = sessionStorage.getItem('posmine_customer');
             if (!saved) {
                 const fb = table?.id ?? '';
                 router.visit(fb ? route('customer.identity', { table: fb }) : route('customer.identity'));
@@ -245,13 +245,13 @@ export default function CustomerMenu({ categories, table }) {
             }
             const data = JSON.parse(saved);
             if (!data.name) {
-                sessionStorage.removeItem('w9_customer');
+                sessionStorage.removeItem('posmine_customer');
                 const fb = table?.id ?? '';
                 router.visit(fb ? route('customer.identity', { table: fb }) : route('customer.identity'));
                 return;
             }
             if (table?.id && data.tableId !== table.id) {
-                sessionStorage.removeItem('w9_customer');
+                sessionStorage.removeItem('posmine_customer');
                 router.visit(route('customer.identity', { table: table.id }));
                 return;
             }
@@ -300,21 +300,21 @@ export default function CustomerMenu({ categories, table }) {
     return (
         <CustomerLayout activeTab="menu">
             <Head>
-                <title>Menu — W9 Cafe</title>
+                <title>Menu — POSMine</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
                 <style>{`
                     html, body { background: ${STONE_50}; }
-                    .w9-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
-                    .w9-card:hover { box-shadow: ${C.shadowLift} !important; transform: translateY(-2px); }
-                    .w9-add-btn { transition: background 0.15s ease; }
-                    .w9-add-btn:hover { background: ${C.accentHover} !important; }
-                    .w9-chip { transition: background 0.15s, color 0.15s; }
-                    .w9-search:focus { outline: none; box-shadow: 0 0 0 2px rgba(68,64,60,0.20) !important; }
-                    .w9-chips::-webkit-scrollbar { display: none; }
-                    .w9-scroll::-webkit-scrollbar { display: none; }
-                    .w9-wallpaper {
+                    .posmine-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+                    .posmine-card:hover { box-shadow: ${C.shadowLift} !important; transform: translateY(-2px); }
+                    .posmine-add-btn { transition: background 0.15s ease; }
+                    .posmine-add-btn:hover { background: ${C.accentHover} !important; }
+                    .posmine-chip { transition: background 0.15s, color 0.15s; }
+                    .posmine-search:focus { outline: none; box-shadow: 0 0 0 2px rgba(68,64,60,0.20) !important; }
+                    .posmine-chips::-webkit-scrollbar { display: none; }
+                    .posmine-scroll::-webkit-scrollbar { display: none; }
+                    .posmine-wallpaper {
                         position: fixed; top: 0; left: 50%; transform: translateX(-50%);
                         width: 100%; max-width: 430px; height: 100vh;
                         z-index: 0; pointer-events: none; overflow: hidden; background: ${STONE_200};
@@ -323,7 +323,7 @@ export default function CustomerMenu({ categories, table }) {
             </Head>
 
             {/* Wallpaper */}
-            <div className="w9-wallpaper" aria-hidden="true">
+            <div className="posmine-wallpaper" aria-hidden="true">
                 <img src="/images/wallpaper-menu.jpg" alt=""
                     fetchPriority="high" loading="eager"
                     style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
@@ -352,12 +352,12 @@ export default function CustomerMenu({ categories, table }) {
                             boxShadow: '0 2px 8px rgba(68,64,60,0.25)',
                         }}>
                             <img
-                                src="/images/logo.jpg" alt="W9 Cafe"
+                                src="/images/logo.jpg" alt="POSMine"
                                 fetchPriority="high" loading="eager"
                                 style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.90 }}
                                 onError={e => {
                                     e.target.style.display = 'none';
-                                    e.target.parentElement.innerHTML = `<span style="color:${WHITE};font-size:16px;font-style:italic;font-weight:700">w9</span>`;
+                                    e.target.parentElement.innerHTML = `<span style="color:${WHITE};font-size:16px;font-style:italic;font-weight:700">posmine</span>`;
                                 }}
                             />
                         </div>
@@ -402,7 +402,7 @@ export default function CustomerMenu({ categories, table }) {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Cari menu favoritmu..."
-                            className="w9-search"
+                            className="posmine-search"
                             style={{
                                 width: '100%', height: 46,
                                 background: 'rgba(255,255,255,0.90)',
@@ -421,7 +421,7 @@ export default function CustomerMenu({ categories, table }) {
 
                 {/* ── Category chips — rounded-12 sesuai Stitch ── */}
                 <div style={{ flexShrink: 0 }}>
-                    <div className="w9-chips" style={{
+                    <div className="posmine-chips" style={{
                         display: 'flex', gap: 8, overflowX: 'auto',
                         scrollbarWidth: 'none', padding: '4px 20px 14px',
                     }}>
@@ -431,7 +431,7 @@ export default function CustomerMenu({ categories, table }) {
                                 <button
                                     key={c.id}
                                     onClick={() => setActiveCategory(c.id === 'all' ? 'all' : c.name)}
-                                    className="w9-chip"
+                                    className="posmine-chip"
                                     style={{
                                         flexShrink:     0,
                                         background:     active ? C.accent : 'rgba(255,255,255,0.90)',
@@ -456,7 +456,7 @@ export default function CustomerMenu({ categories, table }) {
                 </div>
 
                 {/* ── Menu scroll area ── */}
-                <div className="w9-scroll" style={{
+                <div className="posmine-scroll" style={{
                     flex: 1, overflowY: 'auto',
                     padding: '4px 16px',
                     paddingBottom: count > 0 ? 140 : 80,

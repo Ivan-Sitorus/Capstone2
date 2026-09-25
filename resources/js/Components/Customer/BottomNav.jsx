@@ -7,7 +7,7 @@ const F = '"Inter", system-ui, sans-serif';
 
 function getHistoryHref() {
     try {
-        const saved = sessionStorage.getItem('w9_customer');
+        const saved = sessionStorage.getItem('posmine_customer');
         if (saved) {
             const data = JSON.parse(saved);
             if (data?.phone) return route('customer.history', { phone: data.phone });

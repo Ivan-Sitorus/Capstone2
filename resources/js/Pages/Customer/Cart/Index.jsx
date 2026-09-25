@@ -30,7 +30,7 @@ export default function CustomerCart() {
 
     useEffect(() => {
         try {
-            const saved = sessionStorage.getItem('w9_customer');
+            const saved = sessionStorage.getItem('posmine_customer');
             if (saved) setIsStudent(JSON.parse(saved).isMahasiswa === true);
         } catch (_) {}
     }, []);
@@ -53,7 +53,7 @@ export default function CustomerCart() {
         if (isEmpty) return;
         setErrorMsg('');
         let customer = null;
-        try { customer = JSON.parse(sessionStorage.getItem('w9_customer') || 'null'); } catch (_) {}
+        try { customer = JSON.parse(sessionStorage.getItem('posmine_customer') || 'null'); } catch (_) {}
         if (!customer?.name) {
             router.visit(route('customer.menu', tableId ? { table: tableId } : {}));
             return;
@@ -79,14 +79,14 @@ export default function CustomerCart() {
     return (
         <CustomerLayout activeTab="cart">
             <Head>
-                <title>Keranjang — W9 Cafe</title>
+                <title>Keranjang — POSMine</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
                 <style>{`
                     html, body { background: ${C.bg}; }
-                    .w9cart-btn:active { transform: scale(0.98); }
-                    .w9qty-btn:active  { opacity: 0.75; }
+                    .posminecart-btn:active { transform: scale(0.98); }
+                    .posmineqty-btn:active  { opacity: 0.75; }
                     ::-webkit-scrollbar { display: none; }
                 `}</style>
             </Head>
@@ -160,7 +160,7 @@ export default function CustomerCart() {
                             </div>
                             <button
                                 onClick={() => router.visit(route('customer.menu', tableId ? { table: tableId } : {}))}
-                                className="w9cart-btn"
+                                className="posminecart-btn"
                                 style={{
                                     marginTop: 4, height: 46, padding: '0 28px',
                                     background: C.accent, color: C.bg,
@@ -228,7 +228,7 @@ export default function CustomerCart() {
                                         }}>
                                             <button
                                                 onClick={() => handleDecrement(item.menuId)}
-                                                className="w9qty-btn"
+                                                className="posmineqty-btn"
                                                 style={{
                                                     width: 26, height: 26, borderRadius: 6,
                                                     background: C.surface, border: `1px solid ${C.border}`,
@@ -243,7 +243,7 @@ export default function CustomerCart() {
                                             </span>
                                             <button
                                                 onClick={() => handleIncrement(item.menuId)}
-                                                className="w9qty-btn"
+                                                className="posmineqty-btn"
                                                 style={{
                                                     width: 26, height: 26, borderRadius: 6,
                                                     background: C.accent, border: 'none',
@@ -316,7 +316,7 @@ export default function CustomerCart() {
                                 <button
                                     onClick={handleCheckout}
                                     disabled={loading}
-                                    className="w9cart-btn"
+                                    className="posminecart-btn"
                                     style={{
                                         width: '100%', height: 54,
                                         background: loading ? C.textMuted : C.accent,

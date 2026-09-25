@@ -126,7 +126,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                     ) : (
                         <img
                             src="/images/logo.jpg"
-                            alt="W9 Cafe"
+                            alt="POSMine"
                             width={40}
                             height={40}
                             style={{
@@ -140,7 +140,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                         />
                     )}
                     {!isSidebarCollapsed && (
-                        <span style={{ color: 'white', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap' }}>W9 Cafe</span>
+                        <span style={{ color: 'white', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap' }}>POSMine</span>
                     )}
                     {!isSidebarCollapsed && (
                         <button
