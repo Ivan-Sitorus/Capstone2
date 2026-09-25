@@ -12,7 +12,7 @@ use App\Services\InventoryService;
 use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Str;
 
 class PlaceCashierOrderAction
 {
@@ -22,7 +22,7 @@ class PlaceCashierOrderAction
 
     public function handle(StoreOrderRequest $request): array
     {
-        $uuid = $request->uuid ?? (string) Uuid::uuid7();
+        $uuid = $request->uuid ?? (string) Str::uuid();
         $orderModel = null;
 
         $attempt = function () use ($request, &$uuid, &$orderModel) {
@@ -79,7 +79,7 @@ class PlaceCashierOrderAction
         try {
             $attempt();
         } catch (UniqueConstraintViolationException) {
-            $uuid = (string) Uuid::uuid7();
+            $uuid = (string) Str::uuid();
             $attempt();
         }
 

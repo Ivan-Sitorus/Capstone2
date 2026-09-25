@@ -84,7 +84,7 @@ class CafeTable extends Model
     {
         static::creating(function (CafeTable $table) {
             if (empty($table->qr_token)) {
-                $table->qr_token = Str::random(48);
+                $table->qr_token = (string) Str::uuid();
             }
 
             if (empty($table->qr_code)) {
