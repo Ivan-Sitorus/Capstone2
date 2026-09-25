@@ -121,16 +121,11 @@ def fetch_association_data(date_from: Optional[str] = None,
         SELECT
             o.created_at::date   AS "Tanggal",
             o.order_code         AS "Order_id",
-            m.name               AS "Nama Item",
-            oi.item_position     AS "Posisi",
-            oi.quantity          AS "Jumlah",
-            oi.unit_price::float AS "Harga",
-            oi.subtotal::float   AS "Subtotal"
+            m.name               AS "Nama Item"
         FROM order_items oi
         JOIN orders o ON o.id = oi.order_id
         JOIN menus  m ON m.id = oi.menu_id
         WHERE {where_sql}
-        ORDER BY o.created_at ASC, o.id ASC, oi.item_position ASC
     """
 
     conn = get_connection()

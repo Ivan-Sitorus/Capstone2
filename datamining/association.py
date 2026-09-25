@@ -2,7 +2,9 @@
 Association Rule Mining — FP-Growth (Dua Arah)
 W9 Cafe POS | Capstone STIE Totalwin
 
-Menggunakan mlxtend FP-Growth + TransactionEncoder + association_rules.
+Menggunakan mlxtend FP-Growth + association_rules.
+Basket transaksi dibangun vektorisasi via `pd.crosstab` (bukan
+`groupby(...).apply(list)` + TransactionEncoder).
 A→B dan B→A di-generate sebagai rule TERPISAH dengan nilai support/confidence/lift berbeda.
 Filter: hanya rule 1-itemset → 1-itemset.
 Diurutkan berdasarkan lift tertinggi, diambil TOP 8.
@@ -11,7 +13,6 @@ Diurutkan berdasarkan lift tertinggi, diambil TOP 8.
 import warnings
 import pandas as pd
 from mlxtend.frequent_patterns import fpgrowth, association_rules as mlxtend_rules
-from mlxtend.preprocessing import TransactionEncoder
 
 warnings.filterwarnings("ignore")
 
@@ -46,32 +47,30 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
     date_from = str(df_clean["Tanggal"].min().date())
     date_to   = str(df_clean["Tanggal"].max().date())
 
-    # ── Kelompokkan item per transaksi ─────────────────────────────────────
-    # Gunakan semua transaksi (termasuk yang hanya 1 item)
-    transactions = (
+    # ── Kelompokkan item per transaksi (vektorisasi) ───────────────────────
+    # A1: groupby.size().unstack() membangun matriks boolean transaksi × menu
+    # dalam satu operasi vektorisasi — identik dengan TransactionEncoder,
+    # tanpa `groupby(...).apply(list)` per transaksi.
+    # Gunakan semua transaksi (termasuk yang hanya 1 item).
+    df_encoded = (
         df_clean
-        .groupby("ID Pesanan")["Nama Item"]
-        .apply(list)
-        .reset_index()
-    )
-
-    logs.append({
-        "tahap":  "Pengelompokan Transaksi",
-        "detail": (
-            f"Total transaksi (order): {len(transactions)}. "
-            f"Total baris item: {len(df_clean)}."
-        ),
-    })
-
-    # ── Encoding dengan TransactionEncoder ────────────────────────────────
-    te = TransactionEncoder()
-    te_array   = te.fit(transactions["Nama Item"]).transform(transactions["Nama Item"])
-    df_encoded = pd.DataFrame(te_array, columns=te.columns_)
+        .groupby(["ID Pesanan", "Nama Item"])
+        .size()
+        .unstack(fill_value=0)
+    ) > 0
 
     total_transaksi = df_encoded.shape[0]
 
     logs.append({
-        "tahap":  "Encoding Transaksi (TransactionEncoder)",
+        "tahap":  "Pengelompokan Transaksi",
+        "detail": (
+            f"Total transaksi (order): {total_transaksi}. "
+            f"Total baris item: {len(df_clean)}."
+        ),
+    })
+
+    logs.append({
+        "tahap":  "Encoding Transaksi (Basket Boolean)",
         "detail": (
             f"Ditemukan {df_encoded.shape[1]} menu unik. "
             f"Matrix transaksi: {df_encoded.shape[0]} transaksi × {df_encoded.shape[1]} menu. "

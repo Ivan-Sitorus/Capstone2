@@ -32,6 +32,19 @@ HARI_ID = {
     'Sunday':    'Minggu',
 }
 
+# C4: konfigurasi Prophet yang sama dipakai prediksi menu & bahan baku.
+PROPHET_COMMON_PARAMS = {
+    "yearly_seasonality":      False,
+    "weekly_seasonality":      True,
+    "daily_seasonality":       False,
+    "seasonality_mode":        "additive",
+    "interval_width":          0.95,
+    "changepoint_prior_scale": 0.07,
+    "seasonality_prior_scale": 8,
+}
+
+PROPHET_UNCERTAINTY_SAMPLES = 100
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Helper
@@ -67,21 +80,75 @@ def get_day_type(date) -> str:
 # TAHAP 1 — PREPROCESSING  (cell 3–21)
 # ─────────────────────────────────────────────────────────────────────────────
 
+def _fill_missing_dates(df_agg: pd.DataFrame, item_col: str, value_col: str) -> pd.DataFrame:
+    """Lengkapi tanggal yang hilang per item (isi 0) secara vektorisasi."""
+    bounds = df_agg.groupby(item_col)["Tanggal"].agg(["min", "max"])
+    starts = bounds["min"].to_numpy().astype("datetime64[ns]")
+    ends   = bounds["max"].to_numpy().astype("datetime64[ns]")
+    counts = (ends - starts).astype("timedelta64[D]").astype(np.int64) + 1
+    offsets = np.arange(int(counts.sum())) - np.repeat(np.cumsum(counts) - counts, counts)
+    dates = np.repeat(starts, counts) + pd.to_timedelta(offsets, unit="D").to_numpy()
+    keys  = np.repeat(bounds.index.to_numpy(), counts)
+
+    df_full = pd.DataFrame({"Tanggal": dates, item_col: keys})
+    df_full = df_full.merge(df_agg, on=["Tanggal", item_col], how="left")
+    df_full[value_col] = df_full[value_col].fillna(0)
+    return df_full.sort_values([item_col, "Tanggal"]).reset_index(drop=True)
+
+
+def _fill_missing_dates_global(df_agg: pd.DataFrame, item_col: str, value_col: str) -> pd.DataFrame:
+    """Lengkapi tanggal hilang memakai rentang global (min..max seluruh item)."""
+    full_dates = pd.date_range(df_agg["Tanggal"].min(), df_agg["Tanggal"].max(), freq="D")
+    items = df_agg[item_col].unique()
+    idx = pd.MultiIndex.from_product([items, full_dates], names=[item_col, "Tanggal"])
+    df_full = df_agg.set_index([item_col, "Tanggal"]).reindex(idx).reset_index()
+    df_full[value_col] = df_full[value_col].fillna(0)
+    return df_full
+
+
+def _cap_iqr(df: pd.DataFrame, item_col: str, value_col: str, round_bounds: bool = True):
+    """IQR capping per item via groupby quantile (vektorisasi, bukan per-baris)."""
+    q1 = df.groupby(item_col)[value_col].quantile(0.25)
+    q3 = df.groupby(item_col)[value_col].quantile(0.75)
+    q1 = df[item_col].map(q1)
+    q3 = df[item_col].map(q3)
+
+    iqr = q3 - q1
+    if round_bounds:
+        lower = np.floor(q1 - 1.5 * iqr)
+        upper = np.ceil(q3 + 1.5 * iqr)
+    else:
+        lower = q1 - 1.5 * iqr
+        upper = q3 + 1.5 * iqr
+    has_iqr  = iqr > 0
+    values   = df[value_col]
+    capped   = np.where(values > upper, upper, np.where(values < lower, lower, values))
+    n_outlier = int((((values < lower) | (values > upper)) & has_iqr).sum())
+
+    out = df.copy()
+    out[value_col] = np.where(has_iqr, capped, values)
+    return out, n_outlier
+
+
 def preprocess(df: pd.DataFrame):
     logs = []
 
     # Cell 3
     df["Tanggal"] = pd.to_datetime(df["Tanggal"])
 
-    # Cell 7–8 — urutkan & agregasi harian
-    df_sorted = df.sort_values("Tanggal", ascending=True)
-    df_total  = df_sorted.groupby(
-        ["Tanggal", "Nama Item"], as_index=False
-    )["Jumlah"].sum()
+    # Cell 7–8 — agregasi harian per menu
+    # B1: fetch SQL sudah agregasi (Tanggal × Nama Item); groupby hanya
+    # dijalankan bila input ternyata masih memiliki duplikat.
+    if df.duplicated(subset=["Tanggal", "Nama Item"]).any():
+        df_total = df.groupby(
+            ["Tanggal", "Nama Item"], as_index=False
+        )["Jumlah"].sum()
+    else:
+        df_total = df[["Tanggal", "Nama Item", "Jumlah"]].copy()
 
-    # Cell 9 — Day_Type
-    df_total["Day_Type"] = df_total["Tanggal"].dt.dayofweek.apply(
-        lambda x: "Weekend" if x >= 5 else "Weekday"
+    # Cell 9 — Day_Type (B4: np.where, tanpa .apply lambda)
+    df_total["Day_Type"] = np.where(
+        df_total["Tanggal"].dt.dayofweek >= 5, "Weekend", "Weekday"
     )
     logs.append({
         "tahap":  "Agregasi Harian & Day_Type",
@@ -92,53 +159,21 @@ def preprocess(df: pd.DataFrame):
     })
 
     # Cell 12–13 — lengkapi tanggal yang hilang per item (isi Jumlah=0)
-    df_total["Tanggal"] = pd.to_datetime(df_total["Tanggal"])
-    df_full_all = []
-    for item in df_total["Nama Item"].unique():
-        df_item   = df_total[df_total["Nama Item"] == item].copy()
-        all_dates = pd.date_range(
-            df_item["Tanggal"].min(), df_item["Tanggal"].max(), freq="D"
-        )
-        df_full              = pd.DataFrame({"Tanggal": all_dates})
-        df_full              = df_full.merge(df_item, on="Tanggal", how="left")
-        df_full["Jumlah"]    = df_full["Jumlah"].fillna(0)
-        df_full["Nama Item"] = item
-        df_full              = df_full[["Tanggal", "Nama Item", "Jumlah"]]
-        df_full_all.append(df_full)
-
-    df_final = pd.concat(df_full_all, ignore_index=True)
-    df_final = df_final.sort_values(["Nama Item", "Tanggal"]).reset_index(drop=True)
+    # B2: vektorisasi (repeat/merge) menggantikan loop + merge per item.
+    df_final = _fill_missing_dates(df_total, "Nama Item", "Jumlah")
     logs.append({
         "tahap":  "Lengkapi Tanggal Kosong",
         "detail": f"Tanggal hilang diisi Jumlah=0. Total baris: {len(df_final)}.",
     })
 
     # Cell 15 — tambah ulang Day_Type
-    df_final["Day_Type"] = df_final["Tanggal"].dt.dayofweek.apply(
-        lambda x: "Weekend" if x >= 5 else "Weekday"
+    df_final["Day_Type"] = np.where(
+        df_final["Tanggal"].dt.dayofweek >= 5, "Weekend", "Weekday"
     )
 
     # Cell 18 — outlier IQR Capping per item
-    df_result_list = []
-    outlier_total  = 0
-    for item in df_final["Nama Item"].unique():
-        df_item = df_final[df_final["Nama Item"] == item].copy()
-        Q1      = df_item["Jumlah"].quantile(0.25)
-        Q3      = df_item["Jumlah"].quantile(0.75)
-        IQR     = Q3 - Q1
-        if IQR > 0:
-            lower   = math.floor(Q1 - 1.5 * IQR)
-            upper   = math.ceil(Q3 + 1.5 * IQR)
-            outlier_total += int(
-                ((df_item["Jumlah"] < lower) | (df_item["Jumlah"] > upper)).sum()
-            )
-            df_item["Jumlah"] = np.where(
-                df_item["Jumlah"] > upper, upper,
-                np.where(df_item["Jumlah"] < lower, lower, df_item["Jumlah"]),
-            )
-        df_result_list.append(df_item)
-
-    df_capped = pd.concat(df_result_list, ignore_index=True)
+    # B2: groupby.quantile + np.where menggantikan loop per item.
+    df_capped, outlier_total = _cap_iqr(df_final, "Nama Item", "Jumlah")
     logs.append({
         "tahap":  "Outlier IQR Capping",
         "detail": f"Total outlier di-cap: {outlier_total} baris.",
@@ -163,12 +198,18 @@ def preprocess(df: pd.DataFrame):
 # TAHAP 2 — SPLIT 75:25 PER MENU  (cell 28)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def prepare_menu_data(df_capped: pd.DataFrame, menu_name: str):
-    """Filter per menu, rename kolom (ds, y), encode is_weekend, split 75:25."""
-    df_menu = df_capped[df_capped["Nama Item"] == menu_name].copy()
-    df_menu = df_menu.sort_values("Tanggal").reset_index(drop=True)
+def prepare_menu_data(df_item: pd.DataFrame, menu_name: str = None):
+    """Rename kolom (ds, y), encode is_weekend, split 75:25.
+
+    B3: menerima slice yang sudah dipisah per menu (hasil satu `groupby`);
+    `menu_name` opsional dipertahankan agar pemanggilan lama tetap bekerja.
+    """
+    if menu_name is not None:
+        df_item = df_item[df_item["Nama Item"] == menu_name]
+
+    df_menu = df_item.sort_values("Tanggal").reset_index(drop=True)
     df_menu = df_menu.rename(columns={"Tanggal": "ds", "Jumlah": "y"})
-    df_menu["ds"]         = pd.to_datetime(df_menu["ds"])
+    df_menu["ds"] = pd.to_datetime(df_menu["ds"])
     df_menu["is_weekend"] = (
         df_menu["Day_Type"].str.strip().str.lower() == "weekend"
     ).astype(int)
@@ -190,14 +231,8 @@ def build_prophet_model(df_train: pd.DataFrame) -> Prophet:
     uncertainty_samples=100 (lebih cepat dari default 1000, tetap ada CI).
     """
     model = Prophet(
-        yearly_seasonality      = False,
-        weekly_seasonality      = True,
-        daily_seasonality       = False,
-        seasonality_mode        = 'additive',
-        interval_width          = 0.95,
-        changepoint_prior_scale = 0.07,
-        seasonality_prior_scale = 8,
-        uncertainty_samples     = 100,
+        **PROPHET_COMMON_PARAMS,
+        uncertainty_samples=PROPHET_UNCERTAINTY_SAMPLES,
     )
     model.add_regressor('is_weekend')
     model.fit(df_train[["ds", "y", "is_weekend"]])
@@ -235,15 +270,26 @@ def evaluate_model(model: Prophet, df_test: pd.DataFrame):
 # VISUALISASI 1 — FEATURE IMPORTANCE: Weekday vs Weekend  (cell 30)
 # ─────────────────────────────────────────────────────────────────────────────
 
-def build_feature_importance(item_data: dict, items: list) -> list:
+def build_feature_importance(df_capped: pd.DataFrame, items: list) -> list:
+    means = (
+        df_capped
+        .groupby(["Nama Item", "Day_Type"])["Jumlah"]
+        .mean()
+        .unstack("Day_Type")
+        .reindex(items)
+    )
+    weekday = means["Weekday"] if "Weekday" in means.columns else pd.Series(np.nan, index=means.index)
+    weekend = means["Weekend"] if "Weekend" in means.columns else pd.Series(np.nan, index=means.index)
+
     fi_list = []
     for item in items:
-        df_all       = item_data[item]["full"]
-        weekday_data = df_all[df_all["is_weekend"] == 0]["y"]
-        weekend_data = df_all[df_all["is_weekend"] == 1]["y"]
-        avg_weekday  = float(weekday_data.mean()) if len(weekday_data) > 0 else 0.0
-        avg_weekend  = float(weekend_data.mean()) if len(weekend_data) > 0 else 0.0
-        fi_list.append({"item": item, "Weekday": round(avg_weekday, 4), "Weekend": round(avg_weekend, 4)})
+        wd = weekday.get(item)
+        we = weekend.get(item)
+        fi_list.append({
+            "item":    item,
+            "Weekday": round(float(wd), 4) if pd.notna(wd) else 0.0,
+            "Weekend": round(float(we), 4) if pd.notna(we) else 0.0,
+        })
 
     return fi_list
 
@@ -266,10 +312,12 @@ def run_prediction_pipeline(df: pd.DataFrame) -> dict:
     items    = list(df_capped["Nama Item"].unique())
 
     # ── Tahap 2: Split 75:25 per menu (cell 28) ───────────────────────────
+    # B3: pisahkan slice per menu sekali via groupby, lalu pakai ulang.
+    menu_groups = {name: group for name, group in df_capped.groupby("Nama Item")}
     item_data = {}
     skipped_items = []
     for item in items:
-        df_full, df_train, df_test = prepare_menu_data(df_capped, item)
+        df_full, df_train, df_test = prepare_menu_data(menu_groups[item])
         if len(df_train) < 2 or len(df_test) < 1:
             skipped_items.append(item)
             continue
@@ -324,7 +372,7 @@ def run_prediction_pipeline(df: pd.DataFrame) -> dict:
     })
 
     # ── Feature importance (data saja; grafik dirender native) ─────────────
-    feature_importance = build_feature_importance(item_data, items)
+    feature_importance = build_feature_importance(df_capped, items)
 
     # ── Tahap 5: Prediksi 2 hari ke depan (cell 33) ───────────────────────
     future_dates = [max_date + pd.Timedelta(days=i) for i in range(1, 3)]

@@ -16,6 +16,11 @@ try:
 except ImportError:
     from kmeans_utils import select_kmeans
 
+try:
+    from .prediction import _fill_missing_dates, _cap_iqr
+except ImportError:
+    from prediction import _fill_missing_dates, _cap_iqr
+
 warnings.filterwarnings("ignore")
 
 
@@ -30,6 +35,12 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
     # ── Cell 3: pilih kolom yang dibutuhkan ───────────────────────────
     df_select = df[["Tanggal", "Bahan_Baku", "Jumlah_Digunakan"]].copy()
 
+    # C3: peta satuan sekali (menghindari filter df per baris di output).
+    unit_map = (
+        df.groupby("Bahan_Baku")["Unit"].first().to_dict()
+        if "Unit" in df.columns else {}
+    )
+
     # ── Cell 4: parse Tanggal ──────────────────────────────────────────
     df_select["Tanggal"] = pd.to_datetime(df_select["Tanggal"])
 
@@ -43,8 +54,8 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
     df_total = df_sorted.groupby(["Tanggal", "Bahan_Baku"], as_index=False)["Jumlah_Digunakan"].sum()
 
     # ── Cell 10: tambahkan Day_Type ────────────────────────────────────
-    df_total["Day_Type"] = df_total["Tanggal"].dt.dayofweek.apply(
-        lambda x: "Weekend" if x >= 5 else "Weekday"
+    df_total["Day_Type"] = np.where(
+        df_total["Tanggal"].dt.dayofweek >= 5, "Weekend", "Weekday"
     )
     logs.append({
         "tahap":  "Agregasi Harian",
@@ -55,24 +66,12 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
     })
 
     # ── Cell 13: lengkapi tanggal yang hilang (0) ──────────────────────
-    df_total["Tanggal"] = pd.to_datetime(df_total["Tanggal"])
-    df_full_all = []
-    for item in df_total["Bahan_Baku"].unique():
-        df_item = df_total[df_total["Bahan_Baku"] == item].copy()
-        all_dates = pd.date_range(df_item["Tanggal"].min(), df_item["Tanggal"].max(), freq="D")
-        df_full = pd.DataFrame({"Tanggal": all_dates})
-        df_full = df_full.merge(df_item, on="Tanggal", how="left")
-        df_full["Jumlah_Digunakan"] = df_full["Jumlah_Digunakan"].fillna(0)
-        df_full["Bahan_Baku"] = item
-        df_full = df_full[["Tanggal", "Bahan_Baku", "Jumlah_Digunakan"]]
-        df_full_all.append(df_full)
-
-    df_final = pd.concat(df_full_all, ignore_index=True)
-    df_final = df_final.sort_values(["Bahan_Baku", "Tanggal"]).reset_index(drop=True)
+    # C2: date-fill vektorisasi menggantikan loop per bahan baku.
+    df_final = _fill_missing_dates(df_total, "Bahan_Baku", "Jumlah_Digunakan")
 
     # ── Cell 15: Day_Type ulang setelah lengkapi ───────────────────────
-    df_final["Day_Type"] = df_final["Tanggal"].dt.dayofweek.apply(
-        lambda x: "Weekend" if x >= 5 else "Weekday"
+    df_final["Day_Type"] = np.where(
+        df_final["Tanggal"].dt.dayofweek >= 5, "Weekend", "Weekday"
     )
     logs.append({
         "tahap":  "Lengkapi Tanggal Kosong",
@@ -80,25 +79,8 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
     })
 
     # ── Cell 18: IQR Capping per bahan baku ───────────────────────────
-    df_result_list = []
-    outlier_total = 0
-    for item in df_final["Bahan_Baku"].unique():
-        df_item = df_final[df_final["Bahan_Baku"] == item].copy()
-        Q1 = df_item["Jumlah_Digunakan"].quantile(0.25)
-        Q3 = df_item["Jumlah_Digunakan"].quantile(0.75)
-        IQR = Q3 - Q1
-        if IQR > 0:
-            lower = math.floor(Q1 - 1.5 * IQR)
-            upper = math.ceil(Q3 + 1.5 * IQR)
-            n_out = int(((df_item["Jumlah_Digunakan"] < lower) | (df_item["Jumlah_Digunakan"] > upper)).sum())
-            outlier_total += n_out
-            df_item["Jumlah_Digunakan"] = np.where(
-                df_item["Jumlah_Digunakan"] > upper, upper,
-                np.where(df_item["Jumlah_Digunakan"] < lower, lower, df_item["Jumlah_Digunakan"])
-            )
-        df_result_list.append(df_item)
-
-    df_capped = pd.concat(df_result_list, ignore_index=True)
+    # C2: groupby.quantile + np.where menggantikan loop per bahan baku.
+    df_capped, outlier_total = _cap_iqr(df_final, "Bahan_Baku", "Jumlah_Digunakan")
     logs.append({
         "tahap":  "Outlier IQR Capping (per Bahan Baku)",
         "detail": f"Total nilai outlier di-cap: {outlier_total} baris.",
@@ -201,19 +183,15 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
 
 
     # ── Build table_rows (Klaster asc, Jumlah desc) ────────────────────
-    table_rows = []
-    for _, row in df_laporan.iterrows():
-        unit_val = ""
-        if "Unit" in df.columns:
-            match = df[df["Bahan_Baku"] == row["Bahan_Baku"]]["Unit"]
-            if len(match) > 0:
-                unit_val = str(match.iloc[0])
-        table_rows.append({
+    table_rows = [
+        {
             "Nama Bahan Baku":  row["Bahan_Baku"],
-            "Satuan":           unit_val,
+            "Satuan":           str(unit_map.get(row["Bahan_Baku"], "")),
             "Total Penggunaan": float(row["Jumlah_Digunakan"]),
             "Klaster":          int(row["Klaster"]),
-        })
+        }
+        for _, row in df_laporan.iterrows()
+    ]
 
     # ── Build rata_rata_table ──────────────────────────────────────────
     rata_rata_table = [
@@ -238,11 +216,7 @@ def run_bahan_baku_pipeline(df: pd.DataFrame) -> dict:
             "ingredients": [
                 {
                     "name":   r["Bahan_Baku"],
-                    "unit":   (
-                        df[df["Bahan_Baku"] == r["Bahan_Baku"]]["Unit"].iloc[0]
-                        if "Unit" in df.columns and len(df[df["Bahan_Baku"] == r["Bahan_Baku"]]) > 0
-                        else ""
-                    ),
+                    "unit":   unit_map.get(r["Bahan_Baku"], ""),
                     "jumlah": float(r["Jumlah_Digunakan"]),
                 }
                 for _, r in subset.iterrows()

@@ -24,6 +24,11 @@ import pandas as pd
 from prophet import Prophet
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
+try:
+    from .prediction import PROPHET_COMMON_PARAMS, _fill_missing_dates_global, _cap_iqr
+except ImportError:
+    from prediction import PROPHET_COMMON_PARAMS, _fill_missing_dates_global, _cap_iqr
+
 warnings.filterwarnings("ignore")
 
 HARI_ID = {
@@ -70,8 +75,8 @@ def _preprocess(df: pd.DataFrame):
     # Agregasi harian per bahan baku
     df = df.sort_values("Tanggal")
     df_agg = df.groupby(["Tanggal", "Bahan_Baku"], as_index=False)["Jumlah_Digunakan"].sum()
-    df_agg["Day_Type"] = df_agg["Tanggal"].dt.dayofweek.apply(
-        lambda x: "Weekend" if x >= 5 else "Weekday"
+    df_agg["Day_Type"] = np.where(
+        df_agg["Tanggal"].dt.dayofweek >= 5, "Weekend", "Weekday"
     )
     logs.append({
         "tahap":  "Agregasi Harian",
@@ -84,18 +89,11 @@ def _preprocess(df: pd.DataFrame):
     # Reindex — lengkapi tanggal yang hilang dengan Jumlah=0
     min_date = df_agg["Tanggal"].min()
     max_date = df_agg["Tanggal"].max()
-    full_dates = pd.date_range(start=min_date, end=max_date, freq="D")
-    parts = []
-    for bahan in df_agg["Bahan_Baku"].unique():
-        tmp = df_agg[df_agg["Bahan_Baku"] == bahan].set_index("Tanggal")
-        tmp = tmp.reindex(full_dates)
-        tmp["Bahan_Baku"]      = bahan
-        tmp["Jumlah_Digunakan"] = tmp["Jumlah_Digunakan"].fillna(0)
-        tmp = tmp.reset_index().rename(columns={"index": "Tanggal"})
-        parts.append(tmp)
-    df_full = pd.concat(parts, ignore_index=True)
-    df_full["Day_Type"] = df_full["Tanggal"].dt.dayofweek.apply(
-        lambda x: "Weekend" if x >= 5 else "Weekday"
+
+    # C2: date-fill vektorisasi (rentang global) menggantikan loop per bahan.
+    df_full = _fill_missing_dates_global(df_agg, "Bahan_Baku", "Jumlah_Digunakan")
+    df_full["Day_Type"] = np.where(
+        df_full["Tanggal"].dt.dayofweek >= 5, "Weekend", "Weekday"
     )
     logs.append({
         "tahap":  "Lengkapi Tanggal Kosong",
@@ -103,17 +101,8 @@ def _preprocess(df: pd.DataFrame):
     })
 
     # IQR Capping per bahan baku
-    capped, n_outlier = [], 0
-    for bahan in df_full["Bahan_Baku"].unique():
-        tmp = df_full[df_full["Bahan_Baku"] == bahan].copy()
-        Q1, Q3 = tmp["Jumlah_Digunakan"].quantile(0.25), tmp["Jumlah_Digunakan"].quantile(0.75)
-        IQR = Q3 - Q1
-        if IQR > 0:
-            lo, hi = Q1 - 1.5 * IQR, Q3 + 1.5 * IQR
-            n_outlier += int(((tmp["Jumlah_Digunakan"] < lo) | (tmp["Jumlah_Digunakan"] > hi)).sum())
-            tmp["Jumlah_Digunakan"] = tmp["Jumlah_Digunakan"].clip(lower=lo, upper=hi)
-        capped.append(tmp)
-    df_capped = pd.concat(capped, ignore_index=True)
+    # C2: groupby.quantile + np.where menggantikan loop per bahan.
+    df_capped, n_outlier = _cap_iqr(df_full, "Bahan_Baku", "Jumlah_Digunakan", round_bounds=False)
     logs.append({
         "tahap":  "Outlier IQR Capping",
         "detail": f"Total nilai outlier di-cap: {n_outlier} baris.",
@@ -132,12 +121,14 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
     ingredients = df_capped["Bahan_Baku"].unique().tolist()
     n = len(ingredients)
 
+    groups = {name: group for name, group in df_capped.groupby("Bahan_Baku")}
+
     predictions_out       = []
     summary_rows          = []
     all_items_store = []
 
     for bahan in ingredients:
-        df_b = df_capped[df_capped["Bahan_Baku"] == bahan].sort_values("Tanggal").reset_index(drop=True)
+        df_b = groups[bahan].sort_values("Tanggal").reset_index(drop=True)
 
         # Siapkan DataFrame Prophet (ds, y, is_weekend)
         df_p = df_b[["Tanggal", "Jumlah_Digunakan"]].rename(
@@ -151,16 +142,8 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
         train   = df_p.iloc[:n_train].reset_index(drop=True)
         test    = df_p.iloc[n_train:].reset_index(drop=True)
 
-        # ── Prophet — konfigurasi notebook Bahan Baku ──
-        model = Prophet(
-            yearly_seasonality=False,
-            weekly_seasonality=True,
-            daily_seasonality=False,
-            seasonality_mode="additive",
-            interval_width=0.95,
-            changepoint_prior_scale=0.07,
-            seasonality_prior_scale=8,
-        )
+        # ── Prophet — konfigurasi notebook Bahan Baku (C4: konstanta bersama) ──
+        model = Prophet(**PROPHET_COMMON_PARAMS)
         model.add_regressor("is_weekend")
         model.fit(train[["ds", "y", "is_weekend"]])
 
@@ -230,14 +213,23 @@ def run_prediction_pipeline_bahan_baku(df: pd.DataFrame) -> dict:
     # Sort summary by total_forecast desc
     summary_rows.sort(key=lambda x: x["total_forecast"], reverse=True)
 
-    feature_importance = []
-    for bahan in ingredients:
-        tmp = df_capped[df_capped["Bahan_Baku"] == bahan]
-        feature_importance.append({
+    means = (
+        df_capped
+        .groupby(["Bahan_Baku", "Day_Type"])["Jumlah_Digunakan"]
+        .mean()
+        .unstack("Day_Type")
+        .reindex(ingredients)
+    )
+    wd = means["Weekday"] if "Weekday" in means.columns else pd.Series(np.nan, index=means.index)
+    we = means["Weekend"] if "Weekend" in means.columns else pd.Series(np.nan, index=means.index)
+    feature_importance = [
+        {
             "bahan":   bahan,
-            "Weekday": round(float(tmp[tmp["Day_Type"] == "Weekday"]["Jumlah_Digunakan"].mean()), 4),
-            "Weekend": round(float(tmp[tmp["Day_Type"] == "Weekend"]["Jumlah_Digunakan"].mean()), 4),
-        })
+            "Weekday": round(float(wd.loc[bahan]), 4),
+            "Weekend": round(float(we.loc[bahan]), 4),
+        }
+        for bahan in ingredients
+    ]
 
     # ─────────────────────────────────────────────────────────────────────
     # Forecast range dates
