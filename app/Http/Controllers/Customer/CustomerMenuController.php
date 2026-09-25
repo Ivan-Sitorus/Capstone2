@@ -14,12 +14,12 @@ use Inertia\Response;
 
 class CustomerMenuController extends Controller
 {
-    private function findTable(?string $tableId): ?CafeTable
+    private function findTable(?string $token): ?CafeTable
     {
-        if (!$tableId) return null;
+        if (!$token) return null;
 
-        return Cache::remember("cafe_table_{$tableId}", 600, fn () =>
-            CafeTable::select(['id', 'table_number'])->find($tableId)
+        return Cache::remember("cafe_table_{$token}", 600, fn () =>
+            CafeTable::select(['id', 'table_number', 'qr_token'])->where('qr_token', $token)->first()
         );
     }
 

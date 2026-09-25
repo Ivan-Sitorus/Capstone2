@@ -11,6 +11,7 @@ use chillerlan\QRCode\QROptions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class CafeTable extends Model
 {
@@ -18,7 +19,7 @@ class CafeTable extends Model
 
     protected $table = 'cafe_tables';
 
-    protected $fillable = ['table_number', 'qr_code'];
+    protected $fillable = ['table_number', 'qr_token', 'qr_code'];
 
     protected function casts(): array
     {
@@ -32,7 +33,7 @@ class CafeTable extends Model
 
     public function getQrCodeUrlAttribute(): string
     {
-        return route('customer.identity', ['table' => $this->table_number]);
+        return route('customer.identity', ['table' => $this->qr_token]);
     }
 
     public function getQrCodeSvgAttribute(): string
@@ -82,14 +83,12 @@ class CafeTable extends Model
     protected static function booted(): void
     {
         static::creating(function (CafeTable $table) {
-            if (empty($table->qr_code)) {
-                $table->qr_code = route('customer.identity', ['table' => $table->table_number]);
+            if (empty($table->qr_token)) {
+                $table->qr_token = Str::random(48);
             }
-        });
 
-        static::updating(function (CafeTable $table) {
-            if ($table->isDirty('table_number')) {
-                $table->qr_code = route('customer.identity', ['table' => $table->table_number]);
+            if (empty($table->qr_code)) {
+                $table->qr_code = route('customer.identity', ['table' => $table->qr_token]);
             }
         });
     }

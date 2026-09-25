@@ -62,8 +62,10 @@ Route::prefix('pelanggan')->group(function () {
     Route::get('/pesanan/{order}/status', [CustomerOrderController::class, 'showStatus'])->name('customer.order.status');
 });
 
-// QR table entry — accepts {APP_URL}/order?table={id} and forwards to the identity form
-Route::get('/order', fn () => redirect()->route('customer.identity', request()->only('table')))->name('customer.order.entry');
+// QR table entry — accepts {APP_URL}/order?table={token} and forwards to the identity form
+Route::get('/order', fn () => redirect()->route('customer.identity', request()->only('table')))
+    ->middleware('throttle:60,1')
+    ->name('customer.order.entry');
 
 // Receipt (public — no auth required, UUIDv7 only for privacy)
 Route::get('/struk-pesanan/{order:uuid}', [ReceiptController::class, 'showByUuid'])->name('receipt.show-by-uuid');

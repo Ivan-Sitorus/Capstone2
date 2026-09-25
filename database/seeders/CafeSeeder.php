@@ -513,7 +513,6 @@ class CafeSeeder extends Seeder
         for ($n = 1; $n <= 10; $n++) {
             CafeTable::create([
                 'table_number' => $n,
-                'qr_code' => "http://localhost/order?table={$n}",
             ]);
         }
     }
