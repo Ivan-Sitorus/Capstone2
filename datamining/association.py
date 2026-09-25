@@ -1,6 +1,6 @@
 """
 Association Rule Mining — FP-Growth (Dua Arah)
-W9 Cafe POS | Capstone STIE Totalwin
+POSMine | Capstone STIE Totalwin
 
 Menggunakan mlxtend FP-Growth + association_rules.
 Basket transaksi dibangun vektorisasi via `pd.crosstab` (bukan

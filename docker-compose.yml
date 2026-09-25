@@ -21,7 +21,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: 'w9cafe-pos:latest'
+        image: 'posmine-pos:latest'
         profiles:
             - prod
         environment:
@@ -44,7 +44,7 @@ services:
         build:
             context: .
             dockerfile: datamining/Dockerfile
-        image: 'w9cafe-datamining:latest'
+        image: 'posmine-datamining:latest'
         environment:
             DB_HOST: 'pgsql'
             DB_PORT: '5432'

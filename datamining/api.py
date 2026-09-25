@@ -1,6 +1,6 @@
 """
 FastAPI — Data Mining API
-W9 Cafe POS | Capstone STIE Totalwin
+POSMine | Capstone STIE Totalwin
 
 Endpoints:
   GET  /health            — cek status server
@@ -38,7 +38,7 @@ except ImportError:
 warnings.filterwarnings("ignore")
 load_dotenv()
 
-app = FastAPI(title="W9 Cafe — Data Mining API", version="2.0.0")
+app = FastAPI(title="POSMine — Data Mining API", version="2.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -402,7 +402,7 @@ def run_pipeline(df: pd.DataFrame) -> dict:
 # ── ENDPOINTS ──────────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "W9 Cafe Data Mining API v2"}
+    return {"status": "ok", "service": "POSMine Data Mining API v2"}
 
 
 # ── Jalankan pipeline berdasarkan tipe (untuk fire-and-forget) ─────────────

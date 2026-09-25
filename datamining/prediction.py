@@ -1,6 +1,6 @@
 """
 Pipeline Prediksi Time Series per Menu — Prophet
-W9 Cafe POS | Capstone STIE Totalwin
+POSMine | Capstone STIE Totalwin
 
 Mengikuti notebook: 1 Model Menu Prophet preprocessing_prediction.ipynb
 - Split 75:25 (cell 28)
