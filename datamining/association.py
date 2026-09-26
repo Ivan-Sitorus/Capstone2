@@ -1,23 +1,25 @@
 """
 Association Rule Mining — FP-Growth (Dua Arah)
-POSMine | Capstone STIE Totalwin
+W9 Cafe POS | Capstone STIE Totalwin
 
-Menggunakan mlxtend FP-Growth + association_rules.
-Basket transaksi dibangun vektorisasi via `pd.crosstab` (bukan
-`groupby(...).apply(list)` + TransactionEncoder).
+Menggunakan mlxtend FP-Growth + TransactionEncoder + association_rules.
 A→B dan B→A di-generate sebagai rule TERPISAH dengan nilai support/confidence/lift berbeda.
 Filter: hanya rule 1-itemset → 1-itemset.
 Diurutkan berdasarkan lift tertinggi, diambil TOP 8.
 """
 
-import warnings
+import io, base64, warnings
 import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
+import matplotlib.pyplot as plt
 from mlxtend.frequent_patterns import fpgrowth, association_rules as mlxtend_rules
+from mlxtend.preprocessing import TransactionEncoder
 
 warnings.filterwarnings("ignore")
 
-MIN_SUPPORT    = 0.002
-MIN_CONFIDENCE = 0.03
+MIN_SUPPORT    = 0.01
+MIN_CONFIDENCE = 0.01
 
 
 # ── Preprocessing ──────────────────────────────────────────────────────────────
@@ -47,30 +49,32 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
     date_from = str(df_clean["Tanggal"].min().date())
     date_to   = str(df_clean["Tanggal"].max().date())
 
-    # ── Kelompokkan item per transaksi (vektorisasi) ───────────────────────
-    # A1: groupby.size().unstack() membangun matriks boolean transaksi × menu
-    # dalam satu operasi vektorisasi — identik dengan TransactionEncoder,
-    # tanpa `groupby(...).apply(list)` per transaksi.
-    # Gunakan semua transaksi (termasuk yang hanya 1 item).
-    df_encoded = (
+    # ── Kelompokkan item per transaksi ─────────────────────────────────────
+    # Gunakan semua transaksi (termasuk yang hanya 1 item)
+    transactions = (
         df_clean
-        .groupby(["ID Pesanan", "Nama Item"])
-        .size()
-        .unstack(fill_value=0)
-    ) > 0
-
-    total_transaksi = df_encoded.shape[0]
+        .groupby("ID Pesanan")["Nama Item"]
+        .apply(list)
+        .reset_index()
+    )
 
     logs.append({
         "tahap":  "Pengelompokan Transaksi",
         "detail": (
-            f"Total transaksi (order): {total_transaksi}. "
+            f"Total transaksi (order): {len(transactions)}. "
             f"Total baris item: {len(df_clean)}."
         ),
     })
 
+    # ── Encoding dengan TransactionEncoder ────────────────────────────────
+    te = TransactionEncoder()
+    te_array   = te.fit(transactions["Nama Item"]).transform(transactions["Nama Item"])
+    df_encoded = pd.DataFrame(te_array, columns=te.columns_)
+
+    total_transaksi = df_encoded.shape[0]
+
     logs.append({
-        "tahap":  "Encoding Transaksi (Basket Boolean)",
+        "tahap":  "Encoding Transaksi (TransactionEncoder)",
         "detail": (
             f"Ditemukan {df_encoded.shape[1]} menu unik. "
             f"Matrix transaksi: {df_encoded.shape[0]} transaksi × {df_encoded.shape[1]} menu. "
@@ -97,7 +101,7 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
 
     logs.append({
         "tahap":  "Frequent 1-Itemsets (FP-Growth)",
-        "detail": f"Ditemukan {len(freq1_list)} item dengan min_support ≥ {MIN_SUPPORT * 100:g}%.",
+        "detail": f"Ditemukan {len(freq1_list)} item dengan min_support ≥ 1%.",
     })
 
     # Frequent 2-itemsets (pasangan tidak berurutan)
@@ -118,7 +122,7 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
         "tahap":  "Frequent 2-Itemsets (FP-Growth)",
         "detail": (
             f"Ditemukan {len(freq2_list)} pasangan menu yang sering dibeli bersamaan "
-            f"dengan min_support ≥ {MIN_SUPPORT * 100:g}%."
+            f"dengan min_support ≥ 1%."
         ),
     })
 
@@ -182,6 +186,94 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
 
     min_conf_val = rules_top[-1]["confidence"] if rules_top else MIN_CONFIDENCE
 
+    # ── Charts ─────────────────────────────────────────────────────────────
+    plt.rcParams.update({
+        "font.family":       "DejaVu Sans",
+        "axes.spines.top":   False,
+        "axes.spines.right": False,
+        "figure.facecolor":  "white",
+        "axes.facecolor":    "#fafafa",
+        "axes.grid":         True,
+        "grid.color":        "#e5e7eb",
+        "grid.linewidth":    0.8,
+    })
+
+    def _to_b64(fig) -> str:
+        buf = io.BytesIO()
+        fig.savefig(buf, format="png", bbox_inches="tight", dpi=120)
+        buf.seek(0)
+        enc = base64.b64encode(buf.read()).decode()
+        plt.close(fig)
+        return enc
+
+    # Chart 1: Top 8 Rules by Lift (horizontal bar)
+    chart_top_rules = None
+    if rules_top:
+        labels    = [f"{r['menu_pertama']} → {r['menu_kedua']}" for r in rules_top]
+        lift_vals = [r["lift"] for r in rules_top]
+        colors    = ["#4f46e5" if v >= 1.5 else "#f59e0b" for v in lift_vals]
+
+        fig1, ax1 = plt.subplots(figsize=(11, max(4, len(labels) * 0.7)))
+        bars = ax1.barh(labels[::-1], lift_vals[::-1], color=colors[::-1], height=0.6)
+        ax1.axvline(x=1.0, color="#9ca3af", linestyle="--", linewidth=1.2, alpha=0.7)
+        for bar, val in zip(bars, lift_vals[::-1]):
+            ax1.text(val + 0.01, bar.get_y() + bar.get_height() / 2,
+                     f"{val:.2f}", va="center", fontsize=9, color="#374151")
+        ax1.set_xlabel("Lift Value")
+        ax1.set_title(
+            "Top 8 Association Rules — Lift Tertinggi\n"
+            "(A → B dan B → A adalah rule berbeda dengan nilai yang berbeda)",
+            fontsize=11, fontweight="bold", pad=12,
+        )
+        ax1.xaxis.grid(True)
+        ax1.yaxis.grid(False)
+        fig1.tight_layout(pad=2)
+        chart_top_rules = _to_b64(fig1)
+
+    # Chart 2: Support vs Confidence scatter
+    chart_sup_conf = None
+    if not rules_2_items.empty:
+        sup_vals      = rules_2_items["support"].tolist()
+        conf_vals     = rules_2_items["confidence"].tolist()
+        lift_vals_all = rules_2_items["lift"].tolist()
+
+        fig2, ax2 = plt.subplots(figsize=(7, 5))
+        sc = ax2.scatter(
+            sup_vals, conf_vals,
+            c=lift_vals_all, cmap="YlOrRd",
+            s=80, alpha=0.7, edgecolors="#cbd5e1", linewidths=0.5,
+        )
+        plt.colorbar(sc, ax=ax2, label="Lift")
+        ax2.set_xlabel("Support")
+        ax2.set_ylabel("Confidence")
+        ax2.set_title(
+            "Support vs Confidence (warna = Lift)\nSeluruh Rules A → B (dua arah)",
+            fontsize=11, fontweight="bold", pad=10,
+        )
+        fig2.tight_layout(pad=2)
+        chart_sup_conf = _to_b64(fig2)
+
+    # Chart 3: Top 15 Frequent 1-itemsets
+    chart_freq_item = None
+    if freq1_list:
+        top_items  = freq1_list[:15]
+        item_names = [f["item"]              for f in top_items]
+        item_cnts  = [f["jumlah_kemunculan"] for f in top_items]
+
+        fig3, ax3 = plt.subplots(figsize=(10, max(4, len(item_names) * 0.5)))
+        ax3.barh(item_names[::-1], item_cnts[::-1], color="#6366f1", height=0.6)
+        for i, cnt in enumerate(item_cnts[::-1]):
+            ax3.text(cnt + 0.3, i, str(cnt), va="center", fontsize=9, color="#374151")
+        ax3.set_xlabel("Jumlah Kemunculan dalam Transaksi")
+        ax3.set_title(
+            "Frequent 1-Itemsets — Frekuensi Kemunculan per Menu",
+            fontsize=12, fontweight="bold", pad=10,
+        )
+        ax3.xaxis.grid(True)
+        ax3.yaxis.grid(False)
+        fig3.tight_layout(pad=2)
+        chart_freq_item = _to_b64(fig3)
+
     return {
         "status":             "success",
         "total_rules":        len(rules_top),
@@ -193,4 +285,9 @@ def run_association_pipeline(df: pd.DataFrame) -> dict:
         "freq_1_itemsets":    freq1_list,
         "freq_2_itemsets":    freq2_list[:20],
         "preprocessing_logs": logs,
+        "charts": {
+            "top_rules": chart_top_rules,
+            "sup_conf":  chart_sup_conf,
+            "freq_item": chart_freq_item,
+        },
     }

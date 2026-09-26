@@ -83,11 +83,17 @@ docker compose exec -T app php artisan migrate:fresh --seed
 | `/admin/riwayat-kasir` | Riwayat sesi kasir |
 | `/admin/akun-staff` | Akun staff (status Aktif/Nonaktif) |
 | `/admin/pengaturan-struk-dan-whatsapp` | Pengaturan struk & template WhatsApp |
+| `/admin/data-mining` | Data mining — Ikhtisar |
 | `/admin/prediksi-menu` | Data mining — Prediksi Menu |
-| `/admin/klasterisasi-menu` | Data mining — Klasterisasi Menu |
-| `/admin/asosiatif-menu` | Data mining — Asosiasi Menu |
-| `/admin/prediksi-bahan-baku` | Data mining — Prediksi Bahan Baku |
+| `/admin/prediksi-ring-menu` | Data mining — Hasil Prediksi Menu (ring) |
+| `/admin/klasterisasi-menu` | Data mining — Klasterisasi Menu Penjualan |
+| `/admin/ringkasan-menu` | Data mining — Ringkasan Klasterisasi Menu |
+| `/admin/prediksi-bahan-baku` | Data mining — Prediksi Penggunaan Bahan Baku |
+| `/admin/prediction-ring-bahan-baku` | Data mining — Hasil Prediksi Bahan Baku (ring) |
 | `/admin/klasterisasi-bahan-baku` | Data mining — Klasterisasi Bahan Baku |
+| `/admin/ringkasan-clustering-bahan-baku` | Data mining — Ringkasan Klasterisasi Bahan Baku |
+| `/admin/asosiatif-menu` | Data mining — Asosiatif Menu |
+| `/admin/ringkasan-asosiatif` | Data mining — Ringkasan Asosiatif |
 
 ---
 
@@ -118,11 +124,12 @@ docker compose exec -T app php artisan migrate:fresh --seed
 
 ## Data Mining
 
-Layanan FastAPI di `datamining/` (port 8001) menyediakan 5 pipeline via `POST /run`:
+Layanan FastAPI di `datamining/` (port 8001) menyediakan endpoint berikut:
 
-`prediction`, `clustering`, `association`, `prediction-bahan-baku`, `clustering-bahan-baku`.
+`POST /clustering`, `POST /prediction`, `POST /association`, `POST /clustering-bahan-baku`, `POST /prediction-bahan-baku`
+(plus `GET /health` dan `GET /preview-data`).
 
-Laravel memanggilnya fire-and-forget (`DataMiningRunner`) dan menyimpan hasil di tabel `datamining_runs`.
+Halaman admin Filament memanggil endpoint tersebut langsung melalui `config('datamining.url')` dan menyimpan riwayat hasil di Laravel Cache (unik per rentang tanggal). Halaman ringkasan (`prediksi-ring-menu`, `prediction-ring-bahan-baku`, `ringkasan-menu`, `ringkasan-clustering-bahan-baku`, `ringkasan-asosiatif`) membaca hasil dari cache. Rentang tanggal minimal 3 bulan; grafik dikirim FastAPI sebagai PNG base64.
 
 ---
 

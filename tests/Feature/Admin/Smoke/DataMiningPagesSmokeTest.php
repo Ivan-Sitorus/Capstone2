@@ -15,11 +15,17 @@ class DataMiningPagesSmokeTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
 
         $pages = [
+            '/admin/data-mining',
             '/admin/prediksi-menu',
+            '/admin/prediksi-ring-menu',
             '/admin/klasterisasi-menu',
-            '/admin/asosiatif-menu',
-            '/admin/prediksi-bahan-baku',
+            '/admin/ringkasan-menu',
             '/admin/klasterisasi-bahan-baku',
+            '/admin/prediksi-bahan-baku',
+            '/admin/prediction-ring-bahan-baku',
+            '/admin/ringkasan-clustering-bahan-baku',
+            '/admin/asosiatif-menu',
+            '/admin/ringkasan-asosiatif',
         ];
 
         $failed = [];

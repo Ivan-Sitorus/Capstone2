@@ -34,14 +34,14 @@ Fase ini mencakup modul Pelanggan (mobile PWA), Kasir (desktop web), Panel Admin
 | Payment | Manual (Cash / QRIS) |
 | Data Mining | Python 3.13 + FastAPI + scikit-learn + Prophet |
 
-> **Data Mining:** Terintegrasi — FastAPI di `datamining/`, dipanggil `App\Services\DataMiningRunner`, hasil disimpan di tabel `datamining_runs`.
+> **Data Mining:** Terintegrasi — FastAPI di `datamining/` (port 8001). Halaman admin Filament memanggil endpoint-nya langsung via `config('datamining.url')` dan menyimpan riwayat hasil di Laravel Cache; halaman ringkasan membaca hasil dari cache. Tidak ada lagi tabel `datamining_runs`.
 
 ---
 
 ## Panel Admin (Filament v5)
 
 Panel `/admin` (guard `admin`; hanya role admin **dan** status `active` yang boleh masuk) berisi:
-Dashboard (filter rentang tanggal), Menu & Kategori, Bahan Baku (+batch/riwayat), Penyesuaian Stok, Pesanan, Piutang, QR Code Meja (token opaque `qr_token`), Riwayat Kasir, Akun Staff (status Aktif/Nonaktif), Pengaturan Struk & WhatsApp (`/admin/pengaturan-struk-dan-whatsapp`), dan 5 halaman Data Mining (prediksi/klasterisasi menu & bahan baku, asosiasi menu).
+Dashboard (filter rentang tanggal), Menu & Kategori, Bahan Baku (+batch/riwayat), Penyesuaian Stok, Pesanan, Piutang, QR Code Meja (token opaque `qr_token`), Riwayat Kasir, Akun Staff (status Aktif/Nonaktif), Pengaturan Struk & WhatsApp (`/admin/pengaturan-struk-dan-whatsapp`), dan 11 halaman Data Mining (`data-mining`, `prediksi-menu`, `prediksi-ring-menu`, `klasterisasi-menu`, `ringkasan-menu`, `prediksi-bahan-baku`, `prediction-ring-bahan-baku`, `klasterisasi-bahan-baku`, `ringkasan-clustering-bahan-baku`, `asosiatif-menu`, `ringkasan-asosiatif`).
 
 Aturan tampilan admin: label Bahasa Indonesia, tanggal `d M Y` atau `d M Y, H:i:s`, rentang data `d M Y s/d d M Y`, durasi `N detik`, tanpa bulk action, tombol aksi `Buat …`. Date picker dashboard & data mining memakai `native(true)` (bisa diklik dan diketik).
 
@@ -821,8 +821,6 @@ processed_at, completed_at, cancelled_at, timestamps
 **order_items** — `id, order_id FK CASCADE, menu_id FK RESTRICT, item_position INT, quantity INT, unit_price INT, cost_price INT, subtotal BIGINT, timestamps`
 
 **order_payments** — `id, order_id FK CASCADE, amount BIGINT, payment_date TIMESTAMP, payment_method VARCHAR, timestamps`
-
-**datamining_runs** — `id, type VARCHAR, status VARCHAR DEFAULT 'running', parameters JSON, payload JSON, error TEXT NULL, timestamps`
 
 ---
 
