@@ -91,21 +91,10 @@ export default function CustomerCart() {
                 `}</style>
             </Head>
 
-            {/* ── Wallpaper ── */}
-            <div style={{
-                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
-                width: '100%', maxWidth: 430, height: '100vh',
-                zIndex: 0, pointerEvents: 'none', overflow: 'hidden', background: C.bg,
-            }}>
-                <img src="/images/wallpaper-menu.jpg" alt=""
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
-                />
-            </div>
-
             {/* ── Fixed content container ── */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
-                width: '100%', maxWidth: 430, height: '100vh',
+                width: '100%', maxWidth: 430, height: '100dvh',
                 display: 'flex', flexDirection: 'column', zIndex: 1,
             }}>
 
@@ -139,7 +128,7 @@ export default function CustomerCart() {
                         <div style={{
                             display: 'flex', flexDirection: 'column', alignItems: 'center',
                             justifyContent: 'center', gap: 16, padding: '60px 8px',
-                            minHeight: 'calc(100vh - 180px)',
+                            minHeight: 'calc(100dvh - 180px)',
                         }}>
                             <div style={{
                                 width: 72, height: 72, borderRadius: 18,

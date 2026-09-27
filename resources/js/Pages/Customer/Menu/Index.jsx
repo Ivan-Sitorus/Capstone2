@@ -5,7 +5,7 @@ import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
 import usePolling from '@/Hooks/usePolling';
 import { formatRupiah } from '@/helpers';
-import { STONE_50, WHITE, STONE_100, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, GREEN_600, AMBER_400, STONE_250, STONE_200 } from '@/theme';
+import { STONE_50, WHITE, STONE_100, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, GREEN_600, AMBER_400, STONE_250 } from '@/theme';
 
 const F = '"Inter", system-ui, sans-serif';
 
@@ -314,26 +314,13 @@ export default function CustomerMenu({ categories, table }) {
                     .posmine-search:focus { outline: none; box-shadow: 0 0 0 2px rgba(68,64,60,0.20) !important; }
                     .posmine-chips::-webkit-scrollbar { display: none; }
                     .posmine-scroll::-webkit-scrollbar { display: none; }
-                    .posmine-wallpaper {
-                        position: fixed; top: 0; left: 50%; transform: translateX(-50%);
-                        width: 100%; max-width: 430px; height: 100vh;
-                        z-index: 0; pointer-events: none; overflow: hidden; background: ${STONE_200};
-                    }
                 `}</style>
             </Head>
-
-            {/* Wallpaper */}
-            <div className="posmine-wallpaper" aria-hidden="true">
-                <img src="/images/wallpaper-menu.jpg" alt=""
-                    fetchPriority="high" loading="eager"
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', display: 'block' }}
-                />
-            </div>
 
             {/* Fixed flex-column container */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
-                width: '100%', maxWidth: 430, height: '100vh',
+                width: '100%', maxWidth: 430, height: '100dvh',
                 display: 'flex', flexDirection: 'column', zIndex: 1,
             }}>
 

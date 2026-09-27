@@ -81,22 +81,11 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                 `}</style>
             </Head>
 
-            {/* Wallpaper */}
-            <div style={{
-                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
-                width: '100%', maxWidth: 430, height: '100vh',
-                zIndex: 0, pointerEvents: 'none', overflow: 'hidden', background: C.bg,
-            }}>
-                <img src="/images/wallpaper-menu.jpg" alt=""
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
-                />
-            </div>
-
             {/* Fixed full-height container — NO scroll */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: '100%', maxWidth: 430,
-                height: '100vh',
+                height: '100dvh',
                 display: 'flex', flexDirection: 'column',
                 zIndex: 1,
                 paddingBottom: 64, /* ruang BottomNav */

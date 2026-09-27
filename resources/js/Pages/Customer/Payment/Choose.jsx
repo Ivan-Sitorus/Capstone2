@@ -96,24 +96,11 @@ export default function PaymentChoose({ order, items, table_number }) {
                 `}</style>
             </Head>
 
-            {/* ── Wallpaper ── */}
-            <div style={{
-                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
-                width: '100%', maxWidth: 430, height: '100vh',
-                zIndex: 0, pointerEvents: 'none', overflow: 'hidden', background: C.bg,
-            }}>
-                <img src="/images/wallpaper-menu.jpg" alt=""
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
-                />
-            </div>
-
             {/* ── Fixed flex-column container ── */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
-                width: '100%', maxWidth: 430, height: '100vh',
+                width: '100%', maxWidth: 430, height: '100dvh',
                 display: 'flex', flexDirection: 'column', zIndex: 1,
-                background: 'rgba(247,245,242,0.60)',
-                backdropFilter: 'blur(2px)',
             }}>
 
                 {/* ── Header ── */}

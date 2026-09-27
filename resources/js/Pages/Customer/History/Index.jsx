@@ -99,21 +99,10 @@ export default function CustomerRiwayat({ orders = [] }) {
                 `}</style>
             </Head>
 
-            {/* ── Wallpaper ── */}
-            <div style={{
-                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
-                width: '100%', maxWidth: 430, height: '100vh',
-                zIndex: 0, pointerEvents: 'none', overflow: 'hidden', background: C.bg,
-            }}>
-                <img src="/images/wallpaper-menu.jpg" alt=""
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }}
-                />
-            </div>
-
             {/* ── Fixed flex-column ── */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
-                width: '100%', maxWidth: 430, height: '100vh',
+                width: '100%', maxWidth: 430, height: '100dvh',
                 display: 'flex', flexDirection: 'column', zIndex: 1,
             }}>
 
@@ -250,7 +239,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                             background: C.surface,
                             borderRadius: 20,
                             width: '100%', maxWidth: 340,
-                            maxHeight: 'calc(100vh - 48px)',
+                            maxHeight: 'calc(100dvh - 48px)',
                             display: 'flex', flexDirection: 'column',
                             boxShadow: '0 20px 60px rgba(28,25,23,0.28)',
                             overflow: 'hidden',

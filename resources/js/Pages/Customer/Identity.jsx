@@ -81,21 +81,11 @@ export default function Identitas({ table }) {
                     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
                 </Head>
 
-                {/* Wallpaper */}
-                <div style={{
-                    position: 'fixed', inset: 0,
-                    zIndex: 0, pointerEvents: 'none',
-                }}>
-                    <img src="/images/wallpaper-menu.jpg" alt=""
-                        style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-                </div>
-
                 <div style={{
                     position: 'relative', zIndex: 1,
-                    minHeight: '100vh', display: 'flex', flexDirection: 'column',
+                    minHeight: '100dvh', display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
                     padding: '40px 28px', fontFamily: F, textAlign: 'center',
-                    background: 'rgba(247,245,242,0.85)', backdropFilter: 'blur(4px)',
                 }}>
                     <div style={{
                         width: 96, height: 96, borderRadius: 20,
@@ -136,20 +126,10 @@ export default function Identitas({ table }) {
                 `}</style>
             </Head>
 
-            {/* Wallpaper */}
-            <div style={{
-                position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
-                width: '100%', maxWidth: 430, height: '100vh',
-                zIndex: 0, pointerEvents: 'none', overflow: 'hidden',
-            }}>
-                <img src="/images/wallpaper-identitas.png" alt=""
-                    style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-            </div>
-
             {/* Page */}
             <div style={{
                 position: 'relative', zIndex: 1,
-                minHeight: '100vh', display: 'flex', flexDirection: 'column',
+                minHeight: '100dvh', display: 'flex', flexDirection: 'column',
                 maxWidth: 430, margin: '0 auto',
             }}>
 

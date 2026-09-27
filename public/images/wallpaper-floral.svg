@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="320" height="320" viewBox="0 0 320 320" fill="none" role="img" aria-label="Motif bunga POSMine">
+    <defs>
+        <!-- Bunga lima kelopak -->
+        <g id="pm-flower">
+            <g fill="#E8692A" fill-opacity="0.09" stroke="#D9774A" stroke-opacity="0.34" stroke-width="1.1">
+                <ellipse cx="0" cy="-14" rx="7.2" ry="11.6"/>
+                <ellipse cx="0" cy="-14" rx="7.2" ry="11.6" transform="rotate(72)"/>
+                <ellipse cx="0" cy="-14" rx="7.2" ry="11.6" transform="rotate(144)"/>
+                <ellipse cx="0" cy="-14" rx="7.2" ry="11.6" transform="rotate(216)"/>
+                <ellipse cx="0" cy="-14" rx="7.2" ry="11.6" transform="rotate(288)"/>
+            </g>
+            <circle r="4.4" fill="#E8692A" fill-opacity="0.18" stroke="#D9774A" stroke-opacity="0.36" stroke-width="1"/>
+        </g>
+
+        <!-- Kuncup empat kelopak -->
+        <g id="pm-blossom">
+            <g fill="#E8763A" fill-opacity="0.08" stroke="#D9774A" stroke-opacity="0.30" stroke-width="1">
+                <ellipse cx="0" cy="-8.5" rx="5.4" ry="7.8"/>
+                <ellipse cx="0" cy="-8.5" rx="5.4" ry="7.8" transform="rotate(90)"/>
+                <ellipse cx="0" cy="-8.5" rx="5.4" ry="7.8" transform="rotate(180)"/>
+                <ellipse cx="0" cy="-8.5" rx="5.4" ry="7.8" transform="rotate(270)"/>
+            </g>
+            <circle r="2.8" fill="#E8692A" fill-opacity="0.16"/>
+        </g>
+
+        <!-- Tangkai daun -->
+        <g id="pm-sprig">
+            <path d="M0 0C7-13 9-28 4-44" stroke="#7C9E86" stroke-opacity="0.34" stroke-width="1.2" stroke-linecap="round"/>
+            <path d="M3.4-13C-5-17-11-25-11.5-33C-2.5-32 3-24 3.4-13Z" fill="#5A9A6E" fill-opacity="0.10" stroke="#7C9E86" stroke-opacity="0.28" stroke-width="0.9"/>
+            <path d="M6-29C13.5-33 18.5-40 18.5-47C10.5-46 5.5-39 6-29Z" fill="#5A9A6E" fill-opacity="0.10" stroke="#7C9E86" stroke-opacity="0.28" stroke-width="0.9"/>
+            <path d="M0.5 0.5C-4-5-11-8-18-7" stroke="#7C9E86" stroke-opacity="0.26" stroke-width="1" stroke-linecap="round"/>
+        </g>
+
+        <!-- Lingkaran titik putus-putus -->
+        <g id="pm-halo">
+            <circle r="27" fill="none" stroke="#E8692A" stroke-opacity="0.16" stroke-width="1" stroke-dasharray="1.4 6.6" stroke-linecap="round"/>
+        </g>
+
+        <!-- Satu sel motif -->
+        <g id="pm-motif">
+            <use href="#pm-halo" x="88" y="84"/>
+            <use href="#pm-flower" transform="translate(88 84) rotate(-14)"/>
+            <use href="#pm-blossom" transform="translate(238 68) rotate(12)"/>
+            <use href="#pm-flower" transform="translate(242 238) rotate(22) scale(0.74)"/>
+            <use href="#pm-blossom" transform="translate(72 246) rotate(-18) scale(0.92)"/>
+            <use href="#pm-sprig" transform="translate(166 166) rotate(30)"/>
+            <use href="#pm-sprig" transform="translate(6 198) rotate(-42) scale(0.72)"/>
+
+            <g fill="#E8692A" fill-opacity="0.16">
+                <circle cx="30" cy="32" r="2"/>
+                <circle cx="160" cy="28" r="1.5"/>
+                <circle cx="296" cy="54" r="2.2"/>
+                <circle cx="34" cy="162" r="1.8"/>
+                <circle cx="288" cy="148" r="1.9"/>
+                <circle cx="150" cy="302" r="2"/>
+                <circle cx="292" cy="294" r="1.6"/>
+                <circle cx="208" cy="148" r="1.4"/>
+            </g>
+            <g fill="#E8692A" fill-opacity="0.15">
+                <circle cx="196" cy="198" r="1.5"/>
+                <circle cx="204" cy="203" r="1.5"/>
+                <circle cx="199" cy="210" r="1.5"/>
+            </g>
+        </g>
+    </defs>
+
+    <!-- Ubin 3x3 agar motif yang menyentuh tepi tetap bersambung mulus -->
+    <g>
+        <use href="#pm-motif" x="0" y="0"/>
+        <use href="#pm-motif" x="320" y="0"/>
+        <use href="#pm-motif" x="-320" y="0"/>
+        <use href="#pm-motif" x="0" y="320"/>
+        <use href="#pm-motif" x="0" y="-320"/>
+        <use href="#pm-motif" x="320" y="320"/>
+        <use href="#pm-motif" x="-320" y="320"/>
+        <use href="#pm-motif" x="320" y="-320"/>
+        <use href="#pm-motif" x="-320" y="-320"/>
+    </g>
+</svg>

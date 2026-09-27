@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { usePage } from '@inertiajs/react';
 import BottomNav from '@/Components/Customer/BottomNav';
-import { ORANGE_100, ORANGE_200, ORANGE_700 } from '@/theme';
+import { ORANGE_100, ORANGE_200, ORANGE_700, STONE_50 } from '@/theme';
 
 export default function CustomerLayout({ children, activeTab = 'menu', showBottomNav = true }) {
     const { flash } = usePage().props;
@@ -20,13 +20,36 @@ export default function CustomerLayout({ children, activeTab = 'menu', showBotto
         <div style={{
             maxWidth: 430,
             margin: '0 auto',
-            minHeight: '100vh',
+            minHeight: '100dvh',
             background: 'transparent',
             position: 'relative',
             paddingBottom: showBottomNav ? 80 : 0,
         }}>
-            {children}
-            {showBottomNav && <BottomNav activeTab={activeTab} />}
+            {/* ── Wallpaper bunga (SVG, satu layer untuk semua halaman pelanggan) ── */}
+            <div
+                aria-hidden="true"
+                style={{
+                    position: 'fixed',
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    margin: '0 auto',
+                    maxWidth: 430,
+                    zIndex: 0,
+                    pointerEvents: 'none',
+                    backgroundColor: STONE_50,
+                    backgroundImage: "url('/images/wallpaper-floral.svg')",
+                    backgroundRepeat: 'repeat',
+                    backgroundSize: 'clamp(240px, 72vw, 320px) auto',
+                    backgroundPosition: 'center top',
+                }}
+            />
+
+            <div style={{ position: 'relative', zIndex: 1 }}>
+                {children}
+                {showBottomNav && <BottomNav activeTab={activeTab} />}
+            </div>
 
             {/* ── Info toast (verifikasi pending) ── */}
             {info && (

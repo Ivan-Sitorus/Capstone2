@@ -22,7 +22,7 @@ export default function QrisStatus({ order }) {
             <div style={{
                 padding: 24, maxWidth: 430, margin: '0 auto',
                 fontFamily: "'Outfit', system-ui, sans-serif",
-                minHeight: '100vh', background: WARM_WHITE,
+                minHeight: '100dvh', background: WARM_WHITE,
                 display: 'flex', flexDirection: 'column', alignItems: 'center',
                 justifyContent: 'center',
             }}>
