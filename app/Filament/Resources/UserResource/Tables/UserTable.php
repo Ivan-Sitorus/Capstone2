@@ -4,9 +4,13 @@ namespace App\Filament\Resources\UserResource\Tables;
 
 use App\Enums\UserRole;
 use App\Enums\UserStatus;
+use App\Filament\Resources\UserResource\UserLockGuard;
+use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
+use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
@@ -71,8 +75,66 @@ class UserTable
                     ),
             ])
             ->recordActions([
-                EditAction::make()->modal(),
-                DeleteAction::make(),
+                EditAction::make()->modal()
+                    ->before(function (EditAction $action, User $record): void {
+                        $actor = Filament::auth()->user();
+
+                        if (! $actor instanceof User) {
+                            return;
+                        }
+
+                        $data = $action->getData();
+
+                        $rawRole = $data['role'] ?? null;
+                        $newRole = $rawRole instanceof UserRole
+                            ? $rawRole
+                            : UserRole::tryFrom((string) $rawRole);
+
+                        $rawStatus = $data['status'] ?? null;
+                        $newStatus = $rawStatus instanceof UserStatus
+                            ? $rawStatus
+                            : UserStatus::tryFrom((string) $rawStatus);
+
+                        $violation = UserLockGuard::updateViolation($actor, $record, $newRole, $newStatus);
+
+                        if ($violation === null) {
+                            return;
+                        }
+
+                        $operation = $newStatus === UserStatus::Inactive
+                            ? UserLockGuard::OPERATION_DEACTIVATE
+                            : UserLockGuard::OPERATION_DEMOTE;
+
+                        Notification::make()
+                            ->danger()
+                            ->title(UserLockGuard::title($violation, $operation))
+                            ->body(UserLockGuard::message($violation, $operation))
+                            ->send();
+
+                        $action->halt();
+                    }),
+                DeleteAction::make()
+                    ->before(function (DeleteAction $action, User $record): void {
+                        $actor = Filament::auth()->user();
+
+                        if (! $actor instanceof User) {
+                            return;
+                        }
+
+                        $violation = UserLockGuard::deleteViolation($actor, $record);
+
+                        if ($violation === null) {
+                            return;
+                        }
+
+                        Notification::make()
+                            ->danger()
+                            ->title(UserLockGuard::title($violation, UserLockGuard::OPERATION_DELETE))
+                            ->body(UserLockGuard::message($violation, UserLockGuard::OPERATION_DELETE))
+                            ->send();
+
+                        $action->halt();
+                    }),
             ])
             ->defaultSort('created_at', 'desc');
     }
