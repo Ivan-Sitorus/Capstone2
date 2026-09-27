@@ -292,6 +292,14 @@ class CafeSeeder extends Seeder
         'minuman_kemasan' => 'Minuman Kemasan',
     ];
 
+    /**
+     * Unit vocabulary mapping (request #12):
+     * - `buah` is reserved for discrete fruit/produce (e.g. Pisang).
+     * - `pcs` stays for packaged/processed countable items (tea bags, eggs,
+     *   tofu, instant noodles, bottled drinks, etc.).
+     * Separating the two only changes the label stored for fresh seeds;
+     * existing rows keep their `pcs` value unchanged (free-string column).
+     */
     private const INGREDIENTS = [
         'biji_kopi_arabika' => ['Biji Kopi Arabika', 'kg', 2],
         'biji_kopi_robusta' => ['Biji Kopi Robusta', 'kg', 2],
@@ -304,7 +312,7 @@ class CafeSeeder extends Seeder
         'teh_celup' => ['Teh Celup', 'pcs', 50],
         'jeruk_nipis' => ['Jeruk Nipis', 'kg', 3],
         'keju_parut' => ['Keju Parut', 'kg', 2],
-        'pisang' => ['Pisang', 'pcs', 15],
+        'pisang' => ['Pisang', 'buah', 15],
         'tempe' => ['Tempe', 'pcs', 10],
         'kentang' => ['Kentang', 'kg', 5],
         'indomie_goreng' => ['Indomie Goreng', 'pcs', 30],
