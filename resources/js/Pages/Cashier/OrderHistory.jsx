@@ -4,23 +4,10 @@ import { Search, Calendar, CreditCard, ChevronDown } from 'lucide-react';
 import StatusBadge from '@/Components/Common/StatusBadge';
 import Money from '@/Components/Common/Money';
 import { formatDate, formatTime } from '@/helpers';
-import { WHITE, SLATE_100, SLATE_900, SLATE_500, SLATE_400, SLATE_200, BLUE, SLATE_700, SLATE_50 } from '@/theme';
+import { WHITE, SLATE_100, SLATE_900, SLATE_500, SLATE_400, SLATE_200, BLUE, SLATE_700, SLATE_50, SHADOW_CASHIER, SHADOW_CASHIER_SM } from '@/theme';
 
 const METHOD_LABELS = { cash: 'Tunai', qris: 'QRIS', bayar_nanti: 'Bayar Nanti' };
 const TODAY = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Jakarta' });
-
-// Cashier blue theme
-const T = {
-    surface:  WHITE,
-    elevated: SLATE_100,
-    textPri:  SLATE_900,
-    textSec:  SLATE_500,
-    textTer:  SLATE_400,
-    border:   SLATE_200,
-    accent:   BLUE,
-    shadow:   '0 4px 14px rgba(15,23,42,0.06)',
-    shadowSm: '0 2px 8px rgba(15,23,42,0.04)',
-};
 
 const COLS = [
     { key: 'id',      label: 'ID Pesanan',  width: 150 },
@@ -75,13 +62,13 @@ export default function OrderHistory({ orders, filters }) {
             {/* ── Header ── */}
             <div style={{ marginBottom: 28, display: 'flex', flexDirection: 'column', gap: 4 }}>
                 <h1 style={{
-                    fontSize: 26, fontWeight: 700, color: T.textPri,
+                    fontSize: 26, fontWeight: 700, color: SLATE_900,
                     margin: 0, letterSpacing: '-0.5px',
                     fontFamily: '"DM Sans", system-ui',
                 }}>
                     Riwayat Pesanan
                 </h1>
-                <p style={{ fontSize: 14, color: T.textSec, margin: 0, fontFamily: 'Outfit, system-ui' }}>
+                <p style={{ fontSize: 14, color: SLATE_500, margin: 0, fontFamily: 'Outfit, system-ui' }}>
                     Lihat semua transaksi yang telah selesai
                 </p>
             </div>
@@ -92,7 +79,7 @@ export default function OrderHistory({ orders, filters }) {
                 <div style={{ position: 'relative', flex: 1 }}>
                     <Search size={18} style={{
                         position: 'absolute', left: 14, top: '50%',
-                        transform: 'translateY(-50%)', color: T.textTer, pointerEvents: 'none',
+                        transform: 'translateY(-50%)', color: SLATE_400, pointerEvents: 'none',
                     }} />
                     <input
                         type="text"
@@ -101,11 +88,11 @@ export default function OrderHistory({ orders, filters }) {
                         placeholder="Cari transaksi..."
                         style={{
                             width: '100%', height: 44,
-                            border: `1px solid ${T.border}`, borderRadius: 12,
+                            border: `1px solid ${SLATE_200}`, borderRadius: 12,
                             padding: '0 16px 0 44px', fontSize: 14,
-                            color: T.textPri, background: T.surface,
+                            color: SLATE_900, background: WHITE,
                             outline: 'none', boxSizing: 'border-box',
-                            boxShadow: T.shadowSm,
+                            boxShadow: SHADOW_CASHIER_SM,
                             fontFamily: 'Outfit, system-ui',
                         }}
                     />
@@ -115,7 +102,7 @@ export default function OrderHistory({ orders, filters }) {
                 <div style={{ position: 'relative' }}>
                     <Calendar size={16} style={{
                         position: 'absolute', left: 14, top: '50%',
-                        transform: 'translateY(-50%)', color: T.textSec, pointerEvents: 'none',
+                        transform: 'translateY(-50%)', color: SLATE_500, pointerEvents: 'none',
                     }} />
                     <input
                         type="date"
@@ -123,11 +110,11 @@ export default function OrderHistory({ orders, filters }) {
                         onChange={handleDate}
                         style={{
                             height: 44, width: 180,
-                            border: `1px solid ${T.border}`, borderRadius: 12,
+                            border: `1px solid ${SLATE_200}`, borderRadius: 12,
                             padding: '0 14px 0 40px', fontSize: 13,
-                            color: T.textPri, background: T.surface,
+                            color: SLATE_900, background: WHITE,
                             outline: 'none', boxSizing: 'border-box',
-                            boxShadow: T.shadowSm,
+                            boxShadow: SHADOW_CASHIER_SM,
                             fontFamily: 'Outfit, system-ui',
                         }}
                     />
@@ -137,19 +124,19 @@ export default function OrderHistory({ orders, filters }) {
                 <div style={{ position: 'relative' }}>
                     <CreditCard size={16} style={{
                         position: 'absolute', left: 14, top: '50%',
-                        transform: 'translateY(-50%)', color: T.textSec, pointerEvents: 'none',
+                        transform: 'translateY(-50%)', color: SLATE_500, pointerEvents: 'none',
                     }} />
                     <select
                         value={method}
                         onChange={handleMethod}
                         style={{
                             height: 44, width: 180,
-                            border: `1px solid ${T.border}`, borderRadius: 12,
+                            border: `1px solid ${SLATE_200}`, borderRadius: 12,
                             padding: '0 36px 0 40px', fontSize: 13,
-                            color: T.textPri, background: T.surface,
+                            color: SLATE_900, background: WHITE,
                             outline: 'none', appearance: 'none',
                             boxSizing: 'border-box', cursor: 'pointer',
-                            boxShadow: T.shadowSm,
+                            boxShadow: SHADOW_CASHIER_SM,
                             fontFamily: 'Outfit, system-ui',
                         }}
                     >
@@ -159,22 +146,22 @@ export default function OrderHistory({ orders, filters }) {
                     </select>
                     <ChevronDown size={14} style={{
                         position: 'absolute', right: 12, top: '50%',
-                        transform: 'translateY(-50%)', color: T.textTer, pointerEvents: 'none',
+                        transform: 'translateY(-50%)', color: SLATE_400, pointerEvents: 'none',
                     }} />
                 </div>
             </div>
 
             {/* ── Table Card ── */}
             <div style={{
-                background: T.surface, borderRadius: 16,
-                border: `1px solid ${T.border}`,
-                boxShadow: T.shadow, overflow: 'hidden',
+                background: WHITE, borderRadius: 16,
+                border: `1px solid ${SLATE_200}`,
+                boxShadow: SHADOW_CASHIER, overflow: 'hidden',
             }}>
                 {/* Head */}
                 <div style={{
                     display: 'flex', alignItems: 'center',
-                    background: T.elevated, padding: '12px 16px',
-                    borderBottom: `1px solid ${T.border}`,
+                    background: SLATE_100, padding: '12px 16px',
+                    borderBottom: `1px solid ${SLATE_200}`,
                 }}>
                     {COLS.map(col => (
                         <div key={col.key} style={{ width: col.width, flex: col.flex, flexShrink: col.flex ? undefined : 0 }}>
@@ -191,7 +178,7 @@ export default function OrderHistory({ orders, filters }) {
                 {/* Rows */}
                 {rows.length === 0 ? (
                     <div style={{
-                        textAlign: 'center', color: T.textTer,
+                        textAlign: 'center', color: SLATE_400,
                         padding: '48px 16px', fontSize: 14,
                         fontFamily: 'Outfit, system-ui',
                     }}>
@@ -207,7 +194,7 @@ export default function OrderHistory({ orders, filters }) {
             {/* Pagination */}
             {lastPage > 1 && (
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 16 }}>
-                    <span style={{ fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
+                    <span style={{ fontSize: 13, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>
                         Halaman {currPage} dari {lastPage}
                     </span>
                     <div style={{ display: 'flex', gap: 8 }}>
@@ -216,8 +203,8 @@ export default function OrderHistory({ orders, filters }) {
                                 href={prevUrl}
                                 style={{
                                     padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
-                                    border: `1px solid ${T.border}`, color: T.textPri,
-                                    background: T.surface, textDecoration: 'none',
+                                    border: `1px solid ${SLATE_200}`, color: SLATE_900,
+                                    background: WHITE, textDecoration: 'none',
                                     fontFamily: 'Outfit, system-ui',
                                 }}
                             >← Sebelumnya</Link>
@@ -227,7 +214,7 @@ export default function OrderHistory({ orders, filters }) {
                                 href={nextUrl}
                                 style={{
                                     padding: '7px 16px', borderRadius: 8, fontSize: 13, fontWeight: 500,
-                                    background: T.accent, color: WHITE, border: 'none',
+                                    background: BLUE, color: WHITE, border: 'none',
                                     textDecoration: 'none', fontFamily: 'Outfit, system-ui',
                                 }}
                             >Berikutnya →</Link>
@@ -253,37 +240,37 @@ function OrderRow({ order }) {
             style={{
                 display: 'flex', alignItems: 'center',
                 padding: '14px 16px',
-                borderBottom: `1px solid ${T.border}`,
-                background: hovered ? T.elevated : T.surface,
+                borderBottom: `1px solid ${SLATE_200}`,
+                background: hovered ? SLATE_100 : WHITE,
                 transition: 'background 0.1s',
             }}
         >
             <div style={{ width: 150, flexShrink: 0 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: T.textPri, fontFamily: 'Outfit, system-ui' }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>
                     {order.order_code}
                 </span>
             </div>
             <div style={{ width: 120, flexShrink: 0 }}>
-                <span style={{ fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
+                <span style={{ fontSize: 13, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>
                     {formatDate(order.created_at)}
                 </span>
             </div>
             <div style={{ width: 80, flexShrink: 0 }}>
-                <span style={{ fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
+                <span style={{ fontSize: 13, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>
                     {formatTime(order.created_at)}
                 </span>
             </div>
             <div style={{ width: 140, flexShrink: 0 }}>
-                <span style={{ fontSize: 13, fontWeight: 600, color: T.textPri, fontFamily: 'Outfit, system-ui' }}>
+                <span style={{ fontSize: 13, fontWeight: 600, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>
                     <Money value={order.total_amount} />
                 </span>
             </div>
             <div style={{ width: 110, flexShrink: 0 }}>
-                <span style={{ fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>{methodLabel}</span>
+                <span style={{ fontSize: 13, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>{methodLabel}</span>
             </div>
             <div style={{ flex: 1, minWidth: 0 }}>
                 <span style={{
-                    fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui',
+                    fontSize: 13, color: SLATE_500, fontFamily: 'Outfit, system-ui',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block',
                 }}>
                     {order.cashier_name ?? '-'}
@@ -297,7 +284,7 @@ function OrderRow({ order }) {
                     href={route('kasir.order.show', { order: order.id })}
                     style={{
                         fontSize: 13, fontWeight: 500,
-                        color: T.accent, textDecoration: 'none',
+                        color: BLUE, textDecoration: 'none',
                         fontFamily: 'Outfit, system-ui',
                     }}
                 >

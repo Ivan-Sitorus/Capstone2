@@ -5,20 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import StatusBadge from '@/Components/Common/StatusBadge';
 import Money from '@/Components/Common/Money';
 import { formatDate, formatTime } from '@/helpers';
-import { WHITE, SLATE_100, SLATE_900, SLATE_500, SLATE_400, SLATE_200, BLUE, SLATE_50, GREEN_MUTED_LIGHT, BLUE_SOFT, BLUE_MUTED_BG, BLUE_LIGHT, BLUE_DARK, RED_MUTED } from '@/theme';
-
-// Cashier blue theme (consistent with Dashboard, ActiveOrders, etc.)
-const T = {
-    surface:  WHITE,
-    elevated: SLATE_100,
-    textPri:  SLATE_900,
-    textSec:  SLATE_500,
-    textTer:  SLATE_400,
-    border:   SLATE_200,
-    accent:   BLUE,
-    shadow:   '0 4px 14px rgba(15,23,42,0.06)',
-    shadowSm: '0 2px 8px rgba(15,23,42,0.04)',
-};
+import { WHITE, SLATE_100, SLATE_900, SLATE_500, SLATE_200, BLUE, SLATE_50, GREEN_MUTED_LIGHT, BLUE_SOFT, BLUE_MUTED_BG, BLUE_LIGHT, BLUE_DARK, RED_MUTED, SHADOW_CASHIER, SHADOW_CASHIER_SM } from '@/theme';
 
 const paymentLabel = { cash: 'Tunai (Cash)', qris: 'QRIS' };
 
@@ -66,22 +53,22 @@ export default function OrderShow({ order }) {
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
                     <button onClick={handleBack} aria-label="Kembali" style={{
                         width: 36, height: 36, borderRadius: 8, flexShrink: 0,
-                        background: T.surface, border: `1px solid ${T.border}`,
-                        boxShadow: T.shadowSm, cursor: 'pointer',
+                        background: WHITE, border: `1px solid ${SLATE_200}`,
+                        boxShadow: SHADOW_CASHIER_SM, cursor: 'pointer',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        color: T.textPri,
+                        color: SLATE_900,
                     }}>
                         <ArrowLeft size={18} />
                     </button>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                         <h1 style={{
-                            fontSize: 24, fontWeight: 700, color: T.textPri,
+                            fontSize: 24, fontWeight: 700, color: SLATE_900,
                             margin: 0, letterSpacing: '-0.5px',
                             fontFamily: '"DM Sans", system-ui',
                         }}>
                             Detail Pesanan {order.order_code}
                         </h1>
-                        <p style={{ fontSize: 14, color: T.textSec, margin: 0, fontFamily: 'Outfit, system-ui' }}>
+                        <p style={{ fontSize: 14, color: SLATE_500, margin: 0, fontFamily: 'Outfit, system-ui' }}>
                             {formatDate(order.created_at)}, {formatTime(order.created_at)} WIB
                         </p>
                     </div>
@@ -94,7 +81,7 @@ export default function OrderShow({ order }) {
                             disabled={processing}
                             style={{
                                 height: 36, padding: '0 18px',
-                                background: processing ? GREEN_MUTED_LIGHT : T.accent,
+                                background: processing ? GREEN_MUTED_LIGHT : BLUE,
                                 color: WHITE, border: 'none', borderRadius: 8,
                                 fontSize: 13, fontWeight: 600,
                                 fontFamily: 'Outfit, system-ui',
@@ -116,7 +103,7 @@ export default function OrderShow({ order }) {
                         disabled={processing}
                         style={{
                             height: 40, padding: '0 20px',
-                            background: processing ? BLUE_SOFT : T.accent, color: WHITE,
+                            background: processing ? BLUE_SOFT : BLUE, color: WHITE,
                             border: 'none', borderRadius: 8,
                             fontSize: 13, fontWeight: 700,
                             fontFamily: 'Outfit, system-ui',
@@ -139,7 +126,7 @@ export default function OrderShow({ order }) {
                         <span style={{ fontSize: 14, fontWeight: 700, color: BLUE_DARK, fontFamily: '"DM Sans", system-ui' }}>
                             Bukti Pembayaran QRIS Diterima
                         </span>
-                        <span style={{ fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
+                        <span style={{ fontSize: 13, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>
                             Verifikasi bukti transfer pelanggan sebelum memproses pesanan
                         </span>
                     </div>
@@ -161,7 +148,7 @@ export default function OrderShow({ order }) {
                             disabled={processing}
                             style={{
                                 height: 36, padding: '0 14px',
-                                background: T.accent, color: WHITE,
+                                background: BLUE, color: WHITE,
                                 border: 'none', borderRadius: 8,
                                 fontSize: 13, fontWeight: 700,
                                 fontFamily: 'Outfit, system-ui', cursor: processing ? 'not-allowed' : 'pointer',
@@ -179,17 +166,17 @@ export default function OrderShow({ order }) {
                 {/* LEFT: Items Card */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
-                        background: T.surface, borderRadius: 16,
-                        border: `1px solid ${T.border}`,
-                        boxShadow: T.shadow, overflow: 'hidden',
+                        background: WHITE, borderRadius: 16,
+                        border: `1px solid ${SLATE_200}`,
+                        boxShadow: SHADOW_CASHIER, overflow: 'hidden',
                     }}>
                         {/* Card title */}
                         <div style={{
                             padding: '16px 20px',
-                            background: T.elevated, borderBottom: `1px solid ${T.border}`,
+                            background: SLATE_100, borderBottom: `1px solid ${SLATE_200}`,
                         }}>
                             <span style={{
-                                fontSize: 16, fontWeight: 600, color: T.textPri,
+                                fontSize: 16, fontWeight: 600, color: SLATE_900,
                                 fontFamily: 'Outfit, system-ui',
                             }}>
                                 Daftar Item Pesanan
@@ -198,44 +185,44 @@ export default function OrderShow({ order }) {
                         {/* Column headers */}
                         <div style={{
                             display: 'flex', padding: '12px 20px',
-                            borderBottom: `1px solid ${T.border}`,
+                            borderBottom: `1px solid ${SLATE_200}`,
                         }}>
                             <div style={{ flex: 1 }}>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>Nama Item</span>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>Nama Item</span>
                             </div>
                             <div style={{ width: 100, flexShrink: 0 }}>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>Harga</span>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>Harga</span>
                             </div>
                             <div style={{ width: 80, flexShrink: 0 }}>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>Jumlah</span>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>Jumlah</span>
                             </div>
                             <div style={{ width: 120, flexShrink: 0 }}>
-                                <span style={{ fontSize: 12, fontWeight: 600, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>Subtotal</span>
+                                <span style={{ fontSize: 12, fontWeight: 600, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>Subtotal</span>
                             </div>
                         </div>
                         {/* Rows */}
                         {order.items.map(item => (
                             <div key={item.id} style={{
                                 display: 'flex', padding: '14px 20px',
-                                borderBottom: `1px solid ${T.border}`,
+                                borderBottom: `1px solid ${SLATE_200}`,
                             }}>
                                 <div style={{ flex: 1 }}>
-                                    <span style={{ fontSize: 14, fontWeight: 500, color: T.textPri, fontFamily: 'Outfit, system-ui' }}>
+                                    <span style={{ fontSize: 14, fontWeight: 500, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>
                                         {item.name}
                                     </span>
                                 </div>
                                 <div style={{ width: 100, flexShrink: 0 }}>
-                                    <span style={{ fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
+                                    <span style={{ fontSize: 13, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>
                                         <Money value={item.unit_price} />
                                     </span>
                                 </div>
                                 <div style={{ width: 80, flexShrink: 0 }}>
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: T.textPri, fontFamily: 'Outfit, system-ui' }}>
+                                    <span style={{ fontSize: 13, fontWeight: 600, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>
                                         {item.quantity}
                                     </span>
                                 </div>
                                 <div style={{ width: 120, flexShrink: 0 }}>
-                                    <span style={{ fontSize: 13, fontWeight: 600, color: T.textPri, fontFamily: 'Outfit, system-ui' }}>
+                                    <span style={{ fontSize: 13, fontWeight: 600, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>
                                         <Money value={item.subtotal} />
                                     </span>
                                 </div>
@@ -244,16 +231,16 @@ export default function OrderShow({ order }) {
                         {/* Total row */}
                         <div style={{
                             display: 'flex', justifyContent: 'space-between',
-                            padding: '16px 20px', background: T.elevated,
+                            padding: '16px 20px', background: SLATE_100,
                         }}>
                             <span style={{
-                                fontSize: 16, fontWeight: 700, color: T.textPri,
+                                fontSize: 16, fontWeight: 700, color: SLATE_900,
                                 fontFamily: 'Outfit, system-ui',
                             }}>
                                 Total Pembayaran
                             </span>
                             <span style={{
-                                fontSize: 20, fontWeight: 700, color: T.accent,
+                                fontSize: 20, fontWeight: 700, color: BLUE,
                                 fontFamily: 'Outfit, system-ui',
                             }}>
                                 <Money value={order.total_amount} />
@@ -266,15 +253,15 @@ export default function OrderShow({ order }) {
                 {/* RIGHT: Info Card */}
                 <div style={{ width: 360, flexShrink: 0 }}>
                     <div style={{
-                        background: T.surface, borderRadius: 16,
-                        border: `1px solid ${T.border}`, boxShadow: T.shadow,
+                        background: WHITE, borderRadius: 16,
+                        border: `1px solid ${SLATE_200}`, boxShadow: SHADOW_CASHIER,
                         overflow: 'hidden',
                     }}>
                         <div style={{
                             padding: '16px 20px',
-                            background: T.elevated, borderBottom: `1px solid ${T.border}`,
+                            background: SLATE_100, borderBottom: `1px solid ${SLATE_200}`,
                         }}>
-                            <span style={{ fontSize: 16, fontWeight: 600, color: T.textPri, fontFamily: 'Outfit, system-ui' }}>
+                            <span style={{ fontSize: 16, fontWeight: 600, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>
                                 Informasi Pesanan
                             </span>
                         </div>
@@ -288,7 +275,7 @@ export default function OrderShow({ order }) {
                             <InfoRow label="Metode Pembayaran"  value={paymentLabel[order.payment_method] ?? '-'} bold />
                             <InfoRow label="Kasir"              value={order.cashier_name ?? '-'} />
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <span style={{ fontSize: 13, fontWeight: 500, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
+                                <span style={{ fontSize: 13, fontWeight: 500, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>
                                     Status
                                 </span>
                                 <StatusBadge status={order.status} />
@@ -307,17 +294,17 @@ export default function OrderShow({ order }) {
                     zIndex: 200,
                 }}>
                     <div style={{
-                        background: T.surface, borderRadius: 16, padding: 28,
+                        background: WHITE, borderRadius: 16, padding: 28,
                         width: 420,
                         boxShadow: '0 20px 60px rgba(15,23,42,0.20)',
                     }}>
                         <h3 style={{
-                            fontSize: 18, fontWeight: 700, color: T.textPri,
+                            fontSize: 18, fontWeight: 700, color: SLATE_900,
                             marginBottom: 8, fontFamily: '"DM Sans", system-ui',
                         }}>
                             Tolak Bukti QRIS
                         </h3>
-                        <p style={{ fontSize: 14, color: T.textSec, marginBottom: 16, fontFamily: 'Outfit, system-ui' }}>
+                        <p style={{ fontSize: 14, color: SLATE_500, marginBottom: 16, fontFamily: 'Outfit, system-ui' }}>
                             Isi alasan penolakan (opsional). Pelanggan dapat upload ulang.
                         </p>
                         <textarea
@@ -326,11 +313,11 @@ export default function OrderShow({ order }) {
                             placeholder="Contoh: Nominal tidak sesuai / Bukti tidak jelas"
                             rows={3}
                             style={{
-                                width: '100%', border: `1px solid ${T.border}`, borderRadius: 10,
+                                width: '100%', border: `1px solid ${SLATE_200}`, borderRadius: 10,
                                 padding: 12, fontSize: 14, resize: 'vertical',
                                 boxSizing: 'border-box', outline: 'none',
-                                fontFamily: 'Outfit, system-ui', color: T.textPri,
-                                background: T.elevated,
+                                fontFamily: 'Outfit, system-ui', color: SLATE_900,
+                                background: SLATE_100,
                             }}
                         />
                         <div style={{ display: 'flex', gap: 12, marginTop: 16 }}>
@@ -338,8 +325,8 @@ export default function OrderShow({ order }) {
                                 onClick={() => setShowRejectModal(false)}
                                 style={{
                                     flex: 1, height: 42,
-                                    background: T.surface, color: T.textSec,
-                                    border: `1px solid ${T.border}`, borderRadius: 8,
+                                    background: WHITE, color: SLATE_500,
+                                    border: `1px solid ${SLATE_200}`, borderRadius: 8,
                                     fontSize: 14, cursor: 'pointer',
                                     fontFamily: 'Outfit, system-ui',
                                 }}
@@ -370,10 +357,10 @@ export default function OrderShow({ order }) {
 function InfoRow({ label, value, bold }) {
     return (
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <span style={{ fontSize: 13, fontWeight: 500, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
+            <span style={{ fontSize: 13, fontWeight: 500, color: SLATE_500, fontFamily: 'Outfit, system-ui' }}>
                 {label}
             </span>
-            <span style={{ fontSize: 13, fontWeight: bold ? 600 : 400, color: T.textPri, fontFamily: 'Outfit, system-ui' }}>
+            <span style={{ fontSize: 13, fontWeight: bold ? 600 : 400, color: SLATE_900, fontFamily: 'Outfit, system-ui' }}>
                 {value}
             </span>
         </div>

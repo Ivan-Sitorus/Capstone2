@@ -136,3 +136,14 @@ export const AMBER_300 = '#FCD34D';
 export const AMBER_TINT = '#FFFBEB';
 export const CREAM = '#FDF6E8';
 export const GOLD_DARK = '#D4A04A';
+
+export const FONT_SANS = '"Inter", system-ui, sans-serif';
+
+export const SHADOW_CARD = '0 4px 20px -2px rgba(0,0,0,0.05)';
+export const SHADOW_CARD_LIFT = '0 8px 24px -2px rgba(0,0,0,0.10)';
+export const SHADOW_SOFT = '0 2px 8px -2px rgba(0,0,0,0.05)';
+export const SHADOW_CASHIER = '0 4px 14px rgba(15,23,42,0.06)';
+export const SHADOW_CASHIER_SM = '0 2px 8px rgba(15,23,42,0.04)';
+
+export const NAVY_SIDEBAR = '#1A2332';
+export const NAVY_LOGO = '#0F1621';

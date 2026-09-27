@@ -7,7 +7,7 @@ import MenuGridItem from '@/Components/Cashier/MenuGridItem';
 import CartItem from '@/Components/Cashier/CartItem';
 import { formatRupiah, formatTime } from '@/helpers';
 import { useIsMobile } from '@/Hooks/useMediaQuery';
-import { BLUE, BLUE_50, BLUE_200, GRAY_900, GRAY_600, GRAY_BORDER, WHITE, GRAY_BG, SLATE_400, SLATE_LIGHT, GRAY_700, SLATE_DARK, SLATE_300, GREEN_600, SLATE_200, SLATE_900, SLATE_500, RED, RED_50, SLATE_100, BLUE_100, BLUE_SOFT, GREEN_50, GREEN_VIVID } from '@/theme';
+import { BLUE, BLUE_50, GRAY_900, GRAY_600, GRAY_BORDER, WHITE, GRAY_BG, SLATE_400, SLATE_LIGHT, GRAY_700, SLATE_DARK, SLATE_300, GREEN_600, SLATE_200, SLATE_900, SLATE_500, RED, RED_50, SLATE_100, BLUE_100, BLUE_SOFT, GREEN_50, GREEN_VIVID } from '@/theme';
 
 const CART_SNAP_POINTS = [0.5, 0.9];
 
@@ -171,19 +171,6 @@ export default function NewOrder({ categories }) {
         setIsStudent(false);
     }
 
-    /* ── Design tokens ── */
-    const T = {
-        accent:     BLUE,
-        accentBg:   BLUE_50,
-        accentRing: BLUE_200,
-        text:       GRAY_900,
-        sub:        GRAY_600,
-        border:     GRAY_BORDER,
-        elevated:   WHITE,
-        surface:    WHITE,
-        panelBg:    GRAY_BG,
-    };
-
     const cartItemsList = (
         <div style={{ flex: 1, overflowY: 'auto' }}>
             {cartItems.length === 0 ? (
@@ -195,7 +182,7 @@ export default function NewOrder({ categories }) {
     );
 
     const cartSummary = (
-        <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 16, marginTop: 'auto' }}>
+        <div style={{ borderTop: `1px solid ${GRAY_BORDER}`, paddingTop: 16, marginTop: 'auto' }}>
             {/* Toggle Mahasiswa */}
             <div
                 onClick={() => setIsStudent(p => !p)}
@@ -203,18 +190,18 @@ export default function NewOrder({ categories }) {
             >
                 <div style={{
                     width: 16, height: 16, borderRadius: 4, flexShrink: 0,
-                    border: `1.5px solid ${isStudent ? T.accent : SLATE_300}`,
-                    background: isStudent ? T.accent : 'white',
+                    border: `1.5px solid ${isStudent ? BLUE : SLATE_300}`,
+                    background: isStudent ? BLUE : 'white',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
                     {isStudent && <span style={{ color: 'white', fontSize: 11, lineHeight: 1 }}>✓</span>}
                 </div>
-                <span style={{ fontSize: 13, color: T.sub }}>Mahasiswa STIE Totalwin Semarang</span>
+                <span style={{ fontSize: 13, color: GRAY_600 }}>Mahasiswa STIE Totalwin Semarang</span>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                <span style={{ fontSize: 14, color: T.sub }}>Subtotal</span>
-                <span style={{ fontSize: 14, fontWeight: 500, color: T.text }}>{formatRupiah(total)}</span>
+                <span style={{ fontSize: 14, color: GRAY_600 }}>Subtotal</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: GRAY_900 }}>{formatRupiah(total)}</span>
             </div>
             {isStudent && totalCashback > 0 && (
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
@@ -222,13 +209,13 @@ export default function NewOrder({ categories }) {
                     <span style={{ fontSize: 13, fontWeight: 600, color: GREEN_600 }}>- {formatRupiah(totalCashback)}</span>
                 </div>
             )}
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderTop: `1px solid ${T.border}`, marginBottom: 16 }}>
-                <span style={{ fontSize: 16, fontWeight: 700, color: T.text }}>Total</span>
-                <span style={{ fontSize: 16, fontWeight: 700, color: T.text }}>{formatRupiah(grandTotal)}</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderTop: `1px solid ${GRAY_BORDER}`, marginBottom: 16 }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: GRAY_900 }}>Total</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: GRAY_900 }}>{formatRupiah(grandTotal)}</span>
             </div>
             <button
                 onClick={openModal} disabled={cartItems.length === 0}
-                style={{ width: '100%', height: 52, background: cartItems.length === 0 ? SLATE_300 : T.accent, color: 'white', border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 700, cursor: cartItems.length === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', boxShadow: cartItems.length > 0 ? '0 4px 16px rgba(59,111,212,0.30)' : 'none', transition: 'background 0.15s' }}
+                style={{ width: '100%', height: 52, background: cartItems.length === 0 ? SLATE_300 : BLUE, color: 'white', border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 700, cursor: cartItems.length === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', boxShadow: cartItems.length > 0 ? '0 4px 16px rgba(59,111,212,0.30)' : 'none', transition: 'background 0.15s' }}
             >
                 <span>BAYAR</span>
                 <span style={{ fontSize: 18 }}>{formatRupiah(grandTotal)}</span>
@@ -246,7 +233,7 @@ export default function NewOrder({ categories }) {
                         flex: 1,
                         padding: isPortrait ? 14 : 24,
                         paddingBottom: isMobile ? 96 : (isPortrait ? 14 : 24),
-                        background: T.panelBg,
+                        background: GRAY_BG,
                         overflowY: 'auto',
                         display: 'flex',
                         flexDirection: 'column',
@@ -262,7 +249,7 @@ export default function NewOrder({ categories }) {
                             <input
                                 type="text" value={search} onChange={e => setSearch(e.target.value)}
                                 placeholder="Cari menu..."
-                                style={{ width: '100%', height: 44, border: `1px solid ${T.border}`, borderRadius: 8, padding: '0 40px 0 44px', fontSize: 14, color: T.text, background: T.surface, outline: 'none', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(15,23,42,0.04)' }}
+                                style={{ width: '100%', height: 44, border: `1px solid ${GRAY_BORDER}`, borderRadius: 8, padding: '0 40px 0 44px', fontSize: 14, color: GRAY_900, background: WHITE, outline: 'none', boxSizing: 'border-box', boxShadow: '0 2px 8px rgba(15,23,42,0.04)' }}
                             />
                             {search && (
                                 <button onClick={() => setSearch('')} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: SLATE_400, padding: 0, display: 'flex' }}>
@@ -271,7 +258,7 @@ export default function NewOrder({ categories }) {
                             )}
                         </div>
                         <span style={{ fontSize: 11, color: GRAY_600, whiteSpace: 'nowrap', flexShrink: 0 }}>Diperbarui {formatTime(lastUpdated)}</span>
-                        <button onClick={refreshMenu} aria-label="Muat ulang menu" style={{ width: 40, height: 40, border: `1px solid ${T.border}`, borderRadius: 8, background: T.surface, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: BLUE, flexShrink: 0 }}>
+                        <button onClick={refreshMenu} aria-label="Muat ulang menu" style={{ width: 40, height: 40, border: `1px solid ${GRAY_BORDER}`, borderRadius: 8, background: WHITE, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: BLUE, flexShrink: 0 }}>
                             <RefreshCw size={16} />
                         </button>
                     </div>
@@ -281,7 +268,7 @@ export default function NewOrder({ categories }) {
                         {['Semua', ...categories.map(c => c.name)].map(cat => {
                             const active = activeCategory === cat;
                             return (
-                                <button key={cat} onClick={() => setActiveCategory(cat)} style={{ height: 36, padding: '0 16px', borderRadius: 100, border: active ? 'none' : `1.5px solid ${SLATE_LIGHT}`, cursor: 'pointer', fontSize: 13, fontWeight: active ? 600 : 500, background: active ? T.accent : T.surface, color: active ? WHITE : GRAY_700, whiteSpace: 'nowrap', transition: 'background 0.15s, color 0.15s', flexShrink: 0 }}>
+                                <button key={cat} onClick={() => setActiveCategory(cat)} style={{ height: 36, padding: '0 16px', borderRadius: 100, border: active ? 'none' : `1.5px solid ${SLATE_LIGHT}`, cursor: 'pointer', fontSize: 13, fontWeight: active ? 600 : 500, background: active ? BLUE : WHITE, color: active ? WHITE : GRAY_700, whiteSpace: 'nowrap', transition: 'background 0.15s, color 0.15s', flexShrink: 0 }}>
                                     {cat}
                                 </button>
                             );
@@ -303,9 +290,9 @@ export default function NewOrder({ categories }) {
                 <div
                     style={{
                         width: isPortrait ? '100%' : cartPanelWidth,
-                        background: T.surface,
-                        borderLeft: isPortrait ? 'none' : `1px solid ${T.border}`,
-                        borderTop: isPortrait ? `1px solid ${T.border}` : 'none',
+                        background: WHITE,
+                        borderLeft: isPortrait ? 'none' : `1px solid ${GRAY_BORDER}`,
+                        borderTop: isPortrait ? `1px solid ${GRAY_BORDER}` : 'none',
                         padding: isCartCollapsed ? '14px 12px' : (isPortrait ? '14px 16px 16px' : 24),
                         display: 'flex',
                         flexDirection: 'column',
@@ -317,9 +304,9 @@ export default function NewOrder({ categories }) {
                     }}
                 >
                     <div style={{ display: 'flex', justifyContent: isCartCollapsed ? 'center' : 'space-between', alignItems: 'center', marginBottom: isCartCollapsed ? 0 : 16, gap: 10 }}>
-                        {!isCartCollapsed && <span style={{ fontSize: 16, fontWeight: 700, color: T.text, letterSpacing: '-0.2px' }}>Keranjang Pesanan</span>}
+                        {!isCartCollapsed && <span style={{ fontSize: 16, fontWeight: 700, color: GRAY_900, letterSpacing: '-0.2px' }}>Keranjang Pesanan</span>}
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <span style={{ background: T.accent, color: 'white', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{totalQty}</span>
+                            <span style={{ background: BLUE, color: 'white', borderRadius: '50%', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{totalQty}</span>
                             <button
                                 type="button"
                                 onClick={() => setIsCartCollapsed(prev => !prev)}
@@ -328,8 +315,8 @@ export default function NewOrder({ categories }) {
                                     width: 32,
                                     height: 32,
                                     borderRadius: 8,
-                                    border: `1px solid ${T.border}`,
-                                    background: T.panelBg,
+                                    border: `1px solid ${GRAY_BORDER}`,
+                                    background: GRAY_BG,
                                     color: SLATE_DARK,
                                     display: 'inline-flex',
                                     alignItems: 'center',
@@ -378,7 +365,7 @@ export default function NewOrder({ categories }) {
                             padding: '0 22px',
                             borderRadius: 999,
                             border: 'none',
-                            background: cartItems.length === 0 ? BLUE_SOFT : T.accent,
+                            background: cartItems.length === 0 ? BLUE_SOFT : BLUE,
                             color: WHITE,
                             display: 'inline-flex',
                             alignItems: 'center',
@@ -404,17 +391,17 @@ export default function NewOrder({ categories }) {
                         <Drawer.Backdrop className="cashier-drawer-backdrop" />
                         <Drawer.Viewport className="cashier-sheet-viewport">
                             <Drawer.Popup className="cashier-sheet-popup" aria-modal="true" style={{ background: WHITE }}>
-                                <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderBottom: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderBottom: `1px solid ${GRAY_BORDER}`, display: 'flex', flexDirection: 'column', gap: 10 }}>
                                     <div aria-hidden="true" style={{ width: 44, height: 5, borderRadius: 999, background: SLATE_300, margin: '0 auto' }} />
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                                        <Drawer.Title style={{ margin: 0, fontSize: 16, fontWeight: 700, color: T.text, letterSpacing: '-0.2px' }}>
+                                        <Drawer.Title style={{ margin: 0, fontSize: 16, fontWeight: 700, color: GRAY_900, letterSpacing: '-0.2px' }}>
                                             Keranjang Pesanan
                                         </Drawer.Title>
-                                        <span style={{ background: T.accent, color: 'white', borderRadius: 999, minWidth: 26, height: 26, padding: totalQty > 9 ? '0 8px' : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{totalQty}</span>
+                                        <span style={{ background: BLUE, color: 'white', borderRadius: 999, minWidth: 26, height: 26, padding: totalQty > 9 ? '0 8px' : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{totalQty}</span>
                                         <Drawer.Close
                                             type="button"
                                             aria-label="Tutup keranjang"
-                                            style={{ marginLeft: 'auto', width: 34, height: 34, borderRadius: 10, border: `1px solid ${T.border}`, background: T.panelBg, color: SLATE_DARK, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                                            style={{ marginLeft: 'auto', width: 34, height: 34, borderRadius: 10, border: `1px solid ${GRAY_BORDER}`, background: GRAY_BG, color: SLATE_DARK, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
                                         >
                                             <X size={18} />
                                         </Drawer.Close>
@@ -439,7 +426,7 @@ export default function NewOrder({ categories }) {
                     style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.55)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: 24 }}
                     onClick={e => { if (e.target === e.currentTarget) closeModal(); }}
                 >
-                    <div style={{ background: T.surface, borderRadius: 24, width: '100%', maxWidth: 440, boxShadow: '0 24px 64px rgba(15,23,42,0.18), 0 2px 8px rgba(15,23,42,0.06)', overflow: 'hidden' }}>
+                    <div style={{ background: WHITE, borderRadius: 24, width: '100%', maxWidth: 440, boxShadow: '0 24px 64px rgba(15,23,42,0.18), 0 2px 8px rgba(15,23,42,0.06)', overflow: 'hidden' }}>
 
                         {/* ─── Pilih Cara Bayar ─── */}
                         {(<>

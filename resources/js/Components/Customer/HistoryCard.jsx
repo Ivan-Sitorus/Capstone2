@@ -1,11 +1,6 @@
 import { Coffee } from 'lucide-react';
 import Money from '@/Components/Common/Money';
-import { STONE_50, STONE_300, STONE_400, STONE_500, STONE_700, STONE_900, AMBER_400, BLUE_400, GREEN_400 } from '@/theme';
-
-const F = '"Inter", system-ui, sans-serif';
-
-/* stone-bg dari Stitch */
-const BG = STONE_50;
+import { STONE_50, STONE_300, STONE_400, STONE_500, STONE_700, STONE_900, AMBER_400, BLUE_400, GREEN_400, FONT_SANS } from '@/theme';
 
 const STATUS_MAP = {
     pending:  { label: 'Pending',  dot: AMBER_400, bg: 'rgba(251,191,36,0.10)',  border: 'rgba(251,191,36,0.20)'  },
@@ -42,7 +37,7 @@ export default function HistoryCard({ order, onDetail }) {
                     {/* Coffee icon circle */}
                     <div style={{
                         width: 40, height: 40, borderRadius: '50%',
-                        background: BG,
+                        background: STONE_50,
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         flexShrink: 0,
                     }}>
@@ -51,11 +46,11 @@ export default function HistoryCard({ order, onDetail }) {
                     <div>
                         <h3 style={{
                             fontSize: 14, fontWeight: 700, color: STONE_900,
-                            fontFamily: F, margin: 0, letterSpacing: '-0.01em',
+                            fontFamily: FONT_SANS, margin: 0, letterSpacing: '-0.01em',
                         }}>
                             {order.order_code}
                         </h3>
-                        <p style={{ fontSize: 12, color: 'rgba(68,64,60,0.60)', fontFamily: F, marginTop: 2 }}>
+                        <p style={{ fontSize: 12, color: 'rgba(68,64,60,0.60)', fontFamily: FONT_SANS, marginTop: 2 }}>
                             {subtitle}
                         </p>
                     </div>
@@ -73,7 +68,7 @@ export default function HistoryCard({ order, onDetail }) {
                     <span style={{ width: 6, height: 6, borderRadius: '50%', background: s.dot, flexShrink: 0 }} />
                     <span style={{
                         fontSize: 10, fontWeight: 700, color: STONE_900,
-                        fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.04em',
+                        fontFamily: FONT_SANS, textTransform: 'uppercase', letterSpacing: '0.04em',
                     }}>
                         {s.label}
                     </span>
@@ -82,23 +77,23 @@ export default function HistoryCard({ order, onDetail }) {
 
             {/* ── Item list ── */}
             <div style={{
-                borderTop: `1px solid ${BG}`,
-                borderBottom: `1px solid ${BG}`,
+                borderTop: `1px solid ${STONE_50}`,
+                borderBottom: `1px solid ${STONE_50}`,
                 padding: '12px 0',
                 marginBottom: 14,
                 display: 'flex', flexDirection: 'column', gap: 8,
             }}>
                 {hasItems ? order.items.map((item, i) => (
                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
-                        <span style={{ color: STONE_700, fontFamily: F }}>
+                        <span style={{ color: STONE_700, fontFamily: FONT_SANS }}>
                             <span style={{ fontWeight: 600 }}>{item.quantity}×</span> {item.name}
                         </span>
-                        <span style={{ color: STONE_900, fontWeight: 500, fontFamily: F }}>
+                        <span style={{ color: STONE_900, fontWeight: 500, fontFamily: FONT_SANS }}>
                             <Money value={item.subtotal} />
                         </span>
                     </div>
                 )) : (
-                    <span style={{ fontSize: 13, color: STONE_500, fontFamily: F }}>
+                    <span style={{ fontSize: 13, color: STONE_500, fontFamily: FONT_SANS }}>
                         {order.itemsSummary}
                     </span>
                 )}
@@ -110,11 +105,11 @@ export default function HistoryCard({ order, onDetail }) {
                     <p style={{
                         fontSize: 10, fontWeight: 700, color: 'rgba(68,64,60,0.50)',
                         textTransform: 'uppercase', letterSpacing: '0.06em',
-                        fontFamily: F, marginBottom: 3,
+                        fontFamily: FONT_SANS, marginBottom: 3,
                     }}>
                         TOTAL
                     </p>
-                    <p style={{ fontSize: 20, fontWeight: 700, color: STONE_900, fontFamily: F, letterSpacing: '-0.02em' }}>
+                    <p style={{ fontSize: 20, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS, letterSpacing: '-0.02em' }}>
                         <Money value={order.total_amount} />
                     </p>
                 </div>
@@ -126,7 +121,7 @@ export default function HistoryCard({ order, onDetail }) {
                         borderRadius: 8,
                         background: 'transparent',
                         fontSize: 13, fontWeight: 700,
-                        color: STONE_700, fontFamily: F,
+                        color: STONE_700, fontFamily: FONT_SANS,
                         cursor: 'pointer',
                         transition: 'background 0.15s',
                     }}

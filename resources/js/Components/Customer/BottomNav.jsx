@@ -1,9 +1,7 @@
 import { Link } from '@inertiajs/react';
 import { Home, ShoppingCart, Clock } from 'lucide-react';
 import useCart from '@/Hooks/useCart';
-import { WHITE, INK, STONE_400, AMBER_600 } from '@/theme';
-
-const F = '"Inter", system-ui, sans-serif';
+import { WHITE, INK, STONE_400, AMBER_600, FONT_SANS } from '@/theme';
 
 function getHistoryHref() {
     try {
@@ -61,7 +59,7 @@ export default function BottomNav({ activeTab }) {
                                 justifyContent: 'center',
                                 gap:            4,
                                 textDecoration: 'none',
-                                fontFamily:     F,
+                                fontFamily:     FONT_SANS,
                                 position:       'relative',
                             }}
                         >
@@ -94,7 +92,7 @@ export default function BottomNav({ activeTab }) {
                                         height:         15,
                                         fontSize:       8,
                                         fontWeight:     700,
-                                        fontFamily:     F,
+                                        fontFamily:     FONT_SANS,
                                         display:        'flex',
                                         alignItems:     'center',
                                         justifyContent: 'center',

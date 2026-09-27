@@ -5,22 +5,7 @@ import useCart from '@/Hooks/useCart';
 import { ChevronLeft, Banknote, QrCode, MapPin, Wallet } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
-import { WHITE, STONE_50, GRAY_100, GRAY_200, STONE_700, STONE_900, STONE_500, RED_50, RED_TINT, RED_DARK, STONE_GREY } from '@/theme';
-
-const F = '"Inter", system-ui, sans-serif';
-
-/* stone-minimalist tokens: sesuai Stitch */
-const C = {
-    surface:    WHITE,
-    bg:         STONE_50,   /* stone-bg */
-    border:     GRAY_100,   /* gray-100 */
-    borderMd:   GRAY_200,   /* gray-200 */
-    accent:     STONE_700,   /* stone-primary */
-    accentDark: STONE_900,   /* stone-heading / hover */
-    textHead:   STONE_900,
-    textSecond: STONE_500,
-    shadow:     '0 2px 8px -2px rgba(0,0,0,0.05)',
-};
+import { WHITE, STONE_50, GRAY_100, GRAY_200, STONE_700, STONE_900, STONE_500, RED_50, RED_TINT, RED_DARK, STONE_GREY, SHADOW_SOFT, FONT_SANS } from '@/theme';
 
 const METHODS = [
     {
@@ -92,7 +77,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                         transition: background 0.15s, transform 0.1s;
                     }
                     .mineposp-confirm:active { transform: scale(0.98); }
-                    .mineposp-confirm:hover:not(:disabled) { background: ${C.accentDark} !important; }
+                    .mineposp-confirm:hover:not(:disabled) { background: ${STONE_900} !important; }
                 `}</style>
             </Head>
 
@@ -115,34 +100,34 @@ export default function PaymentChoose({ order, items, table_number }) {
                         style={{
                             marginTop: 2,
                             width: 36, height: 36, borderRadius: '50%',
-                            background: C.surface,
-                            border: `1px solid ${C.border}`,
-                            boxShadow: C.shadow,
+                            background: WHITE,
+                            border: `1px solid ${GRAY_100}`,
+                            boxShadow: SHADOW_SOFT,
                             cursor: 'pointer',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             flexShrink: 0,
                         }}
                     >
-                        <ChevronLeft size={20} color={C.accent} strokeWidth={2} />
+                        <ChevronLeft size={20} color={STONE_700} strokeWidth={2} />
                     </button>
 
                     <div style={{ flex: 1 }}>
                         <h1 style={{
-                            fontSize: 20, fontWeight: 700, color: C.textHead,
-                            fontFamily: F, letterSpacing: '-0.02em', margin: 0,
+                            fontSize: 20, fontWeight: 700, color: STONE_900,
+                            fontFamily: FONT_SANS, letterSpacing: '-0.02em', margin: 0,
                         }}>
                             Pilih Cara Bayar
                         </h1>
                         <p style={{
-                            fontSize: 12, fontWeight: 500, color: C.textSecond,
-                            fontFamily: F, marginTop: 4,
+                            fontSize: 12, fontWeight: 500, color: STONE_500,
+                            fontFamily: FONT_SANS, marginTop: 4,
                         }}>
                             Pesanan #{order.order_code}
                         </p>
                         {table_number && (
                             <div style={{ display: 'flex', alignItems: 'center', gap: 4, marginTop: 4 }}>
-                                <MapPin size={12} color={C.textSecond} strokeWidth={2} />
-                                <span style={{ fontSize: 12, color: C.textSecond, fontFamily: F }}>
+                                <MapPin size={12} color={STONE_500} strokeWidth={2} />
+                                <span style={{ fontSize: 12, color: STONE_500, fontFamily: FONT_SANS }}>
                                     Meja {table_number}
                                 </span>
                             </div>
@@ -162,18 +147,18 @@ export default function PaymentChoose({ order, items, table_number }) {
                     {/* ── Order Summary ── */}
                     <section style={{ padding: '0 24px', marginTop: 8 }}>
                         <h2 style={{
-                            fontSize: 10, fontWeight: 700, color: C.textSecond,
+                            fontSize: 10, fontWeight: 700, color: STONE_500,
                             textTransform: 'uppercase', letterSpacing: '0.12em',
-                            fontFamily: F, marginBottom: 12,
+                            fontFamily: FONT_SANS, marginBottom: 12,
                         }}>
                             Ringkasan Pesanan
                         </h2>
 
                         <div style={{
-                            background: C.surface,
+                            background: WHITE,
                             borderRadius: 12,
-                            border: `1px solid ${C.border}`,
-                            boxShadow: C.shadow,
+                            border: `1px solid ${GRAY_100}`,
+                            boxShadow: SHADOW_SOFT,
                             overflow: 'hidden',
                         }}>
                             {/* Item rows */}
@@ -181,24 +166,24 @@ export default function PaymentChoose({ order, items, table_number }) {
                                 <div key={idx} style={{
                                     padding: '14px 16px',
                                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                    borderBottom: idx < items.length - 1 ? `1px solid ${C.border}` : 'none',
+                                    borderBottom: idx < items.length - 1 ? `1px solid ${GRAY_100}` : 'none',
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                                         {/* Qty badge: rectangular, sesuai Stitch */}
                                         <span style={{
-                                            background: C.bg,
-                                            color: C.accent,
+                                            background: STONE_50,
+                                            color: STONE_700,
                                             fontSize: 10, fontWeight: 700,
                                             padding: '3px 7px', borderRadius: 4,
-                                            fontFamily: F, flexShrink: 0,
+                                            fontFamily: FONT_SANS, flexShrink: 0,
                                         }}>
                                             {item.qty}x
                                         </span>
-                                        <span style={{ fontSize: 14, fontWeight: 500, color: C.textHead, fontFamily: F }}>
+                                        <span style={{ fontSize: 14, fontWeight: 500, color: STONE_900, fontFamily: FONT_SANS }}>
                                             {item.name}
                                         </span>
                                     </div>
-                                    <span style={{ fontSize: 14, fontWeight: 600, color: C.textHead, fontFamily: F }}>
+                                    <span style={{ fontSize: 14, fontWeight: 600, color: STONE_900, fontFamily: FONT_SANS }}>
                                         {formatRupiah(item.subtotal)}
                                     </span>
                                 </div>
@@ -208,13 +193,13 @@ export default function PaymentChoose({ order, items, table_number }) {
                             <div style={{
                                 padding: '14px 16px',
                                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                                borderTop: `1px solid ${C.border}`,
+                                borderTop: `1px solid ${GRAY_100}`,
                                 background: 'rgba(247,245,242,0.5)',
                             }}>
-                                <span style={{ fontSize: 15, fontWeight: 700, color: C.textHead, fontFamily: F }}>
+                                <span style={{ fontSize: 15, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS }}>
                                     Total
                                 </span>
-                                <span style={{ fontSize: 18, fontWeight: 700, color: C.textHead, fontFamily: F }}>
+                                <span style={{ fontSize: 18, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS }}>
                                     {formatRupiah(order.total_amount)}
                                 </span>
                             </div>
@@ -224,9 +209,9 @@ export default function PaymentChoose({ order, items, table_number }) {
                     {/* ── Payment Methods ── */}
                     <section style={{ padding: '0 24px', marginTop: 24 }}>
                         <h2 style={{
-                            fontSize: 10, fontWeight: 700, color: C.textSecond,
+                            fontSize: 10, fontWeight: 700, color: STONE_500,
                             textTransform: 'uppercase', letterSpacing: '0.12em',
-                            fontFamily: F, marginBottom: 12,
+                            fontFamily: FONT_SANS, marginBottom: 12,
                         }}>
                             Metode Pembayaran
                         </h2>
@@ -240,12 +225,12 @@ export default function PaymentChoose({ order, items, table_number }) {
                                         onClick={() => setSelected(key)}
                                         className="mineposp-method"
                                         style={{
-                                            background: C.surface,
+                                            background: WHITE,
                                             borderRadius: 12,
-                                            border: `1px solid ${active ? C.accent : C.border}`,
+                                            border: `1px solid ${active ? STONE_700 : GRAY_100}`,
                                             boxShadow: active
-                                                ? `0 0 0 1px ${C.accent}, ${C.shadow}`
-                                                : C.shadow,
+                                                ? `0 0 0 1px ${STONE_700}, ${SHADOW_SOFT}`
+                                                : SHADOW_SOFT,
                                             padding: '14px 16px',
                                             display: 'flex', alignItems: 'center', gap: 14,
                                             cursor: 'pointer',
@@ -254,28 +239,28 @@ export default function PaymentChoose({ order, items, table_number }) {
                                         {/* Icon box: bg tetap stone-bg, tidak berubah saat aktif */}
                                         <div style={{
                                             width: 40, height: 40, borderRadius: 10,
-                                            background: C.bg,
+                                            background: STONE_50,
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             flexShrink: 0,
                                         }}>
                                             {key === 'qris'
                                                 ? <img src="/images/logo-qris.png" alt="QRIS"
                                                     style={{ width: 24, height: 24, objectFit: 'contain' }} />
-                                                : <Icon size={20} color={C.accent} strokeWidth={2} />
+                                                : <Icon size={20} color={STONE_700} strokeWidth={2} />
                                             }
                                         </div>
 
                                         {/* Labels */}
                                         <div style={{ flex: 1 }}>
                                             <p style={{
-                                                fontSize: 14, fontWeight: 700, color: C.textHead,
-                                                fontFamily: F, margin: 0, lineHeight: 1,
+                                                fontSize: 14, fontWeight: 700, color: STONE_900,
+                                                fontFamily: FONT_SANS, margin: 0, lineHeight: 1,
                                             }}>
                                                 {title}
                                             </p>
                                             <p style={{
-                                                fontSize: 11, color: C.textSecond,
-                                                fontFamily: F, marginTop: 5, lineHeight: 1.4,
+                                                fontSize: 11, color: STONE_500,
+                                                fontFamily: FONT_SANS, marginTop: 5, lineHeight: 1.4,
                                             }}>
                                                 {desc}
                                             </p>
@@ -284,14 +269,14 @@ export default function PaymentChoose({ order, items, table_number }) {
                                         {/* Radio indicator */}
                                         <div style={{
                                             width: 20, height: 20, borderRadius: '50%',
-                                            border: `2px solid ${active ? C.accent : C.borderMd}`,
+                                            border: `2px solid ${active ? STONE_700 : GRAY_200}`,
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             flexShrink: 0,
                                             transition: 'border-color 0.2s',
                                         }}>
                                             <div style={{
                                                 width: 10, height: 10, borderRadius: '50%',
-                                                background: C.accent,
+                                                background: STONE_700,
                                                 opacity: active ? 1 : 0,
                                                 transition: 'opacity 0.2s',
                                             }} />
@@ -315,7 +300,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                             marginBottom: 10,
                             background: RED_50, border: `1px solid ${RED_TINT}`,
                             borderRadius: 10, padding: '10px 14px',
-                            fontSize: 13, color: RED_DARK, fontFamily: F,
+                            fontSize: 13, color: RED_DARK, fontFamily: FONT_SANS,
                         }}>
                             {error}
                         </div>
@@ -327,7 +312,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                         style={{
                             width: '100%',
                             padding: '16px 0',
-                            background: !selected || loading ? STONE_GREY : C.accent,
+                            background: !selected || loading ? STONE_GREY : STONE_700,
                             color: WHITE,
                             border: 'none', borderRadius: 12,
                             fontSize: 15, fontWeight: 700,
@@ -335,7 +320,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                             boxShadow: !selected || loading
                                 ? 'none'
                                 : '0 4px 16px rgba(68,64,60,0.30)',
-                            fontFamily: F, letterSpacing: '-0.01em',
+                            fontFamily: FONT_SANS, letterSpacing: '-0.01em',
                         }}
                     >
                         {loading ? 'Memproses...' : 'Konfirmasi Pembayaran'}
@@ -354,7 +339,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                     padding: '0 24px',
                 }}>
                     <div style={{
-                        background: C.surface,
+                        background: WHITE,
                         borderRadius: 20,
                         width: '100%', maxWidth: 320,
                         padding: '28px 24px 24px',
@@ -365,22 +350,22 @@ export default function PaymentChoose({ order, items, table_number }) {
                         {/* Icon */}
                         <div style={{
                             width: 64, height: 64, borderRadius: 16,
-                            background: C.bg, border: `1px solid ${C.border}`,
+                            background: STONE_50, border: `1px solid ${GRAY_100}`,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                         }}>
-                            <Wallet size={30} color={C.accent} strokeWidth={1.75} />
+                            <Wallet size={30} color={STONE_700} strokeWidth={1.75} />
                         </div>
 
                         <div style={{
-                            fontSize: 17, fontWeight: 700, color: C.textHead,
-                            fontFamily: F, textAlign: 'center',
+                            fontSize: 17, fontWeight: 700, color: STONE_900,
+                            fontFamily: FONT_SANS, textAlign: 'center',
                         }}>
                             Bayar di Kasir
                         </div>
 
                         <div style={{
-                            fontSize: 13, color: C.textSecond, lineHeight: 1.6,
-                            fontFamily: F, textAlign: 'center',
+                            fontSize: 13, color: STONE_500, lineHeight: 1.6,
+                            fontFamily: FONT_SANS, textAlign: 'center',
                         }}>
                             Silakan tunjukkan pesanan ini ke kasir dan lakukan pembayaran tunai.
                         </div>
@@ -388,27 +373,27 @@ export default function PaymentChoose({ order, items, table_number }) {
                         {/* Order info box */}
                         <div style={{
                             width: '100%',
-                            background: C.bg, borderRadius: 12,
-                            border: `1px solid ${C.border}`,
+                            background: STONE_50, borderRadius: 12,
+                            border: `1px solid ${GRAY_100}`,
                             padding: '14px 16px',
                             display: 'flex', flexDirection: 'column',
                             alignItems: 'center', gap: 3,
                         }}>
-                            <span style={{ fontSize: 10, color: C.textSecond, fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                            <span style={{ fontSize: 10, color: STONE_500, fontFamily: FONT_SANS, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                                 No. Pesanan
                             </span>
                             <span style={{
-                                fontSize: 15, fontWeight: 700, color: C.textHead,
-                                fontFamily: F, letterSpacing: '0.02em', marginBottom: 8,
+                                fontSize: 15, fontWeight: 700, color: STONE_900,
+                                fontFamily: FONT_SANS, letterSpacing: '0.02em', marginBottom: 8,
                             }}>
                                 #{cashOrderCode}
                             </span>
-                            <span style={{ fontSize: 10, color: C.textSecond, fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+                            <span style={{ fontSize: 10, color: STONE_500, fontFamily: FONT_SANS, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
                                 Total Pembayaran
                             </span>
                             <span style={{
-                                fontSize: 22, fontWeight: 700, color: C.textHead,
-                                fontFamily: F, letterSpacing: '-0.02em',
+                                fontSize: 22, fontWeight: 700, color: STONE_900,
+                                fontFamily: FONT_SANS, letterSpacing: '-0.02em',
                             }}>
                                 {formatRupiah(order.total_amount)}
                             </span>
@@ -416,13 +401,13 @@ export default function PaymentChoose({ order, items, table_number }) {
 
                         {/* Info riwayat */}
                         <div style={{
-                            width: '100%', background: C.bg,
-                            borderRadius: 10, border: `1px solid ${C.border}`,
+                            width: '100%', background: STONE_50,
+                            borderRadius: 10, border: `1px solid ${GRAY_100}`,
                             padding: '10px 14px',
                         }}>
-                            <span style={{ fontSize: 12, color: C.textSecond, lineHeight: 1.5, fontFamily: F }}>
+                            <span style={{ fontSize: 12, color: STONE_500, lineHeight: 1.5, fontFamily: FONT_SANS }}>
                                 Pantau status pesananmu di tab{' '}
-                                <strong style={{ color: C.accent }}>Riwayat</strong>
+                                <strong style={{ color: STONE_700 }}>Riwayat</strong>
                                 {' '}untuk melihat update dari kasir.
                             </span>
                         </div>
@@ -433,10 +418,10 @@ export default function PaymentChoose({ order, items, table_number }) {
                             className="mineposp-confirm"
                             style={{
                                 width: '100%', padding: '13px 0',
-                                background: C.accent, color: WHITE,
+                                background: STONE_700, color: WHITE,
                                 border: 'none', borderRadius: 12,
                                 fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                                fontFamily: F,
+                                fontFamily: FONT_SANS,
                                 boxShadow: '0 4px 16px rgba(68,64,60,0.25)',
                             }}
                         >

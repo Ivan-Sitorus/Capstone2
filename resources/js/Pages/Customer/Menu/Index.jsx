@@ -4,25 +4,7 @@ import { Search, ShoppingBag, Coffee } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
 import { formatRupiah } from '@/helpers';
-import { STONE_50, WHITE, STONE_100, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, GREEN_600, AMBER_400, STONE_250 } from '@/theme';
-
-const F = '"Inter", system-ui, sans-serif';
-
-const C = {
-    bg:          STONE_50,
-    surface:     WHITE,
-    surfaceAlt:  STONE_100,
-    border:      STONE_300,
-    accent:      STONE_700,
-    accentHover: STONE_900,
-    textPrimary: STONE_900,
-    textSecond:  STONE_500,
-    textMuted:   STONE_400,
-    success:     GREEN_600,
-    warning:     AMBER_400,
-    shadow:      '0 4px 20px -2px rgba(0,0,0,0.05)',
-    shadowLift:  '0 8px 24px -2px rgba(0,0,0,0.10)',
-};
+import { STONE_50, WHITE, STONE_700, STONE_900, STONE_500, STONE_400, GREEN_600, AMBER_400, STONE_250, SHADOW_CARD, SHADOW_CARD_LIFT, FONT_SANS } from '@/theme';
 
 /* ── Menu card ─────────────────────────────────────────────────── */
 function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priority = false, isStudent = false }) {
@@ -36,7 +18,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
             borderRadius:  12,
             overflow:      'hidden',
             border:        `1px solid rgba(226,222,216,0.60)`,
-            boxShadow:     C.shadow,
+            boxShadow:     SHADOW_CARD,
             display:       'flex',
             flexDirection: 'column',
             opacity:       soldOut ? 0.75 : 1,
@@ -75,7 +57,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                             color:         WHITE,
                             fontSize:      10,
                             fontWeight:    700,
-                            fontFamily:    F,
+                            fontFamily:    FONT_SANS,
                             letterSpacing: '0.05em',
                             textTransform: 'uppercase',
                             padding:       '4px 12px',
@@ -98,8 +80,8 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                 <h3 style={{
                     fontSize:      13,
                     fontWeight:    700,
-                    color:         C.textPrimary,
-                    fontFamily:    F,
+                    color:         STONE_900,
+                    fontFamily:    FONT_SANS,
                     lineHeight:    1.3,
                     letterSpacing: '-0.01em',
                     margin:        0,
@@ -111,8 +93,8 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                 <p style={{
                     fontSize:   13,
                     fontWeight: 600,
-                    color:      C.accent,
-                    fontFamily: F,
+                    color:      STONE_700,
+                    fontFamily: FONT_SANS,
                     margin:     0,
                 }}>
                     {formatRupiah(Number(menu.price))}
@@ -123,14 +105,14 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                     <p style={{
                         fontSize:   10,
                         fontWeight: 500,
-                        color:      C.success,
-                        fontFamily: F,
+                        color:      GREEN_600,
+                        fontFamily: FONT_SANS,
                         display:    'flex',
                         alignItems: 'center',
                         gap:        4,
                         margin:     0,
                     }}>
-                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: C.success, flexShrink: 0 }} />
+                        <span style={{ width: 5, height: 5, borderRadius: '50%', background: GREEN_600, flexShrink: 0 }} />
                         Cashback {formatRupiah(cashback)}
                     </p>
                 )}
@@ -141,13 +123,13 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                         <button disabled style={{
                             width:        '100%',
                             background:   STONE_250,
-                            color:        C.textMuted,
+                            color:        STONE_400,
                             border:       'none',
                             borderRadius: 8,
                             padding:      '8px 0',
                             fontSize:     12,
                             fontWeight:   700,
-                            fontFamily:   F,
+                            fontFamily:   FONT_SANS,
                             cursor:       'not-allowed',
                         }}>
                             Stok Habis
@@ -164,11 +146,11 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                             <button onClick={onDecrement} style={{
                                 width:          28, height: 28,
                                 borderRadius:   6,
-                                background:     C.surface,
+                                background:     WHITE,
                                 border:         'none',
                                 cursor:         'pointer',
                                 fontSize:       16, fontWeight: 500,
-                                color:          C.accent,
+                                color:          STONE_700,
                                 display:        'flex',
                                 alignItems:     'center',
                                 justifyContent: 'center',
@@ -177,10 +159,10 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
 
                             <span style={{
                                 fontSize:   12, fontWeight: 700,
-                                color:      C.textPrimary,
+                                color:      STONE_900,
                                 minWidth:   20,
                                 textAlign:  'center',
-                                fontFamily: F,
+                                fontFamily: FONT_SANS,
                                 padding:    '0 6px',
                             }}>
                                 {cartItem.quantity}
@@ -189,11 +171,11 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                             <button onClick={onIncrement} style={{
                                 width:          28, height: 28,
                                 borderRadius:   6,
-                                background:     C.accent,
+                                background:     STONE_700,
                                 border:         'none',
                                 cursor:         'pointer',
                                 fontSize:       16, fontWeight: 600,
-                                color:          C.surface,
+                                color:          WHITE,
                                 display:        'flex',
                                 alignItems:     'center',
                                 justifyContent: 'center',
@@ -203,14 +185,14 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                     ) : (
                         <button onClick={onAdd} className="minepos-add-btn" style={{
                             width:         '100%',
-                            background:    C.accent,
-                            color:         C.surface,
+                            background:    STONE_700,
+                            color:         WHITE,
                             border:        'none',
                             borderRadius:  8,
                             padding:       '8px 0',
                             fontSize:      12,
                             fontWeight:    700,
-                            fontFamily:    F,
+                            fontFamily:    FONT_SANS,
                             cursor:        'pointer',
                             letterSpacing: '0.01em',
                         }}>
@@ -306,9 +288,9 @@ export default function CustomerMenu({ categories, table }) {
                 <style>{`
                     html, body { background: ${STONE_50}; }
                     .minepos-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
-                    .minepos-card:hover { box-shadow: ${C.shadowLift} !important; transform: translateY(-2px); }
+                    .minepos-card:hover { box-shadow: ${SHADOW_CARD_LIFT} !important; transform: translateY(-2px); }
                     .minepos-add-btn { transition: background 0.15s ease; }
-                    .minepos-add-btn:hover { background: ${C.accentHover} !important; }
+                    .minepos-add-btn:hover { background: ${STONE_900} !important; }
                     .minepos-chip { transition: background 0.15s, color 0.15s; }
                     .minepos-search:focus { outline: none; box-shadow: 0 0 0 2px rgba(68,64,60,0.20) !important; }
                     .minepos-chips::-webkit-scrollbar { display: none; }
@@ -332,7 +314,7 @@ export default function CustomerMenu({ categories, table }) {
                         {/* Logo: rounded-xl dark bg sesuai Stitch */}
                         <div style={{
                             width: 48, height: 48, borderRadius: 14,
-                            background: C.accent,
+                            background: STONE_700,
                             overflow: 'hidden', flexShrink: 0,
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             boxShadow: '0 2px 8px rgba(68,64,60,0.25)',
@@ -351,20 +333,20 @@ export default function CustomerMenu({ categories, table }) {
                         {/* Greeting + name inline */}
                         <div style={{ flex: 1 }}>
                             <p style={{
-                                fontSize: 10, fontWeight: 500, color: C.textSecond,
-                                fontFamily: F, textTransform: 'uppercase',
+                                fontSize: 10, fontWeight: 500, color: STONE_500,
+                                fontFamily: FONT_SANS, textTransform: 'uppercase',
                                 letterSpacing: '0.10em', margin: '0 0 3px',
                             }}>
                                 Selamat datang,
                             </p>
                             <h1 style={{
-                                fontSize: 19, fontWeight: 700, color: C.textPrimary,
-                                fontFamily: F, letterSpacing: '-0.02em',
+                                fontSize: 19, fontWeight: 700, color: STONE_900,
+                                fontFamily: FONT_SANS, letterSpacing: '-0.02em',
                                 margin: 0, lineHeight: 1.2,
                             }}>
                                 {customer?.name ?? 'Pelanggan'}
                                 <span style={{
-                                    fontSize: 13, fontWeight: 400, color: C.textMuted,
+                                    fontSize: 13, fontWeight: 400, color: STONE_400,
                                     marginLeft: 6, letterSpacing: 0,
                                 }}>
                                     • Meja {table?.table_number ?? customer?.tableNumber ?? '-'}
@@ -376,7 +358,7 @@ export default function CustomerMenu({ categories, table }) {
 
                     {/* Search: no border, rounded-12, backdrop-blur sesuai Stitch */}
                     <div style={{ position: 'relative' }}>
-                        <Search size={18} color={C.textMuted} strokeWidth={2}
+                        <Search size={18} color={STONE_400} strokeWidth={2}
                             style={{
                                 position: 'absolute', left: 14,
                                 top: '50%', transform: 'translateY(-50%)',
@@ -397,9 +379,9 @@ export default function CustomerMenu({ categories, table }) {
                                 borderRadius: 12,
                                 padding: '0 16px 0 42px',
                                 fontSize: 14, fontWeight: 400,
-                                color: C.textPrimary, fontFamily: F,
+                                color: STONE_900, fontFamily: FONT_SANS,
                                 outline: 'none', boxSizing: 'border-box',
-                                boxShadow: C.shadow,
+                                boxShadow: SHADOW_CARD,
                             }}
                         />
                     </div>
@@ -420,18 +402,18 @@ export default function CustomerMenu({ categories, table }) {
                                     className="minepos-chip"
                                     style={{
                                         flexShrink:     0,
-                                        background:     active ? C.accent : 'rgba(255,255,255,0.90)',
+                                        background:     active ? STONE_700 : 'rgba(255,255,255,0.90)',
                                         backdropFilter: active ? 'none' : 'blur(6px)',
                                         borderRadius:   12,
                                         border:         active ? 'none' : '1px solid rgba(255,255,255,0.20)',
                                         padding:        '8px 20px',
                                         fontSize:       13,
                                         fontWeight:     active ? 600 : 500,
-                                        color:          active ? C.surface : C.textSecond,
-                                        fontFamily:     F,
+                                        color:          active ? WHITE : STONE_500,
+                                        fontFamily:     FONT_SANS,
                                         cursor:         'pointer',
                                         whiteSpace:     'nowrap',
-                                        boxShadow:      active ? '0 2px 8px rgba(68,64,60,0.25)' : C.shadow,
+                                        boxShadow:      active ? '0 2px 8px rgba(68,64,60,0.25)' : SHADOW_CARD,
                                     }}
                                 >
                                     {c.name}
@@ -451,9 +433,9 @@ export default function CustomerMenu({ categories, table }) {
                 }}>
                     {filtered.length === 0 ? (
                         <div style={{
-                            textAlign: 'center', color: C.textMuted,
+                            textAlign: 'center', color: STONE_400,
                             padding: '64px 0', fontSize: 14,
-                            fontFamily: F, lineHeight: 1.6,
+                            fontFamily: FONT_SANS, lineHeight: 1.6,
                         }}>
                             Tidak ada menu ditemukan
                         </div>
@@ -480,12 +462,12 @@ export default function CustomerMenu({ categories, table }) {
                                     alignItems: 'center', marginBottom: 12,
                                 }}>
                                     <span style={{
-                                        fontSize: 11, fontWeight: 600, color: C.textMuted,
-                                        fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.08em',
+                                        fontSize: 11, fontWeight: 600, color: STONE_400,
+                                        fontFamily: FONT_SANS, textTransform: 'uppercase', letterSpacing: '0.08em',
                                     }}>
                                         {group.label}
                                     </span>
-                                    <span style={{ fontSize: 11, color: C.textMuted, fontFamily: F }}>
+                                    <span style={{ fontSize: 11, color: STONE_400, fontFamily: FONT_SANS }}>
                                         {group.menus.length} menu
                                     </span>
                                 </div>
@@ -513,29 +495,29 @@ export default function CustomerMenu({ categories, table }) {
                 <div style={{
                     position: 'fixed', bottom: 64, left: '50%', transform: 'translateX(-50%)',
                     width: '100%', maxWidth: 430,
-                    background: C.textPrimary,
+                    background: STONE_900,
                     padding: '12px 16px',
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                     zIndex: 100,
                 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                         <div style={{ position: 'relative', flexShrink: 0 }}>
-                            <ShoppingBag size={22} color={C.surface} />
+                            <ShoppingBag size={22} color={WHITE} />
                             <span style={{
                                 position: 'absolute', top: -6, right: -6,
-                                background: C.warning, color: C.textPrimary,
+                                background: AMBER_400, color: STONE_900,
                                 borderRadius: '50%', width: 18, height: 18,
-                                fontSize: 10, fontWeight: 700, fontFamily: F,
+                                fontSize: 10, fontWeight: 700, fontFamily: FONT_SANS,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                             }}>
                                 {count}
                             </span>
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                            <span style={{ fontSize: 11, color: C.textSecond, fontFamily: F }}>
+                            <span style={{ fontSize: 11, color: STONE_500, fontFamily: FONT_SANS }}>
                                 {count} item di keranjang
                             </span>
-                            <span style={{ fontSize: 15, fontWeight: 700, color: C.surface, fontFamily: F, letterSpacing: '-0.02em' }}>
+                            <span style={{ fontSize: 15, fontWeight: 700, color: WHITE, fontFamily: FONT_SANS, letterSpacing: '-0.02em' }}>
                                 {formatRupiah(total)}
                             </span>
                         </div>
@@ -543,10 +525,10 @@ export default function CustomerMenu({ categories, table }) {
                     <button
                         onClick={() => router.visit(route('customer.cart'))}
                         style={{
-                            background: C.surface, color: C.textPrimary,
+                            background: WHITE, color: STONE_900,
                             border: 'none', borderRadius: 8,
                             padding: '9px 16px', fontSize: 13, fontWeight: 600,
-                            fontFamily: F, cursor: 'pointer', whiteSpace: 'nowrap',
+                            fontFamily: FONT_SANS, cursor: 'pointer', whiteSpace: 'nowrap',
                             letterSpacing: '-0.01em',
                         }}
                     >

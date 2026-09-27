@@ -5,20 +5,7 @@ import { ChevronLeft, Camera, Send, CheckCircle } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import { formatRupiah } from '@/helpers';
 import useCart from '@/Hooks/useCart';
-import { STONE_50, WHITE, STONE_100, STONE_TINT, STONE_700, STONE_900, STONE_500, STONE_400, RED_50, RED_TINT, RED_DARK, RED_400, GREEN_400 } from '@/theme';
-
-const F = '"Inter", system-ui, sans-serif';
-const C = {
-    bg:         STONE_50,
-    surface:    WHITE,
-    alt:        STONE_100,
-    border:     STONE_TINT,
-    accent:     STONE_700,
-    textHead:   STONE_900,
-    textSecond: STONE_500,
-    textMuted:  STONE_400,
-    shadow:     '0 4px 20px -2px rgba(0,0,0,0.05)',
-};
+import { STONE_50, WHITE, STONE_100, STONE_TINT, STONE_700, STONE_900, STONE_500, STONE_400, RED_50, RED_TINT, RED_DARK, RED_400, GREEN_400, SHADOW_CARD, FONT_SANS } from '@/theme';
 
 export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, rejectedMessage }) {
     const [file,      setFile]      = useState(null);
@@ -105,23 +92,23 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             background: 'rgba(255,255,255,0.90)',
                             backdropFilter: 'blur(6px)',
                             border: `1px solid rgba(231,229,228,0.50)`,
-                            boxShadow: C.shadow,
+                            boxShadow: SHADOW_CARD,
                             cursor: 'pointer',
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                             flexShrink: 0,
                         }}
                     >
-                        <ChevronLeft size={18} color={C.textHead} strokeWidth={2} />
+                        <ChevronLeft size={18} color={STONE_900} strokeWidth={2} />
                     </button>
                     <div>
                         <h1 style={{
-                            fontSize: 17, fontWeight: 700, color: C.textHead,
-                            fontFamily: F, letterSpacing: '-0.02em', margin: 0,
+                            fontSize: 17, fontWeight: 700, color: STONE_900,
+                            fontFamily: FONT_SANS, letterSpacing: '-0.02em', margin: 0,
                         }}>
                             Pembayaran QRIS
                         </h1>
                         {order.order_code && (
-                            <span style={{ fontSize: 11, fontWeight: 500, color: C.textSecond, fontFamily: F }}>
+                            <span style={{ fontSize: 11, fontWeight: 500, color: STONE_500, fontFamily: FONT_SANS }}>
                                 #{order.order_code}
                             </span>
                         )}
@@ -137,10 +124,10 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                 background: RED_50, border: `1px solid ${RED_TINT}`,
                                 borderRadius: 10, padding: '8px 12px', flexShrink: 0,
                             }}>
-                                <p style={{ fontSize: 12, fontWeight: 700, color: RED_DARK, margin: '0 0 2px', fontFamily: F }}>
+                                <p style={{ fontSize: 12, fontWeight: 700, color: RED_DARK, margin: '0 0 2px', fontFamily: FONT_SANS }}>
                                     Bukti Ditolak Kasir
                                 </p>
-                                <p style={{ fontSize: 12, color: C.textSecond, margin: 0, fontFamily: F }}>{rejectedMessage}</p>
+                                <p style={{ fontSize: 12, color: STONE_500, margin: 0, fontFamily: FONT_SANS }}>{rejectedMessage}</p>
                             </div>
                         )}
 
@@ -152,7 +139,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             backdropFilter: 'blur(8px)',
                             borderRadius: 16,
                             border: `1px solid rgba(231,229,228,0.30)`,
-                            boxShadow: C.shadow,
+                            boxShadow: SHADOW_CARD,
                             padding: '16px 20px',
                             display: 'flex', flexDirection: 'column',
                             overflow: 'hidden',
@@ -166,7 +153,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                 marginBottom: 10,
                             }}>
                                 <div style={{
-                                    background: C.surface,
+                                    background: WHITE,
                                     padding: 6, borderRadius: 14,
                                     border: `1px solid rgba(231,229,228,0.50)`,
                                     boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
@@ -184,29 +171,29 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
 
                             {/* Merchant + amount (kompak) */}
                             <div style={{ textAlign: 'center', flexShrink: 0, marginBottom: 12 }}>
-                                <p style={{ fontSize: 12, fontWeight: 500, color: C.textSecond, fontFamily: F, margin: '0 0 4px' }}>
+                                <p style={{ fontSize: 12, fontWeight: 500, color: STONE_500, fontFamily: FONT_SANS, margin: '0 0 4px' }}>
                                     {qrisName || ''}
                                 </p>
-                                <p style={{ fontSize: 26, fontWeight: 700, color: C.textHead, fontFamily: F, letterSpacing: '-0.03em', margin: 0 }}>
+                                <p style={{ fontSize: 26, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS, letterSpacing: '-0.03em', margin: 0 }}>
                                     {formatRupiah(totalAmount)}
                                 </p>
-                                <p style={{ fontSize: 10, color: C.textMuted, fontFamily: F, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 6 }}>
+                                <p style={{ fontSize: 10, color: STONE_400, fontFamily: FONT_SANS, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: 6 }}>
                                     Scan QR dengan aplikasi dompet digital
                                 </p>
                             </div>
 
                             {/* Divider */}
-                            <div style={{ height: 1, background: C.alt, flexShrink: 0, marginBottom: 12 }} />
+                            <div style={{ height: 1, background: STONE_100, flexShrink: 0, marginBottom: 12 }} />
 
                             {/* Upload section (kompak) */}
                             <div style={{ flexShrink: 0 }}>
-                                <label style={{ fontSize: 13, fontWeight: 600, color: C.textHead, fontFamily: F, display: 'block', marginBottom: 8 }}>
+                                <label style={{ fontSize: 13, fontWeight: 600, color: STONE_900, fontFamily: FONT_SANS, display: 'block', marginBottom: 8 }}>
                                     Upload Bukti Pembayaran <span style={{ color: RED_400 }}>*</span>
                                 </label>
 
                                 <label htmlFor="proof-upload" style={{ cursor: 'pointer', display: 'block' }}>
                                     <div className="mineposq-upload" style={{
-                                        border: `2px dashed ${file ? C.accent : C.border}`,
+                                        border: `2px dashed ${file ? STONE_700 : STONE_TINT}`,
                                         background: file ? 'rgba(239,237,233,0.40)' : 'rgba(239,237,233,0.30)',
                                         borderRadius: 12,
                                         padding: preview ? 0 : '14px 16px',
@@ -222,18 +209,18 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                             <>
                                                 <div style={{
                                                     width: 36, height: 36, borderRadius: '50%',
-                                                    background: C.surface,
+                                                    background: WHITE,
                                                     boxShadow: '0 2px 6px rgba(0,0,0,0.07)',
                                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                                     flexShrink: 0,
                                                 }}>
-                                                    <Camera size={18} color={C.textSecond} strokeWidth={1.5} />
+                                                    <Camera size={18} color={STONE_500} strokeWidth={1.5} />
                                                 </div>
                                                 <div>
-                                                    <p style={{ fontSize: 13, fontWeight: 700, color: C.textHead, fontFamily: F, margin: 0 }}>
+                                                    <p style={{ fontSize: 13, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS, margin: 0 }}>
                                                         Pilih atau Foto Bukti Bayar
                                                     </p>
-                                                    <p style={{ fontSize: 11, color: C.textSecond, fontFamily: F, margin: 0 }}>
+                                                    <p style={{ fontSize: 11, color: STONE_500, fontFamily: FONT_SANS, margin: 0 }}>
                                                         JPG, PNG, max 5MB
                                                     </p>
                                                 </div>
@@ -249,7 +236,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                 </label>
 
                                 {error && (
-                                    <p style={{ color: RED_DARK, fontSize: 12, fontFamily: F, margin: '6px 0 0' }}>
+                                    <p style={{ color: RED_DARK, fontSize: 12, fontFamily: FONT_SANS, margin: '6px 0 0' }}>
                                         {error}
                                     </p>
                                 )}
@@ -264,13 +251,13 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                 className="mineposq-btn"
                                 style={{
                                     width: '100%', padding: '14px 0',
-                                    background: !file || uploading ? C.border : C.accent,
-                                    color: !file || uploading ? C.textSecond : C.surface,
+                                    background: !file || uploading ? STONE_TINT : STONE_700,
+                                    color: !file || uploading ? STONE_500 : WHITE,
                                     border: 'none', borderRadius: 12,
                                     fontSize: 15, fontWeight: 700,
                                     cursor: !file || uploading ? 'not-allowed' : 'pointer',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
-                                    fontFamily: F,
+                                    fontFamily: FONT_SANS,
                                     boxShadow: !file || uploading ? 'none' : '0 4px 16px rgba(68,64,60,0.30)',
                                 }}
                             >
@@ -297,21 +284,21 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             <CheckCircle size={36} color={GREEN_400} strokeWidth={1.75} />
                         </div>
                         <div>
-                            <h2 style={{ fontSize: 20, fontWeight: 700, color: C.textHead, fontFamily: F, margin: '0 0 8px' }}>
+                            <h2 style={{ fontSize: 20, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS, margin: '0 0 8px' }}>
                                 Bukti Dikirim!
                             </h2>
-                            <p style={{ fontSize: 13, color: C.textSecond, fontFamily: F, margin: 0, lineHeight: 1.6 }}>
+                            <p style={{ fontSize: 13, color: STONE_500, fontFamily: FONT_SANS, margin: 0, lineHeight: 1.6 }}>
                                 Kasir sedang memverifikasi pembayaran Anda.<br/>Harap tunggu konfirmasi.
                             </p>
                         </div>
                         <div style={{
                             width: '100%', background: 'rgba(255,255,255,0.90)',
                             backdropFilter: 'blur(6px)',
-                            borderRadius: 12, border: `1px solid ${C.border}`,
+                            borderRadius: 12, border: `1px solid ${STONE_TINT}`,
                             padding: '12px 16px', textAlign: 'left',
                         }}>
-                            <span style={{ fontSize: 13, color: C.textSecond, lineHeight: 1.5, fontFamily: F }}>
-                                Pantau status di tab <strong style={{ color: C.accent }}>Riwayat</strong> untuk update dari kasir.
+                            <span style={{ fontSize: 13, color: STONE_500, lineHeight: 1.5, fontFamily: FONT_SANS }}>
+                                Pantau status di tab <strong style={{ color: STONE_700 }}>Riwayat</strong> untuk update dari kasir.
                             </span>
                         </div>
                         <button
@@ -319,10 +306,10 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             className="mineposq-btn"
                             style={{
                                 width: '100%', padding: '14px 0',
-                                background: C.accent, color: C.surface,
+                                background: STONE_700, color: WHITE,
                                 border: 'none', borderRadius: 12,
                                 fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                                fontFamily: F, boxShadow: '0 4px 16px rgba(68,64,60,0.30)',
+                                fontFamily: FONT_SANS, boxShadow: '0 4px 16px rgba(68,64,60,0.30)',
                             }}
                         >
                             Cek Status Pesanan

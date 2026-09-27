@@ -5,20 +5,7 @@ import { Coffee } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
 import { formatRupiah } from '@/helpers';
-import { STONE_50, WHITE, STONE_100, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, EMERALD_600, RED_50, RED_TINT, RED_DARK } from '@/theme';
-
-const F = '"Inter", system-ui, sans-serif';
-const C = {
-    bg:          STONE_50,
-    surface:     WHITE,
-    alt:         STONE_100,
-    border:      STONE_300,
-    accent:      STONE_700,
-    textPrimary: STONE_900,
-    textSecond:  STONE_500,
-    textMuted:   STONE_400,
-    success:     EMERALD_600,
-};
+import { STONE_50, WHITE, STONE_100, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, EMERALD_600, RED_50, RED_TINT, RED_DARK, FONT_SANS } from '@/theme';
 
 export default function CustomerCart() {
     const { items, tableId, updateQty, total, count } = useCart();
@@ -84,7 +71,7 @@ export default function CustomerCart() {
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
                 <style>{`
-                    html, body { background: ${C.bg}; }
+                    html, body { background: ${STONE_50}; }
                     .mineposcart-btn:active { transform: scale(0.98); }
                     .mineposqty-btn:active  { opacity: 0.75; }
                     ::-webkit-scrollbar { display: none; }
@@ -105,13 +92,13 @@ export default function CustomerCart() {
                     textAlign: 'center', flexShrink: 0,
                 }}>
                     <h1 style={{
-                        fontSize: 17, fontWeight: 700, color: C.textPrimary,
-                        fontFamily: F, letterSpacing: '0.10em', textTransform: 'uppercase',
+                        fontSize: 17, fontWeight: 700, color: STONE_900,
+                        fontFamily: FONT_SANS, letterSpacing: '0.10em', textTransform: 'uppercase',
                         margin: 0,
                     }}>
                         Keranjang
                     </h1>
-                    <p style={{ fontSize: 13, color: C.textSecond, fontFamily: F, marginTop: 4, marginBottom: 0 }}>
+                    <p style={{ fontSize: 13, color: STONE_500, fontFamily: FONT_SANS, marginTop: 4, marginBottom: 0 }}>
                         {isEmpty ? 'Belum ada item' : `${count} item tersimpan`}
                     </p>
                 </header>
@@ -133,17 +120,17 @@ export default function CustomerCart() {
                             <div style={{
                                 width: 72, height: 72, borderRadius: 18,
                                 background: 'rgba(255,255,255,0.85)',
-                                border: `1px solid ${C.border}`,
+                                border: `1px solid ${STONE_300}`,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 backdropFilter: 'blur(6px)',
                             }}>
-                                <Coffee size={30} color={C.textMuted} strokeWidth={1.5} />
+                                <Coffee size={30} color={STONE_400} strokeWidth={1.5} />
                             </div>
                             <div style={{ textAlign: 'center' }}>
-                                <p style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, margin: '0 0 6px', fontFamily: F }}>
+                                <p style={{ fontSize: 15, fontWeight: 600, color: STONE_900, margin: '0 0 6px', fontFamily: FONT_SANS }}>
                                     Keranjang Kosong
                                 </p>
-                                <p style={{ fontSize: 13, color: C.textMuted, margin: 0, fontFamily: F, lineHeight: 1.6 }}>
+                                <p style={{ fontSize: 13, color: STONE_400, margin: 0, fontFamily: FONT_SANS, lineHeight: 1.6 }}>
                                     Tambahkan menu favoritmu dari halaman menu
                                 </p>
                             </div>
@@ -152,9 +139,9 @@ export default function CustomerCart() {
                                 className="mineposcart-btn"
                                 style={{
                                     marginTop: 4, height: 46, padding: '0 28px',
-                                    background: C.accent, color: C.bg,
+                                    background: STONE_700, color: STONE_50,
                                     border: 'none', borderRadius: 8,
-                                    fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: F,
+                                    fontSize: 14, fontWeight: 600, cursor: 'pointer', fontFamily: FONT_SANS,
                                     transition: 'transform 0.1s',
                                 }}>
                                 Kembali ke Menu
@@ -175,20 +162,20 @@ export default function CustomerCart() {
                                         backdropFilter: 'blur(8px)',
                                         WebkitBackdropFilter: 'blur(8px)',
                                         borderRadius: 12, padding: 16,
-                                        border: `1px solid ${C.border}`,
+                                        border: `1px solid ${STONE_300}`,
                                         display: 'flex', alignItems: 'center', gap: 16,
                                         boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                                     }}>
                                         {/* Thumbnail */}
                                         <div style={{
                                             width: 64, height: 64, borderRadius: 10,
-                                            background: C.alt, flexShrink: 0,
+                                            background: STONE_100, flexShrink: 0,
                                             display: 'flex', alignItems: 'center', justifyContent: 'center',
                                             overflow: 'hidden',
                                         }}>
                                             {item.image
                                                 ? <img src={item.image} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                                                : <Coffee size={24} color={C.textSecond} strokeWidth={1.5} />
+                                                : <Coffee size={24} color={STONE_500} strokeWidth={1.5} />
                                             }
                                         </div>
 
@@ -196,15 +183,15 @@ export default function CustomerCart() {
                                         <div style={{ flex: 1, minWidth: 0 }}>
                                             <h3 style={{
                                                 fontSize: 14, fontWeight: 600,
-                                                color: C.textPrimary, fontFamily: F,
+                                                color: STONE_900, fontFamily: FONT_SANS,
                                                 margin: '0 0 2px',
                                             }}>
                                                 {item.name}
                                             </h3>
-                                            <p style={{ fontSize: 11, color: C.textSecond, fontFamily: F, margin: '0 0 4px' }}>
+                                            <p style={{ fontSize: 11, color: STONE_500, fontFamily: FONT_SANS, margin: '0 0 4px' }}>
                                                 {formatRupiah(effPrice)} × {item.quantity}
                                             </p>
-                                            <p style={{ fontSize: 14, fontWeight: 700, color: C.textPrimary, fontFamily: F, margin: 0 }}>
+                                            <p style={{ fontSize: 14, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS, margin: 0 }}>
                                                 {formatRupiah(subtotal)}
                                             </p>
                                         </div>
@@ -212,7 +199,7 @@ export default function CustomerCart() {
                                         {/* Qty controls */}
                                         <div style={{
                                             display: 'flex', alignItems: 'center', gap: 10,
-                                            background: C.alt, padding: '6px 8px', borderRadius: 8,
+                                            background: STONE_100, padding: '6px 8px', borderRadius: 8,
                                             flexShrink: 0,
                                         }}>
                                             <button
@@ -220,13 +207,13 @@ export default function CustomerCart() {
                                                 className="mineposqty-btn"
                                                 style={{
                                                     width: 26, height: 26, borderRadius: 6,
-                                                    background: C.surface, border: `1px solid ${C.border}`,
+                                                    background: WHITE, border: `1px solid ${STONE_300}`,
                                                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    fontSize: 15, color: C.textSecond, fontFamily: F, transition: 'opacity 0.1s',
+                                                    fontSize: 15, color: STONE_500, fontFamily: FONT_SANS, transition: 'opacity 0.1s',
                                                 }}>−</button>
                                             <span style={{
-                                                fontSize: 13, fontWeight: 600, color: C.textPrimary,
-                                                minWidth: 18, textAlign: 'center', fontFamily: F,
+                                                fontSize: 13, fontWeight: 600, color: STONE_900,
+                                                minWidth: 18, textAlign: 'center', fontFamily: FONT_SANS,
                                             }}>
                                                 {item.quantity}
                                             </span>
@@ -235,9 +222,9 @@ export default function CustomerCart() {
                                                 className="mineposqty-btn"
                                                 style={{
                                                     width: 26, height: 26, borderRadius: 6,
-                                                    background: C.accent, border: 'none',
+                                                    background: STONE_700, border: 'none',
                                                     cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                                    fontSize: 15, fontWeight: 600, color: WHITE, fontFamily: F, transition: 'opacity 0.1s',
+                                                    fontSize: 15, fontWeight: 600, color: WHITE, fontFamily: FONT_SANS, transition: 'opacity 0.1s',
                                                 }}>+</button>
                                         </div>
                                     </article>
@@ -250,40 +237,40 @@ export default function CustomerCart() {
                                 backdropFilter: 'blur(8px)',
                                 WebkitBackdropFilter: 'blur(8px)',
                                 borderRadius: 12, padding: 20,
-                                border: `1px solid ${C.border}`,
+                                border: `1px solid ${STONE_300}`,
                                 boxShadow: '0 1px 4px rgba(0,0,0,0.04)',
                                 marginTop: 4,
                             }}>
                                 <p style={{
-                                    fontSize: 10, fontWeight: 600, color: C.textSecond,
+                                    fontSize: 10, fontWeight: 600, color: STONE_500,
                                     letterSpacing: '0.10em', textTransform: 'uppercase',
-                                    fontFamily: F, margin: '0 0 16px',
+                                    fontFamily: FONT_SANS, margin: '0 0 16px',
                                 }}>
                                     Ringkasan Pesanan
                                 </p>
 
                                 {/* Rows above divider */}
-                                <div style={{ borderBottom: `1px solid ${C.border}`, paddingBottom: 14, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                                <div style={{ borderBottom: `1px solid ${STONE_300}`, paddingBottom: 14, marginBottom: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>Subtotal</span>
-                                        <span style={{ fontSize: 13, color: C.textPrimary, fontFamily: F }}>{formatRupiah(total)}</span>
+                                        <span style={{ fontSize: 13, color: STONE_500, fontFamily: FONT_SANS }}>Subtotal</span>
+                                        <span style={{ fontSize: 13, color: STONE_900, fontFamily: FONT_SANS }}>{formatRupiah(total)}</span>
                                     </div>
                                     {isStudent && totalCashback > 0 && (
                                         <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>Cashback Mahasiswa</span>
-                                            <span style={{ fontSize: 13, color: C.success, fontFamily: F }}>− {formatRupiah(totalCashback)}</span>
+                                            <span style={{ fontSize: 13, color: EMERALD_600, fontFamily: FONT_SANS }}>Cashback Mahasiswa</span>
+                                            <span style={{ fontSize: 13, color: EMERALD_600, fontFamily: FONT_SANS }}>− {formatRupiah(totalCashback)}</span>
                                         </div>
                                     )}
                                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                        <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>Biaya Layanan</span>
-                                        <span style={{ fontSize: 13, color: C.textPrimary, fontFamily: F }}>Gratis</span>
+                                        <span style={{ fontSize: 13, color: STONE_500, fontFamily: FONT_SANS }}>Biaya Layanan</span>
+                                        <span style={{ fontSize: 13, color: STONE_900, fontFamily: FONT_SANS }}>Gratis</span>
                                     </div>
                                 </div>
 
                                 {/* Total */}
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <span style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, fontFamily: F }}>Total</span>
-                                    <span style={{ fontSize: 17, fontWeight: 700, color: C.textPrimary, fontFamily: F }}>
+                                    <span style={{ fontSize: 15, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS }}>Total</span>
+                                    <span style={{ fontSize: 17, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS }}>
                                         {formatRupiah(grandTotal)}
                                     </span>
                                 </div>
@@ -294,7 +281,7 @@ export default function CustomerCart() {
                                 <div style={{
                                     background: RED_50, border: `1px solid ${RED_TINT}`,
                                     borderRadius: 10, padding: '10px 14px',
-                                    fontSize: 13, color: RED_DARK, fontFamily: F,
+                                    fontSize: 13, color: RED_DARK, fontFamily: FONT_SANS,
                                 }}>
                                     {errorMsg}
                                 </div>
@@ -308,11 +295,11 @@ export default function CustomerCart() {
                                     className="mineposcart-btn"
                                     style={{
                                         width: '100%', height: 54,
-                                        background: loading ? C.textMuted : C.accent,
-                                        color: C.bg, border: 'none', borderRadius: 8,
+                                        background: loading ? STONE_400 : STONE_700,
+                                        color: STONE_50, border: 'none', borderRadius: 8,
                                         fontSize: 15, fontWeight: 700,
                                         cursor: loading ? 'not-allowed' : 'pointer',
-                                        fontFamily: F,
+                                        fontFamily: FONT_SANS,
                                         boxShadow: loading ? 'none' : '0 4px 12px rgba(68,64,60,0.25)',
                                         transition: 'transform 0.1s',
                                     }}

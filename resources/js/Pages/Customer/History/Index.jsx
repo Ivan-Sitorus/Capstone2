@@ -4,19 +4,7 @@ import { ClipboardList, X } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import HistoryCard from '@/Components/Customer/HistoryCard';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
-import { WHITE, STONE_50, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, NAVY_DARK } from '@/theme';
-
-const F  = '"Inter", system-ui, sans-serif';
-const C  = {
-    surface:    WHITE,
-    bg:         STONE_50,
-    border:     STONE_300,
-    accent:     STONE_700,
-    accentDark: STONE_900,
-    textSecond: STONE_500,
-    textMuted:  STONE_400,
-    shadow:     '0 2px 8px -2px rgba(0,0,0,0.05)',
-};
+import { WHITE, STONE_50, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, NAVY_DARK, FONT_SANS } from '@/theme';
 
 const TABS = [
     { key: 'all',      label: 'Semua'    },
@@ -117,15 +105,15 @@ export default function CustomerRiwayat({ orders = [] }) {
                     {/* ── Total Order ── */}
                     <section style={{ marginBottom: 24, paddingLeft: 4 }}>
                         <h2 style={{
-                            fontSize: 10, fontWeight: 700, color: C.accent,
+                            fontSize: 10, fontWeight: 700, color: STONE_700,
                             textTransform: 'uppercase', letterSpacing: '0.12em',
-                            fontFamily: F, marginBottom: 4,
+                            fontFamily: FONT_SANS, marginBottom: 4,
                         }}>
                             TOTAL ORDER
                         </h2>
                         <p style={{
-                            fontSize: 36, fontWeight: 700, color: C.accentDark,
-                            fontFamily: F, letterSpacing: '-0.03em', margin: 0,
+                            fontSize: 36, fontWeight: 700, color: STONE_900,
+                            fontFamily: FONT_SANS, letterSpacing: '-0.03em', margin: 0,
                         }}>
                             {orders.length}
                         </p>
@@ -146,12 +134,12 @@ export default function CustomerRiwayat({ orders = [] }) {
                                             padding: active ? '8px 0' : '8px 0',
                                             borderRadius: 999, border: 'none', cursor: 'pointer',
                                             fontSize: 12, fontWeight: active ? 600 : 600,
-                                            fontFamily: F,
+                                            fontFamily: FONT_SANS,
                                             background: active
-                                                ? C.accent
+                                                ? STONE_700
                                                 : 'rgba(255,255,255,0.50)',
                                             backdropFilter: active ? 'none' : 'blur(4px)',
-                                            color: active ? WHITE : C.accent,
+                                            color: active ? WHITE : STONE_700,
                                             boxShadow: active
                                                 ? '0 4px 12px rgba(68,64,60,0.30)'
                                                 : 'none',
@@ -175,16 +163,16 @@ export default function CustomerRiwayat({ orders = [] }) {
                             <div style={{
                                 width: 72, height: 72, borderRadius: 20,
                                 background: 'rgba(255,255,255,0.80)',
-                                border: `1px solid ${C.border}`,
+                                border: `1px solid ${STONE_300}`,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                             }}>
-                                <ClipboardList size={30} color={C.textMuted} strokeWidth={1.5} />
+                                <ClipboardList size={30} color={STONE_400} strokeWidth={1.5} />
                             </div>
                             <div style={{ textAlign: 'center' }}>
-                                <p style={{ fontSize: 15, fontWeight: 600, color: C.accentDark, fontFamily: F, margin: '0 0 6px' }}>
+                                <p style={{ fontSize: 15, fontWeight: 600, color: STONE_900, fontFamily: FONT_SANS, margin: '0 0 6px' }}>
                                     Belum ada pesanan
                                 </p>
-                                <p style={{ fontSize: 13, color: C.textSecond, fontFamily: F, margin: 0 }}>
+                                <p style={{ fontSize: 13, color: STONE_500, fontFamily: FONT_SANS, margin: 0 }}>
                                     Pesanan kamu akan muncul di sini
                                 </p>
                             </div>
@@ -195,9 +183,9 @@ export default function CustomerRiwayat({ orders = [] }) {
                                 {/* Date header */}
                                 <div style={{ marginBottom: 12 }}>
                                     <span style={{
-                                        fontSize: 11, fontWeight: 700, color: C.accent,
+                                        fontSize: 11, fontWeight: 700, color: STONE_700,
                                         textTransform: 'uppercase', letterSpacing: '0.10em',
-                                        fontFamily: F,
+                                        fontFamily: FONT_SANS,
                                         background: 'rgba(255,255,255,0.30)',
                                         backdropFilter: 'blur(4px)',
                                         padding: '2px 8px', borderRadius: 4,
@@ -236,18 +224,18 @@ export default function CustomerRiwayat({ orders = [] }) {
                     <div
                         onClick={e => e.stopPropagation()}
                         style={{
-                            background: C.surface,
+                            background: WHITE,
                             borderRadius: 20,
                             width: '100%', maxWidth: 340,
                             maxHeight: 'calc(100dvh - 48px)',
                             display: 'flex', flexDirection: 'column',
                             boxShadow: '0 20px 60px rgba(28,25,23,0.28)',
                             overflow: 'hidden',
-                            fontFamily: F,
+                            fontFamily: FONT_SANS,
                         }}
                     >
                         {/* Top bar */}
-                        <div style={{ height: 3, background: C.accent, flexShrink: 0 }} />
+                        <div style={{ height: 3, background: STONE_700, flexShrink: 0 }} />
 
                         {/* Close button */}
                         <div style={{ display: 'flex', justifyContent: 'flex-end', padding: '12px 16px 0', flexShrink: 0 }}>
@@ -255,12 +243,12 @@ export default function CustomerRiwayat({ orders = [] }) {
                                 onClick={() => setReceiptOrder(null)}
                                 style={{
                                     width: 32, height: 32, borderRadius: '50%',
-                                    background: C.bg, border: `1px solid ${C.border}`,
+                                    background: STONE_50, border: `1px solid ${STONE_300}`,
                                     cursor: 'pointer',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 }}
                             >
-                                <X size={15} color={C.textSecond} />
+                                <X size={15} color={STONE_500} />
                             </button>
                         </div>
 
@@ -284,12 +272,12 @@ export default function CustomerRiwayat({ orders = [] }) {
                                         }}
                                     />
                                 </div>
-                                <span style={{ fontSize: 17, fontWeight: 700, color: C.accentDark, fontFamily: F, letterSpacing: '-0.02em' }}>
+                                <span style={{ fontSize: 17, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS, letterSpacing: '-0.02em' }}>
                                     minePOS
                                 </span>
                             </div>
 
-                            <div style={{ height: 1, background: C.border, marginBottom: 16 }} />
+                            <div style={{ height: 1, background: STONE_300, marginBottom: 16 }} />
 
                             {/* Info rows */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 9, marginBottom: 16 }}>
@@ -300,20 +288,20 @@ export default function CustomerRiwayat({ orders = [] }) {
                                     { label: 'Pembayaran',  value: METHOD_LABEL[receiptOrder.payment_method] ?? '-' },
                                 ].map(row => (
                                     <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
-                                        <span style={{ fontSize: 12, color: C.textSecond, flexShrink: 0, fontFamily: F }}>{row.label}</span>
-                                        <span style={{ fontSize: 13, fontWeight: 600, color: C.accentDark, textAlign: 'right', fontFamily: F }}>{row.value}</span>
+                                        <span style={{ fontSize: 12, color: STONE_500, flexShrink: 0, fontFamily: FONT_SANS }}>{row.label}</span>
+                                        <span style={{ fontSize: 13, fontWeight: 600, color: STONE_900, textAlign: 'right', fontFamily: FONT_SANS }}>{row.value}</span>
                                     </div>
                                 ))}
                             </div>
 
-                            <div style={{ height: 1, background: C.border, marginBottom: 14 }} />
+                            <div style={{ height: 1, background: STONE_300, marginBottom: 14 }} />
 
                             {/* Items header */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                                 {['ITEM', 'QTY', 'HARGA'].map((h, i) => (
                                     <span key={h} style={{
-                                        fontSize: 11, fontWeight: 700, color: C.textSecond,
-                                        letterSpacing: '0.06em', fontFamily: F,
+                                        fontSize: 11, fontWeight: 700, color: STONE_500,
+                                        letterSpacing: '0.06em', fontFamily: FONT_SANS,
                                         flex: i === 0 ? 1 : undefined,
                                         width: i === 1 ? 32 : i === 2 ? 80 : undefined,
                                         textAlign: i === 0 ? 'left' : i === 1 ? 'center' : 'right',
@@ -325,51 +313,51 @@ export default function CustomerRiwayat({ orders = [] }) {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 14 }}>
                                 {(receiptOrder.items ?? []).map((item, i) => (
                                     <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <span style={{ fontSize: 13, color: C.accentDark, flex: 1, fontFamily: F }}>{item.name}</span>
-                                        <span style={{ fontSize: 13, color: C.textSecond, width: 32, textAlign: 'center', fontFamily: F }}>{item.quantity}×</span>
-                                        <span style={{ fontSize: 13, color: C.accentDark, width: 80, textAlign: 'right', fontFamily: F }}>{formatRupiah(item.subtotal)}</span>
+                                        <span style={{ fontSize: 13, color: STONE_900, flex: 1, fontFamily: FONT_SANS }}>{item.name}</span>
+                                        <span style={{ fontSize: 13, color: STONE_500, width: 32, textAlign: 'center', fontFamily: FONT_SANS }}>{item.quantity}×</span>
+                                        <span style={{ fontSize: 13, color: STONE_900, width: 80, textAlign: 'right', fontFamily: FONT_SANS }}>{formatRupiah(item.subtotal)}</span>
                                     </div>
                                 ))}
                             </div>
 
-                            <div style={{ height: 1, background: C.border, marginBottom: 12 }} />
+                            <div style={{ height: 1, background: STONE_300, marginBottom: 12 }} />
 
                             {/* Subtotal */}
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>Subtotal</span>
-                                <span style={{ fontSize: 13, color: C.textSecond, fontFamily: F }}>{formatRupiah(receiptOrder.total_amount)}</span>
+                                <span style={{ fontSize: 13, color: STONE_500, fontFamily: FONT_SANS }}>Subtotal</span>
+                                <span style={{ fontSize: 13, color: STONE_500, fontFamily: FONT_SANS }}>{formatRupiah(receiptOrder.total_amount)}</span>
                             </div>
 
                             {/* Total */}
                             <div style={{
                                 display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                                 marginBottom: 20, padding: '10px 12px',
-                                background: C.bg, borderRadius: 10, border: `1px solid ${C.border}`,
+                                background: STONE_50, borderRadius: 10, border: `1px solid ${STONE_300}`,
                             }}>
-                                <span style={{ fontSize: 15, fontWeight: 700, color: C.accentDark, fontFamily: F }}>Total</span>
-                                <span style={{ fontSize: 16, fontWeight: 700, color: C.accentDark, fontFamily: F, letterSpacing: '-0.02em' }}>
+                                <span style={{ fontSize: 15, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS }}>Total</span>
+                                <span style={{ fontSize: 16, fontWeight: 700, color: STONE_900, fontFamily: FONT_SANS, letterSpacing: '-0.02em' }}>
                                     {formatRupiah(receiptOrder.total_amount)}
                                 </span>
                             </div>
 
                             {/* Thank you */}
                             <div style={{ textAlign: 'center', marginBottom: 18 }}>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: C.textSecond, fontFamily: F }}>
+                                <span style={{ fontSize: 13, fontWeight: 600, color: STONE_500, fontFamily: FONT_SANS }}>
                                     Terima kasih sudah memesan!
                                 </span>
                             </div>
                         </div>
 
                         {/* Footer: Tutup */}
-                        <div style={{ padding: '10px 20px 22px', flexShrink: 0, borderTop: `1px solid ${C.border}` }}>
+                        <div style={{ padding: '10px 20px 22px', flexShrink: 0, borderTop: `1px solid ${STONE_300}` }}>
                             <button
                                 onClick={() => setReceiptOrder(null)}
                                 style={{
                                     width: '100%', height: 50,
-                                    background: C.accent, color: WHITE,
+                                    background: STONE_700, color: WHITE,
                                     border: 'none', borderRadius: 12,
                                     fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                                    fontFamily: F,
+                                    fontFamily: FONT_SANS,
                                     boxShadow: '0 4px 16px rgba(68,64,60,0.30)',
                                 }}
                             >

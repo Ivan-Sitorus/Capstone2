@@ -2,21 +2,7 @@ import { useState, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { User, Phone, Check, MapPin } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
-import { STONE_50, WHITE, STONE_300, STONE_700, STONE_800, STONE_900, STONE_500, STONE_400, NAVY, NAVY_DEEP, DANGER } from '@/theme';
-
-const F = '"Inter", system-ui, sans-serif';
-const C = {
-    bg:          STONE_50,
-    surface:     WHITE,
-    border:      STONE_300,
-    accent:      STONE_700,
-    accentHover: STONE_800,
-    textPrimary: STONE_900,
-    textSecond:  STONE_500,
-    textMuted:   STONE_400,
-    headerBg:    NAVY,
-    headerDark:  NAVY_DEEP,
-};
+import { STONE_50, WHITE, STONE_300, STONE_700, STONE_800, STONE_900, STONE_500, STONE_400, NAVY, NAVY_DEEP, DANGER, FONT_SANS } from '@/theme';
 
 export default function Identitas({ table }) {
     const [name,        setName]        = useState('');
@@ -85,24 +71,24 @@ export default function Identitas({ table }) {
                     position: 'relative', zIndex: 1,
                     minHeight: '100dvh', display: 'flex', flexDirection: 'column',
                     alignItems: 'center', justifyContent: 'center',
-                    padding: '40px 28px', fontFamily: F, textAlign: 'center',
+                    padding: '40px 28px', fontFamily: FONT_SANS, textAlign: 'center',
                 }}>
                     <div style={{
                         width: 96, height: 96, borderRadius: 20,
-                        overflow: 'hidden', background: C.headerDark,
+                        overflow: 'hidden', background: NAVY_DEEP,
                         boxShadow: '0 8px 24px rgba(0,0,0,0.25)', marginBottom: 24,
                     }}>
                         <img src="/images/logo.jpg" alt="minePOS"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             onError={e => { e.target.style.display = 'none'; }} />
                     </div>
-                    <h1 style={{ fontSize: 22, fontWeight: 700, color: C.textPrimary, margin: '0 0 10px', fontFamily: F }}>
+                    <h1 style={{ fontSize: 22, fontWeight: 700, color: STONE_900, margin: '0 0 10px', fontFamily: FONT_SANS }}>
                         Scan QR Meja
                     </h1>
-                    <p style={{ fontSize: 14, color: C.textSecond, lineHeight: 1.6, margin: '0 0 6px', fontFamily: F }}>
+                    <p style={{ fontSize: 14, color: STONE_500, lineHeight: 1.6, margin: '0 0 6px', fontFamily: FONT_SANS }}>
                         Silakan scan QR code yang ada di meja Anda untuk mulai memesan.
                     </p>
-                    <p style={{ fontSize: 12, color: C.textMuted, fontFamily: F }}>
+                    <p style={{ fontSize: 12, color: STONE_400, fontFamily: FONT_SANS }}>
                         Hubungi kasir jika membutuhkan bantuan.
                     </p>
                 </div>
@@ -119,10 +105,10 @@ export default function Identitas({ table }) {
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
                 <style>{`
-                    html, body { background: ${C.bg}; }
+                    html, body { background: ${STONE_50}; }
                     .mineposid-input { outline: none; transition: border-color 0.15s; }
-                    .mineposid-input:focus { border-color: ${C.accent} !important; }
-                    .mineposid-btn:active { background: ${C.accentHover} !important; }
+                    .mineposid-input:focus { border-color: ${STONE_700} !important; }
+                    .mineposid-btn:active { background: ${STONE_800} !important; }
                 `}</style>
             </Head>
 
@@ -135,7 +121,7 @@ export default function Identitas({ table }) {
 
                 {/* ── Branding header ── */}
                 <header style={{
-                    background: C.headerBg,
+                    background: NAVY,
                     paddingTop: 48, paddingBottom: 32,
                     borderRadius: '0 0 36px 36px',
                     display: 'flex', flexDirection: 'column', alignItems: 'center',
@@ -143,7 +129,7 @@ export default function Identitas({ table }) {
                 }}>
                     <div style={{
                         width: 96, height: 96, borderRadius: 20,
-                        overflow: 'hidden', background: C.headerDark,
+                        overflow: 'hidden', background: NAVY_DEEP,
                         boxShadow: '0 8px 30px rgba(0,0,0,0.35)',
                         border: '1px solid rgba(255,255,255,0.10)',
                     }}>
@@ -176,15 +162,15 @@ export default function Identitas({ table }) {
                     {/* Welcome + table pill */}
                     <div style={{ textAlign: 'center', marginBottom: 32 }}>
                         <h1 style={{
-                            fontSize: 32, fontWeight: 700, color: C.accent,
+                            fontSize: 32, fontWeight: 700, color: STONE_700,
                             textTransform: 'uppercase', letterSpacing: '-0.02em',
-                            fontFamily: F, margin: '0 0 12px',
+                            fontFamily: FONT_SANS, margin: '0 0 12px',
                         }}>
                             Selamat Datang!
                         </h1>
                         <div style={{
                             display: 'inline-flex', alignItems: 'center', gap: 6,
-                            background: C.accent, color: WHITE,
+                            background: STONE_700, color: WHITE,
                             borderRadius: 999, padding: '6px 16px',
                             boxShadow: '0 2px 8px rgba(68,64,60,0.25)',
                         }}>
@@ -192,7 +178,7 @@ export default function Identitas({ table }) {
                             <span style={{
                                 fontSize: 11, fontWeight: 700,
                                 letterSpacing: '0.10em', textTransform: 'uppercase',
-                                fontFamily: F,
+                                fontFamily: FONT_SANS,
                             }}>
                                 Meja No. {table.table_number}
                             </span>
@@ -201,9 +187,9 @@ export default function Identitas({ table }) {
 
                     {/* Form card */}
                     <section style={{
-                        background: C.surface,
+                        background: WHITE,
                         borderRadius: 12, padding: 24,
-                        border: `1px solid ${C.border}`,
+                        border: `1px solid ${STONE_300}`,
                         boxShadow: '0 4px 6px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.03)',
                         position: 'relative', overflow: 'hidden',
                         display: 'flex', flexDirection: 'column', gap: 20,
@@ -228,12 +214,12 @@ export default function Identitas({ table }) {
                         <div>
                             <label style={{
                                 display: 'block', fontSize: 13, fontWeight: 700,
-                                color: C.textPrimary, marginBottom: 8, fontFamily: F,
+                                color: STONE_900, marginBottom: 8, fontFamily: FONT_SANS,
                             }}>
                                 Nama
                             </label>
                             <div style={{ position: 'relative' }}>
-                                <User size={18} color={C.textMuted} style={{
+                                <User size={18} color={STONE_400} style={{
                                     position: 'absolute', left: 12, top: '50%',
                                     transform: 'translateY(-50%)', pointerEvents: 'none',
                                 }} />
@@ -247,15 +233,15 @@ export default function Identitas({ table }) {
                                     className="mineposid-input"
                                     style={{
                                         width: '100%', height: 48, boxSizing: 'border-box',
-                                        border: `1px solid ${nameError ? DANGER : C.border}`,
+                                        border: `1px solid ${nameError ? DANGER : STONE_300}`,
                                         borderRadius: 8, paddingLeft: 40, paddingRight: 12,
-                                        fontSize: 13, color: C.textPrimary,
-                                        background: C.bg, fontFamily: F,
+                                        fontSize: 13, color: STONE_900,
+                                        background: STONE_50, fontFamily: FONT_SANS,
                                     }}
                                 />
                             </div>
                             {nameError && (
-                                <p style={{ color: DANGER, fontSize: 12, margin: '5px 0 0', fontFamily: F }}>
+                                <p style={{ color: DANGER, fontSize: 12, margin: '5px 0 0', fontFamily: FONT_SANS }}>
                                     {nameError}
                                 </p>
                             )}
@@ -265,12 +251,12 @@ export default function Identitas({ table }) {
                         <div>
                             <label style={{
                                 display: 'block', fontSize: 13, fontWeight: 700,
-                                color: C.textPrimary, marginBottom: 8, fontFamily: F,
+                                color: STONE_900, marginBottom: 8, fontFamily: FONT_SANS,
                             }}>
                                 Nomor Telepon (opsional)
                             </label>
                             <div style={{ position: 'relative' }}>
-                                <Phone size={18} color={C.textMuted} style={{
+                                <Phone size={18} color={STONE_400} style={{
                                     position: 'absolute', left: 12, top: '50%',
                                     transform: 'translateY(-50%)', pointerEvents: 'none',
                                 }} />
@@ -284,19 +270,19 @@ export default function Identitas({ table }) {
                                     className="mineposid-input"
                                     style={{
                                         width: '100%', height: 48, boxSizing: 'border-box',
-                                        border: `1px solid ${phoneError ? DANGER : C.border}`,
+                                        border: `1px solid ${phoneError ? DANGER : STONE_300}`,
                                         borderRadius: 8, paddingLeft: 40, paddingRight: 12,
-                                        fontSize: 13, color: C.textPrimary,
-                                        background: C.bg, fontFamily: F,
+                                        fontSize: 13, color: STONE_900,
+                                        background: STONE_50, fontFamily: FONT_SANS,
                                     }}
                                 />
                             </div>
                             {phoneError && (
-                                <p style={{ color: DANGER, fontSize: 12, margin: '5px 0 0', fontFamily: F }}>
+                                <p style={{ color: DANGER, fontSize: 12, margin: '5px 0 0', fontFamily: FONT_SANS }}>
                                     {phoneError}
                                 </p>
                             )}
-                            <p style={{ color: C.textMuted, fontSize: 11, margin: '5px 0 0', fontFamily: F }}>
+                            <p style={{ color: STONE_400, fontSize: 11, margin: '5px 0 0', fontFamily: FONT_SANS }}>
                                 Dipakai untuk kirim struk via WhatsApp & menampilkan riwayat pesanan Anda.
                             </p>
                         </div>
@@ -308,18 +294,18 @@ export default function Identitas({ table }) {
                         >
                             <div style={{
                                 width: 20, height: 20, borderRadius: 4, flexShrink: 0, marginTop: 1,
-                                border: `1.5px solid ${isStudent ? C.accent : C.border}`,
-                                background: isStudent ? C.accent : C.surface,
+                                border: `1.5px solid ${isStudent ? STONE_700 : STONE_300}`,
+                                background: isStudent ? STONE_700 : WHITE,
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 transition: 'all 0.15s',
                             }}>
                                 {isStudent && <Check size={12} color={WHITE} strokeWidth={2.5} />}
                             </div>
                             <div>
-                                <p style={{ fontSize: 13, fontWeight: 600, color: C.textPrimary, margin: 0, fontFamily: F }}>
+                                <p style={{ fontSize: 13, fontWeight: 600, color: STONE_900, margin: 0, fontFamily: FONT_SANS }}>
                                     Saya adalah mahasiswa STIE Totalwin Semarang
                                 </p>
-                                <p style={{ fontSize: 11, color: C.textMuted, margin: '2px 0 0', fontFamily: F }}>
+                                <p style={{ fontSize: 11, color: STONE_400, margin: '2px 0 0', fontFamily: FONT_SANS }}>
                                     Opsional
                                 </p>
                             </div>
@@ -332,10 +318,10 @@ export default function Identitas({ table }) {
                                 className="mineposid-btn"
                                 style={{
                                     width: '100%', height: 52,
-                                    background: C.accent, color: WHITE,
+                                    background: STONE_700, color: WHITE,
                                     border: 'none', borderRadius: 8,
                                     fontSize: 15, fontWeight: 700, cursor: 'pointer',
-                                    fontFamily: F, transition: 'background 0.15s',
+                                    fontFamily: FONT_SANS, transition: 'background 0.15s',
                                     boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
                                 }}
                             >
