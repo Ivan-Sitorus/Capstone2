@@ -83,7 +83,6 @@ docker compose exec -T app php artisan migrate:fresh --seed
 | `/admin/riwayat-kasir` | Riwayat sesi kasir |
 | `/admin/akun-staff` | Akun staff (status Aktif/Nonaktif) |
 | `/admin/pengaturan-struk-dan-whatsapp` | Pengaturan struk & template WhatsApp |
-| `/admin/data-mining` | Data mining: Ikhtisar |
 | `/admin/prediksi-menu` | Data mining: Prediksi Menu |
 | `/admin/prediksi-ring-menu` | Data mining: Hasil Prediksi Menu (ring) |
 | `/admin/klasterisasi-menu` | Data mining: Klasterisasi Menu Penjualan |
