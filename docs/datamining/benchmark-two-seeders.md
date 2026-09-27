@@ -1,4 +1,4 @@
-# Benchmark Dua Seeder — Original vs Optimized (Data Mining POSMine)
+# Benchmark Dua Seeder — Original vs Optimized (Data Mining minePOS)
 
 > **Status: TERUKUR.** Dataset A & Dataset B sudah diukur (lihat §7). Tidak ada angka rekaan.
 > - Dataset A (2025-01-01 → 2026-09-25): 242,83s → 57,92s = **4,19×** (`comparison-findings.md`;
@@ -137,7 +137,7 @@ Catatan volume:
 
 **Definisi operasional Dataset B yang DIPAKAI (final):** full `DatabaseSeeder` repo original —
 `TransactionHistorySeeder` + `AssociationHistorySeeder` + `PredictionHistorySeeder` + `IngredientUsageSeeder`
-+ `RecipeIngredientSeeder`, direplikasi ke schema POSMine (lihat §7.2). Total **6.454 order / 7.409 item /
++ `RecipeIngredientSeeder`, direplikasi ke schema minePOS (lihat §7.2). Total **6.454 order / 7.409 item /
 23 menu / 24 bahan / 82 resep**, rentang 2025-01-01 → 2026-04-10 (ada gap Mei–Jul 2025).
 
 ---
@@ -346,7 +346,7 @@ Rincian fetch vs pipeline (Dataset A, terukur):
 >
 > Seeder Laravel repo original **tidak bisa dijalankan fresh** (migration `create_expenses_table` &
 > `create_cashier_sessions_table` duplikat; seeder men-query kolom `menus.slug` yang tak ada di schema final).
-> Karena itu Dataset B **direplikasi** ke schema POSMine sesuai spesifikasi seeder
+> Karena itu Dataset B **direplikasi** ke schema minePOS sesuai spesifikasi seeder
 > (`MenuSeeder`, `CategorySeeder`, `RecipeIngredientSeeder`, `HargaModalSeeder`, `AssociationHistorySeeder`,
 > `PredictionHistorySeeder`) via `dataset_b_loader.py`.
 
@@ -505,10 +505,10 @@ Jangan pernah menulis angka estimasi ke sel waktu.
 1. **Repo original tidak bisa di-seed fresh.** Ada 4 seeder dengan rentang berbeda (100/253/151 hari) dan
    status order campur (`completed` vs `selesai`), ditambah migration duplikat (`expenses`, `cashier_sessions`)
    dan seeder yang men-query kolom `menus.slug` yang sudah di-drop di schema final. Karena itu Dataset B
-   **direplikasi** ke schema POSMine sesuai spesifikasi full `DatabaseSeeder` (6.454 order / 7.409 item) —
+   **direplikasi** ke schema minePOS sesuai spesifikasi full `DatabaseSeeder` (6.454 order / 7.409 item) —
    lihat §7.2 dan `dataset_b_loader.py`.
 2. **Filter status.** Pipeline original menyaring `o.status='selesai'`, sedangkan `TransactionHistorySeeder`
-   menulis `'completed'`. Pada replikasi, seluruh order dinormalkan ke `'completed'` (enum POSMine); 500 order
+   menulis `'completed'`. Pada replikasi, seluruh order dinormalkan ke `'completed'` (enum minePOS); 500 order
    ORD1xxx tetap tidak ikut karena memang bukan bagian dataset ber-filter.
 3. **Chart base64 termasuk biaya original.** Membuang chart dari kedua sisi akan mengubah rasio; jangan.
 4. **`min_support` asosiasi berbeda by design.** Jangan mengklaim regresi/keunggulan asosiasi tanpa
@@ -540,7 +540,7 @@ dan metadata agar angka bisa diaudit ulang tanpa percaya pada penulis.
 
 ## 13. Checklist Finalisasi
 
-- [x] Definisi Dataset B ditetapkan: full `DatabaseSeeder` repo original, direplikasi ke schema POSMine.
+- [x] Definisi Dataset B ditetapkan: full `DatabaseSeeder` repo original, direplikasi ke schema minePOS.
 - [x] 5 pipeline × 2 versi dijalankan pada Dataset B; angka diisi di tabel §7.2 + JSON.
 - [x] Paritas Dataset A + uji sintetis (`test_kmeans_parity.py`, `test_optimization_parity.py`) dilampirkan (§8).
 - [x] Loader Dataset B disertakan (`dataset_b_loader.py`) + kode original teradaptasi (`/tmp/orig_dm`).

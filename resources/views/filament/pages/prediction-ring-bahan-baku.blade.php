@@ -1,3 +1,5 @@
+@use('App\Filament\Tables\Components\ColumnInfoTooltip')
+@use('App\Support\DataMiningTooltips')
 <x-filament-panels::page>
 
 {{-- ── Belum ada hasil ─────────────────────────────────────────────────── --}}
@@ -19,7 +21,7 @@
 
 @else
 {{-- ════════════════════════════════════════════════════════════════════ --}}
-{{-- LAPORAN PREDIKSI — maks. 3 entry, unik per rentang tanggal           --}}
+{{-- LAPORAN PREDIKSI - maks. 3 entry, unik per rentang tanggal           --}}
 {{-- ════════════════════════════════════════════════════════════════════ --}}
 
     <div class="flex items-center justify-between mb-6">
@@ -35,7 +37,7 @@
         $predictions  = $result['predictions']   ?? [];
         $summaryTable = $result['summary_table']  ?? [];
         $labelNo      = $idx + 1;
-        $labelTerbaru = $idx === 0 ? ' — Terbaru' : '';
+        $labelTerbaru = $idx === 0 ? ': Terbaru' : '';
 
         // Ambil tanggal forecast dari prediksi pertama
         $forecastDays = [];
@@ -92,7 +94,7 @@
                 Laporan Prediksi Jumlah Penggunaan Bahan Baku {{ count($forecastDays) }} Hari ke Depan
             </h3>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Nilai MAE, RMSE, MAPE, dan SMAPE menunjukkan akurasi model Prophet untuk tiap bahan baku — semakin kecil semakin akurat.
+                Nilai MAE, RMSE, MAPE, dan SMAPE menunjukkan akurasi model Prophet untuk tiap bahan baku, semakin kecil semakin akurat.
             </p>
         </div>
         <div class="overflow-x-auto mb-6" style="overflow-x:auto;">
@@ -107,11 +109,11 @@
     <span style="font-weight:400; font-size:0.65rem; opacity:0.85;">{{ $fd['hari'] ?? '' }}, {{ $fd['tanggal'] ?? '' }}</span>
 </th>
 @endforeach
-                        <th style="padding:11px 12px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; min-width:70px;">Total</th>
-                        <th style="padding:11px 12px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; min-width:70px;">MAE</th>
-                        <th style="padding:11px 12px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; min-width:70px;">RMSE</th>
-                        <th style="padding:11px 12px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; min-width:85px;">MAPE (%)</th>
-                        <th style="padding:11px 12px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; min-width:85px;">SMAPE (%)</th>
+                        <th style="padding:11px 12px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; min-width:70px;">{!! ColumnInfoTooltip::label('Total', DataMiningTooltips::TOTAL_PREDICTION) !!}</th>
+                        <th style="padding:11px 12px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; min-width:70px;">{!! ColumnInfoTooltip::label('MAE', DataMiningTooltips::MAE) !!}</th>
+                        <th style="padding:11px 12px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; min-width:70px;">{!! ColumnInfoTooltip::label('RMSE', DataMiningTooltips::RMSE) !!}</th>
+                        <th style="padding:11px 12px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; min-width:85px;">{!! ColumnInfoTooltip::label('MAPE (%)', DataMiningTooltips::MAPE) !!}</th>
+                        <th style="padding:11px 12px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; min-width:85px;">{!! ColumnInfoTooltip::label('SMAPE (%)', DataMiningTooltips::SMAPE) !!}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -137,12 +139,12 @@
             {{ number_format($fc[$d]['prediksi'] ?? 0, 1) }}
         </span>
         <div style="font-size:0.66rem; color:#64748b; margin-top:4px; white-space:nowrap;">
-            ({{ number_format($fc[$d]['batas_bawah'] ?? 0, 1) }} – {{ number_format($fc[$d]['batas_atas'] ?? 0, 1) }})
+            ({{ number_format($fc[$d]['batas_bawah'] ?? 0, 1) }} - {{ number_format($fc[$d]['batas_atas'] ?? 0, 1) }})
         </div>
         <div style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">{{ $fc[$d]['day_type'] ?? '' }}</div>
     </td>
     @else
-    <td style="padding:11px 12px; text-align:center; color:#94a3b8; font-size:0.875rem;">—</td>
+    <td style="padding:11px 12px; text-align:center; color:#94a3b8; font-size:0.875rem;">-</td>
     @endif
 @endforeach
 

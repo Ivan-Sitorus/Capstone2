@@ -1,3 +1,5 @@
+@use('App\Filament\Tables\Components\ColumnInfoTooltip')
+@use('App\Support\DataMiningTooltips')
 <x-filament-panels::page>
 
 {{-- ════════════════════════════════════════════════════════════════════ --}}
@@ -130,15 +132,15 @@
     </div>
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 1 — RINGKASAN TABEL SEMUA BAHAN BAKU                    --}}
+    {{-- OUTPUT 1 - RINGKASAN TABEL SEMUA BAHAN BAKU                    --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if(count($summaryTable))
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 1 — Ringkasan Prediksi Semua Bahan Baku</h2>
+            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 1: Ringkasan Prediksi Semua Bahan Baku</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Periode prediksi: <span class="font-medium">{{ $dateForecastFrom }}</span> s/d <span class="font-medium">{{ $dateForecastTo }}</span>
-                — diurutkan berdasarkan total prediksi tertinggi
+                Periode prediksi: <span class="font-medium">{{ $dateForecastFrom }}</span> s/d                 <span class="font-medium">{{ $dateForecastTo }}</span>,
+                diurutkan berdasarkan total prediksi tertinggi
             </p>
         </div>
         <div class="overflow-x-auto">
@@ -148,12 +150,12 @@
                         <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">No</th>
                         <th style="padding:11px 14px; text-align:left;   font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Nama Bahan Baku</th>
                         <th style="padding:11px 14px; text-align:center; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Satuan</th>
-                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Total Prediksi</th>
-                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Rata-rata/Hari</th>
-                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">MAE</th>
-                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">RMSE</th>
-                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">MAPE (%)</th>
-                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">SMAPE (%)</th>
+                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Total Prediksi', DataMiningTooltips::TOTAL_PREDICTION) !!}</th>
+                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Rata-rata/Hari', DataMiningTooltips::AVG_PER_DAY) !!}</th>
+                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('MAE', DataMiningTooltips::MAE) !!}</th>
+                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('RMSE', DataMiningTooltips::RMSE) !!}</th>
+                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('MAPE (%)', DataMiningTooltips::MAPE) !!}</th>
+                        <th style="padding:11px 14px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('SMAPE (%)', DataMiningTooltips::SMAPE) !!}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -183,12 +185,12 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 2 — GRAFIK TOTAL FORECAST                               --}}
+    {{-- OUTPUT 2 - GRAFIK TOTAL FORECAST                               --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if($chartForecastAll)
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 2 — Total Prediksi Penggunaan per Bahan Baku</h2>
+            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 2: Total Prediksi Penggunaan per Bahan Baku</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Perbandingan jumlah prediksi penggunaan seluruh bahan baku dalam 7 hari ke depan</p>
         </div>
         <div class="p-5">
@@ -198,17 +200,17 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 3 — DETAIL PREDIKSI PER BAHAN BAKU                     --}}
+    {{-- OUTPUT 3 - DETAIL PREDIKSI PER BAHAN BAKU                     --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if(count($predictions))
 
     {{-- Header Output 3 --}}
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-4 overflow-hidden">
         <div class="px-6 py-4">
-            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 3 — Detail Prediksi Penggunaan per Bahan Baku</h2>
+            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 3: Detail Prediksi Penggunaan per Bahan Baku</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Prediksi 7 hari ke depan: <span class="font-medium">{{ $dateForecastFrom }}</span> s/d <span class="font-medium">{{ $dateForecastTo }}</span>
-                — satu kartu per bahan baku
+                Prediksi 7 hari ke depan: <span class="font-medium">{{ $dateForecastFrom }}</span> s/d                 <span class="font-medium">{{ $dateForecastTo }}</span>,
+                satu kartu per bahan baku
             </p>
         </div>
     </div>
@@ -229,13 +231,13 @@
                 Total: <span style="font-weight:700; color:#4338ca;">{{ number_format($pred['total_forecast'] ?? 0, 1) }} {{ $pred['satuan'] ?? '' }}</span>
             </span>
             <span style="margin-left:auto; display:flex; flex-wrap:wrap; gap:12px; font-size:0.78rem; color:#64748b;">
-                <span>MAE: <span style="font-weight:600; color:#374151;">{{ number_format($pred['mae'] ?? 0, 2) }}</span></span>
-                <span>RMSE: <span style="font-weight:600; color:#374151;">{{ number_format($pred['rmse'] ?? 0, 2) }}</span></span>
-                <span>MAPE: <span style="font-weight:600;
+                <span>{!! ColumnInfoTooltip::label('MAE', DataMiningTooltips::MAE) !!}: <span style="font-weight:600; color:#374151;">{{ number_format($pred['mae'] ?? 0, 2) }}</span></span>
+                <span>{!! ColumnInfoTooltip::label('RMSE', DataMiningTooltips::RMSE) !!}: <span style="font-weight:600; color:#374151;">{{ number_format($pred['rmse'] ?? 0, 2) }}</span></span>
+                <span>{!! ColumnInfoTooltip::label('MAPE', DataMiningTooltips::MAPE) !!}: <span style="font-weight:600;
                     color:{{ ($pred['mape'] ?? 0) <= 10 ? '#16a34a' : (($pred['mape'] ?? 0) <= 25 ? '#d97706' : '#dc2626') }};">
                     {{ number_format($pred['mape'] ?? 0, 2) }}%
                 </span></span>
-                <span>SMAPE: <span style="font-weight:600; color:#374151;">{{ number_format($pred['smape'] ?? 0, 2) }}%</span></span>
+                <span>{!! ColumnInfoTooltip::label('SMAPE', DataMiningTooltips::SMAPE) !!}: <span style="font-weight:600; color:#374151;">{{ number_format($pred['smape'] ?? 0, 2) }}%</span></span>
             </span>
         </div>
 
@@ -247,10 +249,10 @@
                     <tr style="background-color:#1e40af;">
                         <th style="padding:10px 20px; text-align:left;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Tanggal</th>
                         <th style="padding:10px 20px; text-align:left;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Hari</th>
-                        <th style="padding:10px 20px; text-align:center;font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Tipe Hari</th>
+                        <th style="padding:10px 20px; text-align:center;font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Tipe Hari', DataMiningTooltips::DAY_TYPE) !!}</th>
                         <th style="padding:10px 20px; text-align:right; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Prediksi</th>
-                        <th style="padding:10px 20px; text-align:right; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Batas Bawah</th>
-                        <th style="padding:10px 20px; text-align:right; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Batas Atas</th>
+                        <th style="padding:10px 20px; text-align:right; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Batas Bawah', DataMiningTooltips::LOWER_BOUND) !!}</th>
+                        <th style="padding:10px 20px; text-align:right; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Batas Atas', DataMiningTooltips::UPPER_BOUND) !!}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -286,12 +288,12 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 4 — EVALUASI MODEL 2×2                                  --}}
+    {{-- OUTPUT 4 - EVALUASI MODEL 2×2                                  --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if($chartEvaluation)
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 4 — Evaluasi Model per Bahan Baku</h2>
+            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 4: Evaluasi Model per Bahan Baku</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">MAE, RMSE, MAPE, dan SMAPE dihitung pada data uji (25% terakhir dari data historis)</p>
         </div>
         <div class="p-5">
@@ -301,12 +303,12 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 5 — ANALISIS RATA-RATA WEEKDAY VS WEEKEND               --}}
+    {{-- OUTPUT 5 - ANALISIS RATA-RATA WEEKDAY VS WEEKEND               --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if($chartFeatureImportance)
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 5 — Analisis Rata-rata Jumlah Penggunaan Bahan Baku: Weekday vs Weekend</h2>
+            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 5: Analisis Rata-rata Jumlah Penggunaan Bahan Baku, Weekday vs Weekend</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 Perbandingan rata-rata jumlah penggunaan tiap bahan baku pada hari kerja dan akhir pekan berdasarkan data historis yang digunakan.
                 Memperlihatkan seberapa besar perbedaan pengaruh weekend dan weekday terhadap penggunaan tiap bahan baku.
@@ -319,12 +321,12 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 6 — PREDIKSI VS AKTUAL SEMUA BAHAN BAKU                 --}}
+    {{-- OUTPUT 6 - PREDIKSI VS AKTUAL SEMUA BAHAN BAKU                 --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if($chartAllItems)
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 6 — Prediksi vs Aktual — Semua Bahan Baku</h2>
+            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 6: Prediksi vs Aktual Semua Bahan Baku</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Grafik gabungan seluruh bahan baku: garis training, aktual test, dan prediksi test</p>
         </div>
         <div class="p-5">
@@ -334,12 +336,12 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 7 — PREDIKSI VS AKTUAL PER BAHAN BAKU                   --}}
+    {{-- OUTPUT 7 - PREDIKSI VS AKTUAL PER BAHAN BAKU                   --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if(count($chartPerIngredient))
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 7 — Prediksi vs Aktual per Bahan Baku</h2>
+            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Output 7: Prediksi vs Aktual per Bahan Baku</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Grafik individual tiap bahan baku: perbandingan data training, aktual test, dan prediksi test (25%)</p>
         </div>
         <div class="divide-y divide-gray-100 dark:divide-gray-700/40">
@@ -354,12 +356,12 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- PROSES — LOG PREPROCESSING (dipindah ke bawah)                 --}}
+    {{-- PROSES - LOG PREPROCESSING (dipindah ke bawah)                 --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if(count($preprocessLogs))
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Proses — Tahapan Preprocessing Data</h2>
+            <h2 class="text-sm font-bold text-gray-900 dark:text-white">Proses: Tahapan Preprocessing Data</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Tahapan persiapan dan transformasi data sebelum model Prophet dilatih</p>
         </div>
         <div class="divide-y divide-gray-50 dark:divide-gray-700/30">

@@ -1,3 +1,5 @@
+@use('App\Filament\Tables\Components\ColumnInfoTooltip')
+@use('App\Support\DataMiningTooltips')
 <x-filament-panels::page>
 
 {{-- ── Belum ada hasil ─────────────────────────────────────────────────── --}}
@@ -19,7 +21,7 @@
 
 @else
 {{-- ════════════════════════════════════════════════════════════════════ --}}
-{{-- LAPORAN PREDIKSI — maks. 3 entry, unik per rentang tanggal          --}}
+{{-- LAPORAN PREDIKSI - maks. 3 entry, unik per rentang tanggal          --}}
 {{-- ════════════════════════════════════════════════════════════════════ --}}
 
     {{-- Keterangan jumlah laporan --}}
@@ -37,7 +39,7 @@
     @php
         $predictions  = $result['predictions']   ?? [];
         $labelNo      = $idx + 1;
-        $labelTerbaru = $idx === 0 ? ' — Terbaru' : '';
+        $labelTerbaru = $idx === 0 ? ': Terbaru' : '';
 
         // Ambil tanggal forecast dari prediksi pertama
         $forecastDays = [];
@@ -94,7 +96,7 @@
                     Laporan Hasil Prediksi Penjualan {{ count($forecastDays) }} Hari ke Depan
                 </h3>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                    Nilai MAE (Mean Absolute Error) menunjukkan akurasi model — semakin kecil semakin akurat.
+                    Nilai MAE (Mean Absolute Error) menunjukkan akurasi model, semakin kecil semakin akurat.
                 </p>
             </div>
             <div style="overflow-x:auto; width:100%;">
@@ -108,8 +110,8 @@
     <span style="font-weight:400; font-size:0.65rem; opacity:0.85;">{{ $fd['hari'] ?? '' }}, {{ $fd['tanggal'] ?? '' }}</span>
 </th>
 @endforeach
-                            <th style="padding:12px 20px; text-align:right; font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Total Prediksi</th>
-                            <th style="padding:12px 20px; text-align:right; font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">MAE</th>
+                            <th style="padding:12px 20px; text-align:right; font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Total Prediksi', DataMiningTooltips::TOTAL_PREDICTION) !!}</th>
+                            <th style="padding:12px 20px; text-align:right; font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('MAE', DataMiningTooltips::MAE) !!}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -129,14 +131,14 @@
             {{ $fc[$d]['prediksi'] ?? '-' }} unit
         </span>
         <div style="font-size:0.68rem; color:#64748b; margin-top:4px; white-space:nowrap;">
-            ({{ $fc[$d]['batas_bawah'] ?? '-' }} – {{ $fc[$d]['batas_atas'] ?? '-' }})
+            ({{ $fc[$d]['batas_bawah'] ?? '-' }} - {{ $fc[$d]['batas_atas'] ?? '-' }})
         </div>
         <div style="font-size:0.7rem; color:#94a3b8; margin-top:2px;">
             {{ $fc[$d]['day_type'] ?? '' }}
         </div>
     </td>
     @else
-    <td style="padding:12px 14px; text-align:center; color:#94a3b8; font-size:0.875rem;">—</td>
+    <td style="padding:12px 14px; text-align:center; color:#94a3b8; font-size:0.875rem;">-</td>
     @endif
 @endforeach
 

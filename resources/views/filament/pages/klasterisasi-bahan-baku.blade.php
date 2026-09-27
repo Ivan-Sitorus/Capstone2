@@ -1,3 +1,5 @@
+@use('App\Filament\Tables\Components\ColumnInfoTooltip')
+@use('App\Support\DataMiningTooltips')
 <x-filament-panels::page>
 
 {{-- ══════════════════════════════════════════════════════════════════════ --}}
@@ -126,19 +128,19 @@
     {{-- Stat bar --}}
     <div class="grid grid-cols-3 gap-4 mb-8">
         <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-5">
-            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">K Optimal</p>
+            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">{!! ColumnInfoTooltip::label('K Optimal', DataMiningTooltips::K_OPTIMAL) !!}</p>
             <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ $bestK }}</p>
             <p class="text-xs text-gray-400 mt-1">Jumlah klaster terbaik</p>
         </div>
         <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-5">
-            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Silhouette Score</p>
+            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">{!! ColumnInfoTooltip::label('Silhouette Score', DataMiningTooltips::SILHOUETTE) !!}</p>
             <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ number_format($silhouetteScore, 3) }}</p>
             <p class="text-xs mt-1 {{ $silhouetteScore >= 0.7 ? 'text-green-500' : ($silhouetteScore >= 0.5 ? 'text-yellow-500' : 'text-red-400') }}">
                 {{ $silhouetteScore >= 0.7 ? 'Kualitas tinggi' : ($silhouetteScore >= 0.5 ? 'Kualitas sedang' : 'Kualitas rendah') }}
             </p>
         </div>
         <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-6 py-5">
-            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">Bahan Baku Dianalisis</p>
+            <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">{!! ColumnInfoTooltip::label('Bahan Baku Dianalisis', DataMiningTooltips::INGREDIENTS_ANALYZED) !!}</p>
             <p class="text-3xl font-bold text-gray-800 dark:text-white">{{ $totalIngredients }}</p>
             <p class="text-xs text-gray-400 mt-1">Dari data pemakaian harian</p>
         </div>
@@ -152,7 +154,7 @@
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
             <h2 class="text-base font-bold text-gray-900 dark:text-white">Tabel Klasterisasi Bahan Baku Berdasarkan Jumlah Penggunaan</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Diurutkan berdasarkan klaster kemudian jumlah penggunaan tertinggi — data
+                Diurutkan berdasarkan klaster kemudian jumlah penggunaan tertinggi, data
                 <span class="font-medium text-gray-700 dark:text-gray-300">{{ $dateFrom }} s/d {{ $dateTo }}</span>
             </p>
         </div>
@@ -163,8 +165,8 @@
                         <th style="padding:12px 18px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; width:52px;">No</th>
                         <th style="padding:12px 18px; text-align:left;   font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Nama Bahan Baku</th>
                         <th style="padding:12px 18px; text-align:center; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Satuan</th>
-                        <th style="padding:12px 18px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Total Penggunaan</th>
-                        <th style="padding:12px 18px; text-align:center; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Klaster</th>
+                        <th style="padding:12px 18px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Total Penggunaan', DataMiningTooltips::TOTAL_USAGE) !!}</th>
+                        <th style="padding:12px 18px; text-align:center; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Klaster', DataMiningTooltips::CLUSTER) !!}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -206,8 +208,8 @@
             <table style="width:100%; border-collapse:collapse;">
                 <thead>
                     <tr style="background-color:#1e40af;">
-                        <th style="padding:12px 18px; text-align:center; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Klaster</th>
-                        <th style="padding:12px 18px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Rata-rata Jumlah Penggunaan</th>
+                        <th style="padding:12px 18px; text-align:center; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Klaster', DataMiningTooltips::CLUSTER) !!}</th>
+                        <th style="padding:12px 18px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Rata-rata Jumlah Penggunaan', DataMiningTooltips::AVG_USAGE) !!}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -279,7 +281,7 @@
     @if($chartElbow)
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Elbow Method</h2>
+            <h2 class="text-base font-bold text-gray-900 dark:text-white">{!! ColumnInfoTooltip::label('Elbow Method', DataMiningTooltips::INERTIA) !!}</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Penentuan jumlah klaster optimal berdasarkan inertia (SSE)</p>
         </div>
         <div class="p-5">
@@ -294,8 +296,8 @@
     @if($chartSilhouette)
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-8 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Silhouette Score per K</h2>
-            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Kualitas pengelompokan — semakin tinggi semakin baik</p>
+            <h2 class="text-base font-bold text-gray-900 dark:text-white">{!! ColumnInfoTooltip::label('Silhouette Score per K', DataMiningTooltips::SILHOUETTE) !!}</h2>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Kualitas pengelompokan, semakin tinggi semakin baik</p>
         </div>
         <div class="p-5">
             <img src="data:image/png;base64,{{ $chartSilhouette }}" alt="Silhouette Chart" class="w-full rounded"/>
@@ -316,10 +318,10 @@
             <table style="width:100%; border-collapse:collapse;">
                 <thead>
                     <tr style="background-color:#1e40af;">
-                        <th style="padding:12px 18px; text-align:center; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; width:80px;">Klaster</th>
-                        <th style="padding:12px 18px; text-align:center; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Jml Bahan Baku</th>
-                        <th style="padding:12px 18px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Rata-rata Penggunaan</th>
-                        <th style="padding:12px 18px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">Total Penggunaan</th>
+                        <th style="padding:12px 18px; text-align:center; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap; width:80px;">{!! ColumnInfoTooltip::label('Klaster', DataMiningTooltips::CLUSTER) !!}</th>
+                        <th style="padding:12px 18px; text-align:center; font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Jml Bahan Baku', DataMiningTooltips::ITEM_COUNT) !!}</th>
+                        <th style="padding:12px 18px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Rata-rata Penggunaan', DataMiningTooltips::CLUSTER_AVG_USAGE) !!}</th>
+                        <th style="padding:12px 18px; text-align:right;  font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em; white-space:nowrap;">{!! ColumnInfoTooltip::label('Total Penggunaan', DataMiningTooltips::TOTAL_USAGE) !!}</th>
                         <th style="padding:12px 18px; text-align:left;   font-size:0.7rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">Daftar Bahan Baku</th>
                     </tr>
                 </thead>

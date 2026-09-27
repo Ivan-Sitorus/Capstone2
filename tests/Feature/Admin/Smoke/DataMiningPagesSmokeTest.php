@@ -15,7 +15,6 @@ class DataMiningPagesSmokeTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin']);
 
         $pages = [
-            '/admin/data-mining',
             '/admin/prediksi-menu',
             '/admin/prediksi-ring-menu',
             '/admin/klasterisasi-menu',

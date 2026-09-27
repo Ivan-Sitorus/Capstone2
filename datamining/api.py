@@ -42,7 +42,7 @@ except ImportError:
 warnings.filterwarnings("ignore")
 load_dotenv()
 
-app = FastAPI(title="POSMine — Data Mining API", version="2.0.0")
+app = FastAPI(title="minePOS — Data Mining API", version="2.0.0")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -503,7 +503,7 @@ def run_pipeline(df: pd.DataFrame) -> dict:
 # ── ENDPOINTS ──────────────────────────────────────────────────────────────
 @app.get("/health")
 def health():
-    return {"status": "ok", "service": "POSMine Data Mining API v2"}
+    return {"status": "ok", "service": "minePOS Data Mining API v2"}
 
 
 @app.get("/preview-data")

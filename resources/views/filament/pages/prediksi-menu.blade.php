@@ -1,3 +1,5 @@
+@use('App\Filament\Tables\Components\ColumnInfoTooltip')
+@use('App\Support\DataMiningTooltips')
 <x-filament-panels::page>
 
 {{-- ════════════════════════════════════════════════════════════════════ --}}
@@ -125,12 +127,12 @@
     </div>
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- PROSES 2 — EVALUASI MODEL (MAE saja)                           --}}
+    {{-- PROSES 2 - EVALUASI MODEL (MAE saja)                           --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if(count($summaryTable))
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Proses 2 — Evaluasi Model per Menu</h2>
+            <h2 class="text-base font-bold text-gray-900 dark:text-white">Proses 2: Evaluasi Model per Menu</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 Model dilatih pada data train (75%) dan dievaluasi pada data test (25%)
             </p>
@@ -140,8 +142,8 @@
                 <thead>
                     <tr style="background-color:#1e40af;">
                         <th style="padding:12px 20px; text-align:left; font-size:0.75rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">Nama Menu</th>
-                        <th style="padding:12px 20px; text-align:center; font-size:0.75rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">Model</th>
-                        <th style="padding:12px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">MAE</th>
+                        <th style="padding:12px 20px; text-align:center; font-size:0.75rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">{!! ColumnInfoTooltip::label('Model', DataMiningTooltips::MODEL) !!}</th>
+                        <th style="padding:12px 20px; text-align:right; font-size:0.75rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">{!! ColumnInfoTooltip::label('MAE', DataMiningTooltips::MAE) !!}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -165,8 +167,8 @@
         </div>
         <div class="px-6 py-3 border-t border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/20">
             <p class="text-xs text-gray-400">
-                <span class="font-semibold text-gray-500 dark:text-gray-300">MAE</span>
-                — Mean Absolute Error: rata-rata selisih absolut antara nilai aktual dan prediksi pada data test.
+                <span class="font-semibold text-gray-500 dark:text-gray-300">MAE (Mean Absolute Error):</span>
+                rata-rata selisih absolut antara nilai aktual dan prediksi pada data test.
                 Semakin kecil nilainya, semakin akurat model.
             </p>
         </div>
@@ -174,12 +176,12 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 1 — RINGKASAN TOTAL PREDIKSI (bar chart)                --}}
+    {{-- OUTPUT 1 - RINGKASAN TOTAL PREDIKSI (bar chart)                --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if($chartForecastAll)
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Output 1 — Ringkasan Total Prediksi Penjualan</h2>
+            <h2 class="text-base font-bold text-gray-900 dark:text-white">Output 1: Ringkasan Total Prediksi Penjualan</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 Total prediksi unit penjualan per menu untuk periode
                 <span class="font-medium text-primary-600 dark:text-primary-400">{{ $dateForecastFrom }} s/d {{ $dateForecastTo }}</span>
@@ -193,20 +195,20 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 2 — PREDIKSI PENJUALAN 2 HARI KE DEPAN (per menu)      --}}
+    {{-- OUTPUT 2 - PREDIKSI PENJUALAN 7 HARI KE DEPAN (per menu)      --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if(count($predictions))
 
     {{-- Header Output 2 --}}
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-4 overflow-hidden">
         <div class="px-6 py-4">
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Output 2 — Prediksi Penjualan 2 Hari ke Depan</h2>
+            <h2 class="text-base font-bold text-gray-900 dark:text-white">Output 2: Prediksi Penjualan {{ $forecastDays ?: 7 }} Hari ke Depan</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 Periode prediksi:
                 <span class="font-medium text-primary-600 dark:text-primary-400">{{ $dateForecastFrom }}</span>
                 s/d
-                <span class="font-medium text-primary-600 dark:text-primary-400">{{ $dateForecastTo }}</span>
-                — satu kartu per menu
+                <span class="font-medium text-primary-600 dark:text-primary-400">{{ $dateForecastTo }}</span>,
+                satu kartu per menu
             </p>
         </div>
     </div>
@@ -227,7 +229,8 @@
                 </span>
                 <span class="text-xs text-gray-400">|</span>
                 <span class="text-xs text-gray-500 dark:text-gray-400">
-                    MAE: <span class="font-semibold text-gray-700 dark:text-gray-300">{{ number_format($pred['mae'] ?? 0, 2) }}</span>
+                    {!! ColumnInfoTooltip::label('MAE', DataMiningTooltips::MAE) !!}:
+                    <span class="font-semibold text-gray-700 dark:text-gray-300">{{ number_format($pred['mae'] ?? 0, 2) }}</span>
                 </span>
             </div>
         </div>
@@ -240,10 +243,10 @@
                     <tr style="background-color:#1e40af;">
                         <th style="padding:11px 20px; text-align:left;   font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">Tanggal</th>
                         <th style="padding:11px 20px; text-align:left;   font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">Hari</th>
-                        <th style="padding:11px 20px; text-align:center; font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">Tipe Hari</th>
-                        <th style="padding:11px 20px; text-align:right;  font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">Prediksi (unit)</th>
-                        <th style="padding:11px 20px; text-align:right;  font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">Batas Bawah</th>
-                        <th style="padding:11px 20px; text-align:right;  font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">Batas Atas</th>
+                        <th style="padding:11px 20px; text-align:center; font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">{!! ColumnInfoTooltip::label('Tipe Hari', DataMiningTooltips::DAY_TYPE) !!}</th>
+                        <th style="padding:11px 20px; text-align:right;  font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">{!! ColumnInfoTooltip::label('Prediksi (unit)', 'Prediksi jumlah unit menu yang akan terjual pada tanggal ini.') !!}</th>
+                        <th style="padding:11px 20px; text-align:right;  font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">{!! ColumnInfoTooltip::label('Batas Bawah', DataMiningTooltips::LOWER_BOUND) !!}</th>
+                        <th style="padding:11px 20px; text-align:right;  font-size:0.72rem; font-weight:600; color:#ffffff; text-transform:uppercase; letter-spacing:0.06em;">{!! ColumnInfoTooltip::label('Batas Atas', DataMiningTooltips::UPPER_BOUND) !!}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -277,12 +280,12 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 3 — ANALISIS RATA-RATA PENJUALAN: WEEKDAY VS WEEKEND    --}}
+    {{-- OUTPUT 3 - ANALISIS RATA-RATA PENJUALAN: WEEKDAY VS WEEKEND    --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if($chartFeatureImportance)
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Output 3 — Analisis Rata-rata Penjualan: Weekday vs Weekend</h2>
+            <h2 class="text-base font-bold text-gray-900 dark:text-white">Output 3: Analisis Rata-rata Penjualan, Weekday vs Weekend</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 Perbandingan rata-rata jumlah penjualan setiap menu pada hari kerja (weekday) dan akhir pekan (weekend)
                 untuk melihat seberapa besar pengaruh tipe hari terhadap penjualan masing-masing menu.
@@ -296,12 +299,12 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- OUTPUT 4 — VISUALISASI PREDIKSI vs AKTUAL PER ITEM             --}}
+    {{-- OUTPUT 4 - VISUALISASI PREDIKSI vs AKTUAL PER ITEM             --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if($chartAllItems)
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Output 4 — Visualisasi Prediksi vs Aktual per Item</h2>
+            <h2 class="text-base font-bold text-gray-900 dark:text-white">Output 4: Visualisasi Prediksi vs Aktual per Item</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                 <span class="inline-block w-3 h-1 bg-gray-400 rounded mr-1"></span>Abu = data training &nbsp;·&nbsp;
                 <span class="inline-block w-3 h-1 bg-blue-500 rounded mr-1"></span>Biru = aktual test &nbsp;·&nbsp;
@@ -318,12 +321,12 @@
     @endif
 
     {{-- ══════════════════════════════════════════════════════════════ --}}
-    {{-- PROSES 1 — LOG PREPROCESSING (dipindah ke bawah)               --}}
+    {{-- PROSES 1 - LOG PREPROCESSING (dipindah ke bawah)               --}}
     {{-- ══════════════════════════════════════════════════════════════ --}}
     @if(count($preprocessLogs))
     <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 mb-6 overflow-hidden">
         <div class="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 class="text-base font-bold text-gray-900 dark:text-white">Proses 1 — Informasi Data &amp; Preprocessing</h2>
+            <h2 class="text-base font-bold text-gray-900 dark:text-white">Proses 1: Informasi Data &amp; Preprocessing</h2>
             <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Tahapan pemrosesan data sebelum model dilatih</p>
         </div>
         <div class="divide-y divide-gray-50 dark:divide-gray-700/30">

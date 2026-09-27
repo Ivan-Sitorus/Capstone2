@@ -1,3 +1,5 @@
+@use('App\Filament\Tables\Components\ColumnInfoTooltip')
+@use('App\Support\DataMiningTooltips')
 <x-filament-panels::page>
 
 {{-- ── Error ────────────────────────────────────────────────────────────── --}}
@@ -80,7 +82,7 @@
                 Data aktual: <strong class="ml-1">{{ $dateFrom }}</strong> s/d <strong>{{ $dateTo }}</strong>
             </span>
             <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-xs font-semibold px-3 py-1">
-                K={{ $bestK }} · Sil={{ number_format($silScore, 3) }} · {{ $totalMenu }} menu
+                {!! ColumnInfoTooltip::label('K=' . $bestK . ' · Sil=' . number_format($silScore, 3) . ' · ' . $totalMenu . ' menu', DataMiningTooltips::K_SIL_BADGE) !!}
             </span>
         </div>
     </div>
@@ -102,9 +104,9 @@
                     <tr style="background-color:#1d4ed8;">
                         <th style="padding:10px 14px; text-align:right; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6; width:3rem;">No</th>
                         <th style="padding:10px 14px; text-align:left;  font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Nama Item</th>
-                        <th style="padding:10px 14px; text-align:right; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Total Jumlah</th>
-                        <th style="padding:10px 14px; text-align:right; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Total Keuntungan</th>
-                        <th style="padding:10px 14px; text-align:center; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Klaster</th>
+                        <th style="padding:10px 14px; text-align:right; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Total Jumlah', DataMiningTooltips::TOTAL_QTY) !!}</th>
+                        <th style="padding:10px 14px; text-align:right; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Total Keuntungan', DataMiningTooltips::TOTAL_PROFIT) !!}</th>
+                        <th style="padding:10px 14px; text-align:center; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Klaster', DataMiningTooltips::CLUSTER) !!}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -147,9 +149,9 @@
             <table style="width:100%; border-collapse:collapse; font-size:0.82rem;">
                 <thead>
                     <tr style="background-color:#1d4ed8;">
-                        <th style="padding:10px 14px; text-align:center; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Klaster</th>
-                        <th style="padding:10px 14px; text-align:right;  font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Rata-rata Jumlah Penjualan</th>
-                        <th style="padding:10px 14px; text-align:right;  font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Rata-rata Keuntungan</th>
+                        <th style="padding:10px 14px; text-align:center; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Klaster', DataMiningTooltips::CLUSTER) !!}</th>
+                        <th style="padding:10px 14px; text-align:right;  font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Rata-rata Jumlah Penjualan', DataMiningTooltips::AVG_QTY) !!}</th>
+                        <th style="padding:10px 14px; text-align:right;  font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Rata-rata Keuntungan', DataMiningTooltips::AVG_PROFIT) !!}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -224,10 +226,10 @@
                     <tr style="background-color:#1d4ed8;">
                         <th style="padding:10px 14px; text-align:right;  font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6; width:3rem;">No</th>
                         <th style="padding:10px 14px; text-align:left;   font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Nama Item</th>
-                        <th style="padding:10px 14px; text-align:right;  font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Total Jumlah</th>
-                        <th style="padding:10px 14px; text-align:right;  font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Total Keuntungan</th>
-                        <th style="padding:10px 14px; text-align:center; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Klaster</th>
-                        <th style="padding:10px 14px; text-align:left;   font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">Kategori</th>
+                        <th style="padding:10px 14px; text-align:right;  font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Total Jumlah', DataMiningTooltips::TOTAL_QTY) !!}</th>
+                        <th style="padding:10px 14px; text-align:right;  font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Total Keuntungan', DataMiningTooltips::TOTAL_PROFIT) !!}</th>
+                        <th style="padding:10px 14px; text-align:center; font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Klaster', DataMiningTooltips::CLUSTER) !!}</th>
+                        <th style="padding:10px 14px; text-align:left;   font-size:0.72rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.05em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Kategori', DataMiningTooltips::CATEGORY) !!}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -264,11 +266,11 @@
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="w-3 h-3 rounded-full bg-blue-500 shrink-0"></span>
-                    <span class="text-gray-600 dark:text-gray-400"><strong>Laris</strong> 350–399</span>
+                    <span class="text-gray-600 dark:text-gray-400"><strong>Laris</strong> 350-399</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="w-3 h-3 rounded-full bg-amber-500 shrink-0"></span>
-                    <span class="text-gray-600 dark:text-gray-400"><strong>Cukup</strong> 200–349</span>
+                    <span class="text-gray-600 dark:text-gray-400"><strong>Cukup</strong> 200-349</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                     <span class="w-3 h-3 rounded-full bg-red-500 shrink-0"></span>

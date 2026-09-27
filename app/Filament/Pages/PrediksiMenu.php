@@ -162,13 +162,6 @@ class PrediksiMenu extends Page
 
             Cache::put('prediksi_menu_results_history', $history, now()->addDays(30));
 
-            // Tetap simpan key lama agar backward-compatible
-            Cache::put(
-                'prediksi_menu_last_result',
-                array_merge($data, ['last_run_at' => $this->lastRunAt]),
-                now()->addDays(7)
-            );
-
             Notification::make()
                 ->title('Prediksi selesai!')
                 ->body("Berhasil memprediksi {$this->totalMenu} menu untuk {$this->forecastDays} hari ke depan.")

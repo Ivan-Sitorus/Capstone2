@@ -68,7 +68,7 @@
   ],
   "notes": [
     "Seeder Laravel repo original tidak bisa dijalankan fresh (migration expenses & cashier_sessions duplikat; seeder query menus.slug yang sudah di-drop).",
-    "Dataset B direplikasi dari spesifikasi seeder repo original ke schema POSMine.",
+    "Dataset B direplikasi dari spesifikasi seeder repo original ke schema minePOS.",
     "Vercel Hobby (1 vCPU/2GB/300s): optimasi paralel (joblib/multiprocessing) sengaja TIDAK diterapkan."
   ]
 }

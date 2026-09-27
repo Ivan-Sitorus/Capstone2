@@ -1,3 +1,5 @@
+@use('App\Filament\Tables\Components\ColumnInfoTooltip')
+@use('App\Support\DataMiningTooltips')
 <x-filament-panels::page>
 
     {{-- ── Error banner ──────────────────────────────────────────────────────── --}}
@@ -25,7 +27,7 @@
 
     @else
     {{-- ══════════════════════════════════════════════════════════════════════════ --}}
-    {{-- RINGKASAN — loop atas ≤ 3 hasil                                           --}}
+    {{-- RINGKASAN - loop atas ≤ 3 hasil                                           --}}
     {{-- ══════════════════════════════════════════════════════════════════════════ --}}
 
         {{-- Info jumlah hasil ────────────────────────────────────────────────── --}}
@@ -92,10 +94,10 @@
         {{-- ── Stat bar ─────────────────────────────────────────────────────── --}}
         <div class="grid grid-cols-4 gap-4 mb-6">
             @foreach([
-                ['label' => 'Total Rules',     'value' => $totalRules],
-                ['label' => 'Total Transaksi', 'value' => number_format($totalTx)],
-                ['label' => 'Min Support',     'value' => number_format($minSup * 100, 1) . '%'],
-                ['label' => 'Min Confidence',  'value' => number_format($minConf * 100, 1) . '%'],
+                ['label' => ColumnInfoTooltip::label('Total Rules', DataMiningTooltips::TOTAL_RULES),         'value' => $totalRules],
+                ['label' => ColumnInfoTooltip::label('Total Transaksi', DataMiningTooltips::TOTAL_TRANSACTIONS), 'value' => number_format($totalTx)],
+                ['label' => ColumnInfoTooltip::label('Min Support', DataMiningTooltips::MIN_SUPPORT),         'value' => number_format($minSup * 100, 1) . '%'],
+                ['label' => ColumnInfoTooltip::label('Min Confidence', DataMiningTooltips::MIN_CONFIDENCE),      'value' => number_format($minConf * 100, 1) . '%'],
             ] as $s)
                 <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-5 py-4">
                     <p class="text-xs text-gray-400 uppercase tracking-widest mb-1">{{ $s['label'] }}</p>
@@ -112,7 +114,7 @@
             <div class="px-6 py-4 border-b border-gray-100 dark:border-gray-700">
                 <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-100">Top 8 Association Rules (Terurut)</h2>
                 <p class="text-xs text-gray-400 mt-0.5">
-                    Aturan terarah: "Jika memesan A maka memesan B" ≠ "Jika memesan B maka memesan A" — diurutkan berdasarkan Lift tertinggi
+                    Aturan terarah: "Jika memesan A maka memesan B" ≠ "Jika memesan B maka memesan A", diurutkan berdasarkan Lift tertinggi
                 </p>
             </div>
             <div class="overflow-x-auto">
@@ -124,10 +126,10 @@
                             <th style="padding:9px 12px; text-align:left;   font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Pesan Berikutnya (B)</th>
                             <th style="padding:9px 12px; text-align:right;  font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Jml A</th>
                             <th style="padding:9px 12px; text-align:right;  font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Jml B</th>
-                            <th style="padding:9px 12px; text-align:right;  font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Jml A→B</th>
-                            <th style="padding:9px 12px; text-align:right;  font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Support</th>
-                            <th style="padding:9px 12px; text-align:right;  font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Confidence</th>
-                            <th style="padding:9px 12px; text-align:right;  font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Lift</th>
+                            <th style="padding:9px 12px; text-align:right;  font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Jml A→B', DataMiningTooltips::PAIR_COUNT) !!}</th>
+                            <th style="padding:9px 12px; text-align:right;  font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Support', DataMiningTooltips::SUPPORT) !!}</th>
+                            <th style="padding:9px 12px; text-align:right;  font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Confidence', DataMiningTooltips::CONFIDENCE) !!}</th>
+                            <th style="padding:9px 12px; text-align:right;  font-size:0.68rem; font-weight:700; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Lift', DataMiningTooltips::LIFT) !!}</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -218,7 +220,7 @@
                     <thead>
                         <tr style="background-color:#1e40af;">
                             <th style="padding:8px 12px; text-align:left;  font-size:0.67rem; font-weight:600; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Menu</th>
-                            <th style="padding:8px 12px; text-align:right; font-size:0.67rem; font-weight:600; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Support</th>
+                            <th style="padding:8px 12px; text-align:right; font-size:0.67rem; font-weight:600; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Support', DataMiningTooltips::SUPPORT) !!}</th>
                             <th style="padding:8px 12px; text-align:right; font-size:0.67rem; font-weight:600; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Jml Transaksi</th>
                         </tr>
                     </thead>
@@ -250,7 +252,7 @@
                     <thead>
                         <tr style="background-color:#1e40af;">
                             <th style="padding:8px 12px; text-align:left;  font-size:0.67rem; font-weight:600; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Urutan Menu (A → B)</th>
-                            <th style="padding:8px 12px; text-align:right; font-size:0.67rem; font-weight:600; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Support</th>
+                            <th style="padding:8px 12px; text-align:right; font-size:0.67rem; font-weight:600; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">{!! ColumnInfoTooltip::label('Support', DataMiningTooltips::SUPPORT) !!}</th>
                             <th style="padding:8px 12px; text-align:right; font-size:0.67rem; font-weight:600; color:#fff; text-transform:uppercase; letter-spacing:0.04em; border:1px solid #3b82f6;">Jml Transaksi</th>
                         </tr>
                     </thead>

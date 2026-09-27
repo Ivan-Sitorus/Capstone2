@@ -1,5 +1,5 @@
 """Dataset B loader — replikasi spesifikasi seeder data-mining repo asli
-(ShandovaaGame/Capstone_POS_Cafe) ke schema POSMine (DB pos_cafe).
+(ShandovaaGame/Capstone_POS_Cafe) ke schema minePOS (DB pos_cafe).
 
 Menu, resep, bahan, dan harga modal diambil dari:
   - MenuSeeder, CategorySeeder, RecipeIngredientSeeder, HargaModalSeeder
@@ -7,9 +7,9 @@ Menu, resep, bahan, dan harga modal diambil dari:
   - PredictionHistorySeeder (22 menu x 253 hari = 5566 order, 2025-08-01..2026-04-10)
 
 Catatan adaptasi (didokumentasikan di laporan):
-  - status 'selesai' -> 'completed' (enum POSMine).
+  - status 'selesai' -> 'completed' (enum minePOS).
   - harga_modal -> menus.cost_price, dan disnapshot ke order_items.cost_price.
-  - daily_ingredient_usages tidak dibuat; pipeline bahan baku POSMine menurunkan
+  - daily_ingredient_usages tidak dibuat; pipeline bahan baku minePOS menurunkan
     pemakaian dari resep (menu_ingredients) secara langsung.
 """
 import random
