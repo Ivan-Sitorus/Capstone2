@@ -1,11 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
-import { router, Head } from '@inertiajs/react';
+import { router, Head, usePoll } from '@inertiajs/react';
 import axios from 'axios';
 import { X, QrCode } from 'lucide-react';
 import OrderCard from '@/Components/Cashier/OrderCard';
 import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
-import usePolling from '@/Hooks/usePolling';
 import { SLATE_700, SLATE_100, SLATE_300, AMBER_600, AMBER_TINT, AMBER_300, BLUE, BLUE_50, BLUE_300, RED, RED_50, RED_200, SLATE_50, WHITE, SLATE_200, SLATE_900, SLATE_500, SALMON_LIGHT, RED_DARK, RED_MUTED, GREEN_MUTED_LIGHT, GREEN_SAGE } from '@/theme';
 
 export default function ActiveOrders({ orders: initialOrders, counts }) {
@@ -31,7 +30,13 @@ export default function ActiveOrders({ orders: initialOrders, counts }) {
         );
     }, [initialOrders]);
 
-    usePolling(() => router.reload({ only: ['orders', 'counts'] }), 30_000, { immediate: true });
+    usePoll(30_000, { only: ['orders', 'counts'] }, { keepAlive: false });
+
+    // `usePoll` baru memicu reload setelah interval pertama. Muat sekali saat
+    // mount agar perilaku `immediate: true` milik usePolling lama tetap sama.
+    useEffect(() => {
+        router.reload({ only: ['orders', 'counts'] });
+    }, []);
 
     /* ── Tabs ── */
     const tabs = [

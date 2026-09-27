@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
-import { router, Head } from '@inertiajs/react';
+import { router, Head, usePoll } from '@inertiajs/react';
 import { ClipboardList, X } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import HistoryCard from '@/Components/Customer/HistoryCard';
-import usePolling from '@/Hooks/usePolling';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 import { WHITE, STONE_50, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, NAVY_DARK } from '@/theme';
 
@@ -72,11 +71,12 @@ export default function CustomerRiwayat({ orders = [] }) {
         }
     }, []);
 
-    usePolling(
-        () => router.reload({ only: ['orders'], preserveState: true }),
-        30_000,
-        { enabled: orders.some(o => o.status !== 'completed') },
-    );
+    const shouldPoll = orders.some(o => o.status !== 'completed');
+    const { start, stop } = usePoll(30_000, { only: ['orders'], preserveState: true }, { autoStart: false, keepAlive: false });
+
+    useEffect(() => {
+        if (shouldPoll) start(); else stop();
+    }, [shouldPoll]);
 
     const filteredOrders = orders.filter(o =>
         activeTab === 'all' ? true : o.status === activeTab

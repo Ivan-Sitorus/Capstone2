@@ -1,6 +1,6 @@
-import { router } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { router, usePoll } from '@inertiajs/react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
-import usePolling from '@/Hooks/usePolling';
 import { formatRupiah } from '@/helpers';
 import { WARM_WHITE, ORANGE_100, WARM_TEXT, WARM_TEXT_MUTED, WARM_ICON, WHITE, WARM_BORDER, GREEN, SLATE_MUTED, BRAND_ORANGE, RED_DARK, RED_50, RED_TINT, BROWN } from '@/theme';
 
@@ -8,11 +8,12 @@ export default function QrisStatus({ order }) {
     const isRejected = order.status === 'pending' && !!order.rejection_note;
     const isDone     = order.status === 'completed';
 
-    usePolling(
-        () => router.reload({ only: ['order'] }),
-        15_000,
-        { enabled: !isDone && !isRejected },
-    );
+    const shouldPoll = !isDone && !isRejected;
+    const { start, stop } = usePoll(15_000, { only: ['order'] }, { autoStart: false, keepAlive: false });
+
+    useEffect(() => {
+        if (shouldPoll) start(); else stop();
+    }, [shouldPoll]);
 
     const isWaiting   = order.status === 'pending' && !order.rejection_note;
     const isConfirmed = order.status === 'processing';

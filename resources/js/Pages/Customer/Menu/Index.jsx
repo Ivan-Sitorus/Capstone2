@@ -1,9 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { router, Head } from '@inertiajs/react';
+import { router, Head, usePoll } from '@inertiajs/react';
 import { Search, ShoppingBag, Coffee } from 'lucide-react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
 import useCart from '@/Hooks/useCart';
-import usePolling from '@/Hooks/usePolling';
 import { formatRupiah } from '@/helpers';
 import { STONE_50, WHITE, STONE_100, STONE_300, STONE_700, STONE_900, STONE_500, STONE_400, GREEN_600, AMBER_400, STONE_250 } from '@/theme';
 
@@ -231,7 +230,7 @@ export default function CustomerMenu({ categories, table }) {
     const [customer,       setCustomer]       = useState(null);
     const [ready,          setReady]          = useState(false);
 
-    usePolling(() => router.reload({ only: ['categories'] }), 60_000);
+    usePoll(60_000, { only: ['categories'] }, { keepAlive: false });
 
     const { items, addItem, updateQty, setTable, total, count } = useCart();
 

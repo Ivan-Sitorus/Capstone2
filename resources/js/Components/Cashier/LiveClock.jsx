@@ -1,18 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
-import usePolling from '@/Hooks/usePolling';
 import { formatDate, formatTime } from '@/helpers';
 import { WHITE, SLATE_200, SLATE_900, SLATE_500 } from '@/theme';
 
 /**
  * Jam hidup yang mengisolasi tick 1 detik di dalam komponen ini sendiri,
  * sehingga halaman induk (mis. Dashboard) tidak ikut re-render tiap detik.
- * Pause saat tab tidak aktif mengikuti perilaku usePolling.
+ * Tick dijeda saat tab tidak aktif, lalu langsung menyegar ketika tab kembali
+ * terlihat (perilaku yang sama dengan usePolling lama).
  */
 export default function LiveClock() {
     const [now, setNow] = useState(() => new Date());
 
-    usePolling(() => setNow(new Date()), 1000);
+    useEffect(() => {
+        const tick = () => {
+            if (document.visibilityState === 'hidden') return;
+            setNow(new Date());
+        };
+
+        const id = setInterval(tick, 1000);
+        const onVisible = () => {
+            if (document.visibilityState === 'visible') tick();
+        };
+
+        document.addEventListener('visibilitychange', onVisible);
+
+        return () => {
+            clearInterval(id);
+            document.removeEventListener('visibilitychange', onVisible);
+        };
+    }, []);
 
     return (
         <div style={{

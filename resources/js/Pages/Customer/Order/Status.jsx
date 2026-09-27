@@ -1,6 +1,6 @@
-import { router } from '@inertiajs/react';
+import { useEffect } from 'react';
+import { router, usePoll } from '@inertiajs/react';
 import CustomerLayout from '@/Layouts/CustomerLayout';
-import usePolling from '@/Hooks/usePolling';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 import { GOLD_DARK, CREAM, GREEN_SAGE, GREEN_TINT, BLUE_DEEP, BLUE_TINT, RED_DEEP, RED_TINT_BG, WARM_TEXT_MUTED, WHITE, WARM_BORDER, WARM_TEXT, WARM_BG, WARM_ICON, BRAND_ORANGE } from '@/theme';
 
@@ -16,11 +16,12 @@ const STATUS_CONFIG = {
 export default function OrderStatus({ order }) {
     const cfg = STATUS_CONFIG[order.status] ?? STATUS_CONFIG.pending;
 
-    usePolling(
-        () => router.reload({ only: ['order'] }),
-        30_000,
-        { enabled: !['completed', 'cancelled'].includes(order.status) },
-    );
+    const shouldPoll = !['completed', 'cancelled'].includes(order.status);
+    const { start, stop } = usePoll(30_000, { only: ['order'] }, { autoStart: false, keepAlive: false });
+
+    useEffect(() => {
+        if (shouldPoll) start(); else stop();
+    }, [shouldPoll]);
 
     return (
         <CustomerLayout activeTab="riwayat">

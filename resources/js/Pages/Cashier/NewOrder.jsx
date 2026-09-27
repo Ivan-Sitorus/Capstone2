@@ -1,12 +1,11 @@
 import { useState, useMemo, useEffect } from 'react';
-import { router, Head } from '@inertiajs/react';
+import { router, Head, usePoll } from '@inertiajs/react';
 import { Search, X, Banknote, QrCode, ShieldCheck, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen, RefreshCw, ShoppingCart } from 'lucide-react';
 import { Drawer } from '@base-ui/react/drawer';
 import { useCashierSidebar } from '@/Layouts/CashierLayout';
 import MenuGridItem from '@/Components/Cashier/MenuGridItem';
 import CartItem from '@/Components/Cashier/CartItem';
 import { formatRupiah, formatTime } from '@/helpers';
-import usePolling from '@/Hooks/usePolling';
 import { useIsMobile } from '@/Hooks/useMediaQuery';
 import { BLUE, BLUE_50, BLUE_200, GRAY_900, GRAY_600, GRAY_BORDER, WHITE, GRAY_BG, SLATE_400, SLATE_LIGHT, GRAY_700, SLATE_DARK, SLATE_300, GREEN_600, SLATE_200, SLATE_900, SLATE_500, RED, RED_50, SLATE_100, BLUE_100, BLUE_SOFT, GREEN_50, GREEN_VIVID } from '@/theme';
 
@@ -38,11 +37,16 @@ export default function NewOrder({ categories }) {
     }, [cartSheetOpen]);
     const isMobile = useIsMobile();
 
+    const menuReloadOptions = () => ({
+        only: ['categories'],
+        onSuccess: () => setLastUpdated(new Date()),
+    });
+
     const refreshMenu = () => {
-        router.reload({ only: ['categories'], onSuccess: () => setLastUpdated(new Date()) });
+        router.reload(menuReloadOptions());
     };
 
-    usePolling(refreshMenu, 60_000);
+    usePoll(60_000, menuReloadOptions);
     const { collapsed: isLeftSidebarCollapsed } = useCashierSidebar();
     const [viewport, setViewport] = useState(() => {
         if (typeof window === 'undefined') return { width: 1280, height: 720 };
