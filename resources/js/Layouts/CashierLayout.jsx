@@ -149,7 +149,7 @@ function SidebarContent({ collapsed, showCollapseControl, onToggleCollapse, pend
             {/* Nav */}
             <nav style={{ flex: 1, padding: '20px 20px 0', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
                 {navItems.map(({ label, href, icon: Icon }) => {
-                    const active = window.location.pathname === href;
+                    const active = new URL(href, window.location.origin).pathname.replace(/\/+$/, '') === window.location.pathname.replace(/\/+$/, '');
                     const showBadge = label === 'Pesanan Aktif' && pendingOrderCount > 0;
                     return (
                         <Link
