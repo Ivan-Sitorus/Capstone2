@@ -60,17 +60,24 @@ class QrTableTest extends TestCase
             ->assertNotFound();
     }
 
-    public function test_identity_page_rejects_non_uuid_table_token(): void
+    public function test_identity_page_resolves_numeric_table_id_and_rejects_invalid(): void
     {
-        // Skenario bug: /pelanggan/identitas?table=1 dahulu 500 (SQLSTATE 22P02).
-        $this->get(route('customer.identity', ['table' => '1']))->assertNotFound();
+        $table = CafeTable::create(['table_number' => 7]);
+
+        // Tautan internal aplikasi memakai id meja numerik.
+        $this->get(route('customer.identity', ['table' => (string) $table->id]))->assertOk();
+
+        // Nilai non-numerik dan id yang tidak ada tetap 404 (bukan 500).
         $this->get(route('customer.identity', ['table' => 'abc']))->assertNotFound();
+        $this->get(route('customer.identity', ['table' => '999999']))->assertNotFound();
     }
 
-    public function test_menu_page_rejects_non_uuid_table_token(): void
+    public function test_menu_page_resolves_numeric_table_id_and_rejects_invalid(): void
     {
-        // Skenario bug: /pelanggan/menu?table=1 dahulu 500 (SQLSTATE 22P02).
-        $this->get(route('customer.menu', ['table' => '1']))->assertNotFound();
+        $table = CafeTable::create(['table_number' => 8]);
+
+        $this->get(route('customer.menu', ['table' => (string) $table->id]))->assertOk();
+        $this->get(route('customer.menu', ['table' => 'abc']))->assertNotFound();
     }
 
     public function test_malformed_array_table_token_returns_not_found(): void

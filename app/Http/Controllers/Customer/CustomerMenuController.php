@@ -18,16 +18,26 @@ class CustomerMenuController extends Controller
 {
     private function findTable(mixed $token): ?CafeTable
     {
-        // Token meja bersifat opaque UUID. Nilai apa pun yang bukan UUID
-        // (mis. nomor lama seperti "1") langsung dianggap tidak valid,
-        // sehingga tidak pernah dikirim ke kolom uuid (mencegah SQLSTATE 22P02).
-        if (! is_string($token) || ! Str::isUuid($token)) {
+        if (! is_string($token) || $token === '') {
             return null;
         }
 
-        return Cache::remember("cafe_table_{$token}", 600, fn () =>
-            CafeTable::select(['id', 'table_number', 'qr_token'])->where('qr_token', $token)->first()
-        );
+        // QR meja memakai token opaque UUID.
+        if (Str::isUuid($token)) {
+            return Cache::remember("cafe_table_{$token}", 600, fn () =>
+                CafeTable::select(['id', 'table_number', 'qr_token'])->where('qr_token', $token)->first()
+            );
+        }
+
+        // Tautan internal aplikasi (identitas, keranjang, pembayaran) memakai id
+        // meja numerik, jadi nilai numerik diresolusi lewat kolom id. Nilai lain
+        // (termasuk array) ditolak agar tidak pernah dikirim ke kolom uuid
+        // (mencegah SQLSTATE 22P02) dan tetap dijawab 404.
+        if (ctype_digit($token)) {
+            return CafeTable::select(['id', 'table_number', 'qr_token'])->where('id', (int) $token)->first();
+        }
+
+        return null;
     }
 
     public function showIdentity(Request $request): Response
