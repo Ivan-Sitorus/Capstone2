@@ -12,6 +12,52 @@ use Illuminate\Support\Str;
 
 class CafeSeeder extends Seeder
 {
+    /**
+     * Default tuning for the seeded dataset.
+     *
+     * Only SEED_START_DATE, SEED_END_DATE and SEED_ORDERS_PER_DAY are
+     * overridable at runtime (the test suite sets them via phpunit.xml);
+     * every other value is fixed so the seeded data stays reproducible.
+     */
+    private const SEED_START_DATE = '2025-01-01';
+    private const SEED_END_DATE = null;
+    private const ORDERS_PER_DAY = 100;
+
+    private const DAILY_JITTER = 0.15;
+    private const WEEKEND_MULTIPLIER = 1.4;
+    private const MONTHLY_SEASONALITY = [
+        1 => 1.00,
+        2 => 1.00,
+        3 => 1.05,
+        4 => 1.10,
+        5 => 1.00,
+        6 => 1.05,
+        7 => 1.00,
+        8 => 1.00,
+        9 => 0.95,
+        10 => 1.00,
+        11 => 1.00,
+        12 => 1.15,
+    ];
+
+    private const ITEMS_MIN = 2;
+    private const ITEMS_MAX = 6;
+    private const QTY_MIN = 1;
+    private const QTY_MAX = 3;
+
+    private const STUDENT_DISCOUNT_RATE = 0.25;
+
+    private const PAYMENT_MIX = [
+        'cash' => 55,
+        'qris' => 35,
+        'pay_later' => 10,
+    ];
+    private const PAY_LATER_FULLY_PAID_RATIO = 0.60;
+    private const PAY_LATER_PARTIAL_RATIO = 0.25;
+    private const PAYABLE_UNPAID_RATIO = 0.30;
+
+    private const INSERT_CHUNK = 1000;
+
     private const MENUS = [
         'Espresso' => [
             'category' => 'kopi', 'price' => 12000, 'cashback' => 2000,
@@ -384,27 +430,27 @@ class CafeSeeder extends Seeder
 
     private function loadConfig(): void
     {
-        $endRaw = config('seeding.end_date');
-        $this->start = Carbon::parse(config('seeding.start_date'))->startOfDay();
+        $endRaw = env('SEED_END_DATE', self::SEED_END_DATE);
+        $this->start = Carbon::parse(env('SEED_START_DATE', self::SEED_START_DATE))->startOfDay();
         $this->end = ($endRaw ? Carbon::parse($endRaw) : now())->startOfDay();
         if ($this->end->greaterThan(now())) {
             $this->end = now()->startOfDay();
         }
 
-        $this->ordersPerDay = max(0, (int) config('seeding.orders_per_day'));
-        $this->dailyJitter = (float) config('seeding.daily_jitter');
-        $this->weekendMultiplier = (float) config('seeding.weekend_multiplier');
-        $this->monthlySeasonality = (array) config('seeding.monthly_seasonality');
-        $this->itemsMin = max(1, (int) config('seeding.items_min'));
-        $this->itemsMax = max($this->itemsMin, (int) config('seeding.items_max'));
-        $this->qtyMin = max(1, (int) config('seeding.qty_min'));
-        $this->qtyMax = max($this->qtyMin, (int) config('seeding.qty_max'));
-        $this->studentRate = (float) config('seeding.student_discount_rate');
-        $this->paymentMix = (array) config('seeding.payment_mix');
-        $this->payLaterFullRatio = (float) config('seeding.pay_later_fully_paid_ratio');
-        $this->payLaterPartialRatio = (float) config('seeding.pay_later_partial_ratio');
-        $this->payableUnpaidRatio = (float) config('seeding.payable_unpaid_ratio');
-        $this->insertChunk = max(100, (int) config('seeding.insert_chunk'));
+        $this->ordersPerDay = max(0, (int) env('SEED_ORDERS_PER_DAY', self::ORDERS_PER_DAY));
+        $this->dailyJitter = self::DAILY_JITTER;
+        $this->weekendMultiplier = self::WEEKEND_MULTIPLIER;
+        $this->monthlySeasonality = self::MONTHLY_SEASONALITY;
+        $this->itemsMin = max(1, self::ITEMS_MIN);
+        $this->itemsMax = max($this->itemsMin, self::ITEMS_MAX);
+        $this->qtyMin = max(1, self::QTY_MIN);
+        $this->qtyMax = max($this->qtyMin, self::QTY_MAX);
+        $this->studentRate = self::STUDENT_DISCOUNT_RATE;
+        $this->paymentMix = self::PAYMENT_MIX;
+        $this->payLaterFullRatio = self::PAY_LATER_FULLY_PAID_RATIO;
+        $this->payLaterPartialRatio = self::PAY_LATER_PARTIAL_RATIO;
+        $this->payableUnpaidRatio = self::PAYABLE_UNPAID_RATIO;
+        $this->insertChunk = max(100, self::INSERT_CHUNK);
     }
 
     private function resolveUserIds(): void
