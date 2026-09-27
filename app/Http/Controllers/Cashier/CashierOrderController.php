@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Cashier;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Enums\QrisStatus;
+use App\Exceptions\InsufficientStockException;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Services\InventoryService;
@@ -44,7 +45,7 @@ class CashierOrderController extends Controller
                 'table_number' => $order->cafeTable?->table_number,
                 'items' => $order->items->map(fn ($i) => [
                     'id' => $i->id,
-                    'name' => $i->menu->name,
+                    'name' => $i->menu?->name,
                     'unit_price' => $i->unit_price,
                     'quantity' => $i->quantity,
                     'subtotal' => $i->subtotal,
@@ -61,12 +62,21 @@ class CashierOrderController extends Controller
 
         $request->validate(['reason' => 'nullable|string|max:255']);
 
-        $order->update([
-            'status'         => OrderStatus::Cancelled,
-            'rejection_note' => $request->reason,
-            'cashier_id'     => Auth::id(),
-            'cancelled_at'   => now(),
-        ]);
+        // Conditional update keyed on the status we just read: if another
+        // cashier processed the order in between, this affects 0 rows and we
+        // refuse to cancel an order that is already being prepared.
+        $affected = Order::whereKey($order->id)
+            ->where('status', $order->status->value)
+            ->update([
+                'status'         => OrderStatus::Cancelled->value,
+                'rejection_note' => $request->reason,
+                'cashier_id'     => Auth::id(),
+                'cancelled_at'   => now(),
+            ]);
+
+        if ($affected === 0) {
+            return response()->json(['message' => 'Pesanan sudah diproses oleh kasir lain.'], 409);
+        }
 
         return response()->json(['message' => 'Pesanan dibatalkan.']);
     }
@@ -75,12 +85,14 @@ class CashierOrderController extends Controller
     {
         $request->validate(['status' => 'required|string|in:processing,completed']);
 
+        $currentStatus = $order->status->value;
+
         $validTransitions = [
             OrderStatus::Pending->value => OrderStatus::Processing->value,
             OrderStatus::Processing->value => OrderStatus::Completed->value,
         ];
 
-        $allowed = $validTransitions[$order->status->value] ?? null;
+        $allowed = $validTransitions[$currentStatus] ?? null;
         if (! $allowed || $allowed !== $request->status) {
             return response()->json(['message' => 'Transisi status tidak valid.'], 409);
         }
@@ -102,7 +114,7 @@ class CashierOrderController extends Controller
         }
 
         try {
-            DB::transaction(function () use ($request, $order, $inventoryService) {
+            $updated = DB::transaction(function () use ($request, $order, $inventoryService, $currentStatus) {
                 $data = ['status' => $request->status, 'cashier_id' => Auth::id()];
 
                 if ($request->status === OrderStatus::Processing->value) {
@@ -111,17 +123,32 @@ class CashierOrderController extends Controller
                     $data['completed_at'] = now();
                 }
 
-                $order->update($data);
+                // Guarded transition: only update when the stored status still
+                // equals the one this cashier read. A second cashier racing the
+                // same pending order gets 0 rows and is rejected below.
+                $affected = Order::whereKey($order->id)
+                    ->where('status', $currentStatus)
+                    ->update($data);
+
+                if ($affected === 0) {
+                    return false;
+                }
 
                 if ($request->status === OrderStatus::Processing->value) {
-                    $inventoryService->processSaleForOrder($order);
+                    $inventoryService->processSaleForOrder($order->refresh());
                 }
+
+                return true;
             });
+        } catch (InsufficientStockException $e) {
+            return response()->json(['message' => $e->getMessage()], 409);
         } catch (\RuntimeException $e) {
             return response()->json(['message' => 'Gagal memproses pesanan: '.$e->getMessage()], 500);
         }
 
-        
+        if (! $updated) {
+            return response()->json(['message' => 'Pesanan sudah diproses oleh kasir lain.'], 409);
+        }
 
         return response()->json(['message' => 'Status diperbarui.']);
     }
@@ -150,6 +177,8 @@ class CashierOrderController extends Controller
 
         try {
             return response()->json($this->orderProcessingService->confirmCash($order));
+        } catch (InsufficientStockException $e) {
+            return response()->json(['message' => $e->getMessage()], 409);
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -163,6 +192,8 @@ class CashierOrderController extends Controller
 
         try {
             return response()->json($this->orderProcessingService->confirmQris($order));
+        } catch (InsufficientStockException $e) {
+            return response()->json(['message' => $e->getMessage()], 409);
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -196,6 +227,8 @@ class CashierOrderController extends Controller
         try {
             $this->orderProcessingService->acceptQrisProof($order);
             return response()->json(['message' => 'Bukti QRIS diterima. Pesanan diproses.']);
+        } catch (InsufficientStockException $e) {
+            return response()->json(['message' => $e->getMessage()], 409);
         } catch (\RuntimeException $e) {
             return back()->with('error', $e->getMessage());
         }
@@ -213,7 +246,7 @@ class CashierOrderController extends Controller
             $this->orderProcessingService->rejectQrisProof($order, $request->reason);
             return response()->json(['message' => 'Bukti QRIS ditolak.']);
         } catch (\RuntimeException $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 409);
         }
     }
 
@@ -229,7 +262,7 @@ class CashierOrderController extends Controller
             $this->orderProcessingService->requestQrisResubmit($order, $request->reason);
             return response()->json(['message' => 'Pengunggahan ulang bukti QRIS diminta.']);
         } catch (\RuntimeException $e) {
-            return response()->json(['message' => $e->getMessage()], 500);
+            return response()->json(['message' => $e->getMessage()], 409);
         }
     }
 

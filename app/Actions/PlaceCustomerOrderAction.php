@@ -5,7 +5,7 @@ namespace App\Actions;
 use App\Enums\MenuStatus;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
-use Exception;
+use App\Exceptions\MenuUnavailableException;
 use App\Models\CafeTable;
 use App\Models\Menu;
 use App\Models\Order;
@@ -63,24 +63,17 @@ class PlaceCustomerOrderAction
             $orderItemsToInsert = [];
 
             $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
-            $menus   = collect(Cache::many(array_map(fn($id) => "menu_{$id}", $menuIds)))
-                ->filter()
-                ->mapWithKeys(fn($m, $k) => [str_replace('menu_', '', $k) => $m]);
-
-            $missingIds = collect($menuIds)->filter(fn($id) => !$menus->has($id))->values()->all();
-            if (!empty($missingIds)) {
-                $fresh = Menu::whereIn('id', $missingIds)->get()->keyBy('id');
-                foreach ($fresh as $id => $menu) {
-                    Cache::put("menu_{$id}", $menu, 300);
-                }
-                $menus = $menus->union($fresh);
-            }
+            // Always read the menus fresh inside the transaction and lock them:
+            // a cached model could still report an inactive menu as available.
+            $menus = Menu::whereIn('id', $menuIds)->lockForUpdate()->get()->keyBy('id');
 
             foreach ($request->items as $position => $item) {
                 $menu = $menus->get($item['menu_id']);
 
                 if (!$menu || $menu->status !== MenuStatus::Active) {
-                    throw new Exception("Menu " . ($menu?->name ?? "#{$item['menu_id']}") . " tidak tersedia.");
+                    throw new MenuUnavailableException(
+                        "Menu " . ($menu?->name ?? "#{$item['menu_id']}") . " tidak tersedia."
+                    );
                 }
 
                 $unitPrice = ($isMahasiswa && $menu->is_student_discount && $menu->student_price !== null)

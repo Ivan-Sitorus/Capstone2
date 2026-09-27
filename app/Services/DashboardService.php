@@ -60,7 +60,7 @@ class DashboardService
                 'id'             => $o->id,
                 'order_code'     => $o->order_code,
                 'customer_name'  => $o->customer_name,
-                'itemsSummary'  => $o->items->map(fn($i) => $i->quantity . 'x ' . $i->menu->name)->join(', '),
+                'itemsSummary'  => $o->items->map(fn($i) => $i->quantity . 'x ' . ($i->menu?->name ?? 'Menu dihapus'))->join(', '),
                 'total_amount'   => $o->total_amount,
                 'payment_method' => $o->payment_method,
                 'status'         => $o->status,

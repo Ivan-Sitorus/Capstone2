@@ -2,8 +2,10 @@
 
 namespace App\Actions;
 
+use App\Enums\MenuStatus;
 use App\Enums\OrderStatus;
 use App\Enums\OrderType;
+use App\Exceptions\MenuUnavailableException;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Menu;
 use App\Models\Order;
@@ -37,10 +39,19 @@ class PlaceCashierOrderAction
             $itemsToInsert = [];
 
             $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
-            $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
+            // Lock the referenced menus for the duration of the transaction and
+            // re-check the status from fresh rows: the POS grid/cache may still
+            // show a menu that was deactivated between page load and submit.
+            $menus = Menu::whereIn('id', $menuIds)->lockForUpdate()->get()->keyBy('id');
 
             foreach ($request->items as $position => $item) {
                 $menu = $menus->get($item['menu_id']);
+
+                if (! $menu || $menu->status !== MenuStatus::Active) {
+                    throw new MenuUnavailableException(
+                        'Menu '.($menu?->name ?? "#{$item['menu_id']}").' tidak tersedia.'
+                    );
+                }
 
                 $unitPrice = ($isMahasiswa && $menu->is_student_discount && $menu->student_price !== null)
                     ? $menu->student_price

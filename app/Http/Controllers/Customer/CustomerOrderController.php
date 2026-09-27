@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Customer;
 use App\Actions\PlaceCustomerOrderAction;
 use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
+use App\Exceptions\MenuUnavailableException;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Support\CustomerSession;
@@ -17,7 +18,13 @@ class CustomerOrderController extends Controller
 {
     public function store(Request $request): JsonResponse
     {
-        return app(PlaceCustomerOrderAction::class)->handle($request);
+        try {
+            return app(PlaceCustomerOrderAction::class)->handle($request);
+        } catch (MenuUnavailableException $e) {
+            // A menu that was deactivated/deleted after it was cached on the
+            // device must surface as a conflict, not a 500.
+            return response()->json(['message' => $e->getMessage()], 409);
+        }
     }
 
     public function history(Request $request): Response
@@ -52,10 +59,10 @@ class CustomerOrderController extends Controller
                     'payment_method' => $o->payment_method,
                     'customer_name'  => $o->customer_name,
                     'itemsSummary'  => $o->items
-                        ->map(fn($i) => "{$i->quantity}x {$i->menu->name}")
+                        ->map(fn($i) => "{$i->quantity}x ".($i->menu?->name ?? 'Menu dihapus'))
                         ->join(', '),
                     'items' => $o->items->map(fn($i) => [
-                        'name'     => $i->menu->name,
+                        'name'     => $i->menu?->name ?? 'Menu dihapus',
                         'quantity' => $i->quantity,
                         'subtotal' => (float) $i->subtotal,
                     ])->values()->toArray(),

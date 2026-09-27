@@ -30,7 +30,7 @@ class CustomerPaymentController extends Controller
             return [
                 'order'        => $order->only(['id', 'order_code', 'total_amount', 'customer_name']),
                 'items'        => $order->items->map(fn($i) => [
-                    'name'     => $i->menu->name,
+                    'name'     => $i->menu?->name ?? 'Menu dihapus',
                     'qty'      => $i->quantity,
                     'subtotal' => $i->subtotal,
                 ])->values(),

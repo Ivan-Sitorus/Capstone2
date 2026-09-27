@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Cashier;
 
 use App\Actions\PlaceCashierOrderAction;
 use App\Enums\MenuStatus;
+use App\Exceptions\InsufficientStockException;
+use App\Exceptions\MenuUnavailableException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Category;
@@ -48,6 +50,9 @@ class CashierNewOrderController extends Controller
                 ->with('order_id', $result['order_id'])
                 ->with('order_total', $result['order_total'])
                 ->with('order_code', $result['order_code']);
+        } catch (MenuUnavailableException | InsufficientStockException $e) {
+            return back()
+                ->with('error', $e->getMessage());
         } catch (\RuntimeException $e) {
             return back()
                 ->with('error', 'Gagal memproses pesanan: '.$e->getMessage());

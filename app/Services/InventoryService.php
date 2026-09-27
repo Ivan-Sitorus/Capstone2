@@ -5,12 +5,12 @@ namespace App\Services;
 use App\Enums\BatchMode;
 use App\Enums\MovementType;
 use App\Enums\SourceType;
+use App\Exceptions\InsufficientStockException;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\StockMovement;
-use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -197,7 +197,7 @@ class InventoryService
         $totalAvailable = (float) $batches->sum('quantity');
 
         if ($totalAvailable < $requiredQuantity) {
-            throw new Exception(
+            throw new InsufficientStockException(
                 "Stok tidak mencukupi untuk bahan '{$ingredient->name}'. ".
                 "Dibutuhkan: {$requiredQuantity} {$ingredient->unit->value}, ".
                 "Tersedia: {$totalAvailable} {$ingredient->unit->value}"

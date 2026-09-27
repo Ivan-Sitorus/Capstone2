@@ -29,7 +29,7 @@ class ReceiptController extends Controller
     {
         // Calculate discount (difference between unit_price * qty and subtotal)
         $items = $order->items->map(fn ($i) => [
-            'name' => $i->menu->name,
+            'name' => $i->menu?->name ?? 'Menu dihapus',
             'unit_price' => $i->unit_price,
             'quantity' => $i->quantity,
             'subtotal' => $i->subtotal,
