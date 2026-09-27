@@ -25,7 +25,7 @@
         <env name="CACHE_STORE" value="array"/>
         <env name="DB_HOST" value="pgsql" force="true"/>
         <env name="DB_PORT" value="5432" force="true"/>
-        <env name="DB_DATABASE" value="pos_cafe_testing" force="true"/>
+        <env name="DB_DATABASE" value="minepos_testing" force="true"/>
         <env name="DB_USERNAME" value="postgres" force="true"/>
         <env name="DB_PASSWORD" value="postgres" force="true"/>
         <env name="MAIL_MAILER" value="array"/>

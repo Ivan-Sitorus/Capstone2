@@ -19,12 +19,12 @@ mkdir -p storage/backups
 TS=$(date +%Y%m%d-%H%M%S)
 
 # Database utama
-docker exec capstone2-pgsql-1 pg_dump -U postgres -d pos_cafe -Fc \
-  > "storage/backups/pos_cafe-$TS.dump"
+docker exec capstone2-pgsql-1 pg_dump -U postgres -d minepos -Fc \
+  > "storage/backups/minepos-$TS.dump"
 
 # Database testing
-docker exec capstone2-pgsql-1 pg_dump -U postgres -d pos_cafe_testing -Fc \
-  > "storage/backups/pos_cafe_testing-$TS.dump"
+docker exec capstone2-pgsql-1 pg_dump -U postgres -d minepos_testing -Fc \
+  > "storage/backups/minepos_testing-$TS.dump"
 
 ls -lh storage/backups/
 ```
@@ -33,7 +33,7 @@ Verifikasi isi dump (pastikan TOC terbaca):
 
 ```bash
 docker exec -i capstone2-pgsql-1 pg_restore -l \
-  < storage/backups/pos_cafe-<TS>.dump | head
+  < storage/backups/minepos-<TS>.dump | head
 ```
 
 ## Restore
@@ -41,18 +41,18 @@ docker exec -i capstone2-pgsql-1 pg_restore -l \
 Restore ke database baru, aman karena tidak menimpa database yang ada:
 
 ```bash
-docker exec capstone2-pgsql-1 createdb -U postgres pos_cafe_restore
-docker exec -i capstone2-pgsql-1 pg_restore -U postgres -d pos_cafe_restore --no-owner \
-  < storage/backups/pos_cafe-<TS>.dump
+docker exec capstone2-pgsql-1 createdb -U postgres minepos_restore
+docker exec -i capstone2-pgsql-1 pg_restore -U postgres -d minepos_restore --no-owner \
+  < storage/backups/minepos-<TS>.dump
 ```
 
 Menimpa database yang ada (hati-hati, data saat ini akan hilang):
 
 ```bash
-docker exec capstone2-pgsql-1 dropdb -U postgres pos_cafe
-docker exec capstone2-pgsql-1 createdb -U postgres pos_cafe
-docker exec -i capstone2-pgsql-1 pg_restore -U postgres -d pos_cafe --no-owner \
-  < storage/backups/pos_cafe-<TS>.dump
+docker exec capstone2-pgsql-1 dropdb -U postgres minepos
+docker exec capstone2-pgsql-1 createdb -U postgres minepos
+docker exec -i capstone2-pgsql-1 pg_restore -U postgres -d minepos --no-owner \
+  < storage/backups/minepos-<TS>.dump
 ```
 
 Setelah restore, sinkronkan migration bila perlu:

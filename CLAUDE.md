@@ -879,7 +879,7 @@ APP_URL=http://localhost:8080
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_DATABASE=pos_cafe
+DB_DATABASE=minepos
 DB_USERNAME=postgres
 DB_PASSWORD=
 
