@@ -1,12 +1,16 @@
 import { useState, useMemo, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
-import { Search, X, Banknote, QrCode, ShieldCheck, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen, RefreshCw } from 'lucide-react';
+import { Search, X, Banknote, QrCode, ShieldCheck, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen, RefreshCw, ShoppingCart } from 'lucide-react';
+import { Drawer } from '@base-ui/react/drawer';
 import { useCashierSidebar } from '@/Layouts/CashierLayout';
 import MenuGridItem from '@/Components/Cashier/MenuGridItem';
 import CartItem from '@/Components/Cashier/CartItem';
 import { formatRupiah, formatTime } from '@/helpers';
 import usePolling from '@/Hooks/usePolling';
+import { useIsMobile } from '@/Hooks/useMediaQuery';
 import { BLUE, BLUE_50, BLUE_200, GRAY_900, GRAY_600, GRAY_BORDER, WHITE, GRAY_BG, SLATE_400, SLATE_LIGHT, GRAY_700, SLATE_DARK, SLATE_300, GREEN_600, SLATE_200, SLATE_900, SLATE_500, RED, RED_50, SLATE_100, BLUE_100, BLUE_SOFT, GREEN_50, GREEN_VIVID } from '@/theme';
+
+const CART_SNAP_POINTS = [0.5, 0.9];
 
 export default function NewOrder({ categories }) {
     const [cartItems,      setCartItems]     = useState([]);
@@ -21,6 +25,18 @@ export default function NewOrder({ categories }) {
     const [successTotal,   setSuccessTotal]   = useState(0);
     const [isCartCollapsed, setIsCartCollapsed] = useState(false);
     const [lastUpdated,    setLastUpdated]    = useState(() => new Date());
+    const [cartSheetOpen,  setCartSheetOpen]  = useState(false);
+    const [cartSnapPoint,  setCartSnapPoint]  = useState(0.5);
+
+    useEffect(() => {
+        if (!cartSheetOpen) return undefined;
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') setCartSheetOpen(false);
+        };
+        document.addEventListener('keydown', handleKeyDown, true);
+        return () => document.removeEventListener('keydown', handleKeyDown, true);
+    }, [cartSheetOpen]);
+    const isMobile = useIsMobile();
 
     const refreshMenu = () => {
         router.reload({ only: ['categories'], onSuccess: () => setLastUpdated(new Date()) });
@@ -60,11 +76,13 @@ export default function NewOrder({ categories }) {
 
     const cartExpandedWidth = isLeftSidebarCollapsed ? 380 : 340;
     const cartPanelWidth = isCartCollapsed ? 78 : cartExpandedWidth;
-    const menuGridColumns = isPortrait
-        ? 'repeat(auto-fill, minmax(170px, 1fr))'
-        : isCartCollapsed
-            ? 'repeat(auto-fill, minmax(185px, 1fr))'
-            : 'repeat(auto-fill, minmax(210px, 1fr))';
+    const menuGridColumns = isMobile
+        ? 'repeat(auto-fill, minmax(140px, 1fr))'
+        : isPortrait
+            ? 'repeat(auto-fill, minmax(170px, 1fr))'
+            : isCartCollapsed
+                ? 'repeat(auto-fill, minmax(185px, 1fr))'
+                : 'repeat(auto-fill, minmax(210px, 1fr))';
 
     useEffect(() => {
         const onResize = () => setViewport({ width: window.innerWidth, height: window.innerHeight });
@@ -73,9 +91,13 @@ export default function NewOrder({ categories }) {
     }, []);
 
     useEffect(() => {
-        if (!isPortrait) return;
+        if (!isPortrait || isMobile) return;
         setIsCartCollapsed(true);
-    }, [isPortrait]);
+    }, [isPortrait, isMobile]);
+
+    useEffect(() => {
+        if (!isMobile) setCartSheetOpen(false);
+    }, [isMobile]);
 
     /* ── Cart actions ── */
     function addToCart(menu) {
@@ -90,6 +112,7 @@ export default function NewOrder({ categories }) {
 
     /* ── Modal open/close ── */
     function openModal() {
+        setCartSheetOpen(false);
         setPayMethod('cash');
         setShowPayModal(true);
     }
@@ -157,21 +180,74 @@ export default function NewOrder({ categories }) {
         panelBg:    GRAY_BG,
     };
 
+    const cartItemsList = (
+        <div style={{ flex: 1, overflowY: 'auto' }}>
+            {cartItems.length === 0 ? (
+                <p style={{ color: SLATE_400, textAlign: 'center', marginTop: 40, fontSize: 14 }}>Keranjang kosong</p>
+            ) : (
+                cartItems.map(item => <CartItem key={item.menuId} item={item} onIncrement={increment} onDecrement={decrement} />)
+            )}
+        </div>
+    );
+
+    const cartSummary = (
+        <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 16, marginTop: 'auto' }}>
+            {/* Toggle Mahasiswa */}
+            <div
+                onClick={() => setIsStudent(p => !p)}
+                style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, cursor: 'pointer', userSelect: 'none' }}
+            >
+                <div style={{
+                    width: 16, height: 16, borderRadius: 4, flexShrink: 0,
+                    border: `1.5px solid ${isStudent ? T.accent : SLATE_300}`,
+                    background: isStudent ? T.accent : 'white',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                    {isStudent && <span style={{ color: 'white', fontSize: 11, lineHeight: 1 }}>✓</span>}
+                </div>
+                <span style={{ fontSize: 13, color: T.sub }}>Mahasiswa STIE Totalwin Semarang</span>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <span style={{ fontSize: 14, color: T.sub }}>Subtotal</span>
+                <span style={{ fontSize: 14, fontWeight: 500, color: T.text }}>{formatRupiah(total)}</span>
+            </div>
+            {isStudent && totalCashback > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                    <span style={{ fontSize: 13, color: GREEN_600 }}>Cashback Mahasiswa</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: GREEN_600 }}>- {formatRupiah(totalCashback)}</span>
+                </div>
+            )}
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderTop: `1px solid ${T.border}`, marginBottom: 16 }}>
+                <span style={{ fontSize: 16, fontWeight: 700, color: T.text }}>Total</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: T.text }}>{formatRupiah(grandTotal)}</span>
+            </div>
+            <button
+                onClick={openModal} disabled={cartItems.length === 0}
+                style={{ width: '100%', height: 52, background: cartItems.length === 0 ? SLATE_300 : T.accent, color: 'white', border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 700, cursor: cartItems.length === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', boxShadow: cartItems.length > 0 ? '0 4px 16px rgba(59,111,212,0.30)' : 'none', transition: 'background 0.15s' }}
+            >
+                <span>BAYAR</span>
+                <span style={{ fontSize: 18 }}>{formatRupiah(grandTotal)}</span>
+            </button>
+        </div>
+    );
+
     return (
         <><Head title="Pesanan Baru | POSMine" />
-            <div style={{ display: 'flex', flexDirection: isPortrait ? 'column' : 'row', height: '100vh', overflow: 'hidden' }}>
+            <div style={{ display: 'flex', flexDirection: isPortrait || isMobile ? 'column' : 'row', height: '100%', minHeight: 0, overflow: 'hidden' }}>
 
                 {/* ══ PANEL TENGAH ══ */}
                 <div
                     style={{
                         flex: 1,
                         padding: isPortrait ? 14 : 24,
+                        paddingBottom: isMobile ? 96 : (isPortrait ? 14 : 24),
                         background: T.panelBg,
                         overflowY: 'auto',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: 16,
-                        height: isPortrait ? 'auto' : '100vh',
+                        height: isMobile ? 'auto' : (isPortrait ? 'auto' : '100dvh'),
                         minHeight: 0,
                     }}
                 >
@@ -218,7 +294,8 @@ export default function NewOrder({ categories }) {
                     )}
                 </div>
 
-                {/* ══ PANEL KANAN — Keranjang ══ */}
+                {/* ══ PANEL KANAN — Keranjang (desktop) ══ */}
+                {!isMobile && (
                 <div
                     style={{
                         width: isPortrait ? '100%' : cartPanelWidth,
@@ -229,7 +306,7 @@ export default function NewOrder({ categories }) {
                         display: 'flex',
                         flexDirection: 'column',
                         flexShrink: 0,
-                        height: isPortrait ? (isCartCollapsed ? 72 : '44vh') : '100vh',
+                        height: isPortrait ? (isCartCollapsed ? 72 : '44vh') : '100dvh',
                         overflowY: 'auto',
                         overflowX: 'hidden',
                         transition: 'width 0.2s ease, height 0.2s ease, padding 0.2s ease',
@@ -262,56 +339,95 @@ export default function NewOrder({ categories }) {
                     </div>
                     {!isCartCollapsed && (
                         <>
-                            <div style={{ flex: 1, overflowY: 'auto' }}>
-                                {cartItems.length === 0 ? (
-                                    <p style={{ color: SLATE_400, textAlign: 'center', marginTop: 40, fontSize: 14 }}>Keranjang kosong</p>
-                                ) : (
-                                    cartItems.map(item => <CartItem key={item.menuId} item={item} onIncrement={increment} onDecrement={decrement} />)
-                                )}
-                            </div>
-                            <div style={{ borderTop: `1px solid ${T.border}`, paddingTop: 16, marginTop: 'auto' }}>
-                        {/* Toggle Mahasiswa */}
-                        <div
-                            onClick={() => setIsStudent(p => !p)}
-                            style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12, cursor: 'pointer', userSelect: 'none' }}
-                        >
-                            <div style={{
-                                width: 16, height: 16, borderRadius: 4, flexShrink: 0,
-                                border: `1.5px solid ${isStudent ? T.accent : SLATE_300}`,
-                                background: isStudent ? T.accent : 'white',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>
-                                {isStudent && <span style={{ color: 'white', fontSize: 11, lineHeight: 1 }}>✓</span>}
-                            </div>
-                            <span style={{ fontSize: 13, color: T.sub }}>Mahasiswa STIE Totalwin Semarang</span>
-                        </div>
-
-                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                            <span style={{ fontSize: 14, color: T.sub }}>Subtotal</span>
-                            <span style={{ fontSize: 14, fontWeight: 500, color: T.text }}>{formatRupiah(total)}</span>
-                        </div>
-                        {isStudent && totalCashback > 0 && (
-                            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-                                <span style={{ fontSize: 13, color: GREEN_600 }}>Cashback Mahasiswa</span>
-                                <span style={{ fontSize: 13, fontWeight: 600, color: GREEN_600 }}>- {formatRupiah(totalCashback)}</span>
-                            </div>
-                        )}
-                        <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderTop: `1px solid ${T.border}`, marginBottom: 16 }}>
-                            <span style={{ fontSize: 16, fontWeight: 700, color: T.text }}>Total</span>
-                            <span style={{ fontSize: 16, fontWeight: 700, color: T.text }}>{formatRupiah(grandTotal)}</span>
-                        </div>
-                        <button
-                            onClick={openModal} disabled={cartItems.length === 0}
-                            style={{ width: '100%', height: 52, background: cartItems.length === 0 ? SLATE_300 : T.accent, color: 'white', border: 'none', borderRadius: 14, fontSize: 16, fontWeight: 700, cursor: cartItems.length === 0 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', boxShadow: cartItems.length > 0 ? '0 4px 16px rgba(59,111,212,0.30)' : 'none', transition: 'background 0.15s' }}
-                        >
-                            <span>BAYAR</span>
-                            <span style={{ fontSize: 18 }}>{formatRupiah(grandTotal)}</span>
-                        </button>
-                            </div>
+                            {cartItemsList}
+                            {cartSummary}
                         </>
                     )}
                 </div>
+                )}
             </div>
+
+            {isMobile && (
+                <Drawer.Root
+                    open={cartSheetOpen}
+                    onOpenChange={(open) => {
+                        setCartSheetOpen(open);
+                        if (open) setCartSnapPoint(CART_SNAP_POINTS[0]);
+                    }}
+                    snapPoints={CART_SNAP_POINTS}
+                    snapPoint={cartSnapPoint}
+                    onSnapPointChange={(point) => { if (point !== null) setCartSnapPoint(point); }}
+                    swipeDirection="down"
+                    modal
+                >
+                    <Drawer.Trigger
+                        type="button"
+                        title="Buka keranjang"
+                        style={{
+                            position: 'fixed',
+                            bottom: 'calc(16px + env(safe-area-inset-bottom, 0px))',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            zIndex: 800,
+                            height: 52,
+                            maxWidth: 'calc(100vw - 32px)',
+                            padding: '0 22px',
+                            borderRadius: 999,
+                            border: 'none',
+                            background: cartItems.length === 0 ? BLUE_SOFT : T.accent,
+                            color: WHITE,
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: 10,
+                            fontSize: 15,
+                            fontWeight: 700,
+                            cursor: 'pointer',
+                            whiteSpace: 'nowrap',
+                            boxShadow: cartItems.length === 0 ? '0 6px 18px rgba(15,23,42,0.12)' : '0 8px 24px rgba(59,111,212,0.35)',
+                        }}
+                    >
+                        <ShoppingCart size={18} />
+                        <span>Keranjang ({totalQty})</span>
+                        {totalQty > 0 && (
+                            <>
+                                <span style={{ width: 4, height: 4, borderRadius: 2, background: 'rgba(255,255,255,0.65)' }} />
+                                <span>{formatRupiah(grandTotal)}</span>
+                            </>
+                        )}
+                    </Drawer.Trigger>
+                    <Drawer.Portal>
+                        <Drawer.Backdrop className="cashier-drawer-backdrop" />
+                        <Drawer.Viewport className="cashier-sheet-viewport">
+                            <Drawer.Popup className="cashier-sheet-popup" aria-modal="true" style={{ background: WHITE }}>
+                                <div style={{ flexShrink: 0, padding: '10px 16px 12px', borderBottom: `1px solid ${T.border}`, display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                    <div aria-hidden="true" style={{ width: 44, height: 5, borderRadius: 999, background: SLATE_300, margin: '0 auto' }} />
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                                        <Drawer.Title style={{ margin: 0, fontSize: 16, fontWeight: 700, color: T.text, letterSpacing: '-0.2px' }}>
+                                            Keranjang Pesanan
+                                        </Drawer.Title>
+                                        <span style={{ background: T.accent, color: 'white', borderRadius: 999, minWidth: 26, height: 26, padding: totalQty > 9 ? '0 8px' : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>{totalQty}</span>
+                                        <Drawer.Close
+                                            type="button"
+                                            aria-label="Tutup keranjang"
+                                            style={{ marginLeft: 'auto', width: 34, height: 34, borderRadius: 10, border: `1px solid ${T.border}`, background: T.panelBg, color: SLATE_DARK, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0 }}
+                                        >
+                                            <X size={18} />
+                                        </Drawer.Close>
+                                    </div>
+                                </div>
+                                <Drawer.Content
+                                    className="cashier-sheet-content"
+                                    style={{ padding: '0 16px', paddingBottom: 'max(0px, env(safe-area-inset-bottom, 0px))' }}
+                                >
+                                    {cartItemsList}
+                                    {cartSummary}
+                                </Drawer.Content>
+                            </Drawer.Popup>
+                        </Drawer.Viewport>
+                    </Drawer.Portal>
+                </Drawer.Root>
+            )}
 
             {/* ══ MODAL ══ */}
             {showPayModal && (

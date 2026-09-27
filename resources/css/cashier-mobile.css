@@ -1,0 +1,119 @@
+/*
+ * Kasir Mobile — drawer navigasi kiri + bottom sheet keranjang.
+ * Hanya berisi kelas ber-prefix `.cashier-*` agar tidak bentrok dengan app.css.
+ * Transform & padding memakai CSS variable yang ditulis oleh Base UI Drawer.
+ */
+
+/* ── Overlay gelap (dipakai drawer navigasi & bottom sheet) ── */
+.cashier-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    background: rgba(15, 23, 42, 0.55);
+    opacity: 1;
+    transition: opacity 0.25s ease;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cashier-drawer-backdrop[data-starting-style],
+.cashier-drawer-backdrop[data-ending-style] {
+    opacity: 0;
+}
+
+/* Saat digeser, overlay ikut memudar mengikuti progress swipe Base UI. */
+.cashier-drawer-backdrop[data-swiping] {
+    opacity: calc(1 - var(--drawer-swipe-progress, 0));
+    transition: none;
+}
+
+/* ── Drawer navigasi kiri ── */
+.cashier-drawer-nav-viewport {
+    position: fixed;
+    inset: 0;
+    z-index: 901;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.cashier-drawer-nav-popup {
+    height: 100dvh;
+    width: 280px;
+    max-width: 86vw;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 16px 48px rgba(15, 23, 42, 0.45);
+    outline: none;
+    touch-action: pan-y;
+    transform: translate3d(var(--drawer-swipe-movement-x, 0px), 0, 0);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.cashier-drawer-nav-popup[data-starting-style],
+.cashier-drawer-nav-popup[data-ending-style] {
+    transform: translate3d(-102%, 0, 0);
+}
+
+/* ── Bottom sheet keranjang ── */
+.cashier-sheet-viewport {
+    position: fixed;
+    inset: 0;
+    z-index: 901;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    touch-action: none;
+}
+
+.cashier-sheet-popup {
+    position: relative;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 560px;
+    height: 90dvh;
+    display: flex;
+    flex-direction: column;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -8px 40px rgba(15, 23, 42, 0.18);
+    outline: none;
+    touch-action: none;
+    /* Snap point Base UI: offset dari tinggi popup. Padding bawah menjaga isi
+       tetap terlihat di area yang tidak tergeser ke luar viewport. */
+    transform: translate3d(0, calc(var(--drawer-snap-point-offset, 0px) + var(--drawer-swipe-movement-y, 0px)), 0);
+    padding-bottom: max(0px, calc(var(--drawer-snap-point-offset, 0px) + var(--drawer-swipe-movement-y, 0px)));
+    transition:
+        transform 0.35s cubic-bezier(0.32, 0.72, 0, 1),
+        padding-bottom 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.cashier-sheet-popup[data-starting-style],
+.cashier-sheet-popup[data-ending-style] {
+    transform: translate3d(0, calc(100% + 2px), 0);
+    padding-bottom: 0;
+}
+
+.cashier-sheet-popup[data-swiping] {
+    transition-duration: 0s;
+}
+
+.cashier-sheet-content {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    touch-action: auto;
+    overscroll-behavior: contain;
+}
+
+/* ── Hormati preferensi pengguna yang mengurangi animasi ── */
+@media (prefers-reduced-motion: reduce) {
+    .cashier-drawer-nav-popup,
+    .cashier-sheet-popup {
+        transition: none;
+    }
+
+    .cashier-drawer-backdrop {
+        transition: none;
+    }
+}
