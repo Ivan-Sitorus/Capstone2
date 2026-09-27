@@ -10,6 +10,7 @@ use App\Models\CafeTable;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Services\InventoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -17,6 +18,10 @@ use Illuminate\Support\Facades\DB;
 
 class PlaceCustomerOrderAction
 {
+    public function __construct(
+        protected InventoryService $inventoryService,
+    ) {}
+
     public function handle(Request $request): JsonResponse
     {
         $request->validate([
@@ -37,6 +42,19 @@ class PlaceCustomerOrderAction
             'items.required'         => 'Pesanan tidak boleh kosong.',
             'items.min'              => 'Minimal 1 item dalam pesanan.',
         ]);
+
+        // Validasi ketersediaan bahan SEBELUM order dibuat agar tidak pernah
+        // menghasilkan order parsial saat stok tidak mencukupi.
+        $availability = $this->inventoryService->canFulfillOrder($request->input('items'));
+
+        if (! $availability['can_fulfill']) {
+            $firstInsufficient = $availability['insufficient_ingredients'][0] ?? [];
+            $ingredientName = $firstInsufficient['ingredient_name'] ?? 'bahan baku';
+
+            return response()->json([
+                'message' => "Stok '{$ingredientName}' tidak mencukupi.",
+            ], 422);
+        }
 
         return DB::transaction(function () use ($request) {
             Cache::remember("cafe_table_{$request->table_id}", 600, fn() =>

@@ -3,8 +3,8 @@
 namespace App\Filament\Resources\MenuResource\Pages;
 
 use App\Filament\Resources\MenuResource;
+use App\Observers\MenuObserver;
 use Filament\Resources\Pages\CreateRecord;
-use Illuminate\Support\Facades\Cache;
 
 class CreateMenu extends CreateRecord
 {
@@ -12,7 +12,6 @@ class CreateMenu extends CreateRecord
 
     protected function afterCreate(): void
     {
-        Cache::forget('customer_menu');
-        Cache::forget('menu_categories_cashier');
+        MenuObserver::flushMenuCaches();
     }
 }

@@ -2,7 +2,11 @@
 
 namespace App\Providers;
 
+use App\Models\IngredientBatch;
+use App\Models\MenuIngredient;
 use App\Models\Menu;
+use App\Observers\IngredientBatchObserver;
+use App\Observers\MenuIngredientObserver;
 use App\Observers\MenuObserver;
 use App\Services\MenuImageService;
 use Filament\Support\Assets\Css;
@@ -31,6 +35,8 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Menu::observe(MenuObserver::class);
+        IngredientBatch::observe(IngredientBatchObserver::class);
+        MenuIngredient::observe(MenuIngredientObserver::class);
         OrderPayment::observe(OrderPaymentObserver::class);
         BatchPayment::observe(BatchPaymentObserver::class);
 

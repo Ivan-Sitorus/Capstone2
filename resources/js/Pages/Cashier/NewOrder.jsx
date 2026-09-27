@@ -91,6 +91,9 @@ export default function NewOrder({ categories }) {
 
     /* ── Cart actions ── */
     function addToCart(menu) {
+        // Lapisan pertahanan kedua: jangan pernah menambahkan menu habis walau
+        // kartu tetap terklik (mis. state menu sudah basi).
+        if (menu.is_available === false || menu.available_stock === 0) return;
         setCartItems(prev => {
             const existing = prev.find(i => i.menuId === menu.id);
             if (existing) return prev.map(i => i.menuId === menu.id ? { ...i, quantity: i.quantity + 1 } : i);

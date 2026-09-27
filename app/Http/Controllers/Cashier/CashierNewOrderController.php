@@ -7,6 +7,7 @@ use App\Enums\MenuStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Category;
+use App\Models\Menu;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
@@ -18,24 +19,21 @@ class CashierNewOrderController extends Controller
     {
         // Cache 5 minutes — menu rarely changes, admin can clear cache when updating menu
         $categories = Cache::remember('menu_categories_cashier', 300, fn () => Category::with([
-            'menus' => fn ($q) => $q->where('status', MenuStatus::Active->value)->orderBy('name')
-                ->with(['menuIngredients.ingredient.batches' => fn ($q) => $q
-                    ->where('quantity', '>', 0)
-                    ->where(fn ($q) => $q
-                        ->whereNull('expiry_date')
-                        ->orWhere('expiry_date', '>', now())
-                        ->orWhere('allow_expired_usage', true)
-                    ),
-                ]),
+            'menus' => fn ($q) => $q->where('status', MenuStatus::Active->value)->orderBy('name'),
         ])
             ->orderBy('name')
             ->get()
-            ->each(function ($category) {
-                $category->menus->each(function ($menu) {
-                    $menu->available_stock = $menu->computeAvailableServings();
-                });
-            })
         );
+
+        // Ketersediaan dihitung di luar cache agar perubahan stok/resep selalu
+        // terbaru walau daftar menu sendiri masih tersimpan di cache.
+        $categories->each(function (Category $category) {
+            $category->menus->each(function (Menu $menu) {
+                $stock = $menu->computeAvailableServings();
+                $menu->available_stock = $stock;
+                $menu->is_available = $stock === null || $stock > 0;
+            });
+        });
 
         return Inertia::render('Cashier/NewOrder', ['categories' => $categories]);
     }

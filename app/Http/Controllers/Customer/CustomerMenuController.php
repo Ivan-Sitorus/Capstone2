@@ -6,6 +6,7 @@ use App\Enums\MenuStatus;
 use App\Http\Controllers\Controller;
 use App\Models\CafeTable;
 use App\Models\Category;
+use App\Models\Menu;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -75,6 +76,16 @@ class CustomerMenuController extends Controller
                 ->select(['id', 'name'])
                 ->orderBy('name')
                 ->get();
+        });
+
+        // Ketersediaan dihitung di luar cache agar perubahan stok/resep selalu
+        // terbaru walau daftar menu sendiri masih tersimpan di cache.
+        $categories->each(function (Category $category) {
+            $category->menus->each(function (Menu $menu) {
+                $stock = $menu->computeAvailableServings();
+                $menu->available_stock = $stock;
+                $menu->is_available = $stock === null || $stock > 0;
+            });
         });
 
         $tableParam = $request->query('table');
