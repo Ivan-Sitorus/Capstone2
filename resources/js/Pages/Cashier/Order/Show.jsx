@@ -175,7 +175,7 @@ export default function OrderShow({ order }) {
             {/* ── 2-column content ── */}
             <div style={{ display: 'flex', gap: 24, alignItems: 'flex-start' }}>
 
-                {/* LEFT — Items Card */}
+                {/* LEFT: Items Card */}
                 <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{
                         background: T.surface, borderRadius: 16,
@@ -262,7 +262,7 @@ export default function OrderShow({ order }) {
 
                 </div>
 
-                {/* RIGHT — Info Card */}
+                {/* RIGHT: Info Card */}
                 <div style={{ width: 360, flexShrink: 0 }}>
                     <div style={{
                         background: T.surface, borderRadius: 16,
@@ -281,11 +281,11 @@ export default function OrderShow({ order }) {
                             <InfoRow label="ID Pesanan"         value={order.order_code}   bold />
                             <InfoRow label="Nama Pelanggan"     value={order.customer_name} bold />
                             <InfoRow label="No. Telepon"        value={order.customer_phone} />
-                            <InfoRow label="Meja"               value={order.table_number ? `No. ${order.table_number}` : '—'} />
+                            <InfoRow label="Meja"               value={order.table_number ? `No. ${order.table_number}` : '-'} />
                             <InfoRow label="Tanggal"            value={formatDate(order.created_at)} />
                             <InfoRow label="Waktu"              value={`${formatTime(order.created_at)} WIB`} />
-                            <InfoRow label="Metode Pembayaran"  value={paymentLabel[order.payment_method] ?? '—'} bold />
-                            <InfoRow label="Kasir"              value={order.cashier_name ?? '—'} />
+                            <InfoRow label="Metode Pembayaran"  value={paymentLabel[order.payment_method] ?? '-'} bold />
+                            <InfoRow label="Kasir"              value={order.cashier_name ?? '-'} />
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <span style={{ fontSize: 13, fontWeight: 500, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
                                     Status

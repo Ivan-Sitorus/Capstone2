@@ -45,7 +45,7 @@ export default function OrderHistory({ orders, filters }) {
     const [method, setMethod] = useState(filters.method  ?? '');
     const searchTimer = useRef(null);
 
-    // Ambil data fresh saat halaman dibuka — hindari snapshot stale dari cache prefetch
+    // Ambil data fresh saat halaman dibuka: hindari snapshot stale dari cache prefetch
     useEffect(() => {
         router.reload({ only: ['orders'] });
     }, []);
@@ -243,7 +243,7 @@ export default function OrderHistory({ orders, filters }) {
 
 function OrderRow({ order }) {
     const [hovered, setHovered] = useState(false);
-    const methodLabel = METHOD_LABELS[order.payment_method] ?? order.payment_method ?? '—';
+    const methodLabel = METHOD_LABELS[order.payment_method] ?? order.payment_method ?? '-';
 
     return (
         <div
@@ -285,7 +285,7 @@ function OrderRow({ order }) {
                     fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui',
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block',
                 }}>
-                    {order.cashier_name ?? '—'}
+                    {order.cashier_name ?? '-'}
                 </span>
             </div>
             <div style={{ width: 110, flexShrink: 0 }}>

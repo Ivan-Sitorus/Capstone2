@@ -1,4 +1,4 @@
-# Vercel container build — Laravel + Inertia/React di FrankenPHP
+# Vercel container build: Laravel + Inertia/React di FrankenPHP
 
 # ── Base: FrankenPHP (PHP 8.5) + ekstensi yang dibutuhkan ──────────────
 FROM dunglas/frankenphp:1-php8.5-bookworm AS base

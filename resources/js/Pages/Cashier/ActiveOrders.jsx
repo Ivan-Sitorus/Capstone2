@@ -19,7 +19,7 @@ export default function ActiveOrders({ orders: initialOrders, counts }) {
     const pendingRemoveRef = useRef(new Set());
     const pendingStatusRef = useRef(new Map()); // orderId → optimistic status
 
-    // Sync saat Inertia reload — jaga optimistic state agar polling tidak timpa perubahan in-flight
+    // Sync saat Inertia reload: jaga optimistic state agar polling tidak timpa perubahan in-flight
     useEffect(() => {
         setLocalOrders(
             (initialOrders ?? [])

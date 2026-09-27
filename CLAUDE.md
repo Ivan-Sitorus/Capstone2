@@ -1,4 +1,4 @@
-# CLAUDE.md — POSMine (POSMine)
+# CLAUDE.md: POSMine (POSMine)
 # FASE AKTIF: Transaksi (Pelanggan + Kasir) + Panel Admin (Filament) + Data Mining
 
 ## Gambaran Proyek
@@ -34,7 +34,7 @@ Fase ini mencakup modul Pelanggan (mobile PWA), Kasir (desktop web), Panel Admin
 | Payment | Manual (Cash / QRIS) |
 | Data Mining | Python 3.13 + FastAPI + scikit-learn + Prophet |
 
-> **Data Mining:** Terintegrasi — FastAPI di `datamining/` (port 8001). Halaman admin Filament memanggil endpoint-nya langsung via `config('datamining.url')` dan menyimpan riwayat hasil di Laravel Cache; halaman ringkasan membaca hasil dari cache. Tidak ada lagi tabel `datamining_runs`.
+> **Data Mining:** Terintegrasi: FastAPI di `datamining/` (port 8001). Halaman admin Filament memanggil endpoint-nya langsung via `config('datamining.url')` dan menyimpan riwayat hasil di Laravel Cache; halaman ringkasan membaca hasil dari cache. Tidak ada lagi tabel `datamining_runs`.
 
 ---
 
@@ -48,18 +48,18 @@ Aturan tampilan admin: label Bahasa Indonesia, tanggal `d M Y` atau `d M Y, H:i:
 
 ---
 
-## Arsitektur Inertia.js — Aturan Wajib
+## Arsitektur Inertia.js: Aturan Wajib
 
 ```
 Browser (React 18) ←→ Inertia.js ←→ Laravel Controller → PostgreSQL
                                                          ↘ IndexedDB (offline cart)
 ```
 
-- Controller **selalu** return `Inertia::render('Page', $data)` — TIDAK ada JSON endpoint
-- Navigasi: `<Link href={route('name')}>` — BUKAN `<a href>`
-- Form submit: `useForm()` dari `@inertiajs/react` — BUKAN fetch/axios manual
+- Controller **selalu** return `Inertia::render('Page', $data)`, TIDAK ada JSON endpoint
+- Navigasi: `<Link href={route('name')}>`, BUKAN `<a href>`
+- Form submit: `useForm()` dari `@inertiajs/react`, BUKAN fetch/axios manual
 - Partial reload: `router.reload({ only: ['orders'] })`
-- Validasi error: `usePage().props.errors` — otomatis dari Laravel
+- Validasi error: `usePage().props.errors`, otomatis dari Laravel
 
 ---
 
@@ -181,7 +181,7 @@ export const summarizeItems = (items) =>
 
 ---
 
-### K1 — Login Kasir
+### K1: Login Kasir
 
 **Referensi desain:** Image 7
 
@@ -204,17 +204,17 @@ export const summarizeItems = (items) =>
 **Detail kiri:**
 - Background `#1A2332`, flex center
 - Logo: kotak rounded 16px (80px × 80px), bg `#2A3441`, icon "posmine" script putih
-- "POSMine" — putih, 28px bold, margin-top 16px
-- "Sistem Point of Sale" — `#9AA3AF`, 14px
+- "POSMine": putih, 28px bold, margin-top 16px
+- "Sistem Point of Sale": `#9AA3AF`, 14px
 
 **Detail kanan:**
 - Background `#FFFFFF`, flex center
 - Form max-width 380px, centered
-- Heading "Masuk ke Akun Anda" — 24px bold, `#1A1A2E`
-- Subtitle — 14px `#6C757D`, margin-bottom 28px
-- Label "Email" — 13px semibold, margin-bottom 6px
+- Heading "Masuk ke Akun Anda": 24px bold, `#1A1A2E`
+- Subtitle: 14px `#6C757D`, margin-bottom 28px
+- Label "Email": 13px semibold, margin-bottom 6px
 - Input Email: icon amplop kiri (bi-envelope dari Bootstrap icons / lucide Mail), border 1px `#E9ECEF`, border-radius 8px, padding 11px 12px 11px 40px, font 14px
-- Label "Kata Sandi" — sama
+- Label "Kata Sandi": sama
 - Input Password: icon gembok kiri (lucide Lock), style sama
 - Tombol "Masuk": full-width, height 48px, background `#3B6FD4`, border-radius 8px, font-weight 600, margin-top 20px
 - **Error state**: div background `#FEF2F2`, border `#FCA5A5`, border-radius 8px, padding 12px, icon ⊗ merah + teks "Email atau kata sandi salah"
@@ -223,7 +223,7 @@ export const summarizeItems = (items) =>
 
 ---
 
-### K2 — Dashboard Kasir
+### K2: Dashboard Kasir
 
 **Referensi desain:** Image 8
 
@@ -247,9 +247,9 @@ export const summarizeItems = (items) =>
 - Divider: border-right 1px `#E9ECEF` di col 1 dan 2
 
 **C. Quick Action Row:**
-- "+ Pesanan Baru" — background `#3B6FD4`, putih, border-radius 8px, padding 8px 20px, icon +
-- "📋 Lihat Pesanan" — border 1px `#E9ECEF`, bg putih, border-radius 8px
-- "🕐 Riwayat" — border 1px `#E9ECEF`, bg putih, border-radius 8px
+- "+ Pesanan Baru": background `#3B6FD4`, putih, border-radius 8px, padding 8px 20px, icon +
+- "📋 Lihat Pesanan": border 1px `#E9ECEF`, bg putih, border-radius 8px
+- "🕐 Riwayat": border 1px `#E9ECEF`, bg putih, border-radius 8px
 - Semua tombol: font 14px, height 38px
 
 **D. Tabel Transaksi Terbaru:**
@@ -269,11 +269,11 @@ export const summarizeItems = (items) =>
 
 ---
 
-### K3 — Pesanan Baru (POS Interface)
+### K3: Pesanan Baru (POS Interface)
 
 **Referensi desain:** Image 9
 
-**Layout 3-panel (tanpa inner white card — langsung panels):**
+**Layout 3-panel (tanpa inner white card, langsung panels):**
 ```
 ┌──────────┬────────────────────────────────────────┬───────────────────┐
 │ Sidebar  │  PANEL TENGAH                          │  PANEL KANAN      │
@@ -293,13 +293,13 @@ export const summarizeItems = (items) =>
 └──────────┴────────────────────────────────────────┴───────────────────┘
 ```
 
-**Panel Tengah — Menu:**
+**Panel Tengah: Menu:**
 - Search: full-width, border 1px `#E9ECEF`, border-radius 8px, padding 10px 16px, placeholder "Cari menu..."
 - Category chips (horizontal scroll, margin-bottom 16px):
   - Active: bg `#3B6FD4`, color white, border `#3B6FD4`
   - Inactive: bg white, color `#6C757D`, border `#E9ECEF`
   - Border-radius 50px, padding 6px 16px, font 13px
-- Menu grid — 4 kolom, gap 12px:
+- Menu grid: 4 kolom, gap 12px:
   - Card: bg white, border 1px `#E9ECEF`, border-radius 8px, padding 16px, cursor pointer
   - Label kategori: 11px uppercase, color `#6C757D`, letter-spacing 0.5px
   - Nama menu: 14px semibold, margin-top 4px
@@ -307,7 +307,7 @@ export const summarizeItems = (items) =>
   - Hover: box-shadow `0 2px 8px rgba(0,0,0,0.08)`
   - Klik card → tambah ke keranjang
 
-**Panel Kanan — Keranjang:**
+**Panel Kanan: Keranjang:**
 - Header: "Keranjang Pesanan" (16px semibold) + badge count (lingkaran biru `#3B6FD4`, 24px, warna putih)
 - List items (scrollable, flex-grow):
   - Per item: nama (14px bold) + harga satuan (12px gray) di kiri | [-] qty [+] + subtotal di kanan
@@ -326,7 +326,7 @@ export const summarizeItems = (items) =>
 
 ---
 
-### K4 — Pesanan Aktif
+### K4: Pesanan Aktif
 
 **Referensi desain:** Image 6
 
@@ -344,7 +344,7 @@ export const summarizeItems = (items) =>
 - Inactive: bg `#F0F0F0`, color `#6C757D`, border-radius 50px
 - Padding: 6px 16px, font 13px
 
-**C. Grid Order Cards — 3 kolom (responsive: xl=3, md=2, sm=1):**
+**C. Grid Order Cards: 3 kolom (responsive: xl=3, md=2, sm=1):**
 
 Per card:
 ```
@@ -363,7 +363,7 @@ Per card:
 
 ---
 
-### K5 — Riwayat Pesanan
+### K5: Riwayat Pesanan
 
 **Referensi desain:** Image 5
 
@@ -392,20 +392,20 @@ Per card:
 
 ---
 
-### K6 — Detail Pesanan
+### K6: Detail Pesanan
 
 **Referensi desain:** Image 4
 
 **Struktur dalam white card:**
 
 **A. Header:**
-- Back arrow `←` (Link ke halaman sebelumnya) + "Detail Pesanan #ORD-048" (22px bold) — dalam 1 row
+- Back arrow `←` (Link ke halaman sebelumnya) + "Detail Pesanan #ORD-048" (22px bold), dalam 1 row
 - Subtitle: "22 Februari 2026, 10:25 WIB" (14px gray)
 - Status badge kanan: `● Selesai` (hijau)
 
 **B. Layout 2 kolom (col-8 + col-4):**
 
-**Kiri — "Daftar Item Pesanan" (card border 1px `#E9ECEF`, border-radius 12px, padding 20px):**
+**Kiri: "Daftar Item Pesanan" (card border 1px `#E9ECEF`, border-radius 12px, padding 20px):**
 - Header "Daftar Item Pesanan" (16px semibold), margin-bottom 16px
 - Tabel:
   - Header: Nama Item | Harga | Jumlah | Subtotal (12px gray)
@@ -415,7 +415,7 @@ Per card:
   - Subtotal: 14px
 - Footer row (bold): "Total Pembayaran" | "Rp 47.000" (18px bold, color `#3B6FD4`)
 
-**Kanan — "Informasi Pesanan" (card border 1px `#E9ECEF`, border-radius 12px, padding 20px):**
+**Kanan: "Informasi Pesanan" (card border 1px `#E9ECEF`, border-radius 12px, padding 20px):**
 - Header "Informasi Pesanan" (16px semibold), margin-bottom 16px
 - Rows info (space-between, border-bottom `#F3F4F6`, padding 10px 0):
   - ID Pesanan: label gray | nilai bold (#ORD-048)
@@ -429,7 +429,7 @@ Per card:
 
 ---
 
-### K7 — Verifikasi Akun Mahasiswa
+### K7: Verifikasi Akun Mahasiswa
 
 **Referensi desain:** Image 2
 
@@ -440,8 +440,8 @@ Per card:
   - "Verifikasi Akun Mahasiswa" (24px bold)
   - "Kelola dan verifikasi pendaftaran akun pelanggan mahasiswa" (14px gray)
 - Kanan:
-  - "🕐 5 Menunggu" — icon kuning + teks orange, font 14px semibold
-  - "✓ 12 Disetujui" — icon hijau + teks hijau, font 14px semibold
+  - "🕐 5 Menunggu": icon kuning + teks orange, font 14px semibold
+  - "✓ 12 Disetujui": icon hijau + teks hijau, font 14px semibold
 
 **B. Filter Bar:**
 - Search input (kiri): "Cari nama atau NIM...", width 300px, border-radius 8px
@@ -457,17 +457,17 @@ Per card:
 - NIM: monospace 14px
 - Tgl Daftar: 14px gray
 - Status badges:
-  - `● Menunggu` — dot `#FFC107`, text `#FFC107`
-  - `● Disetujui` — dot `#28A745`, text `#28A745`
-  - `● Ditolak` — dot `#DC3545`, text `#DC3545`
-- **Aksi jika Menunggu:** tombol teks "Setujui" (color `#28A745`, no bg, no border) + "Tolak" (color `#DC3545`) — gap 8px
+  - `● Menunggu`: dot `#FFC107`, text `#FFC107`
+  - `● Disetujui`: dot `#28A745`, text `#28A745`
+  - `● Ditolak`: dot `#DC3545`, text `#DC3545`
+- **Aksi jika Menunggu:** tombol teks "Setujui" (color `#28A745`, no bg, no border) + "Tolak" (color `#DC3545`), gap 8px
 - **Aksi lainnya:** link teks "Detail" (color `#3B6FD4`)
 
-**File:** `resources/js/Pages/Cashier/(dihapus — fitur verifikasi mahasiswa belum diimplementasikan)`
+**File:** `resources/js/Pages/Cashier/(dihapus, fitur verifikasi mahasiswa belum diimplementasikan)`
 
 ---
 
-### K8 — Profil Kasir
+### K8: Profil Kasir
 
 **Referensi desain:** Image 3
 
@@ -475,15 +475,15 @@ Per card:
 
 **Layout 2 kolom (col-4 + col-8):**
 
-**Kiri — Card Profil (bg white, border 1px `#E9ECEF`, border-radius 12px, padding 24px, text-center):**
+**Kiri: Card Profil (bg white, border 1px `#E9ECEF`, border-radius 12px, padding 24px, text-center):**
 - Avatar: lingkaran 80px, bg `#3B6FD4`, icon User putih 40px (lucide-react)
 - Nama kasir: 18px bold, margin-top 12px
-- Badge role: border 1px `#D1D5DB`, bg white, color `#6C757D`, border-radius 50px, padding 3px 12px, font 13px — teks "Kasir"
+- Badge role: border 1px `#D1D5DB`, bg white, color `#6C757D`, border-radius 50px, padding 3px 12px, font 13px: teks "Kasir"
 - Tombol "Keluar dari Akun":
   - Full-width, bg `#DC3545`, color white, border-radius 8px, height 44px, margin-top 20px
   - Icon LogOut kiri (lucide-react), teks "→ Keluar dari Akun"
 
-**Kanan — "Informasi Akun" (bg white, border 1px `#E9ECEF`, border-radius 12px, padding 24px):**
+**Kanan: "Informasi Akun" (bg white, border 1px `#E9ECEF`, border-radius 12px, padding 24px):**
 - Header "Informasi Akun" (16px semibold), margin-bottom 20px
 - 4 field groups (masing-masing label di atas, input di bawah):
   - Label: 13px semibold, color `#374151`, margin-bottom 6px
@@ -526,7 +526,7 @@ Per card:
 
 ---
 
-### C1 — Menu Pelanggan
+### C1: Menu Pelanggan
 
 **Referensi desain:** Image 1 (kolom paling kiri)
 
@@ -539,7 +539,7 @@ Per card:
 - Search bar (margin-top 12px): full-width, border-radius 50px, border 1px `#E9ECEF`, bg white, padding 10px 16px, icon kaca pembesar abu kiri, placeholder "Cari kopi, teh, snack..."
 
 **Section Kategori (padding 16px, bg white, margin-top 8px):**
-- Row header: "Kategori" (14px bold) + "Lihat Semua" (13px, color `#E8692A`) — space-between
+- Row header: "Kategori" (14px bold) + "Lihat Semua" (13px, color `#E8692A`), space-between
 - Chip row (horizontal scroll, gap 8px, margin-top 10px):
   - Active chip: bg `#E8692A`, color white, border-radius 50px, padding 7px 18px, font 13px semibold
   - Inactive chip: bg white, border 1px `#E9ECEF`, color `#6C757D`, border-radius 50px, padding 7px 18px, font 13px
@@ -566,7 +566,7 @@ Per card:
 
 ---
 
-### C2 — Keranjang Pelanggan
+### C2: Keranjang Pelanggan
 
 **Referensi desain:** Image 1 (kolom kedua)
 
@@ -574,7 +574,7 @@ Per card:
 
 **Header (bg white, padding 16px, text-center, border-bottom 1px `#E9ECEF`):**
 - "Keranjang" (18px bold, center)
-- Sub-info: "3 item" (gray 13px) + "Rp 64.000" (color `#E8692A`, 13px semibold) — inline, gap 8px
+- Sub-info: "3 item" (gray 13px) + "Rp 64.000" (color `#E8692A`, 13px semibold), inline, gap 8px
 
 **List items (padding 0 16px):**
 Per item (bg white, border-bottom 1px `#F3F4F6`, padding 16px 0):
@@ -597,7 +597,7 @@ Rp 12.000 (gray 12px)
 
 ---
 
-### C3 — Riwayat Pesanan Pelanggan
+### C3: Riwayat Pesanan Pelanggan
 
 **Referensi desain:** Image 1 (kolom ketiga)
 
@@ -633,25 +633,25 @@ Per card (bg white, border-radius 12px, padding 16px, margin-bottom 10px, box-sh
 
 ---
 
-### C4 — Login Pelanggan (Mahasiswa)
+### C4: Login Pelanggan (Mahasiswa)
 
 **Referensi desain:** Image 1 (kolom paling kanan)
 
 **Background:** `#FAFAFA`, padding 24px, centered
 
 **Logo area (text-center, margin-bottom 24px):**
-- Kotak rounded 16px (80px × 80px), bg `#1A2332`, teks script "posmine" putih — atau gunakan gambar logo
-- "POSMine" — 22px bold, margin-top 12px
-- "Pemesanan Online" — 14px gray
+- Kotak rounded 16px (80px × 80px), bg `#1A2332`, teks script "posmine" putih, atau gunakan gambar logo
+- "POSMine": 22px bold, margin-top 12px
+- "Pemesanan Online": 14px gray
 
 **Info box mahasiswa (bg `#FFF0E8`, border-radius 12px, padding 14px 16px, margin-bottom 20px):**
-- "Login sebagai Mahasiswa" — 14px semibold, color `#E8692A`
-- "Dapatkan diskon 10% untuk semua menu!" — 12px gray
+- "Login sebagai Mahasiswa": 14px semibold, color `#E8692A`
+- "Dapatkan diskon 10% untuk semua menu!": 12px gray
 
 **Form:**
-- Label "Username (Nama Lengkap)" — 13px semibold, margin-bottom 6px
+- Label "Username (Nama Lengkap)": 13px semibold, margin-bottom 6px
 - Input: icon User kiri, bg white, border 1px `#E9ECEF`, border-radius 12px, padding 12px 16px 12px 44px, placeholder "Masukkan nama lengkap..."
-- Label "Password (NIM)" — 13px semibold, margin-top 14px
+- Label "Password (NIM)": 13px semibold, margin-top 14px
 - Input: icon Lock kiri, style sama, placeholder "Masukkan NIM..."
 - Tombol "→ Masuk": full-width, bg `#E8692A`, color white, border-radius 8px, height 50px, font 16px semibold, margin-top 20px
 
@@ -730,7 +730,7 @@ pos-cafe/
 │       │       ├── NewOrder.jsx              ← K3: POS interface
 │       │       ├── ActiveOrders.jsx             ← K4: pesanan aktif
 │       │       ├── OrderHistory.jsx           ← K5: riwayat
-│       │       ├── (dihapus — fitur verifikasi mahasiswa belum diimplementasikan)           ← K7: verifikasi mahasiswa
+│       │       ├── (dihapus, fitur verifikasi mahasiswa belum diimplementasikan)           ← K7: verifikasi mahasiswa
 │       │       ├── Profile.jsx                   ← K8: profil kasir
 │       │       └── Order/
 │       │           └── Show.jsx                 ← K6: detail pesanan
@@ -783,7 +783,7 @@ email_verified_at TIMESTAMP NULL, password, remember_token, timestamps
 ```
 > `role` & `status` disimpan sebagai string; di PHP memakai enum `UserRole` & `UserStatus`.
 
-**menu_categories** (dipakai model `Category`) — `id, name, timestamps`
+**menu_categories** (dipakai model `Category`): `id, name, timestamps`
 
 **menus**
 ```sql
@@ -818,9 +818,9 @@ total_amount BIGINT, payment_method VARCHAR NULL, payment_proof VARCHAR NULL, re
 processed_at, completed_at, cancelled_at, timestamps
 ```
 
-**order_items** — `id, order_id FK CASCADE, menu_id FK RESTRICT, item_position INT, quantity INT, unit_price INT, cost_price INT, subtotal BIGINT, timestamps`
+**order_items**: `id, order_id FK CASCADE, menu_id FK RESTRICT, item_position INT, quantity INT, unit_price INT, cost_price INT, subtotal BIGINT, timestamps`
 
-**order_payments** — `id, order_id FK CASCADE, amount BIGINT, payment_date TIMESTAMP, payment_method VARCHAR, timestamps`
+**order_payments**: `id, order_id FK CASCADE, amount BIGINT, payment_date TIMESTAMP, payment_method VARCHAR, timestamps`
 
 ---
 
@@ -894,9 +894,9 @@ VITE_APP_URL="${APP_URL}"
 2. **Pelanggan**: mobile-first, max-width 430px, bottom nav fixed, warna orange `#E8692A`
 3. **Login kasir**: email + password → tombol biru `#3B6FD4`
 4. **Login pelanggan**: nama lengkap (username) + NIM (password) → tombol orange. Saat ini masih stub (redirect ke menu); verifikasi/diskon mahasiswa belum aktif.
-5. **Status staff**: kolom `users.status` (`active`/`inactive`) — akun nonaktif tidak bisa login ke kasir maupun panel admin.
+5. **Status staff**: kolom `users.status` (`active`/`inactive`), akun nonaktif tidak bisa login ke kasir maupun panel admin.
 6. **POS K3**: kasir pilih menu dari grid → keranjang panel kanan → modal bayar → selesai
 7. **Cart pelanggan**: Zustand (runtime) + IndexedDB (offline persistence), sync via `useCart.js`
 8. **Polling**: halaman status & kanban kasir → `router.reload({ only: ['...'] })` atau hook `usePolling` tiap 5-10 detik
-9. **Format**: `formatRupiah` dkk dari `@/helpers.js`; warna dari `@/theme.js` — TIDAK boleh hardcode format angka/warna manual
+9. **Format**: `formatRupiah` dkk dari `@/helpers.js`; warna dari `@/theme.js`, TIDAK boleh hardcode format angka/warna manual
 10. **QR Code**: per meja, format `{APP_URL}/order?table={qr_token}` (token opaque, bukan id sekuensial)

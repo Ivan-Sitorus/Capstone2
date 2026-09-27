@@ -68,7 +68,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
     return (
         <CustomerLayout activeTab="cart">
             <Head>
-                <title>Pembayaran QRIS — POSMine</title>
+                <title>Pembayaran QRIS - POSMine</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
@@ -81,7 +81,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                 `}</style>
             </Head>
 
-            {/* Fixed full-height container — NO scroll */}
+            {/* Fixed full-height container: NO scroll */}
             <div style={{
                 position: 'fixed', top: 0, left: '50%', transform: 'translateX(-50%)',
                 width: '100%', maxWidth: 430,
@@ -144,7 +144,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             </div>
                         )}
 
-                        {/* ── Main card — flex: 1, semua muat ── */}
+                        {/* ── Main card: flex: 1, semua muat ── */}
                         <div style={{
                             flex: 1,
                             margin: '0 20px',
@@ -158,7 +158,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             overflow: 'hidden',
                             minHeight: 0,
                         }}>
-                            {/* QR image — flex: 1, tumbuh proporsional */}
+                            {/* QR image: flex: 1, tumbuh proporsional */}
                             <div style={{
                                 flex: 1,
                                 display: 'flex', justifyContent: 'center', alignItems: 'center',
@@ -281,7 +281,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                     </>
 
                 ) : (
-                    /* ── Success state — centered ── */
+                    /* ── Success state: centered ── */
                     <div style={{
                         flex: 1,
                         display: 'flex', flexDirection: 'column',

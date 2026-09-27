@@ -74,7 +74,7 @@ class CafeTable extends Model
 
         $raw = (new QRCode($options))->render($this->qr_url);
 
-        // render() returns data:image/png;base64,XXXX — strip the prefix
+        // render() returns data:image/png;base64,XXXX: strip the prefix
         $base64 = substr($raw, strpos($raw, ',') + 1);
 
         return base64_decode($base64);

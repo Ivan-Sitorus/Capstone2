@@ -39,7 +39,7 @@ class TopBahanBakuWidget extends BarChartWidget
     {
         $from = Carbon::parse($this->rangeFrom())->translatedFormat('d M Y');
         $until = Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
-        return "Top 10 Bahan Baku Berdasarkan Biaya Pemakaian ({$from} – {$until})";
+        return "Top 10 Bahan Baku Berdasarkan Biaya Pemakaian ({$from} - {$until})";
     }
 
     protected function getData(): array

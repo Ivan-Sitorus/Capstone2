@@ -42,7 +42,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
             flexDirection: 'column',
             opacity:       soldOut ? 0.75 : 1,
         }}>
-            {/* Image — square aspect */}
+            {/* Image: square aspect */}
             <div style={{
                 position:       'relative',
                 width:          '100%',
@@ -108,7 +108,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                     {menu.name}
                 </h3>
 
-                {/* Price — brand-primary color sesuai Stitch */}
+                {/* Price: brand-primary color sesuai Stitch */}
                 <p style={{
                     fontSize:   13,
                     fontWeight: 600,
@@ -300,7 +300,7 @@ export default function CustomerMenu({ categories, table }) {
     return (
         <CustomerLayout activeTab="menu">
             <Head>
-                <title>Menu — POSMine</title>
+                <title>Menu - POSMine</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
@@ -330,7 +330,7 @@ export default function CustomerMenu({ categories, table }) {
                     {/* Logo + greeting row */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 14 }}>
 
-                        {/* Logo — rounded-xl dark bg sesuai Stitch */}
+                        {/* Logo: rounded-xl dark bg sesuai Stitch */}
                         <div style={{
                             width: 48, height: 48, borderRadius: 14,
                             background: C.accent,
@@ -368,14 +368,14 @@ export default function CustomerMenu({ categories, table }) {
                                     fontSize: 13, fontWeight: 400, color: C.textMuted,
                                     marginLeft: 6, letterSpacing: 0,
                                 }}>
-                                    • Meja {table?.table_number ?? customer?.tableNumber ?? '—'}
+                                    • Meja {table?.table_number ?? customer?.tableNumber ?? '-'}
                                 </span>
                             </h1>
                         </div>
 
                     </div>
 
-                    {/* Search — no border, rounded-12, backdrop-blur sesuai Stitch */}
+                    {/* Search: no border, rounded-12, backdrop-blur sesuai Stitch */}
                     <div style={{ position: 'relative' }}>
                         <Search size={18} color={C.textMuted} strokeWidth={2}
                             style={{
@@ -406,7 +406,7 @@ export default function CustomerMenu({ categories, table }) {
                     </div>
                 </header>
 
-                {/* ── Category chips — rounded-12 sesuai Stitch ── */}
+                {/* ── Category chips: rounded-12 sesuai Stitch ── */}
                 <div style={{ flexShrink: 0 }}>
                     <div className="posmine-chips" style={{
                         display: 'flex', gap: 8, overflowX: 'auto',

@@ -55,7 +55,7 @@ class HandleInertiaRequests extends Middleware
                 'order_id'    => fn () => session('order_id'),
                 'order_total' => fn () => session('order_total'),
             ],
-            // Lazy closure — dihitung langsung tanpa cache agar badge selalu
+            // Lazy closure: dihitung langsung tanpa cache agar badge selalu
             // akurat setiap navigasi (query COUNT ringan, satu sumber kebenaran)
             'pendingOrderCount' => fn () => $user && in_array($user->role, [UserRole::Cashier, UserRole::Admin])
                 ? Order::cashierPendingCount()

@@ -1,4 +1,4 @@
-# POSMine — Sistem Point of Sale
+# POSMine: Sistem Point of Sale
 
 Sistem POS berbasis web PWA untuk kafe (studi kasus POSMine STIE Totalwin Semarang).
 **Fase aktif:** Modul Transaksi (Kasir + Pelanggan) + Panel Admin (Filament) + Data Mining.
@@ -51,9 +51,9 @@ docker compose --profile prod up -d
 docker compose exec -T app php artisan migrate:fresh --seed
 ```
 
-- **app** — FrankenPHP/NGINX + PHP-FPM (port 8081)
-- **pgsql** — PostgreSQL 18 (port 5432)
-- **datamining** — FastAPI data mining (port 8001)
+- **app**: FrankenPHP/NGINX + PHP-FPM (port 8081)
+- **pgsql**: PostgreSQL 18 (port 5432)
+- **datamining**: FastAPI data mining (port 8001)
 
 ---
 
@@ -68,7 +68,7 @@ docker compose exec -T app php artisan migrate:fresh --seed
 
 ---
 
-## Halaman Admin (Filament) — `/admin`
+## Halaman Admin (Filament): `/admin`
 
 | URL | Halaman |
 |---|---|
@@ -83,17 +83,17 @@ docker compose exec -T app php artisan migrate:fresh --seed
 | `/admin/riwayat-kasir` | Riwayat sesi kasir |
 | `/admin/akun-staff` | Akun staff (status Aktif/Nonaktif) |
 | `/admin/pengaturan-struk-dan-whatsapp` | Pengaturan struk & template WhatsApp |
-| `/admin/data-mining` | Data mining — Ikhtisar |
-| `/admin/prediksi-menu` | Data mining — Prediksi Menu |
-| `/admin/prediksi-ring-menu` | Data mining — Hasil Prediksi Menu (ring) |
-| `/admin/klasterisasi-menu` | Data mining — Klasterisasi Menu Penjualan |
-| `/admin/ringkasan-menu` | Data mining — Ringkasan Klasterisasi Menu |
-| `/admin/prediksi-bahan-baku` | Data mining — Prediksi Penggunaan Bahan Baku |
-| `/admin/prediction-ring-bahan-baku` | Data mining — Hasil Prediksi Bahan Baku (ring) |
-| `/admin/klasterisasi-bahan-baku` | Data mining — Klasterisasi Bahan Baku |
-| `/admin/ringkasan-clustering-bahan-baku` | Data mining — Ringkasan Klasterisasi Bahan Baku |
-| `/admin/asosiatif-menu` | Data mining — Asosiatif Menu |
-| `/admin/ringkasan-asosiatif` | Data mining — Ringkasan Asosiatif |
+| `/admin/data-mining` | Data mining: Ikhtisar |
+| `/admin/prediksi-menu` | Data mining: Prediksi Menu |
+| `/admin/prediksi-ring-menu` | Data mining: Hasil Prediksi Menu (ring) |
+| `/admin/klasterisasi-menu` | Data mining: Klasterisasi Menu Penjualan |
+| `/admin/ringkasan-menu` | Data mining: Ringkasan Klasterisasi Menu |
+| `/admin/prediksi-bahan-baku` | Data mining: Prediksi Penggunaan Bahan Baku |
+| `/admin/prediction-ring-bahan-baku` | Data mining: Hasil Prediksi Bahan Baku (ring) |
+| `/admin/klasterisasi-bahan-baku` | Data mining: Klasterisasi Bahan Baku |
+| `/admin/ringkasan-clustering-bahan-baku` | Data mining: Ringkasan Klasterisasi Bahan Baku |
+| `/admin/asosiatif-menu` | Data mining: Asosiatif Menu |
+| `/admin/ringkasan-asosiatif` | Data mining: Ringkasan Asosiatif |
 
 ---
 
@@ -153,6 +153,6 @@ SEED_END_DATE=
 
 ## Tim
 
-- **Ivan** — Fullstack Transaction
-- **Nio** — Fullstack Inventory
-- **Ruben** — Data Mining & FastAPI
+- **Ivan**: Fullstack Transaction
+- **Nio**: Fullstack Inventory
+- **Ruben**: Data Mining & FastAPI

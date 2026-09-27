@@ -22,7 +22,7 @@ class TrackCashierHistory
      * - Updates last_activity_at (throttled to once per 60s)
      *
      * Session creation ONLY happens in AuthController after successful login.
-     * This middleware does NOT create sessions — it only maintains them.
+     * This middleware does NOT create sessions. It only maintains them.
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -43,7 +43,7 @@ class TrackCashierHistory
         if ($activeSession) {
             $this->cashierHistoryService->updateActivity($activeSession);
         }
-        // No else — session creation is AuthController's job
+        // No else: session creation is AuthController's job
 
         return $next($request);
     }

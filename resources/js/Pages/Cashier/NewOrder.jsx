@@ -157,7 +157,7 @@ export default function NewOrder({ categories }) {
     }
 
     function handleSuccessOk() {
-        // Tetap di halaman Pesanan Baru — kosongkan keranjang agar kasir
+        // Tetap di halaman Pesanan Baru: kosongkan keranjang agar kasir
         // langsung bisa membuat pesanan berikutnya. Kasir berpindah ke
         // Pesanan Aktif secara manual lewat sidebar bila perlu.
         setShowSuccess(false);
@@ -294,7 +294,7 @@ export default function NewOrder({ categories }) {
                     )}
                 </div>
 
-                {/* ══ PANEL KANAN — Keranjang (desktop) ══ */}
+                {/* ══ PANEL KANAN: Keranjang (desktop) ══ */}
                 {!isMobile && (
                 <div
                     style={{
@@ -555,7 +555,7 @@ export default function NewOrder({ categories }) {
                     </div>
                 </div>
             )}
-            {/* ══ SUCCESS POPUP (3c Pencil — blue kasir theme) ══ */}
+            {/* ══ SUCCESS POPUP (3c Pencil, blue kasir theme) ══ */}
             {showSuccess && (
                 <div style={{
                     position: 'fixed', inset: 0,

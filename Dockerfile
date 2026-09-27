@@ -1,5 +1,5 @@
 # Single-stage production image: PHP 8.5 FPM + NGINX + Supervisor
-# Alpine packages come from ONE repo version — no ABI mismatches
+# Alpine packages come from ONE repo version: no ABI mismatches
 FROM php:8.5-fpm-alpine
 
 # ── Runtime packages + build deps (layer 1/2: cached for re-runs) ──

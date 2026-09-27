@@ -39,7 +39,7 @@ class PenjualanChartWidget extends LineChartWidget
     {
         $from = Carbon::parse($this->rangeFrom())->translatedFormat('d M Y');
         $until = Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
-        return "Penjualan ({$from} – {$until})";
+        return "Penjualan ({$from} - {$until})";
     }
 
     protected function getData(): array
@@ -62,14 +62,14 @@ class PenjualanChartWidget extends LineChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => $fromDate->translatedFormat('d M Y') . ' – ' . $untilDate->translatedFormat('d M Y'),
+                    'label' => $fromDate->translatedFormat('d M Y') . ' - ' . $untilDate->translatedFormat('d M Y'),
                     'data' => $current,
                     'borderColor' => '#3B6FD4',
                     'backgroundColor' => 'rgba(59, 111, 212, 0.1)',
                     'fill' => true,
                 ],
                 [
-                    'label' => $previousFrom->translatedFormat('d M Y') . ' – ' . $previousUntil->translatedFormat('d M Y'),
+                    'label' => $previousFrom->translatedFormat('d M Y') . ' - ' . $previousUntil->translatedFormat('d M Y'),
                     'data' => $previous,
                     'borderColor' => '#E8692A',
                     'backgroundColor' => 'rgba(232, 105, 42, 0.1)',

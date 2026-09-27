@@ -57,7 +57,7 @@ class DashboardStatsWidget extends StatsOverviewWidget
             ->count('ingredient_id');
 
         $desc = 'Periode ' . Carbon::parse($this->rangeFrom())->translatedFormat('d M Y')
-              . ' – ' . Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
+              . ' - ' . Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
 
         return [
             Stat::make('Penjualan', 'Rp ' . number_format($totalRange, 0, ',', '.'))

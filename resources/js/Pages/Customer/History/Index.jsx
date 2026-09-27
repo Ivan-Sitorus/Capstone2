@@ -87,7 +87,7 @@ export default function CustomerRiwayat({ orders = [] }) {
     return (
         <CustomerLayout activeTab="riwayat">
             <Head>
-                <title>Riwayat Pesanan — POSMine</title>
+                <title>Riwayat Pesanan - POSMine</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
@@ -296,8 +296,8 @@ export default function CustomerRiwayat({ orders = [] }) {
                                 {[
                                     { label: 'No. Pesanan', value: receiptOrder.order_code },
                                     { label: 'Tanggal',     value: `${formatDate(receiptOrder.created_at)}, ${formatTime(receiptOrder.created_at)}` },
-                                    { label: 'Pelanggan',   value: receiptOrder.customer_name ?? sessionName ?? '—' },
-                                    { label: 'Pembayaran',  value: METHOD_LABEL[receiptOrder.payment_method] ?? '—' },
+                                    { label: 'Pelanggan',   value: receiptOrder.customer_name ?? sessionName ?? '-' },
+                                    { label: 'Pembayaran',  value: METHOD_LABEL[receiptOrder.payment_method] ?? '-' },
                                 ].map(row => (
                                     <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 12 }}>
                                         <span style={{ fontSize: 12, color: C.textSecond, flexShrink: 0, fontFamily: F }}>{row.label}</span>

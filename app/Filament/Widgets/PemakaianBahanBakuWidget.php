@@ -48,7 +48,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
 
         $unit = Ingredient::query()->where('name', $ingredientName)->value('unit');
 
-        // Eloquent menerapkan cast enum pada value() — ambil ->value bila BackedEnum.
+        // Eloquent menerapkan cast enum pada value(): ambil ->value bila BackedEnum.
         return $unit instanceof \BackedEnum ? $unit->value : $unit;
     }
 
@@ -121,7 +121,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         $until = Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
         $ingredient = $this->selectedIngredient();
         $prefix = $ingredient ? "Pemakaian {$ingredient}" : 'Pemakaian Bahan Baku';
-        return "{$prefix} ({$from} – {$until})";
+        return "{$prefix} ({$from} - {$until})";
     }
 
     protected function getData(): array
@@ -149,7 +149,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => $fromDate->translatedFormat('d M Y') . ' – ' . $untilDate->translatedFormat('d M Y'),
+                    'label' => $fromDate->translatedFormat('d M Y') . ' - ' . $untilDate->translatedFormat('d M Y'),
                     'data' => $current,
                     'borderColor' => '#28A745',
                     'backgroundColor' => 'rgba(40, 167, 69, 0.1)',
@@ -157,7 +157,7 @@ class PemakaianBahanBakuWidget extends LineChartWidget
                     'unit' => $unit,
                 ],
                 [
-                    'label' => $previousFrom->translatedFormat('d M Y') . ' – ' . $previousUntil->translatedFormat('d M Y'),
+                    'label' => $previousFrom->translatedFormat('d M Y') . ' - ' . $previousUntil->translatedFormat('d M Y'),
                     'data' => $previous,
                     'borderColor' => '#E8692A',
                     'backgroundColor' => 'rgba(232, 105, 42, 0.1)',

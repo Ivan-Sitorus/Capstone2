@@ -61,7 +61,7 @@ class Menu extends Model
 
     /**
      * Calculate how many servings can be made from current stock.
-     * NOT an accessor — must be called explicitly when stock display is needed.
+     * NOT an accessor, must be called explicitly when stock display is needed.
      * Use with eager-loaded batches to avoid N+1 queries.
      *
      * @return ?float

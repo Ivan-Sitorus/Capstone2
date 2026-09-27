@@ -990,7 +990,7 @@ class CafeSeeder extends Seeder
             'quantity' => $qty,
             'quantity_before' => $before,
             'quantity_after' => $after,
-            'reason' => $isIncrease ? 'Koreksi stok setelah stock opname' : 'Bahan rusak / kedaluwarsa — penyesuaian stok',
+            'reason' => $isIncrease ? 'Koreksi stok setelah stock opname' : 'Bahan rusak / kedaluwarsa: penyesuaian stok',
             'reported_by' => $this->adminId,
             'adjusted_at' => $time->toDateTimeString(),
             'code' => sprintf('ADJ-%s-%d', $date->format('dmy'), ++$this->adjustmentSeq),

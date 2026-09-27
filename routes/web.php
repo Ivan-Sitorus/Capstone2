@@ -62,9 +62,9 @@ Route::prefix('pelanggan')->group(function () {
     Route::get('/pesanan/{order}/status', [CustomerOrderController::class, 'showStatus'])->name('customer.order.status');
 });
 
-// QR table entry — accepts {APP_URL}/order?table={token} and forwards to the identity form
+// QR table entry: accepts {APP_URL}/order?table={token} and forwards to the identity form
 Route::get('/order', fn () => redirect()->route('customer.identity', request()->only('table')))
     ->name('customer.order.entry');
 
-// Receipt (public — no auth required, unguessable capability token)
+// Receipt (public, no auth required, unguessable capability token)
 Route::get('/struk-pesanan/{order:receipt_token}', [ReceiptController::class, 'showByReceiptToken'])->name('receipt.show-by-token');

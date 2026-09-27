@@ -44,7 +44,7 @@ class NumericInput
     }
 
     /**
-     * Preset: money (maxDigits 9, integer) — price, amount, total_cost, etc.
+     * Preset: money (maxDigits 9, integer): price, amount, total_cost, etc.
      */
     public static function money(string $name): TextInput
     {
@@ -52,7 +52,7 @@ class NumericInput
     }
 
     /**
-     * Preset: quantity (maxDigits 6, 3 decimals) — quantity, quantity_used, etc.
+     * Preset: quantity (maxDigits 6, 3 decimals): quantity, quantity_used, etc.
      */
     public static function quantity(string $name): TextInput
     {
@@ -61,7 +61,7 @@ class NumericInput
 
     /**
      * Maximum input length (characters), including thousand dots & decimal comma.
-     * Used only for the HTML maxlength attribute — NOT for validation
+     * Used only for the HTML maxlength attribute, NOT for validation
      * (validation uses rulesFor(), since max_digits is broken for decimals).
      *
      * Examples: (6,3) → "999.999,999" = 11; (9,0) → "999.999.999" = 11; (6,0) → "999.999" = 7.

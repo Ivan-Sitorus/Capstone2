@@ -1,5 +1,5 @@
 /*
- * Kasir Mobile — drawer navigasi kiri + bottom sheet keranjang.
+ * Kasir Mobile: drawer navigasi kiri + bottom sheet keranjang.
  * Hanya berisi kelas ber-prefix `.cashier-*` agar tidak bentrok dengan app.css.
  * Transform & padding memakai CSS variable yang ditulis oleh Base UI Drawer.
  */

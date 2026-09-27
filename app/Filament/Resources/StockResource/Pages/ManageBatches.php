@@ -160,7 +160,7 @@ class ManageBatches extends Page implements HasTable
                             'reference' => $batch->batch_code,
                         ]);
 
-                        // Record initial supplier payment if any — observer auto-sets payment_status
+                        // Record initial supplier payment if any: observer auto-sets payment_status
                         if ($totalDibayar > 0) {
                             $batch->batchPayments()->create([
                                 'amount' => $totalDibayar,
@@ -337,7 +337,7 @@ class ManageBatches extends Page implements HasTable
                 ]);
             $fields[] = Toggle::make('sudah_lunas')
                 ->label('Sudah Lunas')
-                ->helperText('Centang jika utang langsung lunas — Total Dibayar otomatis terisi total harga')
+                ->helperText('Centang jika utang langsung lunas: Total Dibayar otomatis terisi total harga')
                 ->live()
                 ->default(false)
                 ->afterStateUpdated(function (Set $set, Get $get, bool $state): void {

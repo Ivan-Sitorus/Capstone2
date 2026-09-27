@@ -25,11 +25,11 @@ export default defineConfig({
         rollupOptions: {
             output: {
                 manualChunks: {
-                    // React + Inertia — core runtime, jarang berubah
+                    // React + Inertia: core runtime, jarang berubah
                     vendor: ['react', 'react-dom', '@inertiajs/react'],
-                    // State management — pisah agar bisa cache terpisah
+                    // State management: pisah agar bisa cache terpisah
                     store: ['zustand'],
-                    // Icons — besar, jarang berubah
+                    // Icons: besar, jarang berubah
                     icons: ['lucide-react'],
                 },
             },

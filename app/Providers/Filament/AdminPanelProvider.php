@@ -47,7 +47,7 @@ class AdminPanelProvider extends PanelProvider
                 'warning' => Color::Orange,
                 'info' => Color::Blue,
             ])
-            ->brandName('W9 Cafe — Admin')
+            ->brandName('W9 Cafe - Admin')
             ->navigationGroups([
                 'Menu',
                 'Inventori',

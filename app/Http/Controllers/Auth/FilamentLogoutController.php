@@ -12,7 +12,7 @@ class FilamentLogoutController
     {
         Filament::auth()->logout();
 
-        // Conditional invalidate — same pattern as AuthController::logout()
+        // Conditional invalidate: same pattern as AuthController::logout()
         // Only destroy session if no other guard is still authenticated
         $otherGuards = array_diff(['web', 'admin'], ['admin']);
         $stillActive = false;

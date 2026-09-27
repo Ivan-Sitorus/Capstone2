@@ -1,6 +1,6 @@
 import { GOLD, GOLD_BG, BLUE_MUTED, BLUE_MUTED_BG, GREEN_MUTED, GREEN_MUTED_BG, RED_MUTED, RED_MUTED_BG, RED, RED_50, NEUTRAL_100, NEUTRAL_400, NEUTRAL_500 } from '@/theme';
 
-// Pencil design tokens — brown/coffee theme
+// Pencil design tokens: brown/coffee theme
 const statusMap = {
     // Order statuses
     pending:    { dot: GOLD, text: GOLD, bg: GOLD_BG, label: 'Pending'  },

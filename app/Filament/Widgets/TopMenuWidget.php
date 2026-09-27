@@ -38,7 +38,7 @@ class TopMenuWidget extends BarChartWidget
     {
         $from = Carbon::parse($this->rangeFrom())->translatedFormat('d M Y');
         $until = Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
-        return "Top 10 Menu ({$from} – {$until})";
+        return "Top 10 Menu ({$from} - {$until})";
     }
 
     protected function getData(): array

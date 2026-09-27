@@ -9,7 +9,7 @@ import { WHITE, STONE_50, GRAY_100, GRAY_200, STONE_700, STONE_900, STONE_500, R
 
 const F = '"Inter", system-ui, sans-serif';
 
-/* stone-minimalist tokens — sesuai Stitch */
+/* stone-minimalist tokens: sesuai Stitch */
 const C = {
     surface:    WHITE,
     bg:         STONE_50,   /* stone-bg */
@@ -78,7 +78,7 @@ export default function PaymentChoose({ order, items, table_number }) {
     return (
         <CustomerLayout activeTab="cart">
             <Head>
-                <title>Pilih Pembayaran — POSMine</title>
+                <title>Pilih Pembayaran - POSMine</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
@@ -184,7 +184,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                                     borderBottom: idx < items.length - 1 ? `1px solid ${C.border}` : 'none',
                                 }}>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                        {/* Qty badge — rectangular, sesuai Stitch */}
+                                        {/* Qty badge: rectangular, sesuai Stitch */}
                                         <span style={{
                                             background: C.bg,
                                             color: C.accent,
@@ -251,7 +251,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                                             cursor: 'pointer',
                                         }}
                                     >
-                                        {/* Icon box — bg tetap stone-bg, tidak berubah saat aktif */}
+                                        {/* Icon box: bg tetap stone-bg, tidak berubah saat aktif */}
                                         <div style={{
                                             width: 40, height: 40, borderRadius: 10,
                                             background: C.bg,
@@ -304,7 +304,7 @@ export default function PaymentChoose({ order, items, table_number }) {
 
                 </div>{/* end scroll */}
 
-                {/* ── Confirm Button — fixed footer, selalu terlihat ── */}
+                {/* ── Confirm Button: fixed footer, selalu terlihat ── */}
                 <div style={{
                     padding: '12px 24px 84px',
                     flexShrink: 0,

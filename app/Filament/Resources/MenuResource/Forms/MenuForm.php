@@ -117,7 +117,7 @@ class MenuForm
                             $ingredient = Ingredient::find($ingredientId);
                             $unit = $ingredient?->unit;
 
-                            // Auto-fill hanya untuk tipe count (pcs/sachet — satu-satunya opsi).
+                            // Auto-fill hanya untuk tipe count (pcs/sachet, satu-satunya opsi).
                             // Weight/volume (gram/kg/ml/liter) dibiarkan kosong agar user memilih sendiri.
                             $set('unit', $unit && $unit->unitType() === 'count' ? $unit->value : null);
                         }),

@@ -10,7 +10,7 @@ use App\Models\Order;
 class DashboardService
 {
     /**
-     * Tanpa cache — dashboard dimuat ulang fresh tiap dibuka (reload-on-mount),
+     * Tanpa cache: dashboard dimuat ulang fresh tiap dibuka (reload-on-mount),
      * query difilter "hari ini" + index created_at sehingga tetap ringan.
      */
     public function getTodayStats(): object

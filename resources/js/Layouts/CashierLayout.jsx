@@ -80,7 +80,7 @@ const drawerCloseStyle = {
 };
 
 /**
- * Isi sidebar (brand, nav, logout) — dipakai ulang oleh <aside> desktop dan
+ * Isi sidebar (brand, nav, logout): dipakai ulang oleh <aside> desktop dan
  * drawer off-canvas mobile agar daftar menu tidak pernah terduplikasi.
  */
 function SidebarContent({ collapsed, showCollapseControl, onToggleCollapse, pendingOrderCount, onNavigate, headerAction }) {
@@ -295,7 +295,7 @@ export default function CashierLayout({ children, fullscreen = false }) {
         window.localStorage.setItem('cashier-sidebar-collapsed', String(isSidebarCollapsed));
     }, [isSidebarCollapsed]);
 
-    // Drawer hanya untuk layar ponsel — tutup otomatis saat kembali ke desktop.
+    // Drawer hanya untuk layar ponsel: tutup otomatis saat kembali ke desktop.
     useEffect(() => {
         if (!isMobile) setDrawerOpen(false);
     }, [isMobile]);
@@ -340,7 +340,7 @@ export default function CashierLayout({ children, fullscreen = false }) {
                 </aside>
             )}
 
-            {/* ── SIDEBAR (mobile) — tombol hamburger + drawer off-canvas ── */}
+            {/* ── SIDEBAR (mobile): tombol hamburger + drawer off-canvas ── */}
             {isMobile && (
                 <Drawer.Root
                     open={drawerOpen}
