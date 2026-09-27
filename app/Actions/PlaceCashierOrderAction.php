@@ -9,10 +9,8 @@ use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Services\InventoryService;
-use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class PlaceCashierOrderAction
 {
@@ -22,66 +20,55 @@ class PlaceCashierOrderAction
 
     public function handle(StoreOrderRequest $request): array
     {
-        $receiptToken = (string) Str::uuid();
         $orderModel = null;
 
-        $attempt = function () use ($request, &$receiptToken, &$orderModel) {
-            DB::transaction(function () use ($request, &$receiptToken, &$orderModel) {
-                $order = Order::create([
-                    'receipt_token' => $receiptToken,
-                    'cashier_id' => Auth::id(),
-                    'order_type' => OrderType::Cashier->value,
-                    'payment_method' => $request->payment_method,
-                    'customer_name' => $request->customer_name,
-                    'status' => OrderStatus::Pending->value,
-                    'total_amount' => 0,
-                ]);
+        DB::transaction(function () use ($request, &$orderModel) {
+            $order = Order::create([
+                'cashier_id' => Auth::id(),
+                'order_type' => OrderType::Cashier->value,
+                'payment_method' => $request->payment_method,
+                'customer_name' => $request->customer_name,
+                'status' => OrderStatus::Pending->value,
+                'total_amount' => 0,
+            ]);
 
-                $isMahasiswa = (bool) $request->input('is_mahasiswa', false);
-                $total = 0;
-                $itemsToInsert = [];
+            $isMahasiswa = (bool) $request->input('is_mahasiswa', false);
+            $total = 0;
+            $itemsToInsert = [];
 
-                $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
-                $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
+            $menuIds = collect($request->items)->pluck('menu_id')->unique()->all();
+            $menus = Menu::whereIn('id', $menuIds)->get()->keyBy('id');
 
-                foreach ($request->items as $position => $item) {
-                    $menu = $menus->get($item['menu_id']);
+            foreach ($request->items as $position => $item) {
+                $menu = $menus->get($item['menu_id']);
 
-                    $unitPrice = ($isMahasiswa && $menu->is_student_discount && $menu->student_price !== null)
-                        ? $menu->student_price
-                        : $menu->price;
-                    $subtotal = $unitPrice * (int) $item['quantity'];
+                $unitPrice = ($isMahasiswa && $menu->is_student_discount && $menu->student_price !== null)
+                    ? $menu->student_price
+                    : $menu->price;
+                $subtotal = $unitPrice * (int) $item['quantity'];
 
-                    $itemsToInsert[] = [
-                        'order_id' => $order->id,
-                        'menu_id' => $menu->id,
-                        'item_position' => $position,
-                        'quantity' => $item['quantity'],
-                        'unit_price' => $unitPrice,
-                        'cost_price' => (int) $menu->cost_price,
-                        'subtotal' => $subtotal,
-                        'created_at' => now(),
-                        'updated_at' => now(),
-                    ];
+                $itemsToInsert[] = [
+                    'order_id' => $order->id,
+                    'menu_id' => $menu->id,
+                    'item_position' => $position,
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $unitPrice,
+                    'cost_price' => (int) $menu->cost_price,
+                    'subtotal' => $subtotal,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ];
 
-                    $total += $subtotal;
-                }
+                $total += $subtotal;
+            }
 
-                OrderItem::insert($itemsToInsert);
+            OrderItem::insert($itemsToInsert);
 
-                $order->update(['total_amount' => $total]);
-                $orderModel = $order;
+            $order->update(['total_amount' => $total]);
+            $orderModel = $order;
 
-                $this->inventoryService->processSaleForOrder($order);
-            });
-        };
-
-        try {
-            $attempt();
-        } catch (UniqueConstraintViolationException) {
-            $receiptToken = (string) Str::uuid();
-            $attempt();
-        }
+            $this->inventoryService->processSaleForOrder($order);
+        });
 
         return [
             'order_id' => $orderModel?->id,

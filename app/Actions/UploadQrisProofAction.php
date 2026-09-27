@@ -28,16 +28,18 @@ class UploadQrisProofAction
 
         $path = $request->file('proof')->store('proofs', 'public');
 
-        DB::transaction(function () use ($order, $path) {
-            $updates = [
-                'payment_proof'  => $path,
-                'payment_method' => PaymentMethod::Qris->value,
-                'rejection_note' => null,
-            ];
-            if (!$order->order_code) {
-                $updates['order_code'] = Order::generateCode();
-            }
-            $order->update($updates);
+        Order::retryOnCodeCollision(function () use ($order, $path) {
+            DB::transaction(function () use ($order, $path) {
+                $updates = [
+                    'payment_proof'  => $path,
+                    'payment_method' => PaymentMethod::Qris->value,
+                    'rejection_note' => null,
+                ];
+                if (!$order->order_code) {
+                    $updates['order_code'] = Order::generateCode();
+                }
+                $order->update($updates);
+            });
         });
 
         return response()->json([

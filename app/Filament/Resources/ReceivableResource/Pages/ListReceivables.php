@@ -116,7 +116,6 @@ class ListReceivables extends ListRecords
                         'total_amount' => $total,
                         'payment_method' => PaymentMethod::PayLater,
                         'status' => OrderStatus::Unpaid,
-                        'order_code' => Order::generateCode(),
                     ]);
 
                     $items = [];

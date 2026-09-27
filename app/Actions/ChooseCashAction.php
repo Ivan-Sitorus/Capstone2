@@ -15,11 +15,13 @@ class ChooseCashAction
         if ($order->status !== OrderStatus::Pending) {
             return response()->json(['message' => 'Status pesanan tidak valid.'], 409);
         }
-        DB::transaction(function () use ($order) {
-            $order->update([
-                'payment_method' => PaymentMethod::Cash->value,
-                'order_code'     => Order::generateCode(),
-            ]);
+        Order::retryOnCodeCollision(function () use ($order) {
+            DB::transaction(function () use ($order) {
+                $order->update([
+                    'payment_method' => PaymentMethod::Cash->value,
+                    'order_code'     => Order::generateCode(),
+                ]);
+            });
         });
         return response()->json(['message' => 'ok', 'order_code' => $order->fresh()->order_code]);
     }

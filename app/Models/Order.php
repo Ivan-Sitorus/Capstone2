@@ -12,20 +12,106 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Str;
+use RuntimeException;
 
 class Order extends Model
 {
     use HasFactory, HasUuids;
+
+    /**
+     * Unique constraints that are safe to recover from by regenerating the
+     * order code on the next attempt.
+     *
+     * @var list<string>
+     */
+    protected const RETRYABLE_UNIQUE_COLUMNS = ['order_code', 'receipt_token'];
+
+    /** Maximum number of attempts to persist an order with a usable code. */
+    protected const MAX_CODE_ATTEMPTS = 5;
 
     protected static function boot(): void
     {
         parent::boot();
 
         static::creating(function ($order) {
-            $order->order_code ??= 'ORD-'.date('dmy').'-'.
-                (Order::whereDate('created_at', today())->count() + 1);
+            $order->order_code ??= static::generateCode();
         });
+    }
+
+    /**
+     * Create a new order, retrying only when the generated order code (or the
+     * receipt token) hits its unique constraint. Any other failure bubbles up
+     * untouched, and the retry is capped so a permanently stuck code cannot
+     * spin forever.
+     *
+     * @param  array<string, mixed>  $attributes
+     */
+    public static function create(array $attributes = [])
+    {
+        return static::retryOnCodeCollision(
+            fn () => static::query()->withSavepointIfNeeded(
+                fn () => static::query()->create($attributes)
+            )
+        );
+    }
+
+    /**
+     * Run the given callback, retrying it only when a unique-constraint
+     * violation points at the order code or receipt token. The callback must
+     * persist a fresh code on every invocation (the model's creating hook
+     * regenerates it for a new instance).
+     *
+     * @template TReturn
+     *
+     * @param  callable(int): TReturn  $callback
+     * @return TReturn
+     */
+    public static function retryOnCodeCollision(callable $callback, int $maxAttempts = self::MAX_CODE_ATTEMPTS)
+    {
+        for ($attempt = 1; ; $attempt++) {
+            try {
+                return $callback($attempt);
+            } catch (UniqueConstraintViolationException $e) {
+                if (! static::isRetryableCodeViolation($e)) {
+                    throw $e;
+                }
+
+                if ($attempt >= $maxAttempts) {
+                    throw new RuntimeException(
+                        "Gagal membuat kode pesanan unik setelah {$maxAttempts} percobaan.",
+                        0,
+                        $e,
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Determine whether the unique violation was caused by a retryable
+     * order-code / receipt-token constraint rather than another column.
+     */
+    protected static function isRetryableCodeViolation(UniqueConstraintViolationException $e): bool
+    {
+        if (! empty($e->columns)) {
+            return (bool) array_intersect($e->columns, static::RETRYABLE_UNIQUE_COLUMNS);
+        }
+
+        $index = (string) $e->index;
+
+        if ($index === '') {
+            return false;
+        }
+
+        foreach (static::RETRYABLE_UNIQUE_COLUMNS as $column) {
+            if (str_contains($index, $column)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function uniqueIds(): array
@@ -38,11 +124,29 @@ class Order extends Model
         return (string) Str::uuid();
     }
 
+    /**
+     * Build the next human-readable order code (e.g. "ORD-270926-0001").
+     *
+     * The sequence is derived from the highest numeric suffix already stored
+     * for today, not from a row count, so gaps left by deletions do not cause
+     * a previously used code to be handed out again. Uniqueness under
+     * concurrent inserts is guaranteed by the order_code unique index plus the
+     * retry loop in create()/retryOnCodeCollision().
+     */
     public static function generateCode(): string
     {
         $date = now();
-        $orderNumber = static::whereDate('created_at', $date)->count() + 1;
-        return 'ORD-'.$date->format('dmy').'-'.str_pad($orderNumber, 4, '0', STR_PAD_LEFT);
+        $prefix = 'ORD-'.$date->format('dmy').'-';
+        $offset = strlen($prefix) + 1;
+
+        $row = static::query()
+            ->where('order_code', 'like', $prefix.'%')
+            ->selectRaw("COALESCE(MAX(CAST(SUBSTR(order_code, {$offset}) AS INTEGER)), 0) AS max_suffix")
+            ->first();
+
+        $next = (int) ($row?->max_suffix ?? 0) + 1;
+
+        return $prefix.str_pad((string) $next, 4, '0', STR_PAD_LEFT);
     }
 
     protected $fillable = [
@@ -118,7 +222,7 @@ class Order extends Model
 
     /**
      * Number of pending orders that need cashier attention.
-     * Single source of truth — used by sidebar badge and count endpoint.
+     * Single source of truth: used by sidebar badge and count endpoint.
      */
     public static function cashierPendingCount(): int
     {
