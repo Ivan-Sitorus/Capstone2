@@ -3,7 +3,7 @@ import { Plus, ClipboardList, Clock } from 'lucide-react';
 import LiveClock from '@/Components/Cashier/LiveClock';
 import StatBar from '@/Components/Cashier/StatBar';
 import StatusBadge from '@/Components/Common/StatusBadge';
-import { formatRupiah } from '@/helpers';
+import Money from '@/Components/Common/Money';
 import { SLATE_50, WHITE, SLATE_200, SLATE_900, SLATE_500, BLUE, SLATE_700, SLATE_400, SLATE_100 } from '@/theme';
 
 export default function Dashboard({ totalSales, transactionCount, activeOrders, recentTransactions }) {
@@ -152,7 +152,7 @@ export default function Dashboard({ totalSales, transactionCount, activeOrders, 
                                             </span>
                                         </td>
                                         <td style={{ padding: '14px 16px', fontSize: 13, fontWeight: 600, color: SLATE_900, whiteSpace: 'nowrap' }}>
-                                            {formatRupiah(trx.total_amount)}
+                                            <Money value={trx.total_amount} />
                                         </td>
                                         <td style={{ padding: '14px 16px', fontSize: 13, color: SLATE_500, textTransform: 'capitalize' }}>
                                             {trx.payment_method || '-'}

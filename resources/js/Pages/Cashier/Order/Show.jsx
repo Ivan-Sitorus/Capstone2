@@ -3,7 +3,8 @@ import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { ArrowLeft, X, CircleCheck } from 'lucide-react';
 import StatusBadge from '@/Components/Common/StatusBadge';
-import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import Money from '@/Components/Common/Money';
+import { formatDate, formatTime } from '@/helpers';
 import { WHITE, SLATE_100, SLATE_900, SLATE_500, SLATE_400, SLATE_200, BLUE, SLATE_50, GREEN_MUTED_LIGHT, BLUE_SOFT, BLUE_MUTED_BG, BLUE_LIGHT, BLUE_DARK, RED_MUTED } from '@/theme';
 
 // Cashier blue theme (consistent with Dashboard, ActiveOrders, etc.)
@@ -225,7 +226,7 @@ export default function OrderShow({ order }) {
                                 </div>
                                 <div style={{ width: 100, flexShrink: 0 }}>
                                     <span style={{ fontSize: 13, color: T.textSec, fontFamily: 'Outfit, system-ui' }}>
-                                        {formatRupiah(item.unit_price)}
+                                        <Money value={item.unit_price} />
                                     </span>
                                 </div>
                                 <div style={{ width: 80, flexShrink: 0 }}>
@@ -235,7 +236,7 @@ export default function OrderShow({ order }) {
                                 </div>
                                 <div style={{ width: 120, flexShrink: 0 }}>
                                     <span style={{ fontSize: 13, fontWeight: 600, color: T.textPri, fontFamily: 'Outfit, system-ui' }}>
-                                        {formatRupiah(item.subtotal)}
+                                        <Money value={item.subtotal} />
                                     </span>
                                 </div>
                             </div>
@@ -255,7 +256,7 @@ export default function OrderShow({ order }) {
                                 fontSize: 20, fontWeight: 700, color: T.accent,
                                 fontFamily: 'Outfit, system-ui',
                             }}>
-                                {formatRupiah(order.total_amount)}
+                                <Money value={order.total_amount} />
                             </span>
                         </div>
                     </div>

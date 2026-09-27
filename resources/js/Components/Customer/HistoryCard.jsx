@@ -1,5 +1,5 @@
 import { Coffee } from 'lucide-react';
-import { formatRupiah } from '@/helpers';
+import Money from '@/Components/Common/Money';
 import { STONE_50, STONE_300, STONE_400, STONE_500, STONE_700, STONE_900, AMBER_400, BLUE_400, GREEN_400 } from '@/theme';
 
 const F = '"Inter", system-ui, sans-serif';
@@ -94,7 +94,7 @@ export default function HistoryCard({ order, onDetail }) {
                             <span style={{ fontWeight: 600 }}>{item.quantity}×</span> {item.name}
                         </span>
                         <span style={{ color: STONE_900, fontWeight: 500, fontFamily: F }}>
-                            {formatRupiah(item.subtotal)}
+                            <Money value={item.subtotal} />
                         </span>
                     </div>
                 )) : (
@@ -115,7 +115,7 @@ export default function HistoryCard({ order, onDetail }) {
                         TOTAL
                     </p>
                     <p style={{ fontSize: 20, fontWeight: 700, color: STONE_900, fontFamily: F, letterSpacing: '-0.02em' }}>
-                        {formatRupiah(order.total_amount)}
+                        <Money value={order.total_amount} />
                     </p>
                 </div>
                 <button

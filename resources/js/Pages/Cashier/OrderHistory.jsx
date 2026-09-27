@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { router, Link, Head } from '@inertiajs/react';
 import { Search, Calendar, CreditCard, ChevronDown } from 'lucide-react';
 import StatusBadge from '@/Components/Common/StatusBadge';
-import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import Money from '@/Components/Common/Money';
+import { formatDate, formatTime } from '@/helpers';
 import { WHITE, SLATE_100, SLATE_900, SLATE_500, SLATE_400, SLATE_200, BLUE, SLATE_700, SLATE_50 } from '@/theme';
 
 const METHOD_LABELS = { cash: 'Tunai', qris: 'QRIS', bayar_nanti: 'Bayar Nanti' };
@@ -274,7 +275,7 @@ function OrderRow({ order }) {
             </div>
             <div style={{ width: 140, flexShrink: 0 }}>
                 <span style={{ fontSize: 13, fontWeight: 600, color: T.textPri, fontFamily: 'Outfit, system-ui' }}>
-                    {formatRupiah(order.total_amount)}
+                    <Money value={order.total_amount} />
                 </span>
             </div>
             <div style={{ width: 110, flexShrink: 0 }}>

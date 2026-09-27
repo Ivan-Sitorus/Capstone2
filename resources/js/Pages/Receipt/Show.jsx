@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { Share2 } from 'lucide-react';
-import { formatRupiah, formatDate, formatTime } from '@/helpers';
+import Money from '@/Components/Common/Money';
+import { formatDate, formatTime } from '@/helpers';
 import { Card, CardContent } from '@/Components/ui/card';
 import { Badge } from '@/Components/ui/badge';
 import {
@@ -113,14 +114,14 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
                                                     {item.name}
                                                 </p>
                                                 <p className="text-xs text-gray-500 mt-0.5">
-                                                    {formatRupiah(item.unit_price)}
+                                                    <Money value={item.unit_price} />
                                                 </p>
                                             </TableCell>
                                             <TableCell className="text-sm text-gray-900 text-center py-2.5">
                                                 {item.quantity}
                                             </TableCell>
                                             <TableCell className="text-sm font-semibold text-gray-900 text-right py-2.5">
-                                                {formatRupiah(item.subtotal)}
+                                                <Money value={item.subtotal} />
                                             </TableCell>
                                         </TableRow>
                                     ))}
@@ -134,7 +135,7 @@ export default function ReceiptShow({ order, cafe, receiptUrl }) {
                                     Total
                                 </span>
                                 <span className="text-lg font-bold text-blue-600">
-                                    {formatRupiah(order.total_amount)}
+                                    <Money value={order.total_amount} />
                                 </span>
                             </div>
 
