@@ -17,32 +17,7 @@ const areaLayouts = {
     Cashier: page => <CashierLayout fullscreen>{page}</CashierLayout>,
 };
 
-// Inertia v3 hanya membaca initial page dari
-// <script data-page="app" type="application/json">.
-// Adapter server yang terpasang (inertia-laravel v2) masih memakai
-// <div id="app" data-page="...">, jadi format lama dibaca sebagai fallback
-// agar hidrasi muat-pertama tetap jalan sampai adapter server di-upgrade ke v3.
-// Begitu server mengirim elemen <script>, fallback ini otomatis tidak terpakai.
-const initialPage = (() => {
-    if (typeof document === 'undefined') return undefined;
-
-    const scriptEl = document.querySelector(
-        'script[data-page="app"][type="application/json"]',
-    );
-    if (scriptEl?.textContent) return undefined;
-
-    const el = document.getElementById('app');
-    if (!el?.dataset?.page) return undefined;
-
-    try {
-        return JSON.parse(el.dataset.page);
-    } catch {
-        return undefined;
-    }
-})();
-
 createInertiaApp({
-    page: initialPage,
     async resolve(name) {
         const module = await pages[`./Pages/${name}.jsx`]();
         const page = module.default;
