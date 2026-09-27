@@ -6,6 +6,7 @@ use App\Enums\MenuStatus;
 use App\Http\Controllers\Controller;
 use App\Models\CafeTable;
 use App\Models\Category;
+use App\Support\CustomerSession;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -44,11 +45,15 @@ class CustomerMenuController extends Controller
 
     public function submitIdentity(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'customer_name' => 'required|string|max:255',
             'phone' => 'required|string|max:20',
             'table_id' => 'nullable|integer|exists:cafe_tables,id',
         ]);
+
+        // Persist the anonymous identity server-side so the order endpoints can
+        // authorise against it rather than a client-supplied phone.
+        CustomerSession::bind($validated['customer_name'], $validated['phone']);
 
         return redirect()->route('customer.menu');
     }

@@ -31,8 +31,18 @@ class CashierDashboardController extends Controller
 
     public function profile(): Response
     {
+        $user = auth()->user();
+
+        // Pass only the fields the profile page renders; the raw user model
+        // would otherwise expose status, verification and token metadata.
         return Inertia::render('Cashier/Profile', [
-            'user' => auth()->user(),
+            'user' => [
+                'id'         => $user->id,
+                'name'       => $user->name,
+                'email'      => $user->email,
+                'role'       => $user->role,
+                'created_at' => $user->created_at,
+            ],
         ]);
     }
 }

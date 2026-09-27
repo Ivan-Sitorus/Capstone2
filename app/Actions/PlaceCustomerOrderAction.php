@@ -10,6 +10,7 @@ use App\Models\CafeTable;
 use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Support\CustomerSession;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -19,6 +20,13 @@ class PlaceCustomerOrderAction
 {
     public function handle(Request $request): JsonResponse
     {
+        // The mobile cart posts `customer_phone` while other callers use
+        // `phone`; accept both so the number is actually persisted and can bind
+        // the session identity to this order.
+        $request->merge([
+            'phone' => $request->input('phone', $request->input('customer_phone')),
+        ]);
+
         $request->validate([
             'customer_name'     => 'required|string|min:2|max:255',
             'phone'             => ['nullable', 'string', 'regex:/^[0-9]{10,15}$/'],
@@ -98,6 +106,12 @@ class PlaceCustomerOrderAction
             OrderItem::insert($orderItemsToInsert);
 
             $order->update(['total_amount' => $total]);
+
+            // Bind the anonymous customer identity to this browser session so
+            // later history/payment/status requests can be authorised against
+            // it instead of trusting client-supplied identifiers.
+            CustomerSession::bind($order->customer_name, $order->phone);
+            CustomerSession::rememberOrder($order);
 
             return response()->json([
                 'order_code'   => $order->order_code,

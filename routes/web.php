@@ -54,12 +54,15 @@ Route::prefix('pelanggan')->group(function () {
     Route::get('/keranjang', fn () => Inertia::render('Customer/Cart/Index', []))->name('customer.cart');
     Route::get('/riwayat', [CustomerOrderController::class, 'history'])->name('customer.history');
 
-    // Order flow
-    Route::get('/pesanan/{order}/payment', [CustomerPaymentController::class, 'showChoose'])->name('customer.payment.choose');
-    Route::post('/pesanan/{order}/payment/choose', [CustomerPaymentController::class, 'choose'])->name('customer.payment.choose.post');
-    Route::get('/pesanan/{order}/payment/qris', [CustomerPaymentController::class, 'showQris'])->name('customer.payment.qris');
-    Route::post('/pesanan/{order}/payment/qris', [CustomerPaymentController::class, 'uploadQris'])->name('customer.payment.qris.upload');
-    Route::get('/pesanan/{order}/status', [CustomerOrderController::class, 'showStatus'])->name('customer.order.status');
+    // Order flow: every route that resolves an order id must prove the order
+    // belongs to the session-bound customer identity.
+    Route::middleware('customer.order')->group(function () {
+        Route::get('/pesanan/{order}/payment', [CustomerPaymentController::class, 'showChoose'])->name('customer.payment.choose');
+        Route::post('/pesanan/{order}/payment/choose', [CustomerPaymentController::class, 'choose'])->name('customer.payment.choose.post');
+        Route::get('/pesanan/{order}/payment/qris', [CustomerPaymentController::class, 'showQris'])->name('customer.payment.qris');
+        Route::post('/pesanan/{order}/payment/qris', [CustomerPaymentController::class, 'uploadQris'])->name('customer.payment.qris.upload');
+        Route::get('/pesanan/{order}/status', [CustomerOrderController::class, 'showStatus'])->name('customer.order.status');
+    });
 });
 
 // QR table entry: accepts {APP_URL}/order?table={token} and forwards to the identity form

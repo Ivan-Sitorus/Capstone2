@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Middleware\EnsureCustomerOrderOwnership;
 use App\Http\Middleware\HandleInertiaRequests;
 use App\Http\Middleware\RoleMiddleware;
 use App\Http\Middleware\TrackCashierHistory;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use Illuminate\Session\Middleware\StartSession;
 use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -21,13 +25,25 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
             TrackCashierHistory::class,
         ]);
+        // The customer API endpoints live in routes/api.php, which does not
+        // start a session by default. They need the same session (and the
+        // cookie decryption that goes with it) as the web routes so order
+        // ownership can be checked server-side.
+        $middleware->group('customer.session', [
+            EncryptCookies::class,
+            AddQueuedCookiesToResponse::class,
+            StartSession::class,
+        ]);
+
         $middleware->trustProxies(at: '*');
         $middleware->alias([
             'role' => RoleMiddleware::class,
+            'customer.order' => EnsureCustomerOrderOwnership::class,
         ]);
-        $middleware->validateCsrfTokens(except: [
-            'kasir/*',
-        ]);
+
+        // The blanket `kasir/*` CSRF exemption was removed: Inertia and axios
+        // send the XSRF-TOKEN automatically, so every state-changing web route
+        // is now CSRF-verified. No endpoint needs a narrowed exemption.
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->respond(function (Response $response) {

@@ -16,25 +16,23 @@ class CashierNewOrderController extends Controller
 {
     public function index(): Response
     {
-        // Cache 5 minutes: menu rarely changes, admin can clear cache when updating menu
-        $categories = Cache::remember('menu_categories_cashier', 300, fn () => Category::with([
-            'menus' => fn ($q) => $q->where('status', MenuStatus::Active->value)->orderBy('name')
-                ->with(['menuIngredients.ingredient.batches' => fn ($q) => $q
-                    ->where('quantity', '>', 0)
-                    ->where(fn ($q) => $q
-                        ->whereNull('expiry_date')
-                        ->orWhere('expiry_date', '>', now())
-                        ->orWhere('allow_expired_usage', true)
-                    ),
-                ]),
-        ])
+        // Cache 5 minutes: menu rarely changes, admin can clear cache when
+        // updating menu.
+        //
+        // Only the columns the POS grid actually reads are selected. The cashier
+        // page has no use for cost_price or the ingredient/batch graph (which
+        // carries supplier names, batch costs and payment status), so none of
+        // that ever leaves the server.
+        $categories = Cache::remember('menu_categories_cashier_v2', 300, fn () => Category::query()
+            ->select(['id', 'name'])
+            ->with([
+                'menus' => fn ($q) => $q
+                    ->select(['id', 'category_id', 'name', 'price'])
+                    ->where('status', MenuStatus::Active->value)
+                    ->orderBy('name'),
+            ])
             ->orderBy('name')
             ->get()
-            ->each(function ($category) {
-                $category->menus->each(function ($menu) {
-                    $menu->available_stock = $menu->computeAvailableServings();
-                });
-            })
         );
 
         return Inertia::render('Cashier/NewOrder', ['categories' => $categories]);

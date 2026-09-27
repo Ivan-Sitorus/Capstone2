@@ -7,6 +7,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Support\CustomerSession;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -21,8 +22,10 @@ class CustomerOrderController extends Controller
 
     public function history(Request $request): Response
     {
-        // History by phone number from sessionStorage (sent via query param)
-        $phone = $request->query('phone');
+        // The phone comes from the server-side session identity, never from the
+        // request. An attacker-controlled `?phone=` query parameter is ignored
+        // so the endpoint cannot be used to read another customer's orders.
+        $phone = CustomerSession::phone();
 
         $orders = $phone
             ? Order::with([
