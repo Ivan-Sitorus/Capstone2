@@ -22,6 +22,11 @@ const navItems = [
     { label: 'Profil',          href: route('kasir.profile'),          icon: User },
 ];
 
+const normalizePath = (path) => {
+    const stripped = (path || '/').replace(/\/+$/, '');
+    return stripped === '' ? '/' : stripped;
+};
+
 export default function CashierLayout({ children, title = 'Dashboard', fullscreen = false }) {
     const { flash, pendingOrderCount: initialCount } = usePage().props;
     const [pendingCount, setPendingCount] = useState(initialCount ?? 0);
@@ -31,6 +36,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
         return window.localStorage.getItem('cashier-sidebar-collapsed') === 'true';
     });
     const sidebarWidth = isSidebarCollapsed ? 84 : 260;
+    const currentPath = typeof window === 'undefined' ? '/' : normalizePath(window.location.pathname);
 
     useEffect(() => {
         if (flash?.success) {
@@ -171,7 +177,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                 {/* Nav */}
                 <nav style={{ flex: 1, padding: '20px 20px 0', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
                     {navItems.map(({ label, href, icon: Icon }) => {
-                        const active = window.location.pathname === href;
+                        const active = normalizePath(new URL(href, window.location.origin).pathname) === currentPath;
                         const showBadge = label === 'Pesanan Aktif' && pendingCount > 0;
                         return (
                             <Link
