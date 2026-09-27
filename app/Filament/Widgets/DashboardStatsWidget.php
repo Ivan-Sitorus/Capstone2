@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Models\Ingredient;
 use App\Models\IngredientBatch;
 use App\Models\Order;
+use App\Support\Formatter;
 use Filament\Widgets\StatsOverviewWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 use Illuminate\Support\Carbon;
@@ -60,7 +61,7 @@ class DashboardStatsWidget extends StatsOverviewWidget
               . ' - ' . Carbon::parse($this->rangeUntil())->translatedFormat('d M Y');
 
         return [
-            Stat::make('Penjualan', 'Rp ' . number_format($totalRange, 0, ',', '.'))
+            Stat::make('Penjualan', Formatter::rupiah($totalRange))
                 ->description($desc)
                 ->color('success')
                 ->icon('heroicon-o-banknotes'),

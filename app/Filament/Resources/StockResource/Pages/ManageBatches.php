@@ -16,6 +16,7 @@ use App\Models\StockAdjustment;
 use App\Models\StockMovement;
 use App\Filament\Resources\StockAdjustmentResource;
 use App\Services\StockReconciliationService;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\CreateAction;
@@ -331,7 +332,7 @@ class ManageBatches extends Page implements HasTable
                     fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get): void {
                         $totalHarga = (float) str_replace('.', '', (string) ($get('total_harga') ?? 0));
                         if ((float) $value > $totalHarga) {
-                            $fail('Total dibayar tidak boleh melebihi total harga (Rp ' . number_format($totalHarga, 0, ',', '.') . ').');
+                            $fail('Total dibayar tidak boleh melebihi total harga (' . Formatter::rupiah($totalHarga) . ').');
                         }
                     },
                 ]);

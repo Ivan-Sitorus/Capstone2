@@ -12,6 +12,7 @@ use App\Models\Menu;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\User;
+use App\Support\Formatter;
 use Filament\Actions\CreateAction;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -72,8 +73,8 @@ class ListReceivables extends ListRecords
                                     $menu = Menu::find($get('menu_id'));
                                     if ($menu && $menu->discounted_price) {
                                         return [
-                                            'normal'   => 'Normal (Rp ' . number_format($menu->price, 0, ',', '.') . ')',
-                                            'discount' => 'Diskon (Rp ' . number_format($menu->discounted_price, 0, ',', '.') . ')',
+                                            'normal'   => 'Normal (' . Formatter::rupiah($menu->price) . ')',
+                                            'discount' => 'Diskon (' . Formatter::rupiah($menu->discounted_price) . ')',
                                         ];
                                     }
                                     return ['normal' => 'Normal'];

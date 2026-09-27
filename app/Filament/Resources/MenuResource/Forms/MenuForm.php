@@ -9,6 +9,7 @@ use App\Filament\Resources\MenuResource;
 use App\Models\Ingredient;
 use App\Models\MenuIngredient;
 use App\Services\MenuImageService;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -82,7 +83,7 @@ class MenuForm
                         $price = (int) str_replace('.', '', (string) ($get("price") ?? 0));
                         $discountedPrice = (int) str_replace('.', '', (string) ($value ?? 0));
                         if ($discountedPrice > $price) {
-                            $fail("Harga diskon tidak boleh lebih besar dari harga menu (Rp ".number_format($price, 0, ",", ".").").");
+                            $fail("Harga diskon tidak boleh lebih besar dari harga menu (".Formatter::rupiah($price).").");
                         }
                     },
                 ])
