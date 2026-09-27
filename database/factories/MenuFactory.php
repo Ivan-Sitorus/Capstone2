@@ -2,10 +2,10 @@
 
 namespace Database\Factories;
 
+use App\Enums\MenuStatus;
 use App\Models\Category;
 use App\Models\Menu;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Str;
 
 /**
  * @extends Factory<Menu>
@@ -22,22 +22,16 @@ class MenuFactory extends Factory
             'Jus Mangga', 'Susu Coklat', 'Croissant', 'Brownies',
         ];
 
-        $name = fake()->randomElement($names);
+        $price = fake()->numberBetween(8000, 50000);
 
         return [
             'category_id' => Category::factory(),
-            'name' => $name,
-            'slug' => Str::slug($name).'-'.Str::random(6),
-            'description' => fake()->sentence(8),
-            'price' => fake()->numberBetween(8000, 50000),
+            'name' => fake()->randomElement($names),
+            'price' => $price,
+            'cost_price' => (int) floor($price * fake()->randomFloat(2, 0.3, 0.7)),
+            'discounted_price' => null,
             'image' => null,
-            'is_available' => fake()->boolean(85),
-            'is_student_discount' => fake()->boolean(30),
-            'student_price' => fn (array $attrs) => $attrs['is_student_discount']
-                ? fake()->numberBetween(5000, 40000)
-                : null,
-            'cashback' => fake()->optional(0.3)->numberBetween(1000, 5000),
-            'is_stock_calculated' => fake()->boolean(20),
+            'status' => MenuStatus::Active->value,
         ];
     }
 }
