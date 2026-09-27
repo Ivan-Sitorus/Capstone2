@@ -9,14 +9,20 @@ use App\Models\Category;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class CustomerMenuController extends Controller
 {
-    private function findTable(?string $token): ?CafeTable
+    private function findTable(mixed $token): ?CafeTable
     {
-        if (!$token) return null;
+        // Token meja bersifat opaque UUID. Nilai apa pun yang bukan UUID
+        // (mis. nomor lama seperti "1") langsung dianggap tidak valid,
+        // sehingga tidak pernah dikirim ke kolom uuid (mencegah SQLSTATE 22P02).
+        if (! is_string($token) || ! Str::isUuid($token)) {
+            return null;
+        }
 
         return Cache::remember("cafe_table_{$token}", 600, fn () =>
             CafeTable::select(['id', 'table_number', 'qr_token'])->where('qr_token', $token)->first()
@@ -25,13 +31,12 @@ class CustomerMenuController extends Controller
 
     public function showIdentity(Request $request): Response
     {
-        $table = $this->findTable($request->query('table'));
+        $tableParam = $request->query('table');
+        $table = $this->findTable($tableParam);
 
-        // Reject if table does not exist in DB
-        if ($tableId = $request->query('table')) {
-            if (! $table) {
-                abort(404);
-            }
+        // Token ada tapi tidak valid/tidak ditemukan -> 404, bukan 500.
+        if ($tableParam !== null && ! $table) {
+            abort(404);
         }
 
         return Inertia::render('Customer/Identity', ['table' => $table]);
@@ -62,12 +67,11 @@ class CustomerMenuController extends Controller
                 ->get();
         });
 
-        $table = $this->findTable($request->query('table'));
+        $tableParam = $request->query('table');
+        $table = $this->findTable($tableParam);
 
-        if ($tableId = $request->query('table')) {
-            if (! $table) {
-                abort(404);
-            }
+        if ($tableParam !== null && ! $table) {
+            abort(404);
         }
 
         return Inertia::render('Customer/Menu/Index', [

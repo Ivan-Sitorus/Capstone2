@@ -59,4 +59,27 @@ class QrTableTest extends TestCase
         $this->get(route('customer.identity', ['table' => (string) Str::uuid()]))
             ->assertNotFound();
     }
+
+    public function test_identity_page_rejects_non_uuid_table_token(): void
+    {
+        // Skenario bug: /pelanggan/identitas?table=1 dahulu 500 (SQLSTATE 22P02).
+        $this->get(route('customer.identity', ['table' => '1']))->assertNotFound();
+        $this->get(route('customer.identity', ['table' => 'abc']))->assertNotFound();
+    }
+
+    public function test_menu_page_rejects_non_uuid_table_token(): void
+    {
+        // Skenario bug: /pelanggan/menu?table=1 dahulu 500 (SQLSTATE 22P02).
+        $this->get(route('customer.menu', ['table' => '1']))->assertNotFound();
+    }
+
+    public function test_malformed_array_table_token_returns_not_found(): void
+    {
+        $this->get(route('customer.identity', ['table' => ['x']]))->assertNotFound();
+    }
+
+    public function test_identity_page_without_table_still_renders(): void
+    {
+        $this->get(route('customer.identity'))->assertOk();
+    }
 }
