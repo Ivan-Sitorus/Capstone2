@@ -21,7 +21,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        image: 'posmine-pos:latest'
+        image: 'minepos-pos:latest'
         profiles:
             - prod
         environment:
@@ -44,7 +44,7 @@ services:
         build:
             context: .
             dockerfile: datamining/Dockerfile
-        image: 'posmine-datamining:latest'
+        image: 'minepos-datamining:latest'
         environment:
             DB_HOST: 'pgsql'
             DB_PORT: '5432'

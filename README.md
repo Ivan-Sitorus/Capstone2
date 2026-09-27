@@ -1,6 +1,6 @@
-# POSMine: Sistem Point of Sale
+# minePOS: Sistem Point of Sale
 
-Sistem POS berbasis web PWA untuk kafe (studi kasus POSMine STIE Totalwin Semarang).
+Sistem POS berbasis web PWA untuk kafe (studi kasus minePOS STIE Totalwin Semarang).
 **Fase aktif:** Modul Transaksi (Kasir + Pelanggan) + Panel Admin (Filament) + Data Mining.
 
 ---
@@ -61,8 +61,8 @@ docker compose exec -T app php artisan migrate:fresh --seed
 
 | Peran | Email | Password |
 |---|---|---|
-| Admin | `admin@posmine.com` | `password` |
-| Kasir | `kasir@posmine.com` | `password` |
+| Admin | `admin@minepos.com` | `password` |
+| Kasir | `kasir@minepos.com` | `password` |
 
 > Login pelanggan (mahasiswa) memakai **Nama Lengkap** sebagai username dan **NIM** sebagai password.
 
@@ -136,7 +136,7 @@ Halaman admin Filament memanggil endpoint tersebut langsung melalui `config('dat
 ## Variabel Environment Penting
 
 ```env
-APP_NAME=POSMine
+APP_NAME=minePOS
 APP_LOCALE=id
 
 DB_CONNECTION=pgsql

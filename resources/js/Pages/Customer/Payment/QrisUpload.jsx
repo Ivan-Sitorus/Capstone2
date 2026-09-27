@@ -68,16 +68,16 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
     return (
         <CustomerLayout activeTab="cart">
             <Head>
-                <title>Pembayaran QRIS - POSMine</title>
+                <title>Pembayaran QRIS - minePOS</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
                 <style>{`
                     html, body { background: ${STONE_50}; }
-                    .posmineq-upload { transition: background 0.15s; }
-                    .posmineq-upload:hover { background: rgba(239,237,233,0.60) !important; }
-                    .posmineq-btn { transition: background 0.15s, transform 0.1s; }
-                    .posmineq-btn:active { transform: scale(0.98); }
+                    .mineposq-upload { transition: background 0.15s; }
+                    .mineposq-upload:hover { background: rgba(239,237,233,0.60) !important; }
+                    .mineposq-btn { transition: background 0.15s, transform 0.1s; }
+                    .mineposq-btn:active { transform: scale(0.98); }
                 `}</style>
             </Head>
 
@@ -175,7 +175,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                     maxHeight: '100%',
                                 }}>
                                     <img
-                                        src={qrisImage} alt="QRIS POSMine"
+                                        src={qrisImage} alt="QRIS minePOS"
                                         style={{ width: '100%', height: 'auto', borderRadius: 10, display: 'block' }}
                                         onError={e => { e.target.src = '/images/logo.jpg'; }}
                                     />
@@ -205,7 +205,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                 </label>
 
                                 <label htmlFor="proof-upload" style={{ cursor: 'pointer', display: 'block' }}>
-                                    <div className="posmineq-upload" style={{
+                                    <div className="mineposq-upload" style={{
                                         border: `2px dashed ${file ? C.accent : C.border}`,
                                         background: file ? 'rgba(239,237,233,0.40)' : 'rgba(239,237,233,0.30)',
                                         borderRadius: 12,
@@ -261,7 +261,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                             <button
                                 onClick={handleUpload}
                                 disabled={!file || uploading}
-                                className="posmineq-btn"
+                                className="mineposq-btn"
                                 style={{
                                     width: '100%', padding: '14px 0',
                                     background: !file || uploading ? C.border : C.accent,
@@ -316,7 +316,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                         </div>
                         <button
                             onClick={() => router.visit(route('customer.history'))}
-                            className="posmineq-btn"
+                            className="mineposq-btn"
                             style={{
                                 width: '100%', padding: '14px 0',
                                 background: C.accent, color: C.surface,

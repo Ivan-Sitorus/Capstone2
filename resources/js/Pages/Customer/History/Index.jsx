@@ -50,7 +50,7 @@ export default function CustomerRiwayat({ orders = [] }) {
 
     const sessionName = (() => {
         try {
-            const s = sessionStorage.getItem('posmine_customer');
+            const s = sessionStorage.getItem('minepos_customer');
             return s ? JSON.parse(s)?.name ?? null : null;
         } catch (_) { return null; }
     })();
@@ -59,7 +59,7 @@ export default function CustomerRiwayat({ orders = [] }) {
         const params = new URLSearchParams(window.location.search);
         if (!params.get('phone')) {
             try {
-                const saved = sessionStorage.getItem('posmine_customer');
+                const saved = sessionStorage.getItem('minepos_customer');
                 if (saved) {
                     const data = JSON.parse(saved);
                     if (data?.phone) {
@@ -87,15 +87,15 @@ export default function CustomerRiwayat({ orders = [] }) {
     return (
         <CustomerLayout activeTab="riwayat">
             <Head>
-                <title>Riwayat Pesanan - POSMine</title>
+                <title>Riwayat Pesanan - minePOS</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
                 <style>{`
                     html, body { background: ${STONE_50}; }
-                    .posminer-scroll::-webkit-scrollbar { display: none; }
-                    .posminer-tab { transition: background 0.175s, color 0.175s, box-shadow 0.175s; }
-                    .posminer-detail-btn:hover { background: ${STONE_50} !important; }
+                    .mineposr-scroll::-webkit-scrollbar { display: none; }
+                    .mineposr-tab { transition: background 0.175s, color 0.175s, box-shadow 0.175s; }
+                    .mineposr-detail-btn:hover { background: ${STONE_50} !important; }
                 `}</style>
             </Head>
 
@@ -107,7 +107,7 @@ export default function CustomerRiwayat({ orders = [] }) {
             }}>
 
                 {/* ── Scrollable content ── */}
-                <div className="posminer-scroll" style={{
+                <div className="mineposr-scroll" style={{
                     flex: 1, overflowY: 'auto', scrollbarWidth: 'none',
                     WebkitOverflowScrolling: 'touch',
                     padding: '32px 24px 100px',
@@ -140,7 +140,7 @@ export default function CustomerRiwayat({ orders = [] }) {
                                     <button
                                         key={tab.key}
                                         onClick={() => setActiveTab(tab.key)}
-                                        className="posminer-tab"
+                                        className="mineposr-tab"
                                         style={{
                                             flex: 1,
                                             padding: active ? '8px 0' : '8px 0',
@@ -276,16 +276,16 @@ export default function CustomerRiwayat({ orders = [] }) {
                                     boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
                                 }}>
                                     <img
-                                        src="/images/logo.jpg" alt="POSMine"
+                                        src="/images/logo.jpg" alt="minePOS"
                                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                         onError={e => {
                                             e.target.style.display = 'none';
-                                            e.target.parentElement.innerHTML = '<span style="color:white;font-size:18px;font-style:italic;font-weight:700">posmine</span>';
+                                            e.target.parentElement.innerHTML = '<span style="color:white;font-size:18px;font-style:italic;font-weight:700">minepos</span>';
                                         }}
                                     />
                                 </div>
                                 <span style={{ fontSize: 17, fontWeight: 700, color: C.accentDark, fontFamily: F, letterSpacing: '-0.02em' }}>
-                                    POSMine
+                                    minePOS
                                 </span>
                             </div>
 

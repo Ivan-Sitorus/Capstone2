@@ -126,7 +126,7 @@ function SidebarContent({ collapsed, showCollapseControl, onToggleCollapse, pend
                     <>
                         <img
                             src="/images/logo.jpg"
-                            alt="POSMine"
+                            alt="minePOS"
                             width={40}
                             height={40}
                             style={{
@@ -138,7 +138,7 @@ function SidebarContent({ collapsed, showCollapseControl, onToggleCollapse, pend
                                 boxShadow: '0 2px 10px rgba(0,0,0,0.20)',
                             }}
                         />
-                        <span style={{ color: 'white', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap' }}>POSMine</span>
+                        <span style={{ color: 'white', fontWeight: 700, fontSize: 16, whiteSpace: 'nowrap' }}>minePOS</span>
                         {headerAction
                             ? <span style={{ marginLeft: 'auto', display: 'inline-flex' }}>{headerAction}</span>
                             : (showCollapseControl && collapseButton(false))}

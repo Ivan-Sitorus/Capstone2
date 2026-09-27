@@ -158,7 +158,7 @@ export default function ActiveOrders({ orders: initialOrders, counts }) {
     }
 
     return (
-        <><Head title="Pesanan Aktif | POSMine" />
+        <><Head title="Pesanan Aktif | minePOS" />
             <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 32, background: SLATE_50, minWidth: 0 }}>
             <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 

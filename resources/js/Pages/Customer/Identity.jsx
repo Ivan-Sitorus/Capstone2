@@ -29,7 +29,7 @@ export default function Identitas({ table }) {
     useEffect(() => {
         if (!table) return;
         try {
-            const saved = sessionStorage.getItem('posmine_customer');
+            const saved = sessionStorage.getItem('minepos_customer');
             if (saved) {
                 const data = JSON.parse(saved);
                 if (data.name && data.tableId === table.id) {
@@ -59,7 +59,7 @@ export default function Identitas({ table }) {
 
         if (!valid) return;
 
-        sessionStorage.setItem('posmine_customer', JSON.stringify({
+        sessionStorage.setItem('minepos_customer', JSON.stringify({
             name:        name.trim(),
             phone:       phoneClean,
             isMahasiswa: isStudent,
@@ -75,7 +75,7 @@ export default function Identitas({ table }) {
         return (
             <CustomerLayout activeTab="menu" showBottomNav={false}>
                 <Head>
-                    <title>POSMine</title>
+                    <title>minePOS</title>
                     <link rel="preconnect" href="https://fonts.googleapis.com" />
                     <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
@@ -92,7 +92,7 @@ export default function Identitas({ table }) {
                         overflow: 'hidden', background: C.headerDark,
                         boxShadow: '0 8px 24px rgba(0,0,0,0.25)', marginBottom: 24,
                     }}>
-                        <img src="/images/logo.jpg" alt="POSMine"
+                        <img src="/images/logo.jpg" alt="minePOS"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             onError={e => { e.target.style.display = 'none'; }} />
                     </div>
@@ -114,15 +114,15 @@ export default function Identitas({ table }) {
     return (
         <CustomerLayout activeTab="menu" showBottomNav={false}>
             <Head>
-                <title>Selamat Datang - POSMine</title>
+                <title>Selamat Datang - minePOS</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
                 <style>{`
                     html, body { background: ${C.bg}; }
-                    .posmineid-input { outline: none; transition: border-color 0.15s; }
-                    .posmineid-input:focus { border-color: ${C.accent} !important; }
-                    .posmineid-btn:active { background: ${C.accentHover} !important; }
+                    .mineposid-input { outline: none; transition: border-color 0.15s; }
+                    .mineposid-input:focus { border-color: ${C.accent} !important; }
+                    .mineposid-btn:active { background: ${C.accentHover} !important; }
                 `}</style>
             </Head>
 
@@ -147,7 +147,7 @@ export default function Identitas({ table }) {
                         boxShadow: '0 8px 30px rgba(0,0,0,0.35)',
                         border: '1px solid rgba(255,255,255,0.10)',
                     }}>
-                        <img src="/images/logo.jpg" alt="POSMine"
+                        <img src="/images/logo.jpg" alt="minePOS"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             onError={e => { e.target.style.display = 'none'; }} />
                     </div>
@@ -244,7 +244,7 @@ export default function Identitas({ table }) {
                                     onKeyDown={e => e.key === 'Enter' && handleSubmit()}
                                     placeholder="Masukkan nama lengkap"
                                     maxLength={100}
-                                    className="posmineid-input"
+                                    className="mineposid-input"
                                     style={{
                                         width: '100%', height: 48, boxSizing: 'border-box',
                                         border: `1px solid ${nameError ? DANGER : C.border}`,
@@ -281,7 +281,7 @@ export default function Identitas({ table }) {
                                     onKeyDown={e => e.key === 'Enter' && handleSubmit()}
                                     placeholder="0812 3456 7890"
                                     maxLength={15}
-                                    className="posmineid-input"
+                                    className="mineposid-input"
                                     style={{
                                         width: '100%', height: 48, boxSizing: 'border-box',
                                         border: `1px solid ${phoneError ? DANGER : C.border}`,
@@ -329,7 +329,7 @@ export default function Identitas({ table }) {
                         <div style={{ paddingTop: 4 }}>
                             <button
                                 onClick={handleSubmit}
-                                className="posmineid-btn"
+                                className="mineposid-btn"
                                 style={{
                                     width: '100%', height: 52,
                                     background: C.accent, color: WHITE,

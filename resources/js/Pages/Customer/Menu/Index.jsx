@@ -31,7 +31,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
     const soldOut  = menu.is_available === false;
 
     return (
-        <article className="posmine-card" style={{
+        <article className="minepos-card" style={{
             background:    'rgba(255,255,255,0.90)',
             backdropFilter: 'blur(6px)',
             borderRadius:  12,
@@ -202,7 +202,7 @@ function MenuItemCard({ menu, cartItem, onAdd, onIncrement, onDecrement, priorit
                             }}>+</button>
                         </div>
                     ) : (
-                        <button onClick={onAdd} className="posmine-add-btn" style={{
+                        <button onClick={onAdd} className="minepos-add-btn" style={{
                             width:         '100%',
                             background:    C.accent,
                             color:         C.surface,
@@ -237,7 +237,7 @@ export default function CustomerMenu({ categories, table }) {
 
     useEffect(() => {
         try {
-            const saved = sessionStorage.getItem('posmine_customer');
+            const saved = sessionStorage.getItem('minepos_customer');
             if (!saved) {
                 const fb = table?.id ?? '';
                 router.visit(fb ? route('customer.identity', { table: fb }) : route('customer.identity'));
@@ -245,13 +245,13 @@ export default function CustomerMenu({ categories, table }) {
             }
             const data = JSON.parse(saved);
             if (!data.name) {
-                sessionStorage.removeItem('posmine_customer');
+                sessionStorage.removeItem('minepos_customer');
                 const fb = table?.id ?? '';
                 router.visit(fb ? route('customer.identity', { table: fb }) : route('customer.identity'));
                 return;
             }
             if (table?.id && data.tableId !== table.id) {
-                sessionStorage.removeItem('posmine_customer');
+                sessionStorage.removeItem('minepos_customer');
                 router.visit(route('customer.identity', { table: table.id }));
                 return;
             }
@@ -300,20 +300,20 @@ export default function CustomerMenu({ categories, table }) {
     return (
         <CustomerLayout activeTab="menu">
             <Head>
-                <title>Menu - POSMine</title>
+                <title>Menu - minePOS</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
                 <style>{`
                     html, body { background: ${STONE_50}; }
-                    .posmine-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
-                    .posmine-card:hover { box-shadow: ${C.shadowLift} !important; transform: translateY(-2px); }
-                    .posmine-add-btn { transition: background 0.15s ease; }
-                    .posmine-add-btn:hover { background: ${C.accentHover} !important; }
-                    .posmine-chip { transition: background 0.15s, color 0.15s; }
-                    .posmine-search:focus { outline: none; box-shadow: 0 0 0 2px rgba(68,64,60,0.20) !important; }
-                    .posmine-chips::-webkit-scrollbar { display: none; }
-                    .posmine-scroll::-webkit-scrollbar { display: none; }
+                    .minepos-card { transition: box-shadow 0.2s ease, transform 0.2s ease; }
+                    .minepos-card:hover { box-shadow: ${C.shadowLift} !important; transform: translateY(-2px); }
+                    .minepos-add-btn { transition: background 0.15s ease; }
+                    .minepos-add-btn:hover { background: ${C.accentHover} !important; }
+                    .minepos-chip { transition: background 0.15s, color 0.15s; }
+                    .minepos-search:focus { outline: none; box-shadow: 0 0 0 2px rgba(68,64,60,0.20) !important; }
+                    .minepos-chips::-webkit-scrollbar { display: none; }
+                    .minepos-scroll::-webkit-scrollbar { display: none; }
                 `}</style>
             </Head>
 
@@ -339,12 +339,12 @@ export default function CustomerMenu({ categories, table }) {
                             boxShadow: '0 2px 8px rgba(68,64,60,0.25)',
                         }}>
                             <img
-                                src="/images/logo.jpg" alt="POSMine"
+                                src="/images/logo.jpg" alt="minePOS"
                                 fetchPriority="high" loading="eager"
                                 style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.90 }}
                                 onError={e => {
                                     e.target.style.display = 'none';
-                                    e.target.parentElement.innerHTML = `<span style="color:${WHITE};font-size:16px;font-style:italic;font-weight:700">posmine</span>`;
+                                    e.target.parentElement.innerHTML = `<span style="color:${WHITE};font-size:16px;font-style:italic;font-weight:700">minepos</span>`;
                                 }}
                             />
                         </div>
@@ -389,7 +389,7 @@ export default function CustomerMenu({ categories, table }) {
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Cari menu favoritmu..."
-                            className="posmine-search"
+                            className="minepos-search"
                             style={{
                                 width: '100%', height: 46,
                                 background: 'rgba(255,255,255,0.90)',
@@ -408,7 +408,7 @@ export default function CustomerMenu({ categories, table }) {
 
                 {/* ── Category chips: rounded-12 sesuai Stitch ── */}
                 <div style={{ flexShrink: 0 }}>
-                    <div className="posmine-chips" style={{
+                    <div className="minepos-chips" style={{
                         display: 'flex', gap: 8, overflowX: 'auto',
                         scrollbarWidth: 'none', padding: '4px 20px 14px',
                     }}>
@@ -418,7 +418,7 @@ export default function CustomerMenu({ categories, table }) {
                                 <button
                                     key={c.id}
                                     onClick={() => setActiveCategory(c.id === 'all' ? 'all' : c.name)}
-                                    className="posmine-chip"
+                                    className="minepos-chip"
                                     style={{
                                         flexShrink:     0,
                                         background:     active ? C.accent : 'rgba(255,255,255,0.90)',
@@ -443,7 +443,7 @@ export default function CustomerMenu({ categories, table }) {
                 </div>
 
                 {/* ── Menu scroll area ── */}
-                <div className="posmine-scroll" style={{
+                <div className="minepos-scroll" style={{
                     flex: 1, overflowY: 'auto',
                     padding: '4px 16px',
                     paddingBottom: count > 0 ? 140 : 80,

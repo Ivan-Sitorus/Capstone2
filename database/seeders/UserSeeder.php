@@ -12,8 +12,8 @@ class UserSeeder extends Seeder
     {
         User::insertOrIgnore([
             [
-                'name' => 'Admin POSMine',
-                'email' => 'admin@posmine.com',
+                'name' => 'Admin minePOS',
+                'email' => 'admin@minepos.com',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
                 'created_at' => now(),
@@ -21,7 +21,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Ahmad Kasir',
-                'email' => 'kasir@posmine.com',
+                'email' => 'kasir@minepos.com',
                 'password' => Hash::make('password'),
                 'role' => 'cashier',
                 'created_at' => now(),
@@ -29,7 +29,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Siti Kasir',
-                'email' => 'siti@posmine.com',
+                'email' => 'siti@minepos.com',
                 'password' => Hash::make('password'),
                 'role' => 'cashier',
                 'created_at' => now(),
@@ -37,7 +37,7 @@ class UserSeeder extends Seeder
             ],
             [
                 'name' => 'Budi Kasir',
-                'email' => 'budi@posmine.com',
+                'email' => 'budi@minepos.com',
                 'password' => Hash::make('password'),
                 'role' => 'cashier',
                 'created_at' => now(),

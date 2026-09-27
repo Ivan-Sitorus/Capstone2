@@ -14,7 +14,7 @@ class CashierCustomerPagesSmokeTest extends TestCase
     {
         $this->seed();
 
-        $cashier = User::where('email', 'kasir@posmine.com')->firstOrFail();
+        $cashier = User::where('email', 'kasir@minepos.com')->firstOrFail();
         $customer = User::factory()->create(['role' => 'customer']);
 
         $cashierPages = [

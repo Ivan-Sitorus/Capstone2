@@ -233,7 +233,7 @@ export default function NewOrder({ categories }) {
     );
 
     return (
-        <><Head title="Pesanan Baru | POSMine" />
+        <><Head title="Pesanan Baru | minePOS" />
             <div style={{ display: 'flex', flexDirection: isPortrait || isMobile ? 'column' : 'row', height: '100%', minHeight: 0, overflow: 'hidden' }}>
 
                 {/* ══ PANEL TENGAH ══ */}

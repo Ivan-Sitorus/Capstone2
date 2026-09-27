@@ -25,7 +25,7 @@ export default function Profil({ user }) {
     ];
 
     return (
-        <><Head title="Profil Saya | POSMine" />
+        <><Head title="Profil Saya | minePOS" />
             <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: SLATE_50 }}>
             <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 

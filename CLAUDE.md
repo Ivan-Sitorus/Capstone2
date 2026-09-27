@@ -1,10 +1,10 @@
-# CLAUDE.md: POSMine (POSMine)
+# CLAUDE.md: minePOS (minePOS)
 # FASE AKTIF: Transaksi (Pelanggan + Kasir) + Panel Admin (Filament) + Data Mining
 
 ## Gambaran Proyek
 
-Sistem Point of Sale (POS) berbasis web PWA untuk kafe (studi kasus POSMine STIE Totalwin Semarang).
-**Nama software:** POSMine.
+Sistem Point of Sale (POS) berbasis web PWA untuk kafe (studi kasus minePOS STIE Totalwin Semarang).
+**Nama software:** minePOS.
 Fase ini mencakup modul Pelanggan (mobile PWA), Kasir (desktop web), Panel Admin (Filament v5), dan Data Mining (FastAPI).
 
 - **Dokumen Referensi:** C100.S2T25K09 (Proposal Capstone)
@@ -154,7 +154,7 @@ export const summarizeItems = (items) =>
 │  background: #1A2332          │  background: #F8F9FA             │
 │                               │  padding: 24px                   │
 │  ┌─────────────────────────┐  │  ┌──────────────────────────┐    │
-│  │ [posmine] POSMine            │  │  │ white card               │    │
+│  │ [minepos] minePOS            │  │  │ white card               │    │
 │  │ (logo area, #0F1621)    │  │  │ border-radius: 12px      │    │
 │  ├─────────────────────────┤  │  │ padding: 24px            │    │
 │  │ • Dashboard             │  │  │                          │    │
@@ -172,7 +172,7 @@ export const summarizeItems = (items) =>
 **Sidebar detail:**
 - Background: `#1A2332`
 - Logo area background: `#0F1621` (lebih gelap), padding 20px 16px, border-bottom `#2A3441`
-- Logo: kotak rounded 32px bg `#2A3441` + teks "posmine" putih bold 12px, diikuti "POSMine" putih 15px semibold
+- Logo: kotak rounded 32px bg `#2A3441` + teks "minepos" putih bold 12px, diikuti "minePOS" putih 15px semibold
 - Nav item default: color `#9AA3AF`, padding 10px 12px, border-radius 8px, font 14px
 - Nav item **active**: background `#3B6FD4`, color white
 - Nav item hover: background `rgba(255,255,255,0.05)`
@@ -191,8 +191,8 @@ export const summarizeItems = (items) =>
 │   KIRI (#1A2332)     │   KANAN (#FFFFFF)              │
 │   50vw               │   50vw                         │
 │                      │                                │
-│   [logo POSMine]          │   Masuk ke Akun Anda          │
-│   POSMine            │   subtitle gray                │
+│   [logo minePOS]          │   Masuk ke Akun Anda          │
+│   minePOS            │   subtitle gray                │
 │   Sistem Point of Sale│                               │
 │                      │   Email [_______________]      │
 │                      │   Kata Sandi [___________]     │
@@ -203,8 +203,8 @@ export const summarizeItems = (items) =>
 
 **Detail kiri:**
 - Background `#1A2332`, flex center
-- Logo: kotak rounded 16px (80px × 80px), bg `#2A3441`, icon "posmine" script putih
-- "POSMine": putih, 28px bold, margin-top 16px
+- Logo: kotak rounded 16px (80px × 80px), bg `#2A3441`, icon "minepos" script putih
+- "minePOS": putih, 28px bold, margin-top 16px
 - "Sistem Point of Sale": `#9AA3AF`, 14px
 
 **Detail kanan:**
@@ -640,8 +640,8 @@ Per card (bg white, border-radius 12px, padding 16px, margin-bottom 10px, box-sh
 **Background:** `#FAFAFA`, padding 24px, centered
 
 **Logo area (text-center, margin-bottom 24px):**
-- Kotak rounded 16px (80px × 80px), bg `#1A2332`, teks script "posmine" putih, atau gunakan gambar logo
-- "POSMine": 22px bold, margin-top 12px
+- Kotak rounded 16px (80px × 80px), bg `#1A2332`, teks script "minepos" putih, atau gunakan gambar logo
+- "minePOS": 22px bold, margin-top 12px
 - "Pemesanan Online": 14px gray
 
 **Info box mahasiswa (bg `#FFF0E8`, border-radius 12px, padding 14px 16px, margin-bottom 20px):**
@@ -870,7 +870,7 @@ export default function StatusBadge({ status }) {
 ## Environment Variables
 
 ```env
-APP_NAME="POSMine POS"
+APP_NAME="minePOS POS"
 APP_ENV=local
 APP_KEY=
 APP_PORT=8080

@@ -8,7 +8,7 @@ import { SLATE_50, WHITE, SLATE_200, SLATE_900, SLATE_500, BLUE, SLATE_700, SLAT
 
 export default function Dashboard({ totalSales, transactionCount, activeOrders, recentTransactions }) {
     return (
-        <><Head title="Dashboard | POSMine" />
+        <><Head title="Dashboard | minePOS" />
             <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: SLATE_50 }}>
             <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 

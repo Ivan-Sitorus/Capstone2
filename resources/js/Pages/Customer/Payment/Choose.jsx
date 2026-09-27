@@ -69,7 +69,7 @@ export default function PaymentChoose({ order, items, table_number }) {
     function handleAcknowledge() {
         let tableId = null;
         try {
-            const saved = sessionStorage.getItem('posmine_customer');
+            const saved = sessionStorage.getItem('minepos_customer');
             if (saved) tableId = JSON.parse(saved)?.tableId;
         } catch (_) {}
         router.visit(tableId ? route('customer.menu', { table: tableId }) : route('customer.menu'));
@@ -78,21 +78,21 @@ export default function PaymentChoose({ order, items, table_number }) {
     return (
         <CustomerLayout activeTab="cart">
             <Head>
-                <title>Pilih Pembayaran - POSMine</title>
+                <title>Pilih Pembayaran - minePOS</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
                 <style>{`
                     html, body { background: ${STONE_50}; }
-                    .posminep-scroll::-webkit-scrollbar { display: none; }
-                    .posminep-btn-back { transition: background 0.15s; }
-                    .posminep-btn-back:hover { background: ${GRAY_100} !important; }
-                    .posminep-method { transition: border-color 0.2s, box-shadow 0.2s; }
-                    .posminep-confirm {
+                    .mineposp-scroll::-webkit-scrollbar { display: none; }
+                    .mineposp-btn-back { transition: background 0.15s; }
+                    .mineposp-btn-back:hover { background: ${GRAY_100} !important; }
+                    .mineposp-method { transition: border-color 0.2s, box-shadow 0.2s; }
+                    .mineposp-confirm {
                         transition: background 0.15s, transform 0.1s;
                     }
-                    .posminep-confirm:active { transform: scale(0.98); }
-                    .posminep-confirm:hover:not(:disabled) { background: ${C.accentDark} !important; }
+                    .mineposp-confirm:active { transform: scale(0.98); }
+                    .mineposp-confirm:hover:not(:disabled) { background: ${C.accentDark} !important; }
                 `}</style>
             </Head>
 
@@ -111,7 +111,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                 }}>
                     <button
                         onClick={() => router.visit(route('customer.cart'))}
-                        className="posminep-btn-back"
+                        className="mineposp-btn-back"
                         style={{
                             marginTop: 2,
                             width: 36, height: 36, borderRadius: '50%',
@@ -151,7 +151,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                 </header>
 
                 {/* ── Scroll area ── */}
-                <div className="posminep-scroll" style={{
+                <div className="mineposp-scroll" style={{
                     flex: 1, overflowY: 'auto',
                     scrollbarWidth: 'none',
                     WebkitOverflowScrolling: 'touch',
@@ -238,7 +238,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                                     <div
                                         key={key}
                                         onClick={() => setSelected(key)}
-                                        className="posminep-method"
+                                        className="mineposp-method"
                                         style={{
                                             background: C.surface,
                                             borderRadius: 12,
@@ -323,7 +323,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                     <button
                         onClick={handleSubmit}
                         disabled={!selected || loading}
-                        className="posminep-confirm"
+                        className="mineposp-confirm"
                         style={{
                             width: '100%',
                             padding: '16px 0',
@@ -430,7 +430,7 @@ export default function PaymentChoose({ order, items, table_number }) {
                         {/* Button */}
                         <button
                             onClick={handleAcknowledge}
-                            className="posminep-confirm"
+                            className="mineposp-confirm"
                             style={{
                                 width: '100%', padding: '13px 0',
                                 background: C.accent, color: WHITE,
