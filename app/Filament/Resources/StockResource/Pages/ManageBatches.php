@@ -104,7 +104,7 @@ class ManageBatches extends Page implements HasTable
                     ->formatStateUsing(function ($state, IngredientBatch $record) use ($unit) {
                         $qty = (float) ($record->initial_quantity ?? $record->quantity ?? 0);
                         $fmtQty = number_format($qty, (float) $qty != (int) $qty ? 2 : 0, ',', '.');
-                        return 'Rp'.number_format((float) $state, 0, ',', '.').' / '.$fmtQty.' '.$unit;
+                        return Formatter::rupiah((float) $state).' / '.$fmtQty.' '.$unit;
                     })
                     ->sortable(),
                 TextColumn::make('supplier_name')
@@ -118,7 +118,7 @@ class ManageBatches extends Page implements HasTable
                         $paid = (float) $record->batchPayments->sum('amount');
                         return max(0, $totalCost - $paid);
                     })
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state))
                     ->color(fn ($state) => $state > 0 ? 'warning' : 'success'),
                 TextColumn::make('payment_status')
                     ->label('Status Utang')
@@ -196,7 +196,7 @@ class ManageBatches extends Page implements HasTable
                             Notification::make()
                                 ->danger()
                                 ->title('Total harga tidak boleh kurang dari total dibayar')
-                                ->body('Total sudah dibayar: Rp' . number_format($totalPaid, 0, ',', '.') . '. Naikkan total harga atau hapus pembayaran di Riwayat Bayar.')
+                                ->body('Total sudah dibayar: ' . Formatter::rupiah($totalPaid) . '. Naikkan total harga atau hapus pembayaran di Riwayat Bayar.')
                                 ->send();
                             $action->cancel();
                             return;

@@ -8,6 +8,7 @@ use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\StockResource;
 use App\Models\BatchPayment;
 use App\Models\IngredientBatch;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -51,17 +52,17 @@ class RiwayatBayarBatch extends Page implements HasTable
                 ->schema([
                     TextEntry::make('total')
                         ->label('Total Utang')
-                        ->state(fn (): string => 'Rp' . number_format((float) ($this->batch->total_cost ?? 0), 0, ',', '.')),
+                        ->state(fn (): string => Formatter::rupiah((float) ($this->batch->total_cost ?? 0))),
                     TextEntry::make('dibayar')
                         ->label('Total Dibayar')
-                        ->state(fn (): string => 'Rp' . number_format((float) $this->batch->batchPayments->sum('amount'), 0, ',', '.'))
+                        ->state(fn (): string => Formatter::rupiah((float) $this->batch->batchPayments->sum('amount')))
                         ->color('success'),
                     TextEntry::make('sisa')
                         ->label('Sisa Utang')
                         ->state(function (): string {
                             $remaining = (float) ($this->batch->total_cost ?? 0) - (float) $this->batch->batchPayments->sum('amount');
 
-                            return 'Rp' . number_format(max(0, $remaining), 0, ',', '.');
+                            return Formatter::rupiah(max(0, $remaining));
                         })
                         ->color(function (): string {
                             $remaining = (float) ($this->batch->total_cost ?? 0) - (float) $this->batch->batchPayments->sum('amount');
@@ -90,7 +91,7 @@ class RiwayatBayarBatch extends Page implements HasTable
                     ->sortable(),
                 TextColumn::make('amount')
                     ->label('Jumlah')
-                    ->formatStateUsing(fn ($state) => 'Rp' . number_format($state, 0, ',', '.'))
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state))
                     ->sortable(),
                 TextColumn::make('payment_method')
                     ->label('Metode')
@@ -170,7 +171,7 @@ class RiwayatBayarBatch extends Page implements HasTable
                         Notification::make()
                             ->danger()
                             ->title('Pembayaran melebihi sisa utang')
-                            ->body("Sisa utang: Rp" . number_format(max(0, $remaining), 0, ',', '.'))
+                            ->body("Sisa utang: " . Formatter::rupiah(max(0, $remaining)))
                             ->send();
                         return;
                     }

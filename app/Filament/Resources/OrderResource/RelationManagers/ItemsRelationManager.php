@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\OrderResource\RelationManagers;
 
+use App\Support\Formatter;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -28,10 +29,10 @@ class ItemsRelationManager extends RelationManager
                     ->label('Qty'),
                 TextColumn::make('unit_price')
                     ->label('Harga Satuan')
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state)),
                 TextColumn::make('subtotal')
                     ->label('Subtotal')
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state)),
             ])
             ->paginated(false);
     }

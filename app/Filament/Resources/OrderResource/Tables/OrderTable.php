@@ -6,6 +6,7 @@ use App\Enums\OrderStatus;
 use App\Enums\PaymentMethod;
 use App\Filament\Resources\OrderResource;
 use App\Models\Order;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Support\Icons\Heroicon;
@@ -36,7 +37,7 @@ class OrderTable
                     ->default('-'),
                 TextColumn::make('total_amount')
                     ->label('Total')
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state))
                     ->sortable(),
                 TextColumn::make('payment_method')
                     ->label('Metode Bayar')

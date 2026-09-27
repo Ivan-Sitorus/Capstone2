@@ -9,6 +9,7 @@ use App\Filament\Resources\OrderResource;
 use App\Models\CashierHistory;
 use App\Models\Order;
 use App\Services\CashierHistoryService;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Pages\Page;
@@ -91,7 +92,7 @@ class ViewCashierHistory extends Page implements HasTable
                     ->formatStateUsing(fn (OrderStatus $state): string => self::getStatusLabel($state->value)),
                 TextColumn::make('total_amount')
                     ->label('Total')
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state))
                     ->sortable(),
                 TextColumn::make('created_at')
                     ->label('Waktu')

@@ -8,6 +8,7 @@ use App\Filament\Forms\Components\NumericInput;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Order;
 use App\Models\OrderPayment;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -51,17 +52,17 @@ class RiwayatBayar extends Page implements HasTable
                 ->schema([
                     TextEntry::make('total')
                         ->label('Total Pesanan')
-                        ->state(fn (): string => 'Rp' . number_format((float) $this->order->total_amount, 0, ',', '.')),
+                        ->state(fn (): string => Formatter::rupiah((float) $this->order->total_amount)),
                     TextEntry::make('dibayar')
                         ->label('Total Dibayar')
-                        ->state(fn (): string => 'Rp' . number_format((float) $this->order->orderPayments->sum('amount'), 0, ',', '.'))
+                        ->state(fn (): string => Formatter::rupiah((float) $this->order->orderPayments->sum('amount')))
                         ->color('success'),
                     TextEntry::make('sisa')
                         ->label('Sisa')
                         ->state(function (): string {
                             $remaining = (float) $this->order->total_amount - (float) $this->order->orderPayments->sum('amount');
 
-                            return 'Rp' . number_format($remaining, 0, ',', '.');
+                            return Formatter::rupiah($remaining);
                         })
                         ->color(function (): string {
                             $remaining = (float) $this->order->total_amount - (float) $this->order->orderPayments->sum('amount');
@@ -90,7 +91,7 @@ class RiwayatBayar extends Page implements HasTable
                     ->sortable(),
                 TextColumn::make('amount')
                     ->label('Jumlah')
-                    ->formatStateUsing(fn ($state) => 'Rp' . number_format($state, 0, ',', '.'))
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state))
                     ->sortable(),
                 TextColumn::make('payment_method')
                     ->label('Metode')
@@ -173,7 +174,7 @@ class RiwayatBayar extends Page implements HasTable
                         Notification::make()
                             ->danger()
                             ->title('Pembayaran melebihi sisa')
-                            ->body("Sisa pembayaran: Rp" . number_format($remaining, 0, ',', '.'))
+                            ->body("Sisa pembayaran: " . Formatter::rupiah($remaining))
                             ->send();
                         return;
                     }

@@ -10,6 +10,7 @@ use App\Filament\Resources\OrderResource\Pages\ListOrders;
 use App\Filament\Resources\OrderResource\RelationManagers\ItemsRelationManager;
 use App\Filament\Resources\OrderResource\Tables\OrderTable;
 use App\Models\Order;
+use App\Support\Formatter;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\RepeatableEntry\TableColumn;
 use Filament\Infolists\Components\TextEntry;
@@ -86,7 +87,7 @@ class OrderResource extends Resource
                     TextEntry::make($p.'payment_method')->label('Metode')
                         ->badge()
                         ->formatStateUsing(fn (?PaymentMethod $state): string => $state?->label() ?? '-'),
-                    TextEntry::make($p.'total_amount')->label('Total')->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
+                    TextEntry::make($p.'total_amount')->label('Total')->formatStateUsing(fn ($state) => Formatter::rupiah($state)),
                     TextEntry::make($p.'status')->label('Status Pesanan')
                         ->badge()
                         ->color(fn (OrderStatus $state): string => self::getStatusColor($state->value))
@@ -106,10 +107,10 @@ class OrderResource extends Resource
                         ->schema([
                             TextEntry::make('menu.name'),
                             TextEntry::make('unit_price')
-                                ->formatStateUsing(fn ($state) => 'Rp' . number_format((float) $state, 0, ',', '.')),
+                                ->formatStateUsing(fn ($state) => Formatter::rupiah((float) $state)),
                             TextEntry::make('quantity'),
                             TextEntry::make('subtotal')
-                                ->formatStateUsing(fn ($state) => 'Rp' . number_format((float) $state, 0, ',', '.')),
+                                ->formatStateUsing(fn ($state) => Formatter::rupiah((float) $state)),
                         ]),
                 ]),
         ];

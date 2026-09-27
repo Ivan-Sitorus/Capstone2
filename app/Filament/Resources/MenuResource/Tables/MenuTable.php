@@ -6,6 +6,7 @@ use App\Enums\MenuStatus;
 use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\Ingredient;
 use App\Models\Menu;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\EditAction;
@@ -38,15 +39,15 @@ class MenuTable
                     ->searchable(),
                 TextColumn::make("cost_price")
                     ->label("Biaya Modal")
-                    ->formatStateUsing(fn ($state) => "Rp".number_format($state, 0, ",", "."))
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state))
                     ->sortable(),
                 TextColumn::make("price")
                     ->label("Harga")
-                    ->formatStateUsing(fn ($state) => "Rp".number_format($state, 0, ",", "."))
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state))
                     ->sortable(),
                 TextColumn::make("discounted_price")
                     ->label("Harga Diskon")
-                    ->formatStateUsing(fn ($state) => $state ? "Rp".number_format($state, 0, ",", ".") : "-")
+                    ->formatStateUsing(fn ($state) => $state ? Formatter::rupiah($state) : "-")
                     ->sortable(),
                 TextColumn::make("available_servings")
                     ->label(ColumnInfoTooltip::label('Sisa Jual', "Sisa porsi yang bisa dibuat dari stok tersedia.\nMenu dengan bahan baku yang sama bisa saling mengurangi sisa jual."))

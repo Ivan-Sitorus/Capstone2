@@ -7,6 +7,7 @@ use App\Enums\PaymentMethod;
 use App\Filament\Resources\OrderResource;
 use App\Filament\Resources\ReceivableResource;
 use App\Models\Order;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Support\Icons\Heroicon;
@@ -45,20 +46,20 @@ class ReceivableTable
                     ->default('-'),
                 TextColumn::make('total_amount')
                     ->label('Total')
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state))
                     ->sortable(),
                 TextColumn::make('paid_amount')
                     ->label('Dibayar')
                     ->getStateUsing(function (Order $record) {
                         return (float) $record->orderPayments->sum('amount');
                     })
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.')),
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state)),
                 TextColumn::make('remaining_amount')
                     ->label('Sisa')
                     ->getStateUsing(function (Order $record) {
                         return (float) $record->total_amount - (float) $record->orderPayments->sum('amount');
                     })
-                    ->formatStateUsing(fn ($state) => 'Rp'.number_format($state, 0, ',', '.'))
+                    ->formatStateUsing(fn ($state) => Formatter::rupiah($state))
                     ->color(fn ($state) => $state > 0 ? 'danger' : 'success'),
                 TextColumn::make('status')
                     ->label('Status')

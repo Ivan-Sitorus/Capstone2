@@ -40,7 +40,7 @@ class PaymentSummaryRefreshTest extends TestCase
 
         $component = Livewire::test(RiwayatBayar::class, ['record' => $order->id])
             ->assertOk()
-            ->assertSee('Rp100.000');
+            ->assertSee('Rp 100.000');
 
         $component->mountAction('catat_pembayaran')
             ->set('mountedActions.0.data.amount', 40000)
@@ -55,8 +55,8 @@ class PaymentSummaryRefreshTest extends TestCase
         ]);
 
         $component
-            ->assertSee('Rp40.000')
-            ->assertSee('Rp60.000');
+            ->assertSee('Rp 40.000')
+            ->assertSee('Rp 60.000');
     }
 
     public function test_payable_summary_refreshes_after_recording_payment(): void
@@ -73,7 +73,7 @@ class PaymentSummaryRefreshTest extends TestCase
 
         $component = Livewire::test(RiwayatBayarBatch::class, ['record' => $batch->id])
             ->assertOk()
-            ->assertSee('Rp100.000');
+            ->assertSee('Rp 100.000');
 
         $component->mountAction('catat_pembayaran')
             ->set('mountedActions.0.data.amount', 30000)
@@ -88,7 +88,7 @@ class PaymentSummaryRefreshTest extends TestCase
         ]);
 
         $component
-            ->assertSee('Rp30.000')
-            ->assertSee('Rp70.000');
+            ->assertSee('Rp 30.000')
+            ->assertSee('Rp 70.000');
     }
 }

@@ -4,6 +4,7 @@ namespace App\Filament\Resources\StockResource\Actions;
 
 use App\Enums\MovementType;
 use App\Models\StockMovement;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
@@ -39,7 +40,7 @@ class ViewStockPurchaseDetailAction extends Action
                             ->formatStateUsing(fn ($state) => number_format((float) $state, 2)),
                         TextEntry::make('ingredientBatch.total_cost')
                             ->label('Harga Total')
-                            ->formatStateUsing(fn ($state, $record) => 'Rp' . number_format((float) $state, 0, ',', '.')
+                            ->formatStateUsing(fn ($state, $record) => Formatter::rupiah((float) $state)
                                 . ' / ' . number_format((float) ($record->ingredientBatch?->initial_quantity ?? $record->ingredientBatch?->quantity ?? 0), 2)
                                 . ' ' . ($record->ingredientBatch?->ingredient?->unit?->value ?? '')),
                         TextEntry::make('ingredientBatch.allow_expired_usage')
