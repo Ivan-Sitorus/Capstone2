@@ -17,6 +17,7 @@
 /public/build
 /public/hot
 /public/storage
+/public/css/app
 /storage/*.key
 /storage/pail
 /storage/backups
