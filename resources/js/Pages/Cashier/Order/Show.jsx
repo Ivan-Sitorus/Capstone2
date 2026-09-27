@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { router } from '@inertiajs/react';
 import axios from 'axios';
 import { ArrowLeft, X, CircleCheck } from 'lucide-react';
-import CashierLayout from '@/Layouts/CashierLayout';
 import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 import { WHITE, SLATE_100, SLATE_900, SLATE_500, SLATE_400, SLATE_200, BLUE, SLATE_50, GREEN_MUTED_LIGHT, BLUE_SOFT, BLUE_MUTED_BG, BLUE_LIGHT, BLUE_DARK, RED_MUTED } from '@/theme';
@@ -58,8 +57,7 @@ export default function OrderShow({ order }) {
     function handleRejectQris()   { handleAction(route('kasir.order.reject-qris', { order: order.id }), { note: rejectNote }); setShowRejectModal(false); setRejectNote(''); }
 
     return (
-        <CashierLayout title={`Detail Pesanan ${order.order_code}`} fullscreen>
-            <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: SLATE_50 }}>
+        <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: SLATE_50 }}>
             <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
             {/* ── Header ── */}
@@ -365,7 +363,6 @@ export default function OrderShow({ order }) {
             )}
             </div>
             </div>
-        </CashierLayout>
     );
 }
 

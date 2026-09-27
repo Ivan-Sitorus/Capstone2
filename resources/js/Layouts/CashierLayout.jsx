@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, createContext, useContext, useMemo } from 'react';
 import { Link, usePage, router } from '@inertiajs/react';
 import {
     LayoutDashboard,
@@ -22,15 +22,24 @@ const navItems = [
     { label: 'Profil',          href: route('kasir.profile'),          icon: User },
 ];
 
-export default function CashierLayout({ children, title = 'Dashboard', fullscreen = false }) {
-    const { flash, pendingOrderCount: initialCount } = usePage().props;
-    const [pendingCount, setPendingCount] = useState(initialCount ?? 0);
+const CashierSidebarContext = createContext(null);
+
+export function useCashierSidebar() {
+    return useContext(CashierSidebarContext) ?? { collapsed: false, width: 260 };
+}
+
+export default function CashierLayout({ children, fullscreen = false }) {
+    const { flash, pendingOrderCount = 0 } = usePage().props;
     const [toast, setToast] = useState(null);
     const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(() => {
         if (typeof window === 'undefined') return false;
         return window.localStorage.getItem('cashier-sidebar-collapsed') === 'true';
     });
     const sidebarWidth = isSidebarCollapsed ? 84 : 260;
+    const sidebarContextValue = useMemo(
+        () => ({ collapsed: isSidebarCollapsed, width: sidebarWidth }),
+        [isSidebarCollapsed, sidebarWidth]
+    );
 
     useEffect(() => {
         if (flash?.success) {
@@ -46,32 +55,12 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
     }, [flash]);
 
     useEffect(() => {
-        setPendingCount(initialCount ?? 0);
-    }, [initialCount]);
-
-    // Ambil pending count fresh setiap halaman dibuka — hindari angka stale
-    // dari cache prefetch Inertia saat berpindah menu
-    useEffect(() => {
-        let cancelled = false;
-        window.axios?.get(route('kasir.pending-count'))
-            .then(res => { if (!cancelled) setPendingCount(res.data.count); })
-            .catch(() => {});
-        return () => { cancelled = true; };
-    }, []);
-
-    useEffect(() => {
         if (typeof window === 'undefined') return;
         window.localStorage.setItem('cashier-sidebar-collapsed', String(isSidebarCollapsed));
-
-        window.dispatchEvent(new CustomEvent('cashier-sidebar-toggle', {
-            detail: {
-                collapsed: isSidebarCollapsed,
-                width: sidebarWidth,
-            },
-        }));
     }, [isSidebarCollapsed]);
 
     return (
+        <CashierSidebarContext.Provider value={sidebarContextValue}>
         <div
             style={{
                 display: 'flex',
@@ -172,7 +161,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                 <nav style={{ flex: 1, padding: '20px 20px 0', display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto' }}>
                     {navItems.map(({ label, href, icon: Icon }) => {
                         const active = window.location.pathname === href;
-                        const showBadge = label === 'Pesanan Aktif' && pendingCount > 0;
+                        const showBadge = label === 'Pesanan Aktif' && pendingOrderCount > 0;
                         return (
                             <Link
                                 key={href}
@@ -215,9 +204,9 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                                             fontSize: 9,
                                             fontWeight: 700,
                                             lineHeight: 1,
-                                            padding: pendingCount > 9 ? '0 4px' : 0,
+                                            padding: pendingOrderCount > 9 ? '0 4px' : 0,
                                         }}>
-                                            {pendingCount > 99 ? '99+' : pendingCount}
+                                            {pendingOrderCount > 99 ? '99+' : pendingOrderCount}
                                         </span>
                                     )}
                                 </span>
@@ -227,7 +216,7 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                                         <span style={{
                                             background: RED,
                                             color: WHITE,
-                                            borderRadius: pendingCount > 9 ? 10 : '50%',
+                                            borderRadius: pendingOrderCount > 9 ? 10 : '50%',
                                             minWidth: 20,
                                             height: 20,
                                             display: 'flex',
@@ -236,10 +225,10 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                                             fontSize: 11,
                                             fontWeight: 700,
                                             lineHeight: 1,
-                                            padding: pendingCount > 9 ? '0 5px' : 0,
+                                            padding: pendingOrderCount > 9 ? '0 5px' : 0,
                                             flexShrink: 0,
                                         }}>
-                                            {pendingCount > 99 ? '99+' : pendingCount}
+                                            {pendingOrderCount > 99 ? '99+' : pendingOrderCount}
                                         </span>
                                     )
                                 )}
@@ -325,5 +314,6 @@ export default function CashierLayout({ children, title = 'Dashboard', fullscree
                 </div>
             )}
         </div>
+        </CashierSidebarContext.Provider>
     );
 }

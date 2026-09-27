@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { Search, X, Banknote, QrCode, ShieldCheck, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen, RefreshCw } from 'lucide-react';
-import CashierLayout from '@/Layouts/CashierLayout';
+import { useCashierSidebar } from '@/Layouts/CashierLayout';
 import MenuGridItem from '@/Components/Cashier/MenuGridItem';
 import CartItem from '@/Components/Cashier/CartItem';
 import { formatRupiah, formatTime } from '@/helpers';
@@ -27,10 +27,7 @@ export default function NewOrder({ categories }) {
     };
 
     usePolling(refreshMenu, 60_000);
-    const [isLeftSidebarCollapsed, setIsLeftSidebarCollapsed] = useState(() => {
-        if (typeof window === 'undefined') return false;
-        return window.localStorage.getItem('cashier-sidebar-collapsed') === 'true';
-    });
+    const { collapsed: isLeftSidebarCollapsed } = useCashierSidebar();
     const [viewport, setViewport] = useState(() => {
         if (typeof window === 'undefined') return { width: 1280, height: 720 };
         return { width: window.innerWidth, height: window.innerHeight };
@@ -79,15 +76,6 @@ export default function NewOrder({ categories }) {
         if (!isPortrait) return;
         setIsCartCollapsed(true);
     }, [isPortrait]);
-
-    useEffect(() => {
-        const onSidebarToggle = (event) => {
-            setIsLeftSidebarCollapsed(Boolean(event.detail?.collapsed));
-        };
-
-        window.addEventListener('cashier-sidebar-toggle', onSidebarToggle);
-        return () => window.removeEventListener('cashier-sidebar-toggle', onSidebarToggle);
-    }, []);
 
     /* ── Cart actions ── */
     function addToCart(menu) {
@@ -170,7 +158,7 @@ export default function NewOrder({ categories }) {
     };
 
     return (
-        <><Head title="Pesanan Baru | POSMine" /><CashierLayout title="Pesanan Baru" fullscreen>
+        <><Head title="Pesanan Baru | POSMine" />
             <div style={{ display: 'flex', flexDirection: isPortrait ? 'column' : 'row', height: '100vh', overflow: 'hidden' }}>
 
                 {/* ══ PANEL TENGAH ══ */}
@@ -512,6 +500,6 @@ export default function NewOrder({ categories }) {
                     </div>
                 </div>
             )}
-        </CashierLayout></>
+        </>
     );
 }

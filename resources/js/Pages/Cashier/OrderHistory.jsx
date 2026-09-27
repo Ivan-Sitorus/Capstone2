@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { router, Link, Head } from '@inertiajs/react';
 import { Search, Calendar, CreditCard, ChevronDown } from 'lucide-react';
-import CashierLayout from '@/Layouts/CashierLayout';
 import StatusBadge from '@/Components/Common/StatusBadge';
 import { formatRupiah, formatDate, formatTime } from '@/helpers';
 import { WHITE, SLATE_100, SLATE_900, SLATE_500, SLATE_400, SLATE_200, BLUE, SLATE_700, SLATE_50 } from '@/theme';
@@ -68,7 +67,7 @@ export default function OrderHistory({ orders, filters }) {
     function handleMethod(e) { const val = e.target.value; setMethod(val); apply({ method: val }); }
 
     return (
-        <><Head title="Riwayat Pesanan | POSMine" /><CashierLayout title="Riwayat Pesanan" fullscreen>
+        <><Head title="Riwayat Pesanan | POSMine" />
             <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: SLATE_50 }}>
             <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
@@ -238,7 +237,7 @@ export default function OrderHistory({ orders, filters }) {
 
             </div>
             </div>
-        </CashierLayout></>
+        </>
     );
 }
 

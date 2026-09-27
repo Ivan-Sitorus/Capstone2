@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { router, Head } from '@inertiajs/react';
 import { User, LogOut } from 'lucide-react';
-import CashierLayout from '@/Layouts/CashierLayout';
 import { formatDate } from '@/helpers';
 import { SLATE_50, WHITE, SLATE_200, SLATE_900, SLATE_500, BLUE, BLUE_50, RED_700, RED_DARK, SLATE_100 } from '@/theme';
 
@@ -26,7 +25,7 @@ export default function Profil({ user }) {
     ];
 
     return (
-        <><Head title="Profil Saya | POSMine" /><CashierLayout title="Profil Saya" fullscreen>
+        <><Head title="Profil Saya | POSMine" />
             <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: SLATE_50 }}>
             <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
@@ -154,6 +153,6 @@ export default function Profil({ user }) {
             </div>
             </div>
             </div>
-        </CashierLayout></>
+        </>
     );
 }

@@ -1,23 +1,14 @@
-import { useState, useEffect } from 'react';
 import { router, Link, Head } from '@inertiajs/react';
-import { Calendar, Plus, ClipboardList, Clock } from 'lucide-react';
-import CashierLayout from '@/Layouts/CashierLayout';
+import { Plus, ClipboardList, Clock } from 'lucide-react';
+import LiveClock from '@/Components/Cashier/LiveClock';
 import StatBar from '@/Components/Cashier/StatBar';
 import StatusBadge from '@/Components/Common/StatusBadge';
-import { formatRupiah, formatDate, formatTime } from '@/helpers';
-import usePolling from '@/Hooks/usePolling';
+import { formatRupiah } from '@/helpers';
 import { SLATE_50, WHITE, SLATE_200, SLATE_900, SLATE_500, BLUE, SLATE_700, SLATE_400, SLATE_100 } from '@/theme';
 
 export default function Dashboard({ totalSales, transactionCount, activeOrders, recentTransactions }) {
-    const [now, setNow] = useState(new Date());
-    usePolling(() => setNow(new Date()), 1000);
-
-    useEffect(() => {
-        router.reload({ only: ['totalSales', 'transactionCount', 'activeOrders', 'cashPending', 'qrisPending', 'recentTransactions'] });
-    }, []);
-
     return (
-        <><Head title="Dashboard | POSMine" /><CashierLayout title="Dashboard" fullscreen>
+        <><Head title="Dashboard | POSMine" />
             <div style={{ flex: 1, overflowY: 'auto', padding: 32, background: SLATE_50 }}>
             <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
@@ -33,23 +24,7 @@ export default function Dashboard({ totalSales, transactionCount, activeOrders, 
                 </div>
 
                 {/* Date chip */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 8,
-                    background: WHITE,
-                    border: `1px solid ${SLATE_200}`,
-                    borderRadius: 8,
-                    padding: '8px 14px',
-                    fontSize: 13,
-                    fontWeight: 500,
-                    color: SLATE_900,
-                    boxShadow: '0 2px 8px rgba(15,23,42,0.04)',
-                    flexShrink: 0,
-                }}>
-                    <Calendar size={16} color={SLATE_500} />
-                    {formatDate(now)}, {formatTime(now)}
-                </div>
+                <LiveClock />
             </div>
 
             {/* ── B. Stat Bar ── */}
@@ -195,6 +170,6 @@ export default function Dashboard({ totalSales, transactionCount, activeOrders, 
 
             </div>
             </div>
-        </CashierLayout></>
+        </>
     );
 }
