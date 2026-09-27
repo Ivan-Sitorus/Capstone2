@@ -243,15 +243,23 @@ class ManageBatches extends Page implements HasTable
                     }),
                 DeleteAction::make()
                     ->before(function (DeleteAction $action, IngredientBatch $record) {
-                        if ($record->stockMovements()->exists()) {
+                        $hasMovements = $record->stockMovements()->exists();
+                        $hasPayments = $record->batchPayments()->exists();
+
+                        if ($hasMovements || $hasPayments) {
+                            $blockers = array_values(array_filter([
+                                $hasMovements ? 'riwayat pemakaian stok' : null,
+                                $hasPayments ? 'riwayat pembayaran supplier' : null,
+                            ]));
+
                             Notification::make()
-                                ->warning()
+                                ->danger()
                                 ->title('Batch tidak dapat dihapus')
-                                ->body('Batch ini memiliki riwayat pemakaian. Batch telah dinonaktifkan.')
+                                ->body('Batch ini sudah memiliki '.implode(' dan ', $blockers).'. Riwayat harus tetap tersimpan agar audit stok dan utang tetap utuh.')
                                 ->send();
-                            
-                            $record->update(['quantity' => 0]);
-                            $action->cancel();
+
+                            $action->halt();
+
                             return;
                         }
 

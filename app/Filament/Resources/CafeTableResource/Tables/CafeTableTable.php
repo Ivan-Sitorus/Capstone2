@@ -90,14 +90,18 @@ class CafeTableTable
                     ->requiresConfirmation()
                     ->modalHeading(fn (CafeTable $record) => 'Hapus Meja '.$record->table_number)
                     ->before(function (DeleteAction $action, CafeTable $record) {
-                        if ($record->orders()->whereIn('status', [OrderStatus::Pending->value, OrderStatus::Processing->value])->exists()) {
+                        $activeOrders = $record->orders()
+                            ->whereNotIn('status', [OrderStatus::Completed->value, OrderStatus::Cancelled->value])
+                            ->count();
+
+                        if ($activeOrders > 0) {
                             Notification::make()
                                 ->danger()
                                 ->title('Meja tidak dapat dihapus')
-                                ->body('Meja ini masih memiliki pesanan aktif. Silakan tunggu pesanan selesai terlebih dahulu.')
+                                ->body("Meja ini masih memiliki {$activeOrders} pesanan aktif (Pending/Diproses/Belum Lunas). Selesaikan atau batalkan pesanan tersebut terlebih dahulu.")
                                 ->send();
 
-                            $action->cancel();
+                            $action->halt();
                         }
                     })
                     ->modalWidth('md'),

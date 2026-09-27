@@ -87,18 +87,16 @@ class StockTable
                     EditAction::make()->modal(),
                     DeleteAction::make()
                         ->before(function (DeleteAction $action, Ingredient $record) {
-                        $activeCount = $record->menuIngredients()
-                            ->whereHas('menu')
-                            ->count();
-                            
-                            if ($activeCount > 0) {
+                            $recipeCount = $record->menuIngredients()->count();
+
+                            if ($recipeCount > 0) {
                                 Notification::make()
                                     ->danger()
                                     ->title("Bahan baku '{$record->name}' tidak dapat dihapus")
-                                    ->body("Masih digunakan oleh {$activeCount} menu. Gunakan filter Bahan Baku di halaman Menu untuk melihat daftarnya.")
+                                    ->body("Masih dipakai pada {$recipeCount} resep menu. Hapus bahan ini dari resep menu terlebih dahulu.")
                                     ->send();
 
-                                $action->cancel();
+                                $action->halt();
                             }
                         }),
                 ])

@@ -37,7 +37,7 @@ class CategoryTable
                                 ->body("Kategori '{$record->name}' masih memiliki {$record->menus()->count()} menu. Pindahkan atau hapus menu terlebih dahulu.")
                                 ->send();
 
-                            $action->cancel();
+                            $action->halt();
                         }
                     }),
             ]);

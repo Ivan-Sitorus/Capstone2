@@ -27,9 +27,11 @@ class CashierHistoryTable
             ->columns([
                 TextColumn::make('user.name')
                     ->label('Nama Kasir')
+                    ->default('-')
                     ->searchable(),
                 TextColumn::make('user.email')
                     ->label('Email')
+                    ->default('-')
                     ->searchable(),
                 TextColumn::make('started_at')
                     ->label('Waktu Masuk')
