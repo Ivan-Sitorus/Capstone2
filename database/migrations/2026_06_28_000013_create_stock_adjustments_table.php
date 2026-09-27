@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('stock_adjustments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('ingredient_id')->nullable()->constrained('ingredients')->cascadeOnDelete();
+            $table->foreignId('ingredient_id')->constrained('ingredients')->cascadeOnDelete();
             $table->string('adjustment_type');
             $table->decimal('quantity', 10, 3);
             $table->decimal('quantity_before', 10, 3);

@@ -7,18 +7,18 @@ use Illuminate\Support\Facades\Cache;
 
 class Setting extends Model
 {
-    protected $table = 'app_settings';
+    protected $table = 'receipt_and_whatsapp_settings';
 
-    protected $fillable = ['setting_key', 'setting_value', 'group'];
+    protected $fillable = ['key', 'value'];
 
     public static function get(string $key, $default = null): ?string
     {
         return Cache::remember("setting_{$key}", 3600, function () use ($key, $default) {
-            return static::where('setting_key', $key)->value('setting_value') ?? $default;
+            return static::where('key', $key)->value('value') ?? $default;
         });
     }
 
-    public static function set(string $key, mixed $value, string $group = 'general'): void
+    public static function set(string $key, mixed $value): void
     {
         // Normalize: DB column is NOT NULL, so null → empty string
         if ($value === null) {
@@ -32,8 +32,8 @@ class Setting extends Model
         }
 
         static::updateOrCreate(
-            ['setting_key' => $key],
-            ['setting_value' => $value, 'group' => $group],
+            ['key' => $key],
+            ['value' => $value],
         );
         Cache::forget("setting_{$key}");
     }

@@ -8,17 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('app_settings', function (Blueprint $table) {
+        Schema::create('receipt_and_whatsapp_settings', function (Blueprint $table) {
             $table->id();
-            $table->string('setting_key')->unique();
-            $table->string('setting_value');
-            $table->string('group')->default('general');
+            $table->string('key')->unique();
+            $table->string('value');
             $table->timestamps();
         });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('app_settings');
+        Schema::dropIfExists('receipt_and_whatsapp_settings');
     }
 };

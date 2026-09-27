@@ -95,7 +95,7 @@ class ReceiptSettingsPage extends Page implements HasForms
         $state = $this->form->getState();
 
         foreach ($state as $field => $value) {
-            Setting::set($field, $value, 'receipt');
+            Setting::set($field, $value);
         }
 
         Cache::flush();
