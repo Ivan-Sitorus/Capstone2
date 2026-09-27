@@ -28,20 +28,6 @@ export default function QrisReviewModal({ isOpen, onClose, order }) {
         if (error) setError('');
     }
 
-    async function handleAccept() {
-        setLoading(true);
-        setError('');
-        try {
-            await axios.post(route('kasir.order.qris.accept', { order: order.id }));
-            handleClose();
-            window.location.reload();
-        } catch (err) {
-            setError(err.response?.data?.message || 'Gagal menerima bukti QRIS.');
-        } finally {
-            setLoading(false);
-        }
-    }
-
     async function handleActionWithReason(selectedAction) {
         if (!reason.trim()) {
             setError('Alasan wajib diisi.');

@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { router, Head, usePoll } from '@inertiajs/react';
-import { Search, X, Banknote, QrCode, ShieldCheck, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen, RefreshCw, ShoppingCart } from 'lucide-react';
+import { Search, X, Banknote, Lock, User, CircleCheck, Clock, PanelRightClose, PanelRightOpen, RefreshCw, ShoppingCart } from 'lucide-react';
 import { Drawer } from '@base-ui/react/drawer';
 import { useCashierSidebar } from '@/Layouts/CashierLayout';
 import MenuGridItem from '@/Components/Cashier/MenuGridItem';

@@ -1,0 +1,22 @@
+# Build output
+/public/build
+/public/hot
+
+# Dependencies
+/node_modules
+/vendor
+
+# Laravel runtime
+/storage
+/bootstrap/cache
+
+# Data mining (Python service)
+/datamining
+
+# Generated / minified
+*.min.js
+*.min.css
+
+# Lockfiles are generated, do not reformat
+package-lock.json
+composer.lock
