@@ -17,6 +17,7 @@ export default function ActiveOrders({ orders: initialOrders, counts }) {
     const [cancelReason, setCancelReason] = useState('');
     const [processing,   setProcessing]   = useState(false);
     const [localOrders,  setLocalOrders]  = useState(initialOrders ?? []);
+    const [errorMsg,     setErrorMsg]     = useState(null);
     const pendingRemoveRef = useRef(new Set());
     const pendingStatusRef = useRef(new Map()); // orderId → optimistic status
 
@@ -51,6 +52,12 @@ export default function ActiveOrders({ orders: initialOrders, counts }) {
         }
     })();
 
+    useEffect(() => {
+        if (!errorMsg) return;
+        const timer = setTimeout(() => setErrorMsg(null), 5000);
+        return () => clearTimeout(timer);
+    }, [errorMsg]);
+
     /* ── Actions ── */
     async function handleConfirmQris() {
         if (processing || !qrisOrder) return;
@@ -70,8 +77,9 @@ export default function ActiveOrders({ orders: initialOrders, counts }) {
                 only: ['orders', 'counts'],
                 onFinish: () => pendingStatusRef.current.delete(orderId),
             });
-        } catch (_) {
+        } catch (err) {
             pendingStatusRef.current.delete(orderId);
+            setErrorMsg(err.response?.data?.message || 'Gagal mengonfirmasi QRIS.');
             router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);
@@ -112,9 +120,10 @@ export default function ActiveOrders({ orders: initialOrders, counts }) {
                     pendingStatusRef.current.delete(orderId);
                 },
             });
-        } catch (_) {
+        } catch (err) {
             pendingRemoveRef.current.delete(orderId);
             pendingStatusRef.current.delete(orderId);
+            setErrorMsg(err.response?.data?.message || 'Gagal memperbarui status pesanan.');
             router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);
@@ -139,8 +148,9 @@ export default function ActiveOrders({ orders: initialOrders, counts }) {
                 only: ['orders', 'counts'],
                 onFinish: () => pendingRemoveRef.current.delete(orderId),
             });
-        } catch (_) {
+        } catch (err) {
             pendingRemoveRef.current.delete(orderId);
+            setErrorMsg(err.response?.data?.message || 'Gagal membatalkan pesanan.');
             router.reload({ only: ['orders', 'counts'] });
         } finally {
             setProcessing(false);
@@ -153,6 +163,8 @@ export default function ActiveOrders({ orders: initialOrders, counts }) {
         try {
             await axios.patch(route('kasir.order.confirm-payment', { order: orderId }), { payment_method: paymentMethod });
             router.reload({ only: ['orders', 'counts'] });
+        } catch (err) {
+            setErrorMsg(err.response?.data?.message || 'Gagal mengonfirmasi pembayaran.');
         } finally {
             setProcessing(false);
         }
@@ -160,6 +172,16 @@ export default function ActiveOrders({ orders: initialOrders, counts }) {
 
     return (
         <><Head title="Pesanan Aktif | POSMine" /><CashierLayout title="Pesanan Aktif" fullscreen>
+            {errorMsg && (
+                <div style={{
+                    position: 'fixed', top: 16, right: 16, zIndex: 9999,
+                    background: '#FEF2F2', border: '1px solid #FCA5A5', borderRadius: 10,
+                    padding: '12px 16px', color: '#B91C1C', fontSize: 14, maxWidth: 380,
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.10)',
+                }}>
+                    {errorMsg}
+                </div>
+            )}
             <div style={{ flex: 1, overflowY: 'auto', overflowX: 'hidden', padding: 32, background: SLATE_50, minWidth: 0 }}>
             <div style={{ background: WHITE, borderRadius: 12, padding: 24, border: `1px solid ${SLATE_200}`, boxShadow: '0 2px 8px rgba(15,23,42,0.03)' }}>
 
