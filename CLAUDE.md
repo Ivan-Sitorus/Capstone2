@@ -34,14 +34,14 @@ Fase ini mencakup modul Pelanggan (mobile PWA), Kasir (desktop web), Panel Admin
 | Payment | Manual (Cash / QRIS) |
 | Data Mining | Python 3.13 + FastAPI + scikit-learn + Prophet |
 
-> **Data Mining:** Terintegrasi: FastAPI di `datamining/` (port 8001). Halaman admin Filament memanggil endpoint-nya langsung via `config('datamining.url')` dan menyimpan riwayat hasil di Laravel Cache; halaman ringkasan membaca hasil dari cache. Tidak ada lagi tabel `datamining_runs`.
+> **Data Mining:** Terintegrasi: FastAPI di `datamining/` (port 8001); pipeline K-Means/Prophet/FP-Growth mengembalikan **data JSON saja**. Admin memakai **komponen native Filament** (Resources + Widget chart/tabel) yang membaca tabel `datamining_runs`; proses dijalankan `App\Services\DataMiningRunner` (fire-and-forget `POST /run`) dan notifikasi via `App\Livewire\DataMiningStatus`. Utilitas pemilihan K di `datamining/kmeans_utils.py` (+ uji paritas).
 
 ---
 
 ## Panel Admin (Filament v5)
 
 Panel `/admin` (guard `admin`; hanya role admin **dan** status `active` yang boleh masuk) berisi:
-Dashboard (filter rentang tanggal), Menu & Kategori, Bahan Baku (+batch/riwayat), Penyesuaian Stok, Pesanan, Piutang, QR Code Meja (token opaque `qr_token`), Riwayat Kasir, Akun Staff (status Aktif/Nonaktif), Pengaturan Struk & WhatsApp (`/admin/pengaturan-struk-dan-whatsapp`), dan 10 halaman Data Mining (`prediksi-menu`, `prediksi-ring-menu`, `klasterisasi-menu`, `ringkasan-menu`, `prediksi-bahan-baku`, `prediction-ring-bahan-baku`, `klasterisasi-bahan-baku`, `ringkasan-clustering-bahan-baku`, `asosiatif-menu`, `ringkasan-asosiatif`).
+Dashboard (filter rentang tanggal), Menu & Kategori, Bahan Baku (+batch/riwayat), Penyesuaian Stok, Pesanan, Piutang, QR Code Meja (token opaque `qr_token`), Riwayat Kasir, Akun Staff (status Aktif/Nonaktif), Pengaturan Struk & WhatsApp (`/admin/pengaturan-struk-dan-whatsapp`), dan 5 modul Data Mining berbasis Resource native Filament (`prediksi-menu`, `klasterisasi-menu`, `prediksi-bahan-baku`, `klasterisasi-bahan-baku`, `asosiatif-menu`).
 
 Aturan tampilan admin: label Bahasa Indonesia, tanggal `d M Y` atau `d M Y, H:i:s`, rentang data `d M Y s/d d M Y`, durasi `N detik`, tanpa bulk action, tombol aksi `Buat …`. Date picker dashboard & data mining memakai `native(true)` (bisa diklik dan diketik).
 

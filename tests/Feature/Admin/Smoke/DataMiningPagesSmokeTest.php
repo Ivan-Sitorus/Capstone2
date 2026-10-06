@@ -16,15 +16,10 @@ class DataMiningPagesSmokeTest extends TestCase
 
         $pages = [
             '/admin/prediksi-menu',
-            '/admin/prediksi-ring-menu',
             '/admin/klasterisasi-menu',
-            '/admin/ringkasan-menu',
-            '/admin/klasterisasi-bahan-baku',
-            '/admin/prediksi-bahan-baku',
-            '/admin/prediction-ring-bahan-baku',
-            '/admin/ringkasan-clustering-bahan-baku',
             '/admin/asosiatif-menu',
-            '/admin/ringkasan-asosiatif',
+            '/admin/prediksi-bahan-baku',
+            '/admin/klasterisasi-bahan-baku',
         ];
 
         $failed = [];

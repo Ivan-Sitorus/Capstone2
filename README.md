@@ -83,16 +83,11 @@ docker compose exec -T app php artisan migrate:fresh --seed
 | `/admin/riwayat-kasir` | Riwayat sesi kasir |
 | `/admin/akun-staff` | Akun staff (status Aktif/Nonaktif) |
 | `/admin/pengaturan-struk-dan-whatsapp` | Pengaturan struk & template WhatsApp |
-| `/admin/prediksi-menu` | Data mining: Prediksi Menu |
-| `/admin/prediksi-ring-menu` | Data mining: Hasil Prediksi Menu (ring) |
+| `/admin/prediksi-menu` | Data mining: Prediksi Menu (Resource native Filament) |
 | `/admin/klasterisasi-menu` | Data mining: Klasterisasi Menu Penjualan |
-| `/admin/ringkasan-menu` | Data mining: Ringkasan Klasterisasi Menu |
 | `/admin/prediksi-bahan-baku` | Data mining: Prediksi Penggunaan Bahan Baku |
-| `/admin/prediction-ring-bahan-baku` | Data mining: Hasil Prediksi Bahan Baku (ring) |
 | `/admin/klasterisasi-bahan-baku` | Data mining: Klasterisasi Bahan Baku |
-| `/admin/ringkasan-clustering-bahan-baku` | Data mining: Ringkasan Klasterisasi Bahan Baku |
 | `/admin/asosiatif-menu` | Data mining: Asosiatif Menu |
-| `/admin/ringkasan-asosiatif` | Data mining: Ringkasan Asosiatif |
 
 ---
 
@@ -123,12 +118,9 @@ docker compose exec -T app php artisan migrate:fresh --seed
 
 ## Data Mining
 
-Layanan FastAPI di `datamining/` (port 8001) menyediakan endpoint berikut:
+Layanan FastAPI di `datamining/` (port 8001) menjalankan pipeline K-Means (klasterisasi), Prophet (prediksi), dan FP-Growth (asosiasi) untuk menu maupun bahan baku. Python mengembalikan **data JSON saja** (elbow/silhouette, forecast, association rules) — bukan gambar.
 
-`POST /clustering`, `POST /prediction`, `POST /association`, `POST /clustering-bahan-baku`, `POST /prediction-bahan-baku`
-(plus `GET /health` dan `GET /preview-data`).
-
-Halaman admin Filament memanggil endpoint tersebut langsung melalui `config('datamining.url')` dan menyimpan riwayat hasil di Laravel Cache (unik per rentang tanggal). Halaman ringkasan (`prediksi-ring-menu`, `prediction-ring-bahan-baku`, `ringkasan-menu`, `ringkasan-clustering-bahan-baku`, `ringkasan-asosiatif`) membaca hasil dari cache. Rentang tanggal minimal 3 bulan; grafik dikirim FastAPI sebagai PNG base64.
+Admin memakai **komponen native Filament**: Filament Resources + Widget (chart dan tabel) membaca hasil dari tabel `datamining_runs`. Proses dijalankan `App\Services\DataMiningRunner` (fire-and-forget `POST /run`), lalu `App\Livewire\DataMiningStatus` memberi notifikasi saat selesai/gagal. Utilitas pemilihan K ada di `datamining/kmeans_utils.py` (+ uji paritas).
 
 ---
 
