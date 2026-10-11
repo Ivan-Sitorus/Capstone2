@@ -34,7 +34,7 @@ Fase ini mencakup modul Pelanggan (mobile PWA), Kasir (desktop web), Panel Admin
 | Payment | Manual (Cash / QRIS) |
 | Data Mining | Python 3.13 + FastAPI + scikit-learn + Prophet |
 
-> **Data Mining:** Terintegrasi: FastAPI di `datamining/` (port 8001); pipeline K-Means/Prophet/FP-Growth mengembalikan **data JSON saja**. Admin memakai **komponen native Filament** (Resources + Widget chart/tabel) yang membaca tabel `datamining_runs`; proses dijalankan `App\Services\DataMiningRunner` (fire-and-forget `POST /run`) dan notifikasi via `App\Livewire\DataMiningStatus`. Utilitas pemilihan K di `datamining/kmeans_utils.py` (+ uji paritas).
+> **Data Mining:** Terintegrasi: FastAPI di `datamining/` (port 8001); pipeline K-Means/Prophet/FP-Growth mengembalikan **data JSON saja**. Admin memakai **komponen native Filament** (Resources + Widget chart/tabel) yang membaca tabel `datamining_runs`; proses dijalankan `App\Services\DataMiningRunner` (fire-and-forget `POST /run`). Utilitas pemilihan K di `datamining/kmeans_utils.py` (+ uji paritas).
 
 ---
 

@@ -120,7 +120,7 @@ docker compose exec -T app php artisan migrate:fresh --seed
 
 Layanan FastAPI di `datamining/` (port 8001) menjalankan pipeline K-Means (klasterisasi), Prophet (prediksi), dan FP-Growth (asosiasi) untuk menu maupun bahan baku. Python mengembalikan **data JSON saja** (elbow/silhouette, forecast, association rules) — bukan gambar.
 
-Admin memakai **komponen native Filament**: Filament Resources + Widget (chart dan tabel) membaca hasil dari tabel `datamining_runs`. Proses dijalankan `App\Services\DataMiningRunner` (fire-and-forget `POST /run`), lalu `App\Livewire\DataMiningStatus` memberi notifikasi saat selesai/gagal. Utilitas pemilihan K ada di `datamining/kmeans_utils.py` (+ uji paritas).
+Admin memakai **komponen native Filament**: Filament Resources + Widget (chart dan tabel) membaca hasil dari tabel `datamining_runs`. Proses dijalankan `App\Services\DataMiningRunner` (fire-and-forget `POST /run`). Utilitas pemilihan K ada di `datamining/kmeans_utils.py` (+ uji paritas).
 
 ---
 
