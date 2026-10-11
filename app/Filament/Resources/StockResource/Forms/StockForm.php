@@ -60,7 +60,6 @@ class StockForm
                         DatePicker::make('expiry_date')
                             ->label('Tanggal Kadaluarsa')
                             ->nullable()
-                            ->native(false)
                             ->required(fn ($get) => $get('../../batch_mode') === BatchMode::Fefo->value)
                             ->helperText(fn ($get) => $get('../../batch_mode') === BatchMode::Fefo->value
                                 ? 'Wajib diisi untuk mode FEFO'
@@ -68,8 +67,7 @@ class StockForm
                         DateTimePicker::make('received_at')
                             ->label('Diterima Tanggal')
                             ->nullable()
-                            ->default(now())
-                            ->native(false),
+                            ->default(now()),
                         NumericInput::money('total_cost')
                             ->label('Harga Total')
                             ->required()

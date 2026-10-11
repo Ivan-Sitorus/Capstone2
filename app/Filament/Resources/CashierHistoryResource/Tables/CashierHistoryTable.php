@@ -63,11 +63,9 @@ class CashierHistoryTable
                 Filter::make('started_at')
                     ->schema([
                         DatePicker::make('started_from')
-                            ->label('Masuk dari')
-                            ->native(false),
+                            ->label('Masuk dari'),
                         DatePicker::make('started_until')
-                            ->label('Masuk sampai')
-                            ->native(false),
+                            ->label('Masuk sampai'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(
@@ -81,11 +79,9 @@ class CashierHistoryTable
                 Filter::make('ended_at')
                     ->schema([
                         DatePicker::make('ended_from')
-                            ->label('Keluar dari')
-                            ->native(false),
+                            ->label('Keluar dari'),
                         DatePicker::make('ended_until')
-                            ->label('Keluar sampai')
-                            ->native(false),
+                            ->label('Keluar sampai'),
                     ])
                     ->query(fn (Builder $query, array $data): Builder => $query
                         ->when(

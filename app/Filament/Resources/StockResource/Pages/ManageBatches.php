@@ -300,7 +300,6 @@ class ManageBatches extends Page implements HasTable
                 ->suffix(fn () => ' '.($this->record->unit?->value ?? '')),
             DatePicker::make('expiry_date')
                 ->label('Tanggal Kedaluwarsa')
-                ->native(false)
                 ->required(fn () => $this->record->batch_mode === BatchMode::Fefo)
                 ->helperText(fn () => $this->record->batch_mode === BatchMode::Fefo
                     ? 'Wajib untuk mode FEFO'
@@ -308,8 +307,7 @@ class ManageBatches extends Page implements HasTable
             DateTimePicker::make('received_at')
                 ->label('Waktu Diterima')
                 ->required()
-                ->default(now())
-                ->native(false),
+                ->default(now()),
             TextInput::make('supplier_name')
                 ->label('Supplier')
                 ->maxLength(255)
