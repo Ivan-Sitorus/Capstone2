@@ -26,4 +26,14 @@ final class Formatter
     {
         return number_format($value, $decimals, ',', '.');
     }
+
+    /**
+     * Format a ratio as an id-ID percentage, e.g. 0.1234 => "12,34%".
+     *
+     * Pass the raw ratio (0..1); the value is multiplied by 100 here.
+     */
+    public static function percent(float $ratio, int $decimals = 2): string
+    {
+        return number_format($ratio * 100, $decimals, ',', '.') . '%';
+    }
 }

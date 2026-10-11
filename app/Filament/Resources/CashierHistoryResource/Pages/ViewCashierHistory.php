@@ -57,7 +57,8 @@ class ViewCashierHistory extends Page implements HasTable
                         ->state($session->ended_at?->format('d M Y, H:i:s') ?? 'Masih Aktif'),
                     TextEntry::make('order_count')
                         ->label('Jumlah Pesanan')
-                        ->state(app(CashierHistoryService::class)->getOrderCount($session)),
+                        ->state(app(CashierHistoryService::class)->getOrderCount($session))
+                        ->formatStateUsing(fn ($state) => Formatter::number((int) $state)),
                 ])
                 ->columns(3),
             EmbeddedTable::make(),

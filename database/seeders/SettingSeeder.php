@@ -10,12 +10,12 @@ class SettingSeeder extends Seeder
     public function run(): void
     {
         $settings = [
-            'receipt_title' => 'minePOS',
+            'receipt_title' => 'MinePOS',
             'receipt_header' => 'STIE Totalwin Semarang',
             'receipt_footer' => 'Terima kasih telah berbelanja',
-            'receipt_whatsapp_template' => "Terima kasih telah berbelanja di minePOS.\nStruk: (link)",
+            'receipt_whatsapp_template' => "Terima kasih telah berbelanja di MinePOS.\nStruk: (link)",
             'qris_image' => 'qris/qris-minepos.png',
-            'qris_name' => 'minePOS',
+            'qris_name' => 'MinePOS',
         ];
 
         foreach ($settings as $key => $value) {

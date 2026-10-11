@@ -1,6 +1,6 @@
 """
 prediksibaku.py — Prediksi Penggunaan Bahan Baku — Prophet
-POSMine | Capstone STIE Totalwin
+MinePOS | Capstone STIE Totalwin
 
 Mengikuti notebook: 1 Model Bahan Baku Prophet preprocessing_prediction.ipynb
   - Preprocessing: parse Tanggal, drop NaN/duplikat, agregasi harian,

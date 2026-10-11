@@ -4,6 +4,7 @@ namespace App\Filament\Tables;
 
 use App\Enums\DataminingRunStatus;
 use App\Models\DataminingRun;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Support\Icons\Heroicon;
@@ -35,7 +36,7 @@ class DataminingRunTable
                     ->formatStateUsing(fn (?string $state): string => DataminingRunStatus::tryFrom($state)?->label() ?? (string) $state),
                 TextColumn::make('jumlah')
                     ->label($countLabel)
-                    ->state(fn (DataminingRun $record): int => count($record->payload[$countKey] ?? [])),
+                    ->state(fn (DataminingRun $record): string => Formatter::number(count($record->payload[$countKey] ?? []))),
                 TextColumn::make('duration')
                     ->label('Durasi')
                     ->state(fn (DataminingRun $record): string => self::duration($record)),

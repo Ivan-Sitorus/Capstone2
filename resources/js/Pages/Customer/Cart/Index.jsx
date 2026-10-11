@@ -66,7 +66,7 @@ export default function CustomerCart() {
     return (
         <CustomerLayout activeTab="cart">
             <Head>
-                <title>Keranjang - minePOS</title>
+                <title>Keranjang - MinePOS</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />

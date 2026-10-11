@@ -281,7 +281,7 @@ export default function CustomerMenu({ categories, table }) {
     return (
         <CustomerLayout activeTab="menu">
             <Head>
-                <title>Menu - minePOS</title>
+                <title>Menu - MinePOS</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
@@ -320,12 +320,12 @@ export default function CustomerMenu({ categories, table }) {
                             boxShadow: '0 2px 8px rgba(68,64,60,0.25)',
                         }}>
                             <img
-                                src="/images/logo.jpg" alt="minePOS"
+                                src="/images/logo.jpg" alt="MinePOS"
                                 fetchPriority="high" loading="eager"
                                 style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.90 }}
                                 onError={e => {
                                     e.target.style.display = 'none';
-                                    e.target.parentElement.innerHTML = `<span style="color:${WHITE};font-size:16px;font-style:italic;font-weight:700">minepos</span>`;
+                                    e.target.parentElement.innerHTML = `<span style="color:${WHITE};font-size:16px;font-style:italic;font-weight:700">MinePOS</span>`;
                                 }}
                             />
                         </div>

@@ -224,7 +224,7 @@ export default function NewOrder({ categories }) {
     );
 
     return (
-        <><Head title="Pesanan Baru | minePOS" />
+        <><Head title="Pesanan Baru | MinePOS" />
             <div style={{ display: 'flex', flexDirection: isPortrait || isMobile ? 'column' : 'row', height: '100%', minHeight: 0, overflow: 'hidden' }}>
 
                 {/* ══ PANEL TENGAH ══ */}

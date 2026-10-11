@@ -55,7 +55,7 @@ Ukuran nyata per kunci diukur pada §5; ukurannya didorong oleh **chart base64**
 - DB PostgreSQL 18, container `capstone2-pgsql-1`; database aktif per `.env` = **`pos_cafe`**
   (`DB_CONNECTION=pgsql`, `DB_DATABASE=pos_cafe`).
 - `CACHE_STORE=database` (`.env`), `config/cache.php` → `driver: database`, `table: cache`,
-  prefix default `Str::slug(APP_NAME).'-cache-'`. `APP_NAME=minePOS` → prefix runtime
+  prefix default `Str::slug(APP_NAME).'-cache-'`. `APP_NAME=MinePOS` → prefix runtime
   **`minepos-cache-`**.
 - **Catatan prefix (terukur):** seluruh blob DM di DB tersimpan dengan prefix **`posmine-cache-`**
   (bukan `minepos-`). Artinya blob ini ditulis saat `APP_NAME` masih bernilai brand lama

@@ -37,11 +37,11 @@ class ViewStockPurchaseDetailAction extends Action
                             ->formatStateUsing(fn ($state) => $state === '-' ? '-' : Carbon::parse($state)->translatedFormat('d M Y')),
                         TextEntry::make('ingredientBatch.quantity')
                             ->label('Quantity Awal')
-                            ->formatStateUsing(fn ($state) => number_format((float) $state, 2)),
+                            ->formatStateUsing(fn ($state) => Formatter::number((float) $state, 2)),
                         TextEntry::make('ingredientBatch.total_cost')
                             ->label('Harga Total')
                             ->formatStateUsing(fn ($state, $record) => Formatter::rupiah((float) $state)
-                                . ' / ' . number_format((float) ($record->ingredientBatch?->initial_quantity ?? $record->ingredientBatch?->quantity ?? 0), 2)
+                                . ' / ' . Formatter::number((float) ($record->ingredientBatch?->initial_quantity ?? $record->ingredientBatch?->quantity ?? 0), 2)
                                 . ' ' . ($record->ingredientBatch?->ingredient?->unit?->value ?? '')),
                         TextEntry::make('ingredientBatch.allow_expired_usage')
                             ->label('Bisa Kedaluwarsa')
@@ -49,9 +49,9 @@ class ViewStockPurchaseDetailAction extends Action
                     ])->columns(3),
                 Section::make('Statistik Pemakaian')
                     ->schema([
-                        TextEntry::make('quantity_before')->label('Quantity Awal')->formatStateUsing(fn ($state) => number_format((float) $state, 2)),
-                        TextEntry::make('quantity_change')->label('Perubahan')->formatStateUsing(fn ($state) => number_format((float) $state, 2)),
-                        TextEntry::make('quantity_after')->label('Sisa')->formatStateUsing(fn ($state) => number_format((float) $state, 2)),
+                        TextEntry::make('quantity_before')->label('Quantity Awal')->formatStateUsing(fn ($state) => Formatter::number((float) $state, 2)),
+                        TextEntry::make('quantity_change')->label('Perubahan')->formatStateUsing(fn ($state) => Formatter::number((float) $state, 2)),
+                        TextEntry::make('quantity_after')->label('Sisa')->formatStateUsing(fn ($state) => Formatter::number((float) $state, 2)),
                     ])->columns(3),
             ]);
     }

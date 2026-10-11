@@ -1,6 +1,6 @@
 """
 K-Means Clustering — Bahan Baku
-POSMine | Capstone STIE Totalwin
+MinePOS | Capstone STIE Totalwin
 
 Pipeline mengikuti notebook: Revisi_Bahan_Baku_FIX_KMEANS_Preprocessing_Clustering_(Stok_Bahan_Baku).ipynb
 """

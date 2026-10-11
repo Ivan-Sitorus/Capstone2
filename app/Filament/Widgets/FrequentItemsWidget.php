@@ -3,6 +3,7 @@
 namespace App\Filament\Widgets;
 
 use App\Models\DataminingRun;
+use App\Support\Formatter;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget;
@@ -32,7 +33,7 @@ class FrequentItemsWidget extends TableWidget
             ->columns([
                 TextColumn::make('item')->label('Menu')->searchable(),
                 TextColumn::make('jumlah_kemunculan')->label('Jumlah Kemunculan')->numeric(),
-                TextColumn::make('support')->label('Support')->formatStateUsing(fn ($state) => round((float) $state * 100, 2) . '%'),
+                TextColumn::make('support')->label('Support')->formatStateUsing(fn ($state) => Formatter::percent((float) $state)),
             ]);
     }
 }

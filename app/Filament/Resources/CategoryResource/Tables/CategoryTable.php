@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\CategoryResource\Tables;
 
 use App\Models\Category;
+use App\Support\Formatter;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Notifications\Notification;
@@ -24,6 +25,7 @@ class CategoryTable
                 TextColumn::make('menus_count')
                     ->label('Jumlah Menu')
                     ->counts('menus')
+                    ->formatStateUsing(fn ($state) => Formatter::number((int) $state))
                     ->sortable(),
             ])
             ->recordActions([

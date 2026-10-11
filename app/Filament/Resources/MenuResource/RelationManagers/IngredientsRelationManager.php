@@ -4,6 +4,7 @@ namespace App\Filament\Resources\MenuResource\RelationManagers;
 
 use App\Filament\Forms\Components\NumericInput;
 use App\Models\Menu;
+use App\Support\Formatter;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
@@ -58,7 +59,7 @@ class IngredientsRelationManager extends RelationManager
                     ->label("Stok Tersedia")
                     ->getStateUsing(function ($record) {
                         $stock = $record->ingredient->batches->sum('quantity');
-                        return number_format($stock, 2);
+                        return Formatter::number((float) $stock, 2);
                     })
                     ->suffix(fn ($record) => " ".($record->ingredient->unit?->value ?? ""))
                     ->badge()

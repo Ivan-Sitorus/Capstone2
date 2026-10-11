@@ -1,4 +1,4 @@
-# K6 Load Testing — W9 Cafe POS (Modul Kasir)
+# K6 Load Testing — MinePOS (Modul Kasir)
 
 ## Prasyarat
 

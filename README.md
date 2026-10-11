@@ -1,6 +1,6 @@
-# minePOS: Sistem Point of Sale
+# MinePOS: Sistem Point of Sale
 
-Sistem POS berbasis web PWA untuk kafe (studi kasus minePOS STIE Totalwin Semarang).
+Sistem POS berbasis web PWA untuk kafe (studi kasus MinePOS STIE Totalwin Semarang).
 **Fase aktif:** Modul Transaksi (Kasir + Pelanggan) + Panel Admin (Filament) + Data Mining.
 
 ---
@@ -127,7 +127,7 @@ Admin memakai **komponen native Filament**: Filament Resources + Widget (chart d
 ## Variabel Environment Penting
 
 ```env
-APP_NAME=minePOS
+APP_NAME=MinePOS
 APP_LOCALE=id
 
 DB_CONNECTION=pgsql

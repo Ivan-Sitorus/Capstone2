@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Models\Menu;
 use App\Observers\MenuObserver;
 use App\Services\MenuImageService;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Support\Assets\Css;
 use Filament\Support\Facades\FilamentAsset;
 use Illuminate\Auth\Middleware\Authenticate;
@@ -41,5 +43,9 @@ class AppServiceProvider extends ServiceProvider
         Authenticate::redirectUsing(function (Request $request) {
             return route('kasir.login');
         });
+
+        // Seragamkan seluruh date picker admin ke gaya bawaan Filament (bukan native browser).
+        DatePicker::configureUsing(fn (DatePicker $picker): DatePicker => $picker->native(false));
+        DateTimePicker::configureUsing(fn (DateTimePicker $picker): DateTimePicker => $picker->native(false));
     }
 }

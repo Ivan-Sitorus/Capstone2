@@ -5,6 +5,7 @@ namespace App\Filament\Resources\CashierHistoryResource\Tables;
 use App\Filament\Resources\CashierHistoryResource;
 use App\Models\CashierHistory;
 use App\Services\CashierHistoryService;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\TextInput;
@@ -43,7 +44,8 @@ class CashierHistoryTable
                     ->sortable(),
                 TextColumn::make('order_count')
                     ->label('Jumlah Pesanan')
-                    ->getStateUsing(fn ($record) => app(CashierHistoryService::class)->getOrderCount($record)),
+                    ->getStateUsing(fn ($record) => app(CashierHistoryService::class)->getOrderCount($record))
+                    ->formatStateUsing(fn ($state) => Formatter::number((int) $state)),
             ])
             ->filters([
                 Filter::make('email')

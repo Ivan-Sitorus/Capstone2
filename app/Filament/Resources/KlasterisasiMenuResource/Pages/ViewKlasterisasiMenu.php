@@ -35,7 +35,7 @@ class ViewKlasterisasiMenu extends ViewRecord
                         ->color(fn (?string $state): string => DataminingRunStatus::tryFrom($state)?->color() ?? 'gray'),
                     TextEntry::make('rentang')
                         ->label('Rentang Data')
-                        ->state(fn (): string => ($this->record->parameters['date_from'] ?? '-') . ' s/d ' . ($this->record->parameters['date_to'] ?? '-')),
+                        ->state(fn (): string => self::range($this->record)),
                     TextEntry::make('error')
                         ->label('Error')
                         ->default('-')
@@ -46,5 +46,32 @@ class ViewKlasterisasiMenu extends ViewRecord
                 ['runId' => $this->record->id],
             )),
         ]);
+    }
+
+    private static function range(\App\Models\DataminingRun $record): string
+    {
+        $from = self::formatDate($record->parameters['date_from'] ?? null);
+        $to = self::formatDate($record->parameters['date_to'] ?? null);
+
+        if (! $from && ! $to) {
+            return '-';
+        }
+
+        return ($from ?? '-') . ' s/d ' . ($to ?? '-');
+    }
+
+    private static function formatDate(mixed $value): ?string
+    {
+        if (blank($value)) {
+            return null;
+        }
+
+        try {
+            $date = \Illuminate\Support\Carbon::parse($value);
+        } catch (\Throwable) {
+            return (string) $value;
+        }
+
+        return $date->translatedFormat('d M Y');
     }
 }

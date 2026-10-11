@@ -108,7 +108,8 @@ class OrderResource extends Resource
                             TextEntry::make('menu.name'),
                             TextEntry::make('unit_price')
                                 ->formatStateUsing(fn ($state) => Formatter::rupiah((float) $state)),
-                            TextEntry::make('quantity'),
+                            TextEntry::make('quantity')
+                                ->formatStateUsing(fn ($state) => Formatter::number((int) $state)),
                             TextEntry::make('subtotal')
                                 ->formatStateUsing(fn ($state) => Formatter::rupiah((float) $state)),
                         ]),

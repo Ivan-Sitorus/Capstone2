@@ -55,7 +55,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
     return (
         <CustomerLayout activeTab="cart">
             <Head>
-                <title>Pembayaran QRIS - minePOS</title>
+                <title>Pembayaran QRIS - MinePOS</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
@@ -162,7 +162,7 @@ export default function QrisUpload({ order, qrisImage, qrisName, totalAmount, re
                                     maxHeight: '100%',
                                 }}>
                                     <img
-                                        src={qrisImage} alt="QRIS minePOS"
+                                        src={qrisImage} alt="QRIS MinePOS"
                                         style={{ width: '100%', height: 'auto', borderRadius: 10, display: 'block' }}
                                         onError={e => { e.target.src = '/images/logo.jpg'; }}
                                     />

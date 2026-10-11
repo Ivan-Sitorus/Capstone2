@@ -48,7 +48,19 @@ class PredictionsPerDayWidget extends TableWidget
             })
             ->columns([
                 TextColumn::make('nama')->label('Menu / Bahan Baku')->searchable(),
-                TextColumn::make('tanggal')->label('Tanggal'),
+                TextColumn::make('tanggal')
+                    ->label('Tanggal')
+                    ->formatStateUsing(function (mixed $state): string {
+                        if (blank($state) || $state === '-') {
+                            return '-';
+                        }
+
+                        try {
+                            return \Illuminate\Support\Carbon::parse($state)->translatedFormat('d M Y');
+                        } catch (\Throwable) {
+                            return (string) $state;
+                        }
+                    }),
                 TextColumn::make('hari')->label('Hari'),
                 TextColumn::make('prediksi')->label('Prediksi')->numeric(),
                 TextColumn::make('batas_bawah')->label('Batas Bawah')->numeric(),

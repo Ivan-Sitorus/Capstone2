@@ -6,6 +6,7 @@ use App\Enums\BatchMode;
 use App\Filament\Resources\StockResource;
 use App\Filament\Tables\Components\ColumnInfoTooltip;
 use App\Models\Ingredient;
+use App\Support\Formatter;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\DeleteAction;
@@ -57,6 +58,7 @@ class StockTable
                 TextColumn::make('total_stock')
                     ->label('Total Stok')
                     ->getStateUsing(fn (Ingredient $record) => $record->getTotalStock() + 0)
+                    ->formatStateUsing(fn ($state) => Formatter::number((float) $state, (float) $state != (int) $state ? 2 : 0))
                     ->suffix(fn (Ingredient $record) => ' '.($record->unit?->value ?? ''))
                     ->badge()
                     ->color(fn (Ingredient $record) => $record->getTotalStock() < (float) $record->low_stock_threshold ? 'danger' : 'success')

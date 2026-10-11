@@ -27,7 +27,7 @@ function urlDecode(str) {
  * hanya benar-benar login saat belum punya sesi aktif.
  */
 export function ensureLoggedIn(
-    email    = __ENV.KASIR_EMAIL    || 'kasir@w9cafe.com',
+    email    = __ENV.KASIR_EMAIL    || 'kasir@minepos.com',
     password = __ENV.KASIR_PASSWORD || 'password'
 ) {
     if (_loggedIn) return;

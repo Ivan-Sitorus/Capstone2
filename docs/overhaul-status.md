@@ -1,4 +1,4 @@
-# Status Overhaul minePOS
+# Status Overhaul MinePOS
 
 Dokumen ini merangkum sampai mana pekerjaan overhaul di branch `MinePOS`, apa yang berubah, apa yang belum, dan hal yang perlu diperhatikan.
 
@@ -35,7 +35,7 @@ Dokumen ini merangkum sampai mana pekerjaan overhaul di branch `MinePOS`, apa ya
 **FASE C/D/E/F:**
 - Reusable: `App\Support\Formatter::rupiah`, `resources/js/helpers.js` memakai Intl, komponen `Money`.
 - TypeScript dihapus dari frontend (shadcn `.tsx` -> `.jsx`).
-- Rebranding `POSMine` -> `minePOS`; database `pos_cafe` -> `minepos`, `pos_cafe_testing` -> `minepos_testing`.
+- Rebranding ke `MinePOS`; database `pos_cafe` -> `minepos`, `pos_cafe_testing` -> `minepos_testing`.
 - Tooling: ESLint + Prettier + Pint.
 - Inertia dinaikkan ke v3 (JS dan adapter server), polling diganti `usePoll`.
 - Keamanan backend: kepemilikan pesanan lewat sesi (IDOR ditutup), CSRF kasir diaktifkan, XSS template di-escape, props kasir diminimalkan.

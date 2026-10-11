@@ -6,7 +6,7 @@ export default function Login() {
         <LoginPage
             action={route('kasir.login.attempt')}
             icon={ShoppingBag}
-            title="minePOS"
+            title="MinePOS"
             subtitle="Masuk ke sistem Point of Sale"
             dataInterface="cashier"
         />

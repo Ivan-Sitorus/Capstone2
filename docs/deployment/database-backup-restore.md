@@ -1,4 +1,4 @@
-# Backup dan Restore Database minePOS
+# Backup dan Restore Database MinePOS
 
 Prosedur ini wajib dijalankan sebelum setiap perubahan schema (migration, rename tabel/kolom/database) di branch `MinePOS`.
 

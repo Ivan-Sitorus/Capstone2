@@ -65,15 +65,15 @@ class DashboardStatsWidget extends StatsOverviewWidget
                 ->description($desc)
                 ->color('success')
                 ->icon('heroicon-o-banknotes'),
-            Stat::make('Transaksi', $countRange)
+            Stat::make('Transaksi', Formatter::number($countRange))
                 ->description($desc)
                 ->color('info')
                 ->icon('heroicon-o-shopping-cart'),
-            Stat::make('Stok Menipis', $stokMenipis)
+            Stat::make('Stok Menipis', Formatter::number($stokMenipis))
                 ->description('Bahan baku di bawah peringatan stok rendah')
                 ->color($stokMenipis > 0 ? 'danger' : 'success')
                 ->icon('heroicon-o-exclamation-triangle'),
-            Stat::make('Stok Kedaluwarsa', $stokExpired)
+            Stat::make('Stok Kedaluwarsa', Formatter::number($stokExpired))
                 ->description('Bahan baku dengan batch sudah kedaluwarsa')
                 ->color($stokExpired > 0 ? 'danger' : 'success')
                 ->icon('heroicon-o-calendar-days'),

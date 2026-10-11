@@ -116,15 +116,34 @@ class ForecastVsActualChartWidget extends LineChartWidget
         if (! empty($payload['forecast_test'])) {
             $row = collect($payload['forecast_test'])->firstWhere('nama', $this->filter) ?? $payload['forecast_test'][0];
 
-            return ['labels' => $row['ds'], 'actual' => $row['actual'], 'predicted' => $row['predicted']];
+            return ['labels' => self::formatLabels((array) ($row['ds'] ?? [])), 'actual' => $row['actual'], 'predicted' => $row['predicted']];
         }
 
         if (! empty($payload['all_items'])) {
             $row = collect($payload['all_items'])->firstWhere('bahan', $this->filter) ?? $payload['all_items'][0];
 
-            return ['labels' => $row['test_ds'], 'actual' => $row['test_y'], 'predicted' => $row['pred_y']];
+            return ['labels' => self::formatLabels((array) ($row['test_ds'] ?? [])), 'actual' => $row['test_y'], 'predicted' => $row['pred_y']];
         }
 
         return null;
+    }
+
+    /**
+     * @param  array<int, mixed>  $labels
+     * @return array<int, string>
+     */
+    private static function formatLabels(array $labels): array
+    {
+        return array_map(function (mixed $label): string {
+            if (blank($label) || $label === '-') {
+                return '-';
+            }
+
+            try {
+                return \Illuminate\Support\Carbon::parse($label)->translatedFormat('d M Y');
+            } catch (\Throwable) {
+                return (string) $label;
+            }
+        }, $labels);
     }
 }

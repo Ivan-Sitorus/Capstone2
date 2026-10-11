@@ -12,7 +12,7 @@ class UserSeeder extends Seeder
     {
         User::insertOrIgnore([
             [
-                'name' => 'Admin minePOS',
+                'name' => 'Admin MinePOS',
                 'email' => 'admin@minepos.com',
                 'password' => Hash::make('password'),
                 'role' => 'admin',

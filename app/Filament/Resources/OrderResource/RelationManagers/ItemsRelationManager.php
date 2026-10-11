@@ -26,7 +26,8 @@ class ItemsRelationManager extends RelationManager
                 TextColumn::make('menu.name')
                     ->label('Menu'),
                 TextColumn::make('quantity')
-                    ->label('Qty'),
+                    ->label('Qty')
+                    ->formatStateUsing(fn ($state) => Formatter::number((int) $state)),
                 TextColumn::make('unit_price')
                     ->label('Harga Satuan')
                     ->formatStateUsing(fn ($state) => Formatter::rupiah($state)),

@@ -61,7 +61,7 @@ export default function Identitas({ table }) {
         return (
             <CustomerLayout activeTab="menu" showBottomNav={false}>
                 <Head>
-                    <title>minePOS</title>
+                    <title>MinePOS</title>
                     <link rel="preconnect" href="https://fonts.googleapis.com" />
                     <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
@@ -78,7 +78,7 @@ export default function Identitas({ table }) {
                         overflow: 'hidden', background: NAVY_DEEP,
                         boxShadow: '0 8px 24px rgba(0,0,0,0.25)', marginBottom: 24,
                     }}>
-                        <img src="/images/logo.jpg" alt="minePOS"
+                        <img src="/images/logo.jpg" alt="MinePOS"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             onError={e => { e.target.style.display = 'none'; }} />
                     </div>
@@ -100,7 +100,7 @@ export default function Identitas({ table }) {
     return (
         <CustomerLayout activeTab="menu" showBottomNav={false}>
             <Head>
-                <title>Selamat Datang - minePOS</title>
+                <title>Selamat Datang - MinePOS</title>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" />
@@ -133,7 +133,7 @@ export default function Identitas({ table }) {
                         boxShadow: '0 8px 30px rgba(0,0,0,0.35)',
                         border: '1px solid rgba(255,255,255,0.10)',
                     }}>
-                        <img src="/images/logo.jpg" alt="minePOS"
+                        <img src="/images/logo.jpg" alt="MinePOS"
                             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                             onError={e => { e.target.style.display = 'none'; }} />
                     </div>
