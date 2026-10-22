@@ -4,9 +4,8 @@ namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Drivers\Gd\Driver;
 use Intervention\Image\Format;
-use Intervention\Image\ImageManager;
+use Intervention\Image\Laravel\Facades\Image;
 
 class MenuImageService
 {
@@ -20,8 +19,7 @@ class MenuImageService
             Storage::disk('public')->delete($oldPath);
         }
 
-        $manager = new ImageManager(new Driver);
-        $image = $manager->decode($file);
+        $image = Image::decode($file);
         $image->scale(width: 800);
 
         $filename = 'menu_'.time().'_'.uniqid().'.webp';

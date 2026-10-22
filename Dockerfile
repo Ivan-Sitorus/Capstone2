@@ -8,11 +8,11 @@ RUN apk add --no-cache \
     icu-libs \
     libpng \
     libjpeg-turbo \
+    libwebp \
     freetype \
     libzip \
     oniguruma \
     libxml2 \
-    imagemagick \
     libsodium \
     curl \
     ca-certificates \
@@ -31,7 +31,7 @@ RUN apk add --no-cache \
     freetype-dev \
     libjpeg-turbo-dev \
     libpng-dev \
-    imagemagick-dev \
+    libwebp-dev \
     linux-headers
 
 # ── Timezone ─────────────────────────────────────────────────────────
@@ -39,7 +39,7 @@ ENV TZ=Asia/Jakarta
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # ── PHP extensions ───────────────────────────────────────────────────
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp && \
     docker-php-ext-install -j$(nproc) \
         pdo_pgsql \
         pgsql \
@@ -48,8 +48,7 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg && \
         zip \
         intl \
         exif \
-        pcntl && \
-    pecl install imagick && docker-php-ext-enable imagick
+        pcntl
 
 # ── PHP opcache (production settings) + custom ini ───────────────────
 RUN { \
